@@ -18,8 +18,6 @@ type launchDeps struct {
 	resolveUnityExecutablePath func(string) (string, error)
 	waitForUnityProcessExit    func(context.Context, string, int, time.Duration, time.Duration) error
 	waitForUnityStartupMarker  func(context.Context, string, time.Duration, time.Duration) error
-	waitForFreshUnityLockfile  func(context.Context, string, time.Time, time.Duration, time.Duration) error
-	waitForV2ServerReady       func(context.Context, string, string, time.Duration, time.Duration) error
 	waitForToolReadiness       func(context.Context, string, time.Duration) error
 	probeProjectIpcFallback    func(context.Context, string) error
 	removePath                 func(string) error
@@ -37,14 +35,10 @@ func defaultLaunchDeps() launchDeps {
 		resolveUnityExecutablePath: resolveUnityExecutablePath,
 		waitForUnityProcessExit:    waitForUnityProcessExit,
 		waitForUnityStartupMarker:  waitForUnityStartupMarkerOrTimeout,
-		waitForFreshUnityLockfile:  waitForFreshUnityLockfile,
-		waitForV2ServerReady: func(ctx context.Context, projectRoot string, previousServerSessionID string, poll time.Duration, timeout time.Duration) error {
-			return waitForV2ServerReady(ctx, projectRoot, previousServerSessionID, defaultV2ServerDial, poll, timeout)
-		},
-		waitForToolReadiness:    clicore.WaitForToolReadinessWithTimeout,
-		probeProjectIpcFallback: clicore.ProbeToolReadinessSequence,
-		removePath:              os.RemoveAll,
-		statPath:                os.Stat,
-		sleep:                   time.Sleep,
+		waitForToolReadiness:       clicore.WaitForToolReadinessWithTimeout,
+		probeProjectIpcFallback:    clicore.ProbeToolReadinessSequence,
+		removePath:                 os.RemoveAll,
+		statPath:                   os.Stat,
+		sleep:                      time.Sleep,
 	}
 }

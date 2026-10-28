@@ -88,13 +88,6 @@ func TestRunRealCLICommandReportsStartFailure(t *testing.T) {
 	}
 }
 
-func TestShouldKeepDispatcherProcessCommandForEmptyArgs(t *testing.T) {
-	// Verifies an empty command line stays in the dispatcher process instead of probing for a v2 project.
-	if !shouldKeepDispatcherProcessCommand(nil) {
-		t.Fatal("empty args must stay in the dispatcher process")
-	}
-}
-
 func TestResolveDispatcherProjectRootRejectsInvalidCompileCheckOptions(t *testing.T) {
 	// Verifies compile-check option errors surface from project-root resolution before any project lookup.
 	_, err := resolveDispatcherProjectRoot(t.TempDir(), "", []string{clicore.CompileCheckCommandName, "--no-such-option"})
@@ -173,25 +166,14 @@ func TestRunDispatcherReportsRealCLIResolutionFailure(t *testing.T) {
 	}
 }
 
-func writeDispatcherExecutable(t *testing.T, filePath string, content string) {
-	t.Helper()
-	if err := os.WriteFile(filePath, []byte(content), 0o755); err != nil {
-		t.Fatalf("failed to write %s: %v", filePath, err)
-	}
-}
-
-// fakeDispatcherRunDeps replaces every dependency that could run a real runner, V2 CLI, or
-// self-update with one that fails the test, so a routing regression cannot reach real side effects.
+// fakeDispatcherRunDeps replaces every dependency that could run a real runner or self-update
+// with one that fails the test, so a routing regression cannot reach real side effects.
 func fakeDispatcherRunDeps(t *testing.T) dispatcherRunDeps {
 	t.Helper()
 	deps := defaultDispatcherRunDeps()
 	deps.runRealCLI = func(context.Context, string, []string, io.Writer, io.Writer) int {
 		t.Fatal("the project runner must not be executed")
 		return 0
-	}
-	deps.runV2CLI = func(context.Context, string, []string, io.Writer, io.Writer) (int, error) {
-		t.Fatal("the V2 CLI must not be executed")
-		return 0, nil
 	}
 	deps.runUpdate = func(context.Context) (bool, error) {
 		t.Fatal("the dispatcher self-update must not run")

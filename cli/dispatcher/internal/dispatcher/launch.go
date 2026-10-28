@@ -19,13 +19,11 @@ import (
 )
 
 const (
-	launchLockfilePoll        = 100 * time.Millisecond
-	launchLockfileTimeout     = 5 * time.Second
-	launchProcessExitPoll     = 100 * time.Millisecond
-	launchProcessExitTimeout  = 20 * time.Second
-	launchReadinessTimeout    = 10 * time.Minute
-	launchV2ServerReadyPoll   = 500 * time.Millisecond
-	launchV2ServerDialTimeout = 1 * time.Second
+	launchLockfilePoll       = 100 * time.Millisecond
+	launchLockfileTimeout    = 5 * time.Second
+	launchProcessExitPoll    = 100 * time.Millisecond
+	launchProcessExitTimeout = 20 * time.Second
+	launchReadinessTimeout   = 10 * time.Minute
 	// Why 2s: the UnityLockfile can appear before System Events knows the process.
 	// One retry is enough; more retries would delay a launch that already succeeded.
 	launchFreshFocusRetryDelay = 2 * time.Second
@@ -102,12 +100,6 @@ func runLaunchWithDeps(ctx context.Context, options launchOptions, startPath str
 	if !deleteLaunchRecoveryIfRequested(options, projectRoot, stderr) {
 		return 1
 	}
-	v2Project, _ := detectV2DispatcherProject(projectRoot)
-	// Capture before kill (-r) or start so session-id generation compare sees the prior generation.
-	previousV2ServerSessionID := ""
-	if v2Project.IsV2 {
-		previousV2ServerSessionID = readPreviousV2ServerSessionID(projectRoot)
-	}
 
 	runningProcess, handled, code := findLaunchRunningProcess(ctx, options, projectRoot, stdout, stderr, deps)
 	if handled {
@@ -116,7 +108,7 @@ func runLaunchWithDeps(ctx context.Context, options launchOptions, startPath str
 
 	var previousStop launchStopMethod
 	if runningProcess != nil {
-		stopMethod, handled, code := handleExistingLaunchProcess(ctx, options, projectRoot, runningProcess, v2Project.IsV2, stdout, stderr, deps)
+		stopMethod, handled, code := handleExistingLaunchProcess(ctx, options, projectRoot, runningProcess, stdout, stderr, deps)
 		if handled {
 			return code
 		}
@@ -127,7 +119,7 @@ func runLaunchWithDeps(ctx context.Context, options launchOptions, startPath str
 		return writeLaunchQuitResponse(stdout, stderr, projectRoot, nil, "")
 	}
 
-	return startUnityAndWaitForReadiness(ctx, options, projectRoot, runningProcess, previousStop, v2Project.IsV2, previousV2ServerSessionID, stdout, stderr, deps)
+	return startUnityAndWaitForReadiness(ctx, options, projectRoot, runningProcess, previousStop, stdout, stderr, deps)
 }
 
 func writeLaunchProjectSearch(stdout io.Writer, options launchOptions, startPath string) {
@@ -179,7 +171,6 @@ func handleExistingLaunchProcess(
 	options launchOptions,
 	projectRoot string,
 	runningProcess *unityprocess.UnityProcess,
-	isV2 bool,
 	stdout io.Writer,
 	stderr io.Writer,
 	deps launchDeps,
@@ -189,12 +180,9 @@ func handleExistingLaunchProcess(
 			clierrors.WriteClassifiedError(stderr, launchEditorSelectionRequiresRestartError(options), clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
 			return "", true, 1
 		}
-		if isV2 {
-			return "", true, waitForExistingV2LaunchReadiness(ctx, projectRoot, runningProcess.Pid, stdout, stderr, deps)
-		}
 		return "", true, waitForExistingLaunchReadiness(ctx, projectRoot, runningProcess.Pid, stdout, stderr, deps)
 	}
-	stopMethod, err := stopUnityProcess(ctx, projectRoot, runningProcess.Pid, isV2, deps)
+	stopMethod, err := stopUnityProcess(ctx, projectRoot, runningProcess.Pid, deps)
 	if err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
 		return "", true, 1
@@ -242,8 +230,6 @@ func startUnityAndWaitForReadiness(
 	projectRoot string,
 	runningProcess *unityprocess.UnityProcess,
 	previousStop launchStopMethod,
-	isV2 bool,
-	previousV2ServerSessionID string,
 	stdout io.Writer,
 	stderr io.Writer,
 	deps launchDeps,
@@ -282,7 +268,6 @@ func startUnityAndWaitForReadiness(
 	}
 	clicore.WriteFormat(stdout, "Editor Path: %s\n", unityPath)
 
-	launchStartedAt := deps.now()
 	command := newUnityLaunchCommand(unityPath, buildUnityLaunchArgs(projectRoot, options))
 	if err := command.Start(); err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
@@ -292,9 +277,6 @@ func startUnityAndWaitForReadiness(
 	if err := command.Process.Release(); err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
 		return 1
-	}
-	if isV2 {
-		return waitForV2ProjectOpened(ctx, projectRoot, runningProcess, previousStop, currentPid, stdout, stderr, launchStartedAt, previousV2ServerSessionID, spinner, deps)
 	}
 	if err := deps.waitForUnityStartupMarker(ctx, unityLockfilePath(projectRoot), launchLockfilePoll, launchLockfileTimeout); err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})

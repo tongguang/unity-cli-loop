@@ -142,7 +142,7 @@ func TestExistingEditorPathRequiresRestart(t *testing.T) {
 	deps := isolatedLaunchTestDeps(t)
 	var stdout, stderr bytes.Buffer
 	_, handled, code := handleExistingLaunchProcess(context.Background(), launchOptions{editorPath: "custom"},
-		t.TempDir(), nil, false, &stdout, &stderr, deps)
+		t.TempDir(), nil, &stdout, &stderr, deps)
 	if !handled || code != 1 || !strings.Contains(stderr.String(), "--editor-path requires --restart") {
 		t.Fatalf("handled = %v, code = %d, stderr = %s", handled, code, &stderr)
 	}

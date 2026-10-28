@@ -33,9 +33,8 @@ const (
 // stopUnityProcess ends the running Editor for --restart and --quit. It first asks the Editor to quit,
 // which saves the window layout and discards unsaved scene changes without a dialog, and force-kills it
 // when the Editor does not take the request or does not exit in time.
-func stopUnityProcess(ctx context.Context, projectRoot string, pid int, isV2 bool, deps launchDeps) (launchStopMethod, error) {
-	// Why not for a V2 project: its server predates quit-editor, so asking would only delay the kill.
-	if !isV2 && deps.requestUnityQuit(ctx, projectRoot) {
+func stopUnityProcess(ctx context.Context, projectRoot string, pid int, deps launchDeps) (launchStopMethod, error) {
+	if deps.requestUnityQuit(ctx, projectRoot) {
 		err := deps.waitForUnityProcessExit(ctx, projectRoot, pid, launchProcessExitPoll, launchQuitExitTimeout)
 		if err == nil {
 			return launchStopMethodQuit, nil

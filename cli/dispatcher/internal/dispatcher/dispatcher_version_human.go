@@ -9,10 +9,11 @@ import (
 )
 
 // tryHandleDispatcherHumanVersionRequest answers a plain `-v` / `--version` locally when stdout is a
-// terminal, printing the dispatcher version plus one sentence naming the CLI generation that serves
+// terminal, printing the dispatcher version plus one sentence naming the project runner that serves
 // this directory.
-// Why only on a terminal: the shipped V2 Unity package runs `tloop --version` with redirected stdout
-// and parses the whole stdout as strict SemVer, so the non-terminal contract must stay byte-identical.
+// Why only on a terminal: the Unity package's CLI detection runs `tloop --version` and `tloop -v` with
+// redirected stdout and reads the whole stdout as the version, so the non-terminal contract must stay
+// byte-identical.
 func tryHandleDispatcherHumanVersionRequest(
 	remainingArgs []string,
 	projectPath string,
@@ -48,15 +49,11 @@ func isTerminalWriter(writer io.Writer) bool {
 	return term.IsTerminal(int(file.Fd()))
 }
 
-// dispatcherVersionContextSentence explains which CLI generation serves the resolved directory.
+// dispatcherVersionContextSentence explains which project runner serves the resolved directory.
 func dispatcherVersionContextSentence(projectPath string, remainingArgs []string) string {
 	projectRoot, err := resolveDispatcherHumanVersionProjectRoot(projectPath, remainingArgs)
 	if err != nil {
-		return "No Unity project detected here; run inside a Unity project to see which CLI generation serves it."
-	}
-	v2Project, detectErr := detectV2DispatcherProject(projectRoot)
-	if detectErr == nil && v2Project.IsV2 {
-		return dispatcherV2VersionContextSentence(v2Project)
+		return "No Unity project detected here; run inside a Unity project to see which project runner serves it."
 	}
 	pin, pinErr := loadDispatcherPin(projectRoot)
 	if pinErr != nil {
@@ -64,16 +61,6 @@ func dispatcherVersionContextSentence(projectPath string, remainingArgs []string
 			"open it in Unity once to create " + dispatcherProjectPinRelativePath + "."
 	}
 	return "This Unity project pins tloop project runner " + pin.ProjectRunnerVersion + "."
-}
-
-func dispatcherV2VersionContextSentence(v2Project dispatcherV2Project) string {
-	if v2Project.PackageVersion == "" {
-		return "This Unity project uses the tloop V2 package, but its package version could not be resolved; " +
-			"see the error from any other tloop command here."
-	}
-	return "This Unity project uses the tloop V2 package " + v2Project.PackageVersion +
-		", so its commands run through the V2 CLI (" +
-		dispatcherV2CLIPackageName + "@" + v2Project.PackageVersion + ")."
 }
 
 func resolveDispatcherHumanVersionProjectRoot(projectPath string, remainingArgs []string) (string, error) {

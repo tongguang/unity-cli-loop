@@ -49,7 +49,7 @@ result. Do not spend time on this setting again without new evidence that its be
 use the remedies below.
 
 The block is not specific to the transport: with the default `allowedHosts` policy the sandbox
-also stops V2's localhost TCP connection (verified 2026-07-27), so a plain `tloop ...` command
+also stopped the upstream V2 server's localhost TCP connection (verified 2026-07-27), so a plain `tloop ...` command
 succeeding proves only that `excludedCommands` took it out of the sandbox — not that Unix sockets
 are the problem and TCP would get through. The difference is only in the escape hatch each one
 has: a TCP host can be put on `allowedHosts`, while the equivalent for a Unix socket is the

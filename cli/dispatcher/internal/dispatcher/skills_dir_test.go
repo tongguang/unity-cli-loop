@@ -12,6 +12,13 @@ import (
 	clierrors "github.com/hatayama/unity-cli-loop/common/errors"
 )
 
+func skipDispatcherTestOnWindows(t *testing.T, reason string) {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		t.Skip(reason)
+	}
+}
+
 // writeDirModeSkillSource seeds a skill source directory with a SKILL.md and one
 // reference file, returning the definition used by --output-dir mode tests.
 func writeDirModeSkillSource(t *testing.T, root string, name string) skillDefinition {

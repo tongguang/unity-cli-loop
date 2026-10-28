@@ -14,8 +14,6 @@ MCP support has been removed; the CLI plus Skills is now the only integration pa
 
 For most users the upgrade is three steps. Raise the Unity package version, open `Window > Tuanjie CLI Loop > Settings` and press **Install CLI** (or **Update CLI**) to replace the old npm CLI with the native `tloop` command, and finally press **Install Skills** (or **Update Skills**) in the same window to refresh your installed Skills to the V3 content. The installer attempts to remove the obsolete npm package with `npm uninstall -g tloop-cli` and prints the command to run manually when it cannot.
 
-The new `tloop` command is also compatible with V2 projects. When a project still resolves to the V2 package, it fetches the matching V2 CLI automatically and delegates the command to it — so replacing the CLI first does not break the V2 projects you still have around.
-
 You only need the migration guide if you wrote your own integrations: C# custom tools built on the V2 extension API, or your own `SKILL.md` files, Markdown docs, shell scripts, or PowerShell scripts that invoke `tloop`. In that case read [Migrating Custom Tools and Skills to V3](migration-v2-to-v3.md) before you start fixing anything by hand.
 
 ## New Tools
@@ -67,8 +65,6 @@ tloop clear-pause-point --id "Assets/Scripts/Enemy.cs:42"
 - **Two-layer architecture, with the runner tracking the Unity package automatically** — a single global `tloop` command (the dispatcher) lives on your `PATH` and delegates to a per-project `tloop-project-runner`. The runner version comes from `.tloop/project-runner-pin.json` in each project and is downloaded into a per-version user cache automatically. Because the runner follows Unity package updates on its own, there is no per-project CLI version to manage, and projects on different versions coexist on one machine.
 - **Installer authenticity verification** — release assets carry sigstore attestations, and the installer verifies the downloaded archive against the digests pinned in the repository before running anything.
 - **Bounded runtime output** — each subfolder under `.tloop/outputs/` is capped at 20 files, with the oldest removed first, so screenshots, test results, and hierarchy dumps no longer accumulate without limit.
-- **Automatic delegation to V2 projects** — when the V3 dispatcher detects that a project still resolves to the V2 package, it installs the matching V2 `tloop-cli` release into a per-version cache and forwards the command. Keeping the V3 dispatcher installed is the supported way to work across V2 and V3 projects at the same time. Note that Node.js 22+ is needed **only if you keep using V2 projects**, because delegation goes through npm; once everything is on V3, Node.js is not needed at all.
-
 ## Removed in V3
 
 - **MCP connection** — removed. Use the CLI together with the bundled Skills; every capability that was exposed over MCP is reachable through `tloop` commands.

@@ -37,7 +37,6 @@ type dispatcherUpdateState struct {
 type dispatcherRunDeps struct {
 	now              func() time.Time
 	runRealCLI       func(context.Context, string, []string, io.Writer, io.Writer) int
-	runV2CLI         func(context.Context, string, []string, io.Writer, io.Writer) (int, error)
 	runUpdate        func(context.Context) (bool, error)
 	stdoutIsTerminal func(io.Writer) bool
 	launch           launchDeps
@@ -47,7 +46,6 @@ func defaultDispatcherRunDeps() dispatcherRunDeps {
 	return dispatcherRunDeps{
 		now:              time.Now,
 		runRealCLI:       runRealCLICommand,
-		runV2CLI:         runDispatcherV2CLI,
 		runUpdate:        runDispatcherUpdateCommand,
 		stdoutIsTerminal: isTerminalWriter,
 		launch:           defaultLaunchDeps(),
@@ -64,22 +62,20 @@ func runDispatcherWithDeps(ctx context.Context, args []string, stdout io.Writer,
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{})
 		return 1
 	}
-	if handled, code := tryHandleDispatcherHelpOrVersion(ctx, args, remainingArgs, projectPath, stdout, stderr, deps); handled {
+	if handled, code := tryHandleDispatcherHelpOrVersion(args, remainingArgs, projectPath, stdout, deps); handled {
 		return code
 	}
 	if shouldRunInDispatcherProcess(remainingArgs) {
-		return runDispatcherProcessCommandWithDeps(ctx, args, remainingArgs, projectPath, stdout, stderr, deps)
+		return runDispatcherProcessCommandWithDeps(ctx, remainingArgs, projectPath, stdout, stderr, deps)
 	}
 	return runPinnedDispatcherProjectRunner(ctx, args, remainingArgs, projectPath, stdout, stderr, deps)
 }
 
 func tryHandleDispatcherHelpOrVersion(
-	ctx context.Context,
 	args []string,
 	remainingArgs []string,
 	projectPath string,
 	stdout io.Writer,
-	stderr io.Writer,
 	deps dispatcherRunDeps,
 ) (bool, int) {
 	if len(args) != 0 && !clicore.IsHelpRequest(remainingArgs) && !clicore.IsVersionRequest(remainingArgs) && !clicore.IsVersionJSONRequest(remainingArgs) {
@@ -87,13 +83,6 @@ func tryHandleDispatcherHelpOrVersion(
 	}
 	if handled, code := tryHandleDispatcherHumanVersionRequest(remainingArgs, projectPath, stdout, deps); handled {
 		return true, code
-	}
-	if startPath, workingDirectoryErr := os.Getwd(); workingDirectoryErr == nil {
-		if projectRoot, resolveErr := resolveDispatcherProjectRoot(startPath, projectPath, remainingArgs); resolveErr == nil {
-			if handled, code := tryRunDetectedDispatcherV2Project(ctx, projectRoot, args, stdout, stderr, deps); handled {
-				return true, code
-			}
-		}
 	}
 	if handled, code := tryHandleDispatcherInfoRequest(args, stdout); handled {
 		return true, code
@@ -121,9 +110,6 @@ func runPinnedDispatcherProjectRunner(
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{})
 		return 1
 	}
-	if handled, code := tryRunDetectedDispatcherV2Project(ctx, projectRoot, args, stdout, stderr, deps); handled {
-		return code
-	}
 
 	pin, err := loadDispatcherPin(projectRoot)
 	if err != nil {
@@ -150,7 +136,6 @@ func runPinnedDispatcherProjectRunner(
 // execution path must not run through RunProjectLocal.
 func runDispatcherProcessCommandWithDeps(
 	ctx context.Context,
-	args []string,
 	remainingArgs []string,
 	projectPath string,
 	stdout io.Writer,
@@ -161,13 +146,6 @@ func runDispatcherProcessCommandWithDeps(
 	if err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{})
 		return 1
-	}
-	if !shouldKeepDispatcherProcessCommand(remainingArgs) {
-		if projectRoot, resolveErr := resolveDispatcherProjectRoot(startPath, projectPath, remainingArgs); resolveErr == nil {
-			if handled, code := tryRunDetectedDispatcherV2Project(ctx, projectRoot, args, stdout, stderr, deps); handled {
-				return code
-			}
-		}
 	}
 	if handled, code := tryHandleProjectScopeHelpRequest(remainingArgs, projectPath, stdout); handled {
 		return code
@@ -197,20 +175,6 @@ func runDispatcherProcessCommandWithDeps(
 		clierrors.ErrorContext{Command: command},
 	))
 	return 1
-}
-
-func shouldKeepDispatcherProcessCommand(args []string) bool {
-	if len(args) == 0 {
-		return true
-	}
-	switch args[0] {
-	case clicore.InstallCommandName, clicore.UpdateCommandName, clicore.UninstallCommandName,
-		clicore.LaunchCommandName, clicore.CompileCheckCommandName, clicore.VerifyProjectCommandName,
-		clicore.PackageCommandName:
-		return true
-	default:
-		return false
-	}
 }
 
 func shouldRunInDispatcherProcess(args []string) bool {

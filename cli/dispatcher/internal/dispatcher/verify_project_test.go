@@ -237,23 +237,10 @@ func TestVerifyProjectReportsRunErrorAsInternalError(t *testing.T) {
 	}
 }
 
-// createV2VerifyProjectFixture creates a clean project that the dispatcher detects as a V2 project.
-func createV2VerifyProjectFixture(t *testing.T) string {
-	t.Helper()
-	projectRoot := createVerifyProjectFixture(t)
-	writeV2PackageManifest(t, projectRoot)
-	writeV2PackageCachePackageJSON(t, projectRoot, "abc123", "2.2.0")
-	return projectRoot
-}
-
-// verifyProjectLocalDeps fails the test if a command is handed to the V2 CLI or a project runner.
+// verifyProjectLocalDeps fails the test if a command is handed to a project runner.
 func verifyProjectLocalDeps(t *testing.T) dispatcherRunDeps {
 	t.Helper()
 	deps := defaultDispatcherRunDeps()
-	deps.runV2CLI = func(context.Context, string, []string, io.Writer, io.Writer) (int, error) {
-		t.Fatal("verify-project must not be handed to the V2 CLI")
-		return 0, nil
-	}
 	deps.runRealCLI = func(context.Context, string, []string, io.Writer, io.Writer) int {
 		t.Fatal("verify-project must not be handed to a project runner")
 		return 0
@@ -261,9 +248,9 @@ func verifyProjectLocalDeps(t *testing.T) dispatcherRunDeps {
 	return deps
 }
 
-// Verifies verify-project runs in the dispatcher even in a V2 project, since it needs no package.
-func TestRunDispatcherKeepsVerifyProjectForV2Project(t *testing.T) {
-	projectRoot := createV2VerifyProjectFixture(t)
+// Verifies verify-project runs in the dispatcher without a project runner, since it needs no package.
+func TestRunDispatcherRunsVerifyProjectWithoutAProjectRunner(t *testing.T) {
+	projectRoot := createVerifyProjectFixture(t)
 	t.Chdir(projectRoot)
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -278,9 +265,9 @@ func TestRunDispatcherKeepsVerifyProjectForV2Project(t *testing.T) {
 	}
 }
 
-// Verifies verify-project --help is answered by the dispatcher even in a V2 project.
+// Verifies verify-project --help is answered by the dispatcher without a project runner.
 func TestRunDispatcherAnswersVerifyProjectHelpLocally(t *testing.T) {
-	projectRoot := createV2VerifyProjectFixture(t)
+	projectRoot := createVerifyProjectFixture(t)
 	t.Chdir(projectRoot)
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer

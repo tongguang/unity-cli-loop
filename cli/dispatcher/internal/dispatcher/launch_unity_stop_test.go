@@ -46,7 +46,7 @@ func unityStopTestDeps(quitTaken bool, exitWaitResults ...error) (launchDeps, *u
 func TestStopUnityProcessLetsAnEditorThatQuitsExitOnItsOwn(t *testing.T) {
 	deps, recorder := unityStopTestDeps(true)
 
-	method, err := stopUnityProcess(context.Background(), "/projects/sample", 222, false, deps)
+	method, err := stopUnityProcess(context.Background(), "/projects/sample", 222, deps)
 	if err != nil {
 		t.Fatalf("stopUnityProcess() error = %v", err)
 	}
@@ -66,7 +66,7 @@ func TestStopUnityProcessLetsAnEditorThatQuitsExitOnItsOwn(t *testing.T) {
 func TestStopUnityProcessKillsAnEditorThatDoesNotExitAfterTakingTheQuitRequest(t *testing.T) {
 	deps, recorder := unityStopTestDeps(true, launchProcessExitTimeoutError{pid: 222, timeout: launchQuitExitTimeout}, nil)
 
-	method, err := stopUnityProcess(context.Background(), "/projects/sample", 222, false, deps)
+	method, err := stopUnityProcess(context.Background(), "/projects/sample", 222, deps)
 	if err != nil {
 		t.Fatalf("stopUnityProcess() error = %v", err)
 	}
@@ -86,7 +86,7 @@ func TestStopUnityProcessKillsAnEditorThatDoesNotExitAfterTakingTheQuitRequest(t
 func TestStopUnityProcessKillsAnEditorThatDoesNotTakeTheQuitRequest(t *testing.T) {
 	deps, recorder := unityStopTestDeps(false)
 
-	method, err := stopUnityProcess(context.Background(), "/projects/sample", 222, false, deps)
+	method, err := stopUnityProcess(context.Background(), "/projects/sample", 222, deps)
 	if err != nil {
 		t.Fatalf("stopUnityProcess() error = %v", err)
 	}
@@ -104,33 +104,13 @@ func TestStopUnityProcessKillsAnEditorThatDoesNotTakeTheQuitRequest(t *testing.T
 	}
 }
 
-// Verifies a V2 project's Editor is force-killed without a quit request, because its server predates the
-// request and asking would only delay the kill.
-func TestStopUnityProcessKillsAV2EditorWithoutAskingItToQuit(t *testing.T) {
-	deps, recorder := unityStopTestDeps(true)
-
-	method, err := stopUnityProcess(context.Background(), "/projects/sample", 222, true, deps)
-	if err != nil {
-		t.Fatalf("stopUnityProcess() error = %v", err)
-	}
-	if method != launchStopMethodForceKill {
-		t.Fatalf("method = %q, want %q", method, launchStopMethodForceKill)
-	}
-	if recorder.quitRequests != 0 {
-		t.Fatalf("quit requests = %d, want none for a V2 project", recorder.quitRequests)
-	}
-	if len(recorder.killedPids) != 1 {
-		t.Fatalf("killed %v, want one kill", recorder.killedPids)
-	}
-}
-
 // Verifies a failure to watch the Editor exit, other than running out of time, is reported instead of
 // being taken as an Editor to kill, since it says nothing about whether the Editor is still running.
 func TestStopUnityProcessReportsAnExitWaitThatFailsForAnotherReason(t *testing.T) {
 	lookupFailure := errors.New("process listing failed")
 	deps, recorder := unityStopTestDeps(true, lookupFailure)
 
-	_, err := stopUnityProcess(context.Background(), "/projects/sample", 222, false, deps)
+	_, err := stopUnityProcess(context.Background(), "/projects/sample", 222, deps)
 
 	if !errors.Is(err, lookupFailure) {
 		t.Fatalf("err = %v, want the process listing failure", err)
@@ -146,7 +126,7 @@ func TestStopUnityProcessReportsAFailedKill(t *testing.T) {
 	killFailure := errors.New("kill denied")
 	deps.killUnityProcess = func(int) error { return killFailure }
 
-	_, err := stopUnityProcess(context.Background(), "/projects/sample", 222, false, deps)
+	_, err := stopUnityProcess(context.Background(), "/projects/sample", 222, deps)
 
 	if !errors.Is(err, killFailure) {
 		t.Fatalf("err = %v, want the kill failure", err)

@@ -72,19 +72,6 @@ func writeExistingLaunchReadyResponse(stdout io.Writer, stderr io.Writer, projec
 	})
 }
 
-func writeExistingV2LaunchReadyResponse(stdout io.Writer, stderr io.Writer, projectRoot string, currentPid int) int {
-	return writeLaunchResponse(stdout, stderr, launchReadyResponse{
-		Success:          true,
-		Ready:            true,
-		ServerReady:      true,
-		ProjectIpcReady:  false,
-		AlreadyRunning:   true,
-		CurrentProcessId: &currentPid,
-		ProjectRoot:      projectRoot,
-		Message:          "Unity is already running and the V2 tloop server is ready. This project uses tloop V2; commands run through the V2 CLI.",
-	})
-}
-
 func writeLaunchedReadyResponse(
 	stdout io.Writer,
 	stderr io.Writer,
@@ -105,29 +92,6 @@ func writeLaunchedReadyResponse(
 		CurrentProcessId:  &currentPid,
 		ProjectRoot:       projectRoot,
 		Message:           launchReadyMessage,
-	})
-}
-
-func writeLaunchedV2ReadyResponse(
-	stdout io.Writer,
-	stderr io.Writer,
-	projectRoot string,
-	previousPid *int,
-	previousStop launchStopMethod,
-	currentPid int,
-) int {
-	return writeLaunchResponse(stdout, stderr, launchReadyResponse{
-		Success:           true,
-		Ready:             true,
-		ServerReady:       true,
-		ProjectIpcReady:   false,
-		Launched:          true,
-		Restarted:         previousPid != nil,
-		PreviousProcessId: previousPid,
-		StopMethod:        string(previousStop),
-		CurrentProcessId:  &currentPid,
-		ProjectRoot:       projectRoot,
-		Message:           "Unity started and the V2 tloop server is ready. This project uses tloop V2; commands run through the V2 CLI.",
 	})
 }
 

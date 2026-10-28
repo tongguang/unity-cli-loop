@@ -14,7 +14,10 @@ import (
 	"github.com/hatayama/unity-cli-loop/common/project"
 )
 
-const packageVersionFlagName = "version"
+const (
+	packageVersionFlagName                 = "version"
+	dispatcherPackagesManifestRelativePath = "Packages/manifest.json"
+)
 
 type packageInstallOptions struct {
 	version string
