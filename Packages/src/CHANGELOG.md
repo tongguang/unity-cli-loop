@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.22.0](https://github.com/tongguang/unity-cli-loop/compare/v3.21.1...v3.22.0) (2026-10-28)
+
+
+### Features
+
+* make tloop a Tuanjie-only CLI ([77ee691](https://github.com/tongguang/unity-cli-loop/commit/77ee6912d7641709737d277549b0fc8efc1e6daf))
+
+
+### Bug Fixes
+
+* require fork-native CLI releases for Tuanjie packages ([4471444](https://github.com/tongguang/unity-cli-loop/commit/4471444aa3e80e97f8f7c8d8316e72b359f8be86))
+
 ## [3.21.1](https://github.com/hatayama/unity-cli-loop/compare/v3.21.0...v3.21.1) (2026-10-27)
 
 
