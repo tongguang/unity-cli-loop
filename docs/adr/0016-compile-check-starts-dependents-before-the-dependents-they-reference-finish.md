@@ -4,7 +4,7 @@ Date: 2026-10-15
 
 ## Decision
 
-`uloop compile-check` starts an assembly that has to compile - one selected for its own sources,
+`tloop compile-check` starts an assembly that has to compile - one selected for its own sources,
 or a dependent at least one of whose finished references changed its public surface - as soon as
 every assembly it references that was selected for its own sources has finished. It does not wait
 for the dependents it references that are still compiling. For those it reads Unity's reference

@@ -8,7 +8,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 {
     /// <summary>
     /// The Unity messages hot reload never forwards to an added method: the engine calls them
-    /// only after 'uloop compile'. Shared so the worker's guidance and the Editor's proxy agree
+    /// only after 'tloop compile'. Shared so the worker's guidance and the Editor's proxy agree
     /// on the list.
     /// </summary>
     internal static class HotReloadNotForwardedUnityMessageNames

@@ -100,8 +100,8 @@ namespace io.github.hatayama.UnityCliLoop.Application
             return _sharedRegistry;
         }
 
-        // Why not cancellable by uloop cancel: this entry point serves callers inside the Editor,
-        // which manage cancellation with their own token, and uloop cancel only stops CLI requests.
+        // Why not cancellable by tloop cancel: this entry point serves callers inside the Editor,
+        // which manage cancellation with their own token, and tloop cancel only stops CLI requests.
         public Task<UnityCliLoopToolResponse> ExecuteToolAsync(string toolName, JToken paramsToken, CancellationToken ct)
         {
             return _toolExecutionService.ExecuteToolAsync(
@@ -113,7 +113,7 @@ namespace io.github.hatayama.UnityCliLoop.Application
         }
 
         /// <summary>
-        /// Runs a tool a CLI requested. cancellableByUser tells whether uloop cancel may stop it.
+        /// Runs a tool a CLI requested. cancellableByUser tells whether tloop cancel may stop it.
         /// </summary>
         internal Task<UnityCliLoopToolResponse> ExecuteRequestedToolAsync(
             string toolName,

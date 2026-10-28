@@ -87,7 +87,7 @@ What the implementation relies on, and what the Windows run observed:
   and otherwise a `Data` directory beside the executable. The compiler directory under that root is
   found by a bounded scan, so a layout that moved is reported rather than silently missed. The one
   place `runtime.GOOS` is consulted is the host file name (`dotnet.exe` versus `dotnet`). A Hub
-  install on Windows does keep `Data` beside `Unity.exe`, and both `csc` and `dotnet.exe` are found.
+  install on Windows does keep `Data` beside `Tuanjie.exe`, and both `csc` and `dotnet.exe` are found.
 - **Separators in response files.** Bee writes forward slashes inside `.rsp` files on Windows too,
   for project-relative and absolute paths alike (`C:/Program Files/Unity/...`). The parser keeps
   every path exactly as Bee spelled it, rebuilt source lists are spelled with `/` as well

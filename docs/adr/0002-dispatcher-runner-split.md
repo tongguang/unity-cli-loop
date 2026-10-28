@@ -4,7 +4,7 @@ Date: 2026-07-24
 
 ## Decision
 
-uloop keeps its two-binary CLI architecture: a thin, globally installed dispatcher and a
+tloop keeps its two-binary CLI architecture: a thin, globally installed dispatcher and a
 per-project runner whose exact version is pinned by the Unity package
 (`projectRunnerVersion` in `Packages/src/project-runner-pin.json`). We do not consolidate
 into a single self-contained CLI binary in the style of Unity's official `unity` CLI
@@ -20,9 +20,9 @@ by making the CLI the package's installer: `unity pipeline install` rewrites
 `Packages/manifest.json` to the latest package version. No explicit protocol-version gate
 between CLI and package was found in the shipped binaries.
 
-uloop already shares the self-describing half of this design: the runner fetches the tool
+tloop already shares the self-describing half of this design: the runner fetches the tool
 catalog (including user-defined custom tools) from the Unity package via `get-tool-details`
-and caches it in `.uloop/tools.json`, with the embedded `default-tools.json` as a fallback
+and caches it in `.tloop/tools.json`, with the embedded `default-tools.json` as a fallback
 only. Custom tool authors therefore never depend on the CLI version. The question was
 whether to adopt the other half as well — collapsing dispatcher and runner into one global
 binary.
@@ -32,7 +32,7 @@ binary.
 ### A self-describing catalog carries schemas, not behavior
 
 The single-binary model holds only while the CLI remains a generic dispatcher that wraps
-"command name + JSON parameters" in a transport envelope. The uloop runner already contains
+"command name + JSON parameters" in a transport envelope. The tloop runner already contains
 client-side behavior that co-evolves with package features: pause-point wait loops,
 transient-connection retry, post-compile warmup, test-status polling, progress display.
 This class of logic cannot be delivered through a schema catalog — it is code. As
@@ -69,7 +69,7 @@ mechanism for that:
 here: that is read as a beta-stage limitation, and a stable release can be expected to
 allow version-selected installs.)
 
-uloop's model is the inverse — the package dictates the runner version — and the pin plus
+tloop's model is the inverse — the package dictates the runner version — and the pin plus
 dispatcher is exactly the machinery that makes "align the CLI to the package" automatic:
 the compatibility mapping is the pin (`projectRunnerVersion`), and per-project selection is
 the dispatcher's job. This matches how Unity projects are actually operated.
@@ -95,7 +95,7 @@ which is already built and documented.
 
 Rejected under current requirements. It would require either dropping support for
 per-project package pinning (adopting Unity's force-latest install model) or maintaining a
-cross-generation compatibility matrix inside one binary. Reversal condition: if uloop ever
+cross-generation compatibility matrix inside one binary. Reversal condition: if tloop ever
 commits to always forcing the package to latest and abandons per-project package pinning,
 consolidation becomes viable and this decision should be revisited.
 

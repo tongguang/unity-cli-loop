@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace io.github.hatayama.UnityCliLoop.Domain
 {
     /// <summary>
-    /// Classifies whether a detected uloop executable is owned by Homebrew.
+    /// Classifies whether a detected tloop executable is owned by Homebrew.
     /// </summary>
     public static class HomebrewManagedCliPolicy
     {

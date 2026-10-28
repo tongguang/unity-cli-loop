@@ -9,7 +9,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// <summary>
     /// Log handler that drops only the messageless "Assertion failed" log raised by the Input System
     /// and forwards every other log to the wrapped handler.
-    /// Why: when an input callback removes a state monitor while uloop applies state outside event
+    /// Why: when an input callback removes a state monitor while tloop applies state outside event
     /// processing, the Input System's FireStateChangeNotifications removes the monitor immediately and
     /// DynamicBitfield.ClearBit then trips its range assert. Real device input goes through the event
     /// loop, where that removal is deferred, so the assert never fires for real input; dropping it keeps

@@ -4,7 +4,7 @@ Date: 2026-10-21
 
 ## Decision
 
-Every stopped `uloop record-video` recording returns, beside the video file, evidence an agent
+Every stopped `tloop record-video` recording returns, beside the video file, evidence an agent
 can read without watching the video:
 
 - a burst sheet: up to 32 consecutive frames around the moment of interest, anchored on a mark when one
@@ -20,7 +20,7 @@ can read without watching the video:
 The frames are measured while recording, on CPU copies of the frames already captured for the
 encoder, so the evidence is complete the moment the recording stops.
 
-A recording around one action is one command: `--seconds N --trigger "<uloop command>"` focuses
+A recording around one action is one command: `--seconds N --trigger "<tloop command>"` focuses
 Unity, starts, runs the trigger, marks the moment the trigger returns, waits, and stops. The mark
 is what anchors the burst sheet on the action instead of on whatever changed most.
 

@@ -5,7 +5,7 @@ using io.github.hatayama.UnityCliLoop.Domain;
 namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 {
     /// <summary>
-    /// Test fixture that verifies setup compatibility decisions for the global uloop command.
+    /// Test fixture that verifies setup compatibility decisions for the global tloop command.
     /// </summary>
     public class CliSetupCompatibilityTests
     {

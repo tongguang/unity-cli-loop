@@ -10,7 +10,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal enum HotReloadWarningResolution
     {
-        // Gone after 'uloop compile': hot reload's own warnings and Skipped methods.
+        // Gone after 'tloop compile': hot reload's own warnings and Skipped methods.
         ClearedByCompile,
 
         // The caller has to act by hand (re-arm a pause point, wire a field again); a compile

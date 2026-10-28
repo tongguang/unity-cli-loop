@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace io.github.hatayama.UnityCliLoop.Domain
 {
     /// <summary>
-    /// Reports what a uloop cancel request did to the execution slot. The running-tool fields
+    /// Reports what a tloop cancel request did to the execution slot. The running-tool fields
     /// are null when nothing was running.
     /// </summary>
     internal sealed class ToolCancelRequestResult
@@ -51,7 +51,7 @@ namespace io.github.hatayama.UnityCliLoop.Domain
     }
 
     /// <summary>
-    /// What a uloop cancel request found in the execution slot. Member names are the wire values
+    /// What a tloop cancel request found in the execution slot. Member names are the wire values
     /// of the cancel response's Outcome.
     /// </summary>
     internal enum ToolCancelRequestOutcome

@@ -42,7 +42,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         /// <summary>
         /// What: a method added to a compiled file that names a type the same reload refused
-        /// fails, and its reason says the refusal caused the compile error and that 'uloop compile'
+        /// fails, and its reason says the refusal caused the compile error and that 'tloop compile'
         /// clears it. The compile error alone says the type does not exist, while the source the
         /// reader sees still declares it. A type reference and a static member access fail with
         /// different compile errors, so both are covered.

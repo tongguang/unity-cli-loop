@@ -71,7 +71,7 @@ namespace io.github.hatayama.UnityCliLoop.Application
 
                 return response;
             }
-            // Why convert: an explicit uloop cancel must reach the waiting CLI as its own error, while a
+            // Why convert: an explicit tloop cancel must reach the waiting CLI as its own error, while a
             // disconnect (the request token) still drops the connection because nobody is left to answer.
             catch (OperationCanceledException) when (lease.WasCancelledByUser && !ct.IsCancellationRequested)
             {

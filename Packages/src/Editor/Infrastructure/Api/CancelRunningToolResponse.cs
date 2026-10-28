@@ -4,7 +4,7 @@ using io.github.hatayama.UnityCliLoop.ToolContracts;
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Payload of the cancel-running-tool command behind uloop cancel. Outcome is Cancelled,
+    /// Payload of the cancel-running-tool command behind tloop cancel. Outcome is Cancelled,
     /// NothingRunning, or NotCancellable; the running-tool fields are null when nothing was running.
     /// </summary>
     public class CancelRunningToolResponse : UnityCliLoopToolResponse

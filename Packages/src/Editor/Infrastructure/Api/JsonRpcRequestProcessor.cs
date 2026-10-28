@@ -143,7 +143,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                         request.ClientProtocolVersion);
                 }
 
-                // Why computed for every request: the same policy decides whether uloop cancel may stop
+                // Why computed for every request: the same policy decides whether tloop cancel may stop
                 // the request, and that holds whether or not the CLI asked for a dispatch ack.
                 bool cancellableByUser = ShouldCancelAcceptedRequestOnClientDisconnect(request);
                 if (request.AcceptsDispatchAck && earlyResponseWriter != null)
@@ -201,7 +201,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
 
         private static void LogRpcExceptionIfNeeded(Exception ex)
         {
-            // Why not log these: busy and uloop cancel are expected outcomes the CLI reports itself.
+            // Why not log these: busy and tloop cancel are expected outcomes the CLI reports itself.
             if (ex is UnityCliLoopToolBusyException || ex is UnityCliLoopToolCancelledException)
             {
                 return;

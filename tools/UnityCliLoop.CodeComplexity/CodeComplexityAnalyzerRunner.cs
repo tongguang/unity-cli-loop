@@ -29,9 +29,9 @@ namespace UnityCliLoop.CodeComplexity
             "UNITY_6000_0_OR_NEWER",
             "UNITY_6000_3_OR_NEWER",
             "UNITY_6000_4_OR_NEWER",
-            "ULOOP_HAS_INPUT_SYSTEM",
-            "ULOOP_DEBUG",
-            "ULOOP_HAS_TEST_FRAMEWORK"
+            "TLOOP_HAS_INPUT_SYSTEM",
+            "TLOOP_DEBUG",
+            "TLOOP_HAS_TEST_FRAMEWORK"
         };
 
         public async Task<IReadOnlyList<CodeComplexityIssue>> AnalyzeAsync(CodeComplexityOptions options, CancellationToken ct)

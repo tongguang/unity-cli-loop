@@ -318,7 +318,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void BuildInstallerScriptUrl_WhenBetaVersionUsesReleaseInstallerAsset()
         {
-            // Verifies that beta editor installs point at the release-asset install.sh, matching `uloop update`'s verified download URL.
+            // Verifies that beta editor installs point at the release-asset install.sh, matching `tloop update`'s verified download URL.
             string url = NativeCliCommandBuilder.BuildInstallerScriptUrl(
                 TestBetaReleaseTag,
                 CliConstants.POSIX_INSTALL_SCRIPT_NAME);
@@ -329,7 +329,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void BuildInstallerScriptUrl_WhenStableVersionUsesReleaseInstallerAsset()
         {
-            // Verifies that stable editor installs point at the release-asset install.ps1, matching `uloop update`'s verified download URL.
+            // Verifies that stable editor installs point at the release-asset install.ps1, matching `tloop update`'s verified download URL.
             string url = NativeCliCommandBuilder.BuildInstallerScriptUrl(
                 TestStableReleaseTag,
                 CliConstants.WINDOWS_INSTALL_SCRIPT_NAME);
@@ -508,7 +508,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void BuildUninstallCommand_OnMacRunsInstalledDispatcher()
         {
-            // Verifies that editor uninstall delegates removal to the installed uloop command.
+            // Verifies that editor uninstall delegates removal to the installed tloop command.
             NativeCliInstallCommand command = NativeCliCommandBuilder.BuildUninstallCommand(
                 "/Users/ExampleUser/.local/bin",
                 RuntimePlatform.OSXEditor);
@@ -521,7 +521,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void BuildUninstallCommand_OnWindowsRunsInstalledDispatcher()
         {
-            // Verifies that Windows editor uninstall delegates removal to the installed uloop command.
+            // Verifies that Windows editor uninstall delegates removal to the installed tloop command.
             NativeCliInstallCommand command = NativeCliCommandBuilder.BuildUninstallCommand(
                 "C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor);

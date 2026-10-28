@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "io.github.hatayama.uloopmcp": "file:../../../../Packages/src"
+    "io.github.tongguang.tloop": "file:../../../../Packages/src"
   }
 }

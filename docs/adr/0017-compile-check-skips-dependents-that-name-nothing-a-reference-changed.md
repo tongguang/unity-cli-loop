@@ -7,7 +7,7 @@ Date: 2026-10-16
 When an assembly's reference assembly shows its dependents a different API than Unity's last
 build, the changed-files check worker also names what the change touches: the simple names of the
 types whose rows differ, their members' names, the namespace segments one side lacks, and `new(`
-for a constructor a target-typed `new` can reach. `uloop compile-check` then leaves out a dependent
+for a constructor a target-typed `new` can reach. `tloop compile-check` then leaves out a dependent
 that writes none of those names, in its own sources or in the generator output its last full
 compile saved, the same way it leaves out a dependent whose references all kept their surface. The
 dependent counts as keeping its surface for the assemblies below it, and an assembly that started

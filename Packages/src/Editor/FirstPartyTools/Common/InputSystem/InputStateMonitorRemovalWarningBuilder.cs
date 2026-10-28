@@ -5,7 +5,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 {
     /// <summary>
     /// Builds the response warning that tells the caller an input callback removed a state monitor
-    /// while uloop applied input, which the suppressed assertion would otherwise have reported.
+    /// while tloop applied input, which the suppressed assertion would otherwise have reported.
     /// </summary>
     internal static class InputStateMonitorRemovalWarningBuilder
     {

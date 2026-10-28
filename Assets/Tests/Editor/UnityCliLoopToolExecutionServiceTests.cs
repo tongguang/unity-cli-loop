@@ -290,7 +290,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
         /// <summary>
         /// Verifies a tool that honours its token ends with UnityCliLoopToolCancelledException when
-        /// uloop cancel fires, and that the slot is free again afterwards.
+        /// tloop cancel fires, and that the slot is free again afterwards.
         /// </summary>
         [Test]
         public async Task ExecuteToolAsync_WhenCancelledByUser_ThrowsToolCancelledAndReleasesSlot()
@@ -330,7 +330,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies a request still waiting for the stalled Editor main thread is resumed by uloop
+        /// Verifies a request still waiting for the stalled Editor main thread is resumed by tloop
         /// cancel, ends with UnityCliLoopToolCancelledException, and frees the slot without the main
         /// thread ever running it.
         /// </summary>
@@ -369,7 +369,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies a request whose client also disconnected after uloop cancel keeps ending with the
+        /// Verifies a request whose client also disconnected after tloop cancel keeps ending with the
         /// plain OperationCanceledException, because nobody is left to read a cancel error.
         /// </summary>
         [Test]
@@ -407,7 +407,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
         /// <summary>
         /// Verifies a client disconnect alone still ends the request with OperationCanceledException,
-        /// not with the uloop cancel error.
+        /// not with the tloop cancel error.
         /// </summary>
         [Test]
         public async Task ExecuteToolAsync_WhenOnlyRequestTokenIsCancelled_ThrowsOperationCanceled()
@@ -442,7 +442,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
         /// <summary>
         /// Verifies a tool started through the public registrar entry point, which Editor code uses
-        /// with its own token, is reported NotCancellable and keeps running when uloop cancel arrives.
+        /// with its own token, is reported NotCancellable and keeps running when tloop cancel arrives.
         /// </summary>
         [Test]
         public async Task CancelRunningTool_WhenToolRunsThroughPublicRegistrarEntryPoint_ReportsNotCancellable()

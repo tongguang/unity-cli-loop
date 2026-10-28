@@ -7,7 +7,7 @@ using io.github.hatayama.UnityCliLoop.ToolContracts;
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Publishes the package CLI pin contract into the project .uloop directory for dispatcher lookup.
+    /// Publishes the package CLI pin contract into the project .tloop directory for dispatcher lookup.
     /// </summary>
     internal static class CliPinSynchronizer
     {

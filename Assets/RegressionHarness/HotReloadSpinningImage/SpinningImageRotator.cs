@@ -4,7 +4,7 @@ namespace io.github.hatayama.UnityCliLoop.RegressionHarness
 {
     // Minimal uGUI demo for manual hot-reload checks: orbits the attached Image around the
     // screen center. The orbit radius (pixels) and speed (degrees per second) are literals inside
-    // Update on purpose so they can be tuned with `uloop hot-reload --files <this file>` while
+    // Update on purpose so they can be tuned with `tloop hot-reload --files <this file>` while
     // PlayMode is running.
     // Why body literals (not a const, field, or SerializeField): hot-reload shims contain only the
     // rewritten method body, so anything outside the body is read from the stale compiled

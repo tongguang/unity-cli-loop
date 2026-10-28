@@ -1,7 +1,7 @@
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Tells the CLI that waited for a tool that uloop cancel stopped it, so the CLI can report the
+    /// Tells the CLI that waited for a tool that tloop cancel stopped it, so the CLI can report the
     /// cancel instead of a dropped connection.
     /// </summary>
     public class ToolCancelledErrorData : JsonRpcErrorData

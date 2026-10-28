@@ -14,7 +14,7 @@ later tell which methods were edited. That capture now runs on a pool thread:
   except while a capture runs and the file on disk matches the checksum the compiled assembly's
   PDB recorded: those are the bytes the compiler read, so the pause point reads that file
   instead of waiting.
-- `get-compile-status` reports not ready while a capture runs, so `uloop compile` returns only
+- `get-compile-status` reports not ready while a capture runs, so `tloop compile` returns only
   after the capture, up to 30 seconds. The hold lives in the internal bridge command, because
   the CLI waits for a compile by polling it, outside the tool execution path.
 - A domain reload or a compile start cancels the running capture without waiting. A capture that
@@ -35,7 +35,7 @@ instead, so what stays on the main thread is the compile start record (`SessionS
 package list (the Package Manager). Everything else the capture does is file IO and PDB reads,
 which the pool can do.
 
-The guarantee that an edit made right after `uloop compile` returns is never captured as
+The guarantee that an edit made right after `tloop compile` returns is never captured as
 compiled source used to hold because the capture finished inside the domain load, before the
 command listener opened. Holding `get-compile-status` keeps that guarantee. A source written
 after the compile started is still checked against the PDB, so a capture that ends after the

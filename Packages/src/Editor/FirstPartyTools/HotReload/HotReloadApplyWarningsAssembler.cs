@@ -46,7 +46,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 lines.AddRange(additionalWarnings);
             }
 
-            // A Skipped method is applied by 'uloop compile' like the warnings above it, so its
+            // A Skipped method is applied by 'tloop compile' like the warnings above it, so its
             // line counts as one. Whether the Message may add the single-compile sentence is
             // decided from the method rows themselves.
             HotReloadSkippedWarningCollapser.Append(lines, result.Methods);

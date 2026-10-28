@@ -455,7 +455,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         /// What: a body edit of a type a retained artifact serves reports no skip row for the
         /// type's constructor, because the assembly the domain loaded already runs it and this
         /// edit never touched it. Without the suppression every reload of such a file told the
-        /// reader to run 'uloop compile' over a member they had not changed.
+        /// reader to run 'tloop compile' over a member they had not changed.
         /// </summary>
         [Test]
         public async Task Transform_RetainedDeclarationHasAConstructor_ReportsNoSkipRowForIt()

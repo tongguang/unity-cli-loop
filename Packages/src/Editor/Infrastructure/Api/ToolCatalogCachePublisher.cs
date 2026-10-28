@@ -10,7 +10,7 @@ using io.github.hatayama.UnityCliLoop.ToolContracts;
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Publishes the tool catalog to .uloop/tools.json so package updates refresh the CLI cache without a manual sync.
+    /// Publishes the tool catalog to .tloop/tools.json so package updates refresh the CLI cache without a manual sync.
     /// </summary>
     internal static class ToolCatalogCachePublisher
     {
@@ -22,7 +22,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
             Debug.Assert(toolRegistrarService != null, "toolRegistrarService must not be null");
 
             GetToolDetailsResponse response = GetToolDetailsBridgeCommand.Execute(null, toolRegistrarService);
-            // Why reuse JsonRpcResponseSerializer: tools.json must match the IPC result bytes that uloop sync writes.
+            // Why reuse JsonRpcResponseSerializer: tools.json must match the IPC result bytes that tloop sync writes.
             string json = JsonConvert.SerializeObject(
                 response,
                 Formatting.None,

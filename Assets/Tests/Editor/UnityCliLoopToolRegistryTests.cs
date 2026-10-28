@@ -444,7 +444,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task ExecuteCommandAsync_WhenCommandIsCancelRunningTool_AnswersWithoutWaitingForMainThread()
         {
-            // Tests that cancel-running-tool answers while the Editor main thread is held, because uloop
+            // Tests that cancel-running-tool answers while the Editor main thread is held, because tloop
             // cancel exists for the tool that blocks it. The queueing dispatcher holds every switch, as
             // in the get-editor-status test above, so a router that switched first would leave the task
             // unfinished.

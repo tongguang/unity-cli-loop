@@ -47,7 +47,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             // Tests that every enum a first-party schema exposes can be resolved by its ordinal.
             // The schema cache stores an enum default as a number while listing the members by name,
-            // so the CLI recovers the name shown in `--help` / `uloop list` by indexing that name
+            // so the CLI recovers the name shown in `--help` / `tloop list` by indexing that name
             // list (Go enumValueAtIndex). Enum.GetNames sorts by value, so a same-value alias
             // occupies the next index and displaces later canonical names. Members must therefore
             // have distinct values. Gaps, negative values, and a [Flags] enum would make the CLI

@@ -161,7 +161,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         }
 
         // A patch that outlived the method it replaced: the edited source no longer declares it,
-        // so compiled callers keep running the patched body until 'uloop compile', '--revert-all',
+        // so compiled callers keep running the patched body until 'tloop compile', '--revert-all',
         // or a later reload whose source restores the method to the compiled baseline reverts it.
         // A reload that declares the method with a different body only replaces the patch.
         public static HotReloadMethodOutcome Stale(string method, string filePath)

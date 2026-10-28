@@ -3,7 +3,7 @@ using System;
 namespace io.github.hatayama.UnityCliLoop.Domain
 {
     /// <summary>
-    /// Classifies whether a detected uloop executable is owned by winget.
+    /// Classifies whether a detected tloop executable is owned by winget.
     /// </summary>
     public static class WingetManagedCliPolicy
     {

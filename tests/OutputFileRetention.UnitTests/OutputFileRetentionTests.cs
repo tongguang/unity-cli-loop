@@ -7,7 +7,7 @@ using io.github.hatayama.UnityCliLoop.FirstPartyTools;
 namespace io.github.hatayama.UnityCliLoop.UnitTests
 {
     /// <summary>
-    /// Pure unit coverage for directory file-count retention used by uloop output exporters.
+    /// Pure unit coverage for directory file-count retention used by tloop output exporters.
     /// </summary>
     [TestFixture]
     public class OutputFileRetentionTests

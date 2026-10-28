@@ -33,7 +33,7 @@ point it at a large production project for the most realistic signal.
   so this variant is not expected to run on Windows.
 - Windows (`soak-loop.ps1`): Windows PowerShell 5.1 or PowerShell 7. No `jq` —
   responses are parsed with `ConvertFrom-Json`. Metrics come from
-  `Win32_Process`, so `unity_rss_kb` is `Unity.exe`'s working set.
+  `Win32_Process`, so `unity_rss_kb` is `Tuanjie.exe`'s working set.
 
 ## Quick start
 

@@ -67,7 +67,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             SessionState.SetString(RecordsKey, JsonUtility.ToJson(payload));
         }
 
-        // Why swallow: a malformed value can only come from a store written by another uloop
+        // Why swallow: a malformed value can only come from a store written by another tloop
         // generation, and losing the restore is better than blocking Editor startup on it.
         private static WatchPersistedRecordList TryParse(string json)
         {

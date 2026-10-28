@@ -9,8 +9,8 @@ using io.github.hatayama.UnityCliLoop.ToolContracts;
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Reads and saves the skill install root in .uloop/settings.skills.json and resolves it to a directory.
-    /// The file is shared with the uloop CLI, which installs into the same root when no --root is given.
+    /// Reads and saves the skill install root in .tloop/settings.skills.json and resolves it to a directory.
+    /// The file is shared with the tloop CLI, which installs into the same root when no --root is given.
     /// </summary>
     internal sealed class SkillInstallRootResolver
     {

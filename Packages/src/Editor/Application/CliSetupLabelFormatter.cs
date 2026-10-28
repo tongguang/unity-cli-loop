@@ -7,7 +7,7 @@ namespace io.github.hatayama.UnityCliLoop.Application
     /// </summary>
     public static class CliSetupLabelFormatter
     {
-        // Why: uloop installed by Homebrew must be updated and removed through brew itself,
+        // Why: tloop installed by Homebrew must be updated and removed through brew itself,
         // so the package offers no primary action for it.
         public const string HOMEBREW_MANAGED_BUTTON_TEXT = "Managed by Homebrew";
         public const string WINGET_MANAGED_BUTTON_TEXT = "Managed by winget";

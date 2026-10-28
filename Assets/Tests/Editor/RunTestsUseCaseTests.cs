@@ -18,7 +18,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private const string RecordedCompletedAt = "2026-01-02T03:04:05.0000000Z";
 
         // Why a temporary store for every use case: ExecuteAsync rewrites the last-run record, and the
-        // project's own record must not be replaced by stub results while uloop runs these tests.
+        // project's own record must not be replaced by stub results while tloop runs these tests.
         private string _recordDirectory;
         private RunTestsLastRunRecordStore _recordStore;
 

@@ -22,7 +22,7 @@ namespace UnityCliLoop.DeadCodeScanner
             "UNITY_EDITOR_OSX",
             "UNITY_2022_3_OR_NEWER",
             "UNITY_6000_0_OR_NEWER",
-            "ULOOP_HAS_INPUT_SYSTEM"
+            "TLOOP_HAS_INPUT_SYSTEM"
         };
 
         public WorkspaceBuildResult Build(string rootPath)

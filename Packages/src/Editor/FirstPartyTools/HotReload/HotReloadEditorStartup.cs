@@ -113,7 +113,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
         /// <summary>
         /// Starts the source snapshot capture of the current compile before this domain answers any
-        /// uloop command, without waiting for it. The guarantee that an edit made after the compile
+        /// tloop command, without waiting for it. The guarantee that an edit made after the compile
         /// returned is never captured as compiled source comes from get-compile-status holding the
         /// compile completion while the capture runs (up to 30 seconds).
         /// </summary>

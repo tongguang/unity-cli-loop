@@ -6,7 +6,7 @@ using io.github.hatayama.UnityCliLoop.Runtime;
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Runs the cancel-running-tool command behind uloop cancel: fires the cancellation of the tool
+    /// Runs the cancel-running-tool command behind tloop cancel: fires the cancellation of the tool
     /// that holds the execution slot and reports what it found.
     /// </summary>
     internal static class CancelRunningToolBridgeCommand

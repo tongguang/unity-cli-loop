@@ -22,7 +22,7 @@ the C# enum member that backs them, and that member is named by the following ru
 Parsing stays case-insensitive on both sides (`CaseInsensitiveStringEnumConverter` in the
 package, `strings.EqualFold` in the project runner), so `--action Status` and
 `--action status` are the same request. The rules govern the documented spelling, which is
-what `--help`, `uloop list`, the tool catalog, and skill files show and what AI agents copy.
+what `--help`, `tloop list`, the tool catalog, and skill files show and what AI agents copy.
 
 We do not add a conversion layer that turns C# member names into kebab-case wire values.
 

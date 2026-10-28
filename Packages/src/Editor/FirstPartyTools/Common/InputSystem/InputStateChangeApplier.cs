@@ -48,7 +48,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     }
 
     /// <summary>
-    /// Shared entry point that every uloop input simulation path uses to apply device state.
+    /// Shared entry point that every tloop input simulation path uses to apply device state.
     /// </summary>
     internal static class InputStateChangeApplier
     {

@@ -68,7 +68,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         /// <summary>
         /// What: adding a method to a retained type that an unchanged retained type returns from a
-        /// public method fails the run and names both types and 'uloop compile', instead of
+        /// public method fails the run and names both types and 'tloop compile', instead of
         /// reporting the added method as unbound and dropping the members added earlier.
         /// </summary>
         [Test]

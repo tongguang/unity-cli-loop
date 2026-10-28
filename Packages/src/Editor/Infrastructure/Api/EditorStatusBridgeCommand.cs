@@ -5,7 +5,7 @@ using io.github.hatayama.UnityCliLoop.Application;
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Builds the get-editor-status payload behind uloop status from the execution slot and the
+    /// Builds the get-editor-status payload behind tloop status from the execution slot and the
     /// cached Editor state.
     /// </summary>
     internal static class EditorStatusBridgeCommand

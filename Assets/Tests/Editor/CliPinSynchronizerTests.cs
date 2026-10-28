@@ -15,7 +15,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void SyncProjectPinFile_WhenDestinationMissing_ShouldCopyPackagePin()
         {
-            // Tests that the project runner pin contract is published into the project .uloop directory.
+            // Tests that the project runner pin contract is published into the project .tloop directory.
             string root = CreateTestRoot();
             string packageRoot = Path.Combine(root, "package");
             string projectRoot = Path.Combine(root, "project");

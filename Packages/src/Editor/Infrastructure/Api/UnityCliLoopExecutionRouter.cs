@@ -41,7 +41,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
         /// </summary>
         /// <param name="methodName">JSON-RPC method name</param>
         /// <param name="paramsToken">Parameters</param>
-        /// <param name="cancellableByUser">Whether uloop cancel may stop the tool this request runs</param>
+        /// <param name="cancellableByUser">Whether tloop cancel may stop the tool this request runs</param>
         /// <returns>Execution result</returns>
         public async Task<UnityCliLoopToolResponse> ExecuteAsync(
             string methodName,
@@ -51,7 +51,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
         {
             if (methodName == UnityCliLoopConstants.COMMAND_NAME_GET_EDITOR_STATUS)
             {
-                // Why before the main-thread switch below: uloop status must answer while the Editor
+                // Why before the main-thread switch below: tloop status must answer while the Editor
                 // main thread is blocked, and this command reads only thread-safe snapshots.
                 ct.ThrowIfCancellationRequested();
                 // Why wake the loop: an idle Editor's main loop can sleep until something signals it,
@@ -65,7 +65,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
 
             if (methodName == UnityCliLoopConstants.COMMAND_NAME_CANCEL_RUNNING_TOOL)
             {
-                // Why before the main-thread switch below: uloop cancel exists for the tool that
+                // Why before the main-thread switch below: tloop cancel exists for the tool that
                 // blocks the main thread, so it must answer without waiting for it.
                 ct.ThrowIfCancellationRequested();
                 return CancelRunningToolBridgeCommand.Execute(_toolRegistrarService);

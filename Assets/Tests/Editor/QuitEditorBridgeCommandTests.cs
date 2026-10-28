@@ -17,7 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private const double ExitAt = 10.0;
 
         /// <summary>
-        /// Verifies quit-editor is routed as an internal bridge command, which uloop launch --restart and
+        /// Verifies quit-editor is routed as an internal bridge command, which tloop launch --restart and
         /// --quit rely on before they fall back to force-killing the Editor.
         /// </summary>
         [Test]

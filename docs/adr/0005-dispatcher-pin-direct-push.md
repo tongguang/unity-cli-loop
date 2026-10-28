@@ -5,7 +5,7 @@ Date: 2026-09-05
 ## Decision
 
 After a **stable** dispatcher Release is published, the `dispatcher-publish`
-workflow stamps `Packages/src/project-runner-pin.json` (and its `.uloop/` mirror)
+workflow stamps `Packages/src/project-runner-pin.json` (and its `.tloop/` mirror)
 and pushes the stamp commit straight to `main`, using a GitHub App token that the
 `main` branch ruleset lists as a bypass actor. No pull request is opened and no
 human merges the stamp.

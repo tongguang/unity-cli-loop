@@ -6,7 +6,7 @@ Date: 2026-09-08
 
 release-please opens one release pull request per component
 (`separate-pull-requests: true`). A human merges the `dispatcher` release pull
-request and approves the `cli-release` environment; the `uloop-project-runner`
+request and approves the `cli-release` environment; the `tloop-project-runner`
 one can be merged at any time. The `unity-package` release pull request is
 merged by automation: after `post-publish` pushes the dispatcher pin stamp to
 `main`, `merge-package-release-pr` waits for that pull request to record the

@@ -7,7 +7,7 @@ using io.github.hatayama.UnityCliLoop.ToolContracts;
 namespace io.github.hatayama.UnityCliLoop.Dev
 {
     /// <summary>
-    /// Unity Editor menu items for toggling ULOOP_DEBUG and debug-only Roslyn support.
+    /// Unity Editor menu items for toggling TLOOP_DEBUG and debug-only Roslyn support.
     ///
     /// This file is intended for internal debugging convenience:
     /// - It lives under Assets/Editor/ outside Packages, so it is NOT included in the distributed UnityCliLoop package.
@@ -15,7 +15,7 @@ namespace io.github.hatayama.UnityCliLoop.Dev
     ///   These menus operate only on the currently selected BuildTargetGroup and may temporarily diverge from global policy.
     ///
     /// Related classes:
-    /// - UnityCliLoopSettingsWindow: Uses ULOOP_DEBUG to show/hide developer tools
+    /// - UnityCliLoopSettingsWindow: Uses TLOOP_DEBUG to show/hide developer tools
     /// - McpLogger: Debug logging behavior controlled by this symbol
     /// </summary>
     public static class UnityCliLoopDebugToggle
@@ -24,7 +24,7 @@ namespace io.github.hatayama.UnityCliLoop.Dev
         private const string MENU_PATH_DISABLE = "UnityCliLoop/Tools/Debug Settings/Disable Debug Mode";
 
         /// <summary>
-        /// Check if ULOOP_DEBUG symbol is currently defined
+        /// Check if TLOOP_DEBUG symbol is currently defined
         /// </summary>
         private static bool IsDebugModeEnabled()
         {
@@ -34,7 +34,7 @@ namespace io.github.hatayama.UnityCliLoop.Dev
         }
 
         /// <summary>
-        /// Enable ULOOP_DEBUG scripting define symbol
+        /// Enable TLOOP_DEBUG scripting define symbol
         /// </summary>
         [MenuItem(MENU_PATH_ENABLE)]
         public static void EnableDebugMode()
@@ -62,7 +62,7 @@ namespace io.github.hatayama.UnityCliLoop.Dev
         }
 
         /// <summary>
-        /// Disable ULOOP_DEBUG scripting define symbol
+        /// Disable TLOOP_DEBUG scripting define symbol
         /// </summary>
         [MenuItem(MENU_PATH_DISABLE)]
         public static void DisableDebugMode()

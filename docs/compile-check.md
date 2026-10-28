@@ -447,7 +447,8 @@ happened, and how long each assembly took. `docs/vibe-logs.md` lists their field
   unknown type or an ambiguous name in it, the errors inside method bodies, the warnings of that
   stage and the analyzer diagnostics are reported only by the run after the declaration errors are
   fixed.
-- **Linux (x86_64) is supported.** The Editor is looked up under `~/Unity/Hub/Editor/<version>/Editor/Unity`.
+- **Linux (x86_64) is supported.** The Editor is looked up in Tuanjie Hub's `editors-v2.json`, then
+  under `~/Tuanjie/Hub/Editor/<version>/Editor/Tuanjie`.
 
 ## Troubleshooting
 
@@ -458,14 +459,14 @@ rather than refused, and the assemblies it left no artifact for are the ones thi
 
 compile-check cannot create the response files itself: which sources belong to which assembly, the
 scripting defines, and the package references are all decided by the Editor, and part of that
-decision lives in native code. So the first build has to be Unity's. It does not need a window: a
-headless run imports the project, writes the response files and exits.
+decision lives in native code. So the first build has to be the Editor's. It does not need a
+window: a headless run imports the project, writes the response files and exits.
 
 ```bash
 # macOS
-"/Applications/Unity/Hub/Editor/<version>/Unity.app/Contents/MacOS/Unity" -batchmode -nographics -quit -projectPath "<PROJECT_ROOT>"
+"/Applications/Tuanjie/Hub/Editor/<version>/Tuanjie.app/Contents/MacOS/Tuanjie" -batchmode -nographics -quit -projectPath "<PROJECT_ROOT>"
 # Windows
-"C:\Program Files\Unity\Hub\Editor\<version>\Editor\Unity.exe" -batchmode -nographics -quit -projectPath "<PROJECT_ROOT>"
+"C:\Program Files\Tuanjie\Hub\Editor\<version>\Editor\Tuanjie.exe" -batchmode -nographics -quit -projectPath "<PROJECT_ROOT>"
 ```
 
 `tloop launch` is the same first build with the Editor window open; use whichever fits. The run

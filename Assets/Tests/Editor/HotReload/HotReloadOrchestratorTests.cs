@@ -2938,7 +2938,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         /// <summary>
         /// What: when every edited method fails shim compile, isolation is skipped and the
-        /// Failed Reason keeps both CS0103 messages in full (no in-uloop truncation).
+        /// Failed Reason keeps both CS0103 messages in full (no in-tloop truncation).
         /// </summary>
         [Test]
         public async Task Run_AllEditedMethodsFailingShimCompile_ReasonKeepsBothDiagnosticsInFull()
@@ -7567,7 +7567,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             // Restoring the compiled baseline makes the deleted method unchanged again, so the
             // stale patch is reverted with the rest. This is the third way out of a stale patch,
-            // alongside 'uloop compile' and '--revert-all'.
+            // alongside 'tloop compile' and '--revert-all'.
             HotReloadOrchestratorResult restoreRun = await HotReloadCompositionRoot.Services.Orchestrator.RunAsync(
                 new[] { hostPath },
                 WriteEditedSource("StaleOutcomeRestorePass.cs", onDisk),

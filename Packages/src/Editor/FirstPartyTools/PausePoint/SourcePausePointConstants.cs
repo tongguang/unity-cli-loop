@@ -247,7 +247,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string ErrorCodePausePointLineNotCompiled = "PAUSE_POINT_LINE_NOT_COMPILED";
 
         // Why: Debug mode goes back to the 'Code Optimization On Startup' preference on every
-        // Editor restart (including uloop launch -r), so the recovery steps must remind callers
+        // Editor restart (including tloop launch -r), so the recovery steps must remind callers
         // to re-switch after restart rather than only once.
         public const string ReleaseCodeOptimizationRecommendedNextAction =
             "Automatic Debug switch and recompile did not succeed. Confirm Code Optimization is Debug "

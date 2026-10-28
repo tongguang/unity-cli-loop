@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace io.github.hatayama.UnityCliLoop.Domain
 {
     /// <summary>
-    /// Describes the setup action required for the global uloop command.
+    /// Describes the setup action required for the global tloop command.
     /// </summary>
     public readonly struct CliSetupCompatibilityState
     {
@@ -18,7 +18,7 @@ namespace io.github.hatayama.UnityCliLoop.Domain
     }
 
     /// <summary>
-    /// Evaluates setup compatibility for the global uloop dispatcher.
+    /// Evaluates setup compatibility for the global tloop dispatcher.
     /// </summary>
     public static class CliSetupCompatibility
     {

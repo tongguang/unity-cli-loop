@@ -7,7 +7,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 {
     /// <summary>
     /// Builds simulate-mouse-input dry-run responses from Game View physics raycast results.
-    /// Kept outside ULOOP_HAS_INPUT_SYSTEM guards so dry-run works without the Input System package.
+    /// Kept outside TLOOP_HAS_INPUT_SYSTEM guards so dry-run works without the Input System package.
     /// </summary>
     internal static class MouseInputDryRunResponseBuilder
     {

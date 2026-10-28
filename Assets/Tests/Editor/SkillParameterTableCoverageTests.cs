@@ -15,7 +15,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     /// <summary>
     /// Test fixture that verifies the skill parameter tables document every parameter the tools
     /// actually accept.
-    /// Why this lives in C#: `--help`, `uloop list` and the embedded catalog all render from those
+    /// Why this lives in C#: `--help`, `tloop list` and the embedded catalog all render from those
     /// tables now, so a parameter with no table row is a parameter no agent can discover - and the set
     /// of accepted parameters is decided by the C# schema types, which no Go test can see. The reverse
     /// direction (a row for an option no tool accepts) is caught by the catalog generator instead.
@@ -92,7 +92,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
         /// <summary>
         /// Verifies every command in the embedded catalog has a non-empty tool description in a skill,
-        /// which is what `uloop list` and `--help` print as the command's one-line summary.
+        /// which is what `tloop list` and `--help` print as the command's one-line summary.
         /// </summary>
         [Test]
         public void EveryCatalogTool_HasASkillDescription()

@@ -513,7 +513,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         /// <summary>
         /// What: an added OnEnable on a MonoBehaviour whose body has no accessor rewrite names
-        /// 'uloop compile' as the only step, because no rewrite of the body would make the
+        /// 'tloop compile' as the only step, because no rewrite of the body would make the
         /// engine call a message hot reload does not forward.
         /// </summary>
         [Test]

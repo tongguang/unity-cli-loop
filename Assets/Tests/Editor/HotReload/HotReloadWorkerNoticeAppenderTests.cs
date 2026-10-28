@@ -78,7 +78,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         /// <summary>
         /// What: a file that declares a type hot reload already introduced is told its missing
         /// baseline is expected, instead of being warned that all methods are being patched. Such
-        /// a file has no compiled baseline until 'uloop compile', so the generic warning read as
+        /// a file has no compiled baseline until 'tloop compile', so the generic warning read as
         /// a fault on every reload of it.
         /// </summary>
         [Test]
@@ -208,7 +208,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         /// <summary>
         /// What: a file the PDB lists no document for is told no compile gives it a baseline,
-        /// instead of being asked to run uloop compile, which would change nothing for it.
+        /// instead of being asked to run tloop compile, which would change nothing for it.
         /// </summary>
         [Test]
         public void AppendWorkerNotices_WhenThePdbHasNoDocumentForTheFile_SaysNoCompileGivesItABaseline()

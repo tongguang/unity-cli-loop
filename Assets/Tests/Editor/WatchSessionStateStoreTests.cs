@@ -101,7 +101,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// What: content written by another uloop generation degrades to empty instead of throwing.
+        /// What: content written by another tloop generation degrades to empty instead of throwing.
         /// </summary>
         [Test]
         public void Load_WhenStoredJsonIsNotAWatchRecordList_ReturnsEmpty()

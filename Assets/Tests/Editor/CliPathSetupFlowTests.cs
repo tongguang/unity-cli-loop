@@ -19,7 +19,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task EnsureCliVisibleFromShellAsync_WhenAlreadyVisibleDoesNotApplyProfile()
         {
-            // Verifies that fresh shell visibility is the authority and no profile write happens when uloop is visible.
+            // Verifies that fresh shell visibility is the authority and no profile write happens when tloop is visible.
             FakeCliInstallationDetector detector = new(true);
             FakeNativeCliInstaller installer = new FakeNativeCliInstaller(
                 CreateSupportedPlan(),

@@ -193,7 +193,7 @@ namespace io.github.hatayama.UnityCliLoop.Domain
             }
         }
 
-        // Fires the explicit cancellation of every lease whose request may be cancelled by uloop
+        // Fires the explicit cancellation of every lease whose request may be cancelled by tloop
         // cancel. Why the leases are copied under the lock and cancelled outside it: Cancel() runs
         // the cancelled requests' continuations and their lease Release on this thread, and Release
         // takes this lock.
@@ -307,7 +307,7 @@ namespace io.github.hatayama.UnityCliLoop.Domain
     {
         private readonly ToolExecutionSession _session;
         // Why never disposed: it has no timer, so it holds nothing to leak, and leaving it alive
-        // lets a uloop cancel that races the lease's Release call Cancel() without throwing.
+        // lets a tloop cancel that races the lease's Release call Cancel() without throwing.
         private readonly CancellationTokenSource _explicitCancellation = new();
         private readonly CancellationTokenSource _executionCancellation;
         private long? _cancellationObservedTimestamp;
@@ -334,10 +334,10 @@ namespace io.github.hatayama.UnityCliLoop.Domain
         }
 
         // False for calls that did not come from the CLI: their callers manage cancellation with
-        // their own token, and uloop cancel only stops what a CLI asked for.
+        // their own token, and tloop cancel only stops what a CLI asked for.
         internal bool CancellableByUser { get; }
 
-        // Fires when the request is cancelled (client disconnect, server stop) or uloop cancel
+        // Fires when the request is cancelled (client disconnect, server stop) or tloop cancel
         // fires this lease. Tools run with this token instead of the raw request token.
         internal CancellationToken ExecutionToken => _executionCancellation.Token;
 
@@ -378,7 +378,7 @@ namespace io.github.hatayama.UnityCliLoop.Domain
         }
 
         // Records the first time a waiting request sees this lease cancelled, by its client or by
-        // uloop cancel, and reports whether the lease has stayed cancelled for the whole grace
+        // tloop cancel, and reports whether the lease has stayed cancelled for the whole grace
         // period since then. Called only under the session lock.
         internal bool ObserveCancellationPastGrace(long now, long graceTicks)
         {

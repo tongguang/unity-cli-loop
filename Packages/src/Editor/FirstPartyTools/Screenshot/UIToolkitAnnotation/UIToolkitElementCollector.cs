@@ -14,7 +14,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal static class UIToolkitElementCollector
     {
-        // gameViewHeight, not Screen.height: uloop commands run outside the player loop, where Screen reports the
+        // gameViewHeight, not Screen.height: tloop commands run outside the player loop, where Screen reports the
         // size of the last Editor view drawn. ConvertToSimCoordinates flips the result back with the Game View
         // height, so the same height is used here.
         internal static void Collect(List<UIElementInfo> elements, float gameViewHeight)

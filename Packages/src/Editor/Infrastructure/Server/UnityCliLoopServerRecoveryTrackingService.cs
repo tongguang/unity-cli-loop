@@ -100,7 +100,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
             {
                 string message = $"Failed to restore server: {restoreTask.Exception?.GetBaseException().Message}";
                 // Why: startup restore failures are awaited by UI-facing paths and must be visible
-                // in normal user builds where VibeLogger is compiled out without ULOOP_DEBUG.
+                // in normal user builds where VibeLogger is compiled out without TLOOP_DEBUG.
                 Debug.LogError($"[{UnityCliLoopConstants.PROJECT_NAME}] {message}");
                 VibeLogger.LogError("server_startup_restore_failed",
                     message);
@@ -212,8 +212,8 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                     {
                         string message = $"Tuanjie CLI Loop server recovery failed before the bridge became ready. {ex.GetBaseException().Message}";
                         // Why: the thrown exception ends in an unobserved task and VibeLogger is
-                        // compiled out without ULOOP_DEBUG, so without this console entry an
-                        // unrecoverable server (uloop unreachable) would be completely silent.
+                        // compiled out without TLOOP_DEBUG, so without this console entry an
+                        // unrecoverable server (tloop unreachable) would be completely silent.
                         Debug.LogError($"[{UnityCliLoopConstants.PROJECT_NAME}] {message}");
                         VibeLogger.LogError(
                             "server_recovery_failed",

@@ -67,7 +67,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies that the saved file uses the installRoot spelling the uloop CLI reads.
+        /// Verifies that the saved file uses the installRoot spelling the tloop CLI reads.
         /// </summary>
         [Test]
         public void SaveInstallRoot_WritesTheValueTheCliReads()

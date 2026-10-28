@@ -3,7 +3,7 @@ using io.github.hatayama.UnityCliLoop.Domain;
 namespace io.github.hatayama.UnityCliLoop.Application
 {
     /// <summary>
-    /// What a uloop cancel request did to the execution slot, in values that layers outside Domain
+    /// What a tloop cancel request did to the execution slot, in values that layers outside Domain
     /// can read. Outcome is Cancelled, NothingRunning, or NotCancellable; the running-tool fields
     /// are null when nothing was running.
     /// </summary>

@@ -6,7 +6,7 @@ namespace io.github.hatayama.UnityCliLoop.RegressionHarness
     // Minimal EditorWindow demo for manual hot-reload checks in EditMode: a square orbits the
     // window center while the Editor is not playing. The tunable values are literals inside
     // method bodies on purpose: radius, squareSize, and squareColor in DrawOrbit, and
-    // degreesPerSecond in Advance. Edit one and run `uloop hot-reload --files <this file>`
+    // degreesPerSecond in Advance. Edit one and run `tloop hot-reload --files <this file>`
     // to see it change without PlayMode and without a domain reload.
     // Why body literals (not a const or field): hot-reload shims contain only the rewritten
     // method body, so anything outside the body is read from the stale compiled assembly and a

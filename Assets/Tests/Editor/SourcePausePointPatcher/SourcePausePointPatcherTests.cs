@@ -727,7 +727,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
         /// <summary>
         /// What: a hot-reload patched method that has no entry in the file's shim lookup is
-        /// refused without an edited body range, pointing at the edited body or 'uloop compile'.
+        /// refused without an edited body range, pointing at the edited body or 'tloop compile'.
         /// </summary>
         [Test]
         public void Patch_WhenPatchedMethodHasNoEditedSpan_RefusesWithoutARange()

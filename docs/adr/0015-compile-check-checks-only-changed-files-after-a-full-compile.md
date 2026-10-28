@@ -4,7 +4,7 @@ Date: 2026-10-14
 
 ## Decision
 
-`uloop compile-check` checks only the changed files of an assembly, instead of compiling the
+`tloop compile-check` checks only the changed files of an assembly, instead of compiling the
 whole assembly with csc, when both of these hold:
 
 - The last time compile-check compiled that assembly in full, the compile succeeded, and the

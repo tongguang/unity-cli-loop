@@ -12,7 +12,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
     }
 
     /// <summary>
-    /// Runs the quit-editor command behind uloop launch --restart and --quit: closes the Editor so that it
+    /// Runs the quit-editor command behind tloop launch --restart and --quit: closes the Editor so that it
     /// saves its window layout, which a force-kill loses.
     /// </summary>
     internal static class QuitEditorBridgeCommand

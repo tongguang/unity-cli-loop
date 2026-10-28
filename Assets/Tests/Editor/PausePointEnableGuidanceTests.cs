@@ -96,7 +96,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// What: arming guidance describes the trigger as a subcommand without a leading uloop command.
+        /// What: arming guidance describes the trigger as a subcommand without a leading tloop command.
         /// </summary>
         [Test]
         public void ResolveSuccessEnableRecommendedNextAction_WhenExistingIsEmpty_ExplainsTriggerSubcommandFormat()

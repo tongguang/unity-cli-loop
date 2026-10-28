@@ -773,7 +773,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     }
 }
 
-// Why a non-uloop namespace: the selector skips types that start with
+// Why a non-tloop namespace: the selector skips types that start with
 // io.github.hatayama.UnityCliLoop, so a helper in the test namespace would
 // be dropped as infrastructure and a stubbed CaptureCallerFrames would still
 // leave every other test green.

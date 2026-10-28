@@ -12,7 +12,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// <summary>
     /// Line protocol between the Editor and a resident transform worker (`worker.dll --serve`).
     /// Request: one line, `run &lt;base64 input path&gt; &lt;base64 output path&gt;`. Response: two lines,
-    /// a header `__ULOOP_TRANSFORM_RESULT__ &lt;exitCode&gt; &lt;diagnosticByteCount&gt;` followed by the
+    /// a header `__TLOOP_TRANSFORM_RESULT__ &lt;exitCode&gt; &lt;diagnosticByteCount&gt;` followed by the
     /// diagnostics as one base64 line. Why length-prefixed instead of an end marker: worker
     /// diagnostics can contain any text, including a line equal to a marker, and a fixed
     /// two-line frame cannot be desynchronized by its own payload.

@@ -56,7 +56,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         // Reconnection settings
         public const int RECONNECTION_TIMEOUT_SECONDS = 10;
 
-        // .uloop directory
+        // .tloop directory
         public const string ULOOP_DIR = ".tloop";
         public const string ULOOP_TOOL_SETTINGS_FILE_NAME = "settings.tools.json";
         public const string ULOOP_TOOLS_CACHE_FILE_NAME = "tools.json";

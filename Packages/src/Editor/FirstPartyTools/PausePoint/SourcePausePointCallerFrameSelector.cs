@@ -15,7 +15,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     {
         // Frames whose declaring type starts with one of these carry no diagnostic value for
         // "how execution reached the marker": runtime async machinery, patching infrastructure,
-        // and uloop's own plumbing. Unity engine/editor frames are deliberately kept because an
+        // and tloop's own plumbing. Unity engine/editor frames are deliberately kept because an
         // entry point such as EditorApplication.update is itself diagnostic. MonoMod.* is still
         // skipped as infrastructure, except Harmony patch bodies which Select re-includes via
         // TryResolvePatchedCallerDisplay because they are the real application callers.

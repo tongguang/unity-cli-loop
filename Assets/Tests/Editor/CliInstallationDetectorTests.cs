@@ -36,7 +36,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void SelectPreferredDetection_WhenShellCommandMissingUsesPackageOwnedCli()
         {
-            // Verifies that package-owned installs still count when the shell cannot resolve uloop.
+            // Verifies that package-owned installs still count when the shell cannot resolve tloop.
             CliInstallationDetection packageOwnedDetection = new(
                 "3.0.0-beta.3",
                 "/Users/ExampleUser/.local/bin/tloop");
@@ -197,7 +197,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ParseShellCliInstallationOutput_WhenDispatcherJsonExists_ReturnsDispatcherDetection()
         {
-            // Verifies setup detection recognizes the dispatcher release exposed by global uloop.
+            // Verifies setup detection recognizes the dispatcher release exposed by global tloop.
             string output = "__TLOOP_PATH_START__\n"
                             + "/Users/ExampleUser/.local/bin/tloop\n"
                             + "__TLOOP_PATH_END__\n"

@@ -16,7 +16,7 @@ With domain reload enabled on Play entry, hot reload keeps working but guarantee
   unloads them. Hot reload applied after entering Play Mode is not affected.
 - The loss is announced: `control-play-mode --action Play` warns before entering, and
   `hot-reload --status` reports `DroppedByPlayModeEntryCount` afterwards.
-- Running `uloop hot-reload` again, or `uloop compile`, brings the changes back. Values wired
+- Running `tloop hot-reload` again, or `tloop compile`, brings the changes back. Values wired
   into added fields are not brought back; the apply names the fields to wire again.
 
 The code behind these guarantees stays. The parts only Play entry uses are frozen: recording

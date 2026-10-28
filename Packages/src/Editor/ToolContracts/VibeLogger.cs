@@ -75,7 +75,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         
         /// <summary>
         /// Log an info level message with structured context
-        /// Only logs when ULOOP_DEBUG symbol is defined
+        /// Only logs when TLOOP_DEBUG symbol is defined
         /// </summary>
         [Conditional(UnityCliLoopConstants.ENV_KEY_ULOOP_DEBUG)]
         public void LogInfo(string operation, string message, object context = null, 
@@ -86,7 +86,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         
         /// <summary>
         /// Log a warning level message with structured context
-        /// Only logs when ULOOP_DEBUG symbol is defined
+        /// Only logs when TLOOP_DEBUG symbol is defined
         /// </summary>
         [Conditional(UnityCliLoopConstants.ENV_KEY_ULOOP_DEBUG)]
         public void LogWarning(string operation, string message, object context = null, 
@@ -97,7 +97,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         
         /// <summary>
         /// Log an error level message with structured context
-        /// Only logs when ULOOP_DEBUG symbol is defined
+        /// Only logs when TLOOP_DEBUG symbol is defined
         /// </summary>
         [Conditional(UnityCliLoopConstants.ENV_KEY_ULOOP_DEBUG)]
         public void LogError(string operation, string message, object context = null, 
@@ -108,7 +108,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         
         /// <summary>
         /// Log a debug level message with structured context
-        /// Only logs when ULOOP_DEBUG symbol is defined
+        /// Only logs when TLOOP_DEBUG symbol is defined
         /// </summary>
         [Conditional(UnityCliLoopConstants.ENV_KEY_ULOOP_DEBUG)]
         public void LogDebug(string operation, string message, object context = null, 
@@ -119,7 +119,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         
         /// <summary>
         /// Log an exception with structured context
-        /// Only logs when ULOOP_DEBUG symbol is defined
+        /// Only logs when TLOOP_DEBUG symbol is defined
         /// </summary>
         [Conditional(UnityCliLoopConstants.ENV_KEY_ULOOP_DEBUG)]
         public void LogException(string operation, Exception exception, object context = null, 
@@ -153,7 +153,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         
         /// <summary>
         /// Get logs for AI analysis (formatted for Claude Code)
-        /// Output directory: {project_root}/.uloop/outputs/VibeLogs/
+        /// Output directory: {project_root}/.tloop/outputs/VibeLogs/
         /// </summary>
         public string GetLogsForAi(string operation = null, string correlationId = null, int maxCount = 100)
         {

@@ -312,9 +312,9 @@ log "restart-every=$RESTART_EVERY force-every=$FORCE_EVERY pause-every=$PAUSE_EV
 # No response can mean either a busy editor or no editor at all: launching over
 # a busy editor would be wrong, and waiting 15 minutes for an editor that was
 # never started would be wasted, so the two cases are told apart by whether a
-# Unity process has this project open.
+# Tuanjie process has this project open.
 if ! run_tloop get-logs --max-count 1 > /dev/null 2>&1; then
-    if ps ax -o args= | grep -F "$PROJECT_PATH" | grep -F "Unity" | grep -v grep > /dev/null; then
+    if ps ax -o args= | grep -F "$PROJECT_PATH" | grep -F "Tuanjie" | grep -v grep > /dev/null; then
         log "Editor busy — waiting up to 15 minutes for it to answer"
     else
         log "Editor not running — launching it with tloop launch"

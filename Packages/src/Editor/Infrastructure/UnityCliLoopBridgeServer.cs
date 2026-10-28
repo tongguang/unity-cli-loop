@@ -307,7 +307,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                         // (silently pinning a CPU core, as the Mono PipeSecurity regression showed).
                         // Exiting the loop hands the failure to the recovery path, which retries
                         // with bounded backoff. Debug.LogError is required for visibility because
-                        // VibeLogger is compiled out unless ULOOP_DEBUG is defined.
+                        // VibeLogger is compiled out unless TLOOP_DEBUG is defined.
                         Debug.LogError(
                             $"[{UnityCliLoopConstants.PROJECT_NAME}] Server accept loop failed; restarting the IPC server. {ex}");
                         VibeLogger.LogError(

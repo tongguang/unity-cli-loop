@@ -3,7 +3,7 @@ using io.github.hatayama.UnityCliLoop.ToolContracts;
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Editor status payload returned by the internal bridge command behind uloop status.
+    /// Editor status payload returned by the internal bridge command behind tloop status.
     /// The running-tool fields are null while no command holds the execution slot.
     /// </summary>
     public class GetEditorStatusResponse : UnityCliLoopToolResponse

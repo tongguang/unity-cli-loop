@@ -817,7 +817,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies a uloop cancel that races the holder's release does not throw on the released lease.
+        /// Verifies a tloop cancel that races the holder's release does not throw on the released lease.
         /// </summary>
         [Test]
         public void CancelByUser_AfterLeaseIsDisposed_DoesNotThrow()
@@ -830,7 +830,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies an execute-dynamic-code holder cancelled only by uloop cancel is taken back once
+        /// Verifies an execute-dynamic-code holder cancelled only by tloop cancel is taken back once
         /// it outlives the grace period, the same as one whose client disconnected.
         /// </summary>
         [Test]

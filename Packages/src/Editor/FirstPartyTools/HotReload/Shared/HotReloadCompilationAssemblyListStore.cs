@@ -172,7 +172,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 return;
             }
 
-            // Why read before the call: VibeLogger.LogWarning is compiled out without ULOOP_DEBUG,
+            // Why read before the call: VibeLogger.LogWarning is compiled out without TLOOP_DEBUG,
             // and reading Exception is what marks the fault as observed.
             Exception error = write.Exception.GetBaseException();
             VibeLogger.LogWarning(

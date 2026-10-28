@@ -13,7 +13,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 {
     /// <summary>
     /// Verifies JSON-RPC notification handling in JsonRpcRequestProcessor, and how it tells the
-    /// execution path whether uloop cancel may stop a request.
+    /// execution path whether tloop cancel may stop a request.
     /// </summary>
     public sealed class JsonRpcRequestProcessorTests
     {
@@ -33,7 +33,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies uloop cancel may stop exactly the requests a client disconnect would cancel:
+        /// Verifies tloop cancel may stop exactly the requests a client disconnect would cancel:
         /// compile only when it does not wait for the domain reload, run-tests unless it runs in
         /// PlayMode respecting the Enter Play Mode settings, with or without a dispatch ack.
         /// </summary>
@@ -73,7 +73,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies a request stopped by uloop cancel is answered with a tool_cancelled error that
+        /// Verifies a request stopped by tloop cancel is answered with a tool_cancelled error that
         /// names the tool, and that the expected cancel is not logged as an error.
         /// </summary>
         [Test]

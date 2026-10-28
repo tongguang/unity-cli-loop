@@ -296,7 +296,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
         // Format: count of removed members, then the comma-separated names (ordinal).
         // Why a line of its own rather than the full warning again: the full text reappears on
-        // every run until 'uloop compile', and a reader who already acted on it reads the reprint
+        // every run until 'tloop compile', and a reader who already acted on it reads the reprint
         // as news, which buries the warnings the run produced for the first time.
         public const string ContinuingRemovedMembersWarningFormat =
             "Continuing from an earlier run: the same {0} removed member(s) are still in the "

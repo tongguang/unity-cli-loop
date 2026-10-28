@@ -41,7 +41,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
         /// <summary>
         /// Starts the first-party tool work that has to begin before this domain answers its first
-        /// uloop command: the source snapshot capture, which then runs in the background. Called
+        /// tloop command: the source snapshot capture, which then runs in the background. Called
         /// once, at the end of the Editor startup. <paramref name="isToolEnabled"/>
         /// answers whether the user enabled a tool in the tool settings, by its settings name.
         /// </summary>

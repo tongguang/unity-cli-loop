@@ -10,7 +10,7 @@ using io.github.hatayama.UnityCliLoop.ToolContracts;
 namespace io.github.hatayama.UnityCliLoop.Infrastructure
 {
     /// <summary>
-    /// Tool toggle settings management for .uloop/settings.tools.json.
+    /// Tool toggle settings management for .tloop/settings.tools.json.
     /// Controls which tools are enabled or disabled in the CLI tool list.
     /// </summary>
     public sealed class ToolSettingsRepository : IToolSettingsPort

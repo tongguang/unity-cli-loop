@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	// Why a retry: on Windows a helper process Unity spawned (asset import, shader compiler)
-	// or a virus scanner can still hold files under Temp for a moment after Unity.exe itself
+	// Why a retry: on Windows a helper process the Editor spawned (asset import, shader compiler)
+	// or a virus scanner can still hold files under Temp for a moment after Tuanjie.exe itself
 	// has exited, and an operation on such a file fails until it lets go.
 	launchTempLockfileRetryTimeout = 5 * time.Second
 	launchTempLockfileRetryPoll    = 250 * time.Millisecond
