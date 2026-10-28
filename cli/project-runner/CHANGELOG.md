@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.13.0](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.12.2...tloop-project-runner-v3.13.0) (2026-10-28)
+
+
+### Features
+
+* make tloop a Tuanjie-only CLI ([77ee691](https://github.com/tongguang/unity-cli-loop/commit/77ee6912d7641709737d277549b0fc8efc1e6daf))
+
 ## [3.12.2](https://github.com/hatayama/unity-cli-loop/compare/uloop-project-runner-v3.12.1...uloop-project-runner-v3.12.2) (2026-10-27)
 
 
