@@ -116,4 +116,9 @@ require_tar_entry "tloop-dispatcher-darwin-arm64.tar.gz" "tloop"
 require_tar_entry "tloop-dispatcher-linux-amd64.tar.gz" "tloop"
 require_zip_entry "tloop-dispatcher-windows-amd64.zip" "tloop.exe"
 
+require_tar_entry "tloop-dispatcher-darwin-amd64.tar.gz" "LICENSE.md"
+require_tar_entry "tloop-dispatcher-darwin-arm64.tar.gz" "LICENSE.md"
+require_tar_entry "tloop-dispatcher-linux-amd64.tar.gz" "LICENSE.md"
+require_zip_entry "tloop-dispatcher-windows-amd64.zip" "LICENSE.md"
+
 echo "Dispatcher release assets are complete."

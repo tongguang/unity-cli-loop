@@ -13,10 +13,11 @@ package_unix() {
   tmp_dir="$RELEASE_DIR/tmp-$platform"
   mkdir -p "$tmp_dir"
   cp "$DIST_DIR/$platform/tloop-project-runner" "$tmp_dir/tloop-project-runner"
+  cp "$ROOT_DIR/LICENSE.md" "$tmp_dir/LICENSE.md"
   chmod +x "$tmp_dir/tloop-project-runner"
   (
     cd "$tmp_dir"
-    tar -czf "$RELEASE_DIR/tloop-project-runner-$platform.tar.gz" tloop-project-runner
+    tar -czf "$RELEASE_DIR/tloop-project-runner-$platform.tar.gz" tloop-project-runner LICENSE.md
   )
   rm -rf "$tmp_dir"
 }
@@ -26,9 +27,10 @@ package_windows() {
   tmp_dir="$RELEASE_DIR/tmp-$platform"
   mkdir -p "$tmp_dir"
   cp "$DIST_DIR/$platform/tloop-project-runner.exe" "$tmp_dir/tloop-project-runner.exe"
+  cp "$ROOT_DIR/LICENSE.md" "$tmp_dir/LICENSE.md"
   (
     cd "$tmp_dir"
-    zip -q "$RELEASE_DIR/tloop-project-runner-$platform.zip" tloop-project-runner.exe
+    zip -q "$RELEASE_DIR/tloop-project-runner-$platform.zip" tloop-project-runner.exe LICENSE.md
   )
   rm -rf "$tmp_dir"
 }

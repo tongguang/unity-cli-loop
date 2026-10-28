@@ -86,6 +86,13 @@ test_packing_needs_no_signing_credentials() {
   assert_job_contains pack "go run ./cmd/stage-unity-package"
 }
 
+# Verifies the package carries the original project copyright and full license.
+test_package_preserves_project_license() {
+  if ! cmp -s "$ROOT_DIR/LICENSE.md" "$ROOT_DIR/Packages/src/LICENSE.md"; then
+    fail "Expected the UPM package to include an unchanged copy of the project license."
+  fi
+}
+
 # Verifies the release is created only after packing succeeded and only when the plan says so.
 test_release_is_created_only_after_packing() {
   assert_job_contains publish "    needs: [plan, pack]"
@@ -142,6 +149,7 @@ test_runs_after_each_dependency_on_main
 test_only_release_creations_run_one_at_a_time
 test_jobs_use_least_privilege
 test_packing_needs_no_signing_credentials
+test_package_preserves_project_license
 test_release_is_created_only_after_packing
 test_dry_run_reaches_the_plan
 test_plan_decisions_reach_the_jobs

@@ -1,413 +1,107 @@
-# Tuanjie CLI Loop
+# Tuanjie CLI Loop (`tloop`)
 
-[English](README.md) | 日本語
+[简体中文](README.md) | 日本語 | [Upstream (English)](https://github.com/hatayama/unity-cli-loop)
 
-[![Unity](https://img.shields.io/badge/Unity-2022.3+-red.svg)](https://unity3d.com/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)<br>
-![ClaudeCode](https://img.shields.io/badge/Claude_Code-555?logo=claude)
-![Cursor](https://img.shields.io/badge/Cursor-111?logo=Cursor)
-![Codex](https://img.shields.io/badge/Codex-111?logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTIyLjI4MTkgOS44MjExYTUuOTg0NyA1Ljk4NDcgMCAwIDAtLjUxNTctNC45MTA4IDYuMDQ2MiA2LjA0NjIgMCAwIDAtNi41MDk4LTIuOUE2LjA2NTEgNi4wNjUxIDAgMCAwIDQuOTgwNyA0LjE4MThhNS45ODQ3IDUuOTg0NyAwIDAgMC0zLjk5NzcgMi45IDYuMDQ2MiA2LjA0NjIgMCAwIDAgLjc0MjcgNy4wOTY2IDUuOTggNS45OCAwIDAgMCAuNTExIDQuOTEwNyA2LjA1MSA2LjA1MSAwIDAgMCA2LjUxNDYgMi45MDAxQTUuOTg0NyA1Ljk4NDcgMCAwIDAgMTMuMjU5OSAyNGE2LjA1NTcgNi4wNTU3IDAgMCAwIDUuNzcxOC00LjIwNTggNS45ODk0IDUuOTg5NCAwIDAgMCAzLjk5NzctMi45MDAxIDYuMDU1NyA2LjA1NTcgMCAwIDAtLjc0NzUtNy4wNzI5em0tOS4wMjIgMTIuNjA4MWE0LjQ3NTUgNC40NzU1IDAgMCAxLTIuODc2NC0xLjA0MDhsLjE0MTktLjA4MDQgNC43NzgzLTIuNzU4MmEuNzk0OC43OTQ4IDAgMCAwIC4zOTI3LS42ODEzdi02LjczNjlsMi4wMiAxLjE2ODZhLjA3MS4wNzEgMCAwIDEgLjAzOC4wNTJ2NS41ODI2YTQuNTA0IDQuNTA0IDAgMCAxLTQuNDk0NSA0LjQ5NDR6bS05LjY2MDctNC4xMjU0YTQuNDcwOCA0LjQ3MDggMCAwIDEtLjUzNDYtMy4wMTM3bC4xNDIuMDg1MiA0Ljc4MyAyLjc1ODJhLjc3MTIuNzcxMiAwIDAgMCAuNzgwNiAwbDUuODQyOC0zLjM2ODV2Mi4zMzI0YS4wODA0LjA4MDQgMCAwIDEtLjAzMzIuMDYxNUw5Ljc0IDE5Ljk1MDJhNC40OTkyIDQuNDk5MiAwIDAgMS02LjE0MDgtMS42NDY0ek0yLjM0MDggNy44OTU2YTQuNDg1IDQuNDg1IDAgMCAxIDIuMzY1NS0xLjk3MjhWMTEuNmEuNzY2NC43NjY0IDAgMCAwIC4zODc5LjY3NjVsNS44MTQ0IDMuMzU0My0yLjAyMDEgMS4xNjg1YS4wNzU3LjA3NTcgMCAwIDEtLjA3MSAwbC00LjgzMDMtMi43ODY1QTQuNTA0IDQuNTA0IDAgMCAxIDIuMzQwOCA3Ljg3MnptMTYuNTk2MyAzLjg1NThMMTMuMTAzOCA4LjM2NCAxNS4xMTkyIDcuMmEuMDc1Ny4wNzU3IDAgMCAxIC4wNzEgMGw0LjgzMDMgMi43OTEzYTQuNDk0NCA0LjQ5NDQgMCAwIDEtLjY3NjUgOC4xMDQydi01LjY3NzJhLjc5Ljc5IDAgMCAwLS40MDctLjY2N3ptMi4wMTA3LTMuMDIzMWwtLjE0Mi0uMDg1Mi00Ljc3MzUtMi43ODE4YS43NzU5Ljc3NTkgMCAwIDAtLjc4NTQgMEw5LjQwOSA5LjIyOTdWNi44OTc0YS4wNjYyLjA2NjIgMCAwIDEgLjAyODQtLjA2MTVsNC44MzAzLTIuNzg2NmE0LjQ5OTIgNC40OTkyIDAgMCAxIDYuNjgwMiA0LjY2ek04LjMwNjUgMTIuODYzbC0yLjAyLTEuMTYzOGEuMDgwNC4wODA0IDAgMCAxLS4wMzgtLjA1NjdWNi4wNzQyYTQuNDk5MiA0LjQ5OTIgMCAwIDEgNy4zNzU3LTMuNDUzN2wtLjE0Mi4wODA1TDguNzA0IDUuNDU5YS43OTQ4Ljc5NDggMCAwIDAtLjM5MjcuNjgxM3ptMS4wOTc2LTIuMzY1NGwyLjYwMi0xLjQ5OTggMi42MDY5IDEuNDk5OHYyLjk5OTRsLTIuNTk3NCAxLjQ5OTctMi42MDY3LTEuNDk5N1oiLz48L3N2Zz4=)
-![Antigravity](https://img.shields.io/badge/Antigravity-111?logo=google)
-![GitHubCopilot](https://img.shields.io/badge/GitHub_Copilot-111?logo=githubcopilot)
+AI エージェントから CLI を通じて Tuanjie（团结引擎）のコンパイル、テスト、ログ確認、Editor 操作を行うためのプロジェクトです。
 
-<p align="center">
-    <img height="450" alt="logo-black-bg" src="Packages/src/Documentation~/images/logo.png" /><br>
-    <sub>(Logo inspired by Daft Punk's <i>Human After All</i> album art)</sub>  
-</p>
-  
+本プロジェクトは **Masamichi Hatayama** 氏の [Unity CLI Loop (`uloop`)](https://github.com/hatayama/unity-cli-loop) を基に、[tongguang](https://github.com/tongguang) が Tuanjie 専用の派生版として保守しています。上流の開発ループ、ツール実装、skills を基盤に、Editor の自動検出、実行環境の分離、配布フローを変更しています。
 
-CLIを通じて、AIエージェントがUnityプロジェクトのコンパイル・テスト・操作を各種LLMツールから実行できるようにします。
+## 対応範囲
 
-AI駆動の開発ループを既存のUnityプロジェクト内で自律的に回し続けるために設計されています。
+- 本ブランチは Tuanjie 専用です。通常の Unity プロジェクトには上流の `uloop` を使用してください。
+- CLI は `tloop`、runner は `tloop-project-runner`、UPM パッケージは `io.github.tongguang.tloop` です。
+- 環境変数 `TLOOP_*`、キャッシュ、`.tloop/`、`tloop-*` skills は上流と分離しています。同じマシンで共存できます。
+- Windows は名前付きパイプ、macOS / Linux は Unix domain socket を使用します。TCP ポートの設定は不要です。
+- `UnityEngine`、`UnityEditor`、既存のアセンブリ名と拡張 API 名は維持しています。
 
-> [!IMPORTANT]
-> - **[V3の新機能](Packages/src/Documentation~/whats-new-v3_ja.md)** — Node.jsのセットアップとポート管理の廃止、`hot-reload` / `pause-point` の追加、CLIの自動アップデートとプロジェクトごとの自動バージョン使い分け、接続の安定性の向上
-> - **[カスタムツール／スキルのV3移行ガイド](Packages/src/Documentation~/migration-v2-to-v3_ja.md)** — C#カスタムツールや、`tloop` コマンドを呼び出すスキル／スクリプトを自作している方向け。それ以外の方は、パッケージとCLIを更新するだけで移行できます
+Windows / **Tuanjie 1.10.3 (`2022.3.62t15`)** で、ヘッドレス環境でのインポート、IPC 接続、90 件の限定テスト、57 アセンブリのオフラインコンパイルを確認しました。
 
-# コンセプト
-Tuanjie CLI Loopは、「AIがUnityプロジェクトの実装をできるだけ人手を介さずに進められる」ことを目指して作られた Unity連携ツールです。
-人間が手で行っていたコンパイル、Test Runner の実行、ログ確認、シーン編集、画面キャプチャによるUIレイアウト確認、さらには実装した機能が本当に動くかどうかを実際に操作して確かめる動作確認までを、LLM ツールからまとめて行えるようにします。
+GUI の起動、PlayMode、hot reload、録画などは追加検証が必要です。他の Tuanjie バージョンおよび macOS / Linux の Editor 対応は未検証です。Unity の CI 結果は Tuanjie の互換性を保証しません。[検証の詳細と既知の制限](docs/tuanjie-compatibility.md) を参照してください。
 
-Tuanjie CLI Loopのコアとなるコンセプトは次の4つです。
+## リリース
 
-1. **AIが自律的にビルド・テスト・ログ解析・修正を回し続ける「自律開発ループ」** — コードを書き換えずに任意の行で実行を止め、その瞬間の変数を読み取って原因を特定することもできます。メソッド本体の修正は再コンパイルを待たずに実行中のゲームへ即時反映できます。`compile`, `run-tests`, `get-logs`, `clear-console`, `pause-point`, `hot-reload`
-2. **シーン構築、オブジェクト操作、メニュー実行、スクリーンショットからのUI改善など、Unity Editorの操作をAIに委任** — `execute-dynamic-code`, `screenshot`
-3. **PlayMode中の自動テスト — ボタンクリック、ドラッグ、キーボード入力、記録済み入力の再生、ゲーム動作の検証をAIが実行** — `simulate-mouse-ui`, `simulate-mouse-input`, `simulate-keyboard`, `replay-input`, `execute-dynamic-code`, `screenshot`
-4. **上記を最小限のツール数で実現する** → [設計思想](#設計思想)
+| コンポーネント | バージョン |
+| --- | --- |
+| Tuanjie UPM パッケージ | [3.22.0](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.0) |
+| CLI dispatcher | [3.14.0](https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.14.0) |
+| Project runner | [3.13.0](https://github.com/tongguang/unity-cli-loop/releases/tag/tloop-project-runner-v3.13.0) |
 
-# デモ
+runner のバージョンはプロジェクトの pin から自動選択されます。
 
-どの動画も、Claude Code が `tloop` で小さなボクセルゲームを操作した実際のセッションです。ターミナルだけが動く区間は早送りし、ゲーム画面は実時間で再生しています。
+## インストール
 
-## Unity を起動する：`launch`
+### 1. CLI
 
-`tloop launch` は、プロジェクトが指定するバージョンの Unity でプロジェクトを開き、Editor がコマンドを受け付けられるようになるまで待ちます。
-
-https://github.com/user-attachments/assets/06cb2abf-7d05-49f3-8b0d-afb90417f7f8
-
-## 機能を足してテストする：`compile`、`run-tests`
-
-Claude が光る松明ブロックを追加し、`compile` でビルドして、`run-tests` で EditMode テストを実行します。失敗したテストを直し、Play Mode で夜にして松明を確かめます。
-
-https://github.com/user-attachments/assets/f0daa13b-af3a-4560-9acc-4f6c8262889d
-
-## Play Mode のままコードを変える：`hot-reload`
-
-Claude が二段ジャンプを追加し、Play Mode を止めずに `hot-reload` で反映します。続けて `simulate-keyboard` で Space を押し、ジャンプの高さを測ります。
-
-https://github.com/user-attachments/assets/a1661238-e215-460b-8236-fc5b5707f5e8
-
-## 指定した行で止めて、そのフレームを読む：`pause-point`
-
-水が隙間へ初めて流れ込むとき、セルの新しい水位を決める行で `pause-point` がゲームを止め、そのフレームのローカル変数・フィールド・呼び出し経路を返します。続いてウォッチ式で水路の水位を追いながら、水を 1 tick ずつ進めます。
-
-https://github.com/user-attachments/assets/7d6bbef6-64e7-4d70-af73-676a85f3ad05
-
-## ゲームの中で C# を実行する：`execute-dynamic-code`
-
-`execute-dynamic-code` は実行中のゲームの中で C# を動かします。Claude がプレイヤーの前にガラスブロックを 10 個積み、一時的なカメラから塔全体を撮ります。
-
-https://github.com/user-attachments/assets/ff4ec461-a7bc-4cb5-bcc8-8e1bdfa7fefd
-
-## ゲーム画面を撮る：`screenshot`
-
-Claude が `execute-dynamic-code` で湖を探してカメラを真上に移し、`screenshot` で撮ります。そのあと HUD を隠して撮り直します。
-
-https://github.com/user-attachments/assets/6af6c20d-8ea5-49d9-b913-6e5bc124ff58
-
-## シーンの構造を読む：`get-hierarchy`、`find-game-objects`
-
-`get-hierarchy` が実行中のシーンのツリーをファイルに保存し、`find-game-objects` がプレイヤーのコンポーネントを読みます。
-
-https://github.com/user-attachments/assets/c836df71-d66c-4bf1-8bc4-afc7f69969cb
-
-## キーを押す：`simulate-keyboard`
-
-`simulate-keyboard` が Input System 経由で W キーを押し続けます。プレイヤーは岸から湖に入り、スクリーンショットで水中の視界を確かめます。
-
-https://github.com/user-attachments/assets/cc4e44d5-9a78-49db-99ab-3164a58b472b
-
-## マウスを動かしてクリックする：`simulate-mouse-input`
-
-`simulate-mouse-input` が人の手のようにマウスを少しずつ動かし、ブロックを 3 つ壊して、できた穴を水で満たします。
-
-https://github.com/user-attachments/assets/118c8b4a-8254-4798-a63c-f6a213fc1031
-
-# クイックスタート
-
-このガイドでは、CLI、Unity パッケージ、スキルの 3 つをインストールし、LLM ツールから Unity を操作できる状態にします。ターミナルから入れる方法と Unity の UI から入れる方法があり、どちらか一方で完了します。
-
-## 始める前に
-
-以下を確認してください：
-
-- Unity 2022.3 以降のプロジェクトがある
-- Claude Code、Codex など、スキルを読み込める LLM ツールを使っている
-
-> [!NOTE]
-> **V2 からアップグレードする場合**: V2 API で作ったカスタムツールがあるプロジェクトでは、V3 パッケージを入れた直後にコンパイルエラーが出ます。これは想定内の挙動です。手で直さず、Unity 起動時の Safe Mode の問い合わせで `Ignore` を選び、自動で開く移行ウィンドウ（`Window > Tuanjie CLI Loop > Custom Tool Migration`）で **Migrate** を押してください。手順は [カスタムツール／スキルの V3 移行ガイド](Packages/src/Documentation~/migration-v2-to-v3_ja.md) を参照してください。
-
-## ターミナルから入れる場合
-
-### ステップ 1：CLI をインストールする
-
-**macOS、Linux (x86_64)、Windows Git Bash:**
-
-Linux では focus-window は未対応です。
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scripts/install.sh | sh
-```
-
-**Windows PowerShell:**
+Windows PowerShell:
 
 ```powershell
 irm https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scripts/install.ps1 | iex
 ```
 
-**Homebrew（macOS）:**
+macOS / Linux / Windows Git Bash:
 
-```bash
-brew install hatayama/tap/tloop
+```sh
+curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scripts/install.sh | sh
 ```
 
-インストールできたか確認します：
+`tloop --version` で確認できます。Homebrew、winget、OpenUPM での配布はまだ設定していません。`tloop package install` は OpenUPM への登録が必要なため、今回は次の Git URL または tarball を使用してください。
 
-```bash
-tloop -v
+### 2. Tuanjie パッケージ
+
+Tuanjie の `Window > Package Manager` で **Add package from git URL** を選択し、次の URL を入力してください。
+
+```text
+https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.0
 ```
 
-最初の行に CLI のバージョン（例: `3.0.1`）が表示されれば成功です。
+または [UPM リリース](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.0) の `.tgz` をダウンロードし、**Add package from tarball** でインストールできます。通常の UPM パッケージとして配布しており、Unity Cloud のパッケージ署名は不要です。CLI のチェックサムと来歴証明の検証は維持しています。
 
-### ステップ 2：Unity パッケージをインストールする
+### 3. Skills
 
-Unity プロジェクトのルートで実行します：
+パッケージには `tloop-*` の skill ソースも含まれています。パッケージのインストール後、Tuanjie プロジェクトのルートで実行してください。
 
-```bash
-tloop package install
-```
-
-OpenUPM の scoped registry と `io.github.tongguang.tloop` の依存を `Packages/manifest.json` に追加します。バージョンを固定するには `--version <x.y.z>` を付けます。
-
-続けて Unity を起動します。Unity がすでに起動している場合は、その Unity にフォーカスします：
-
-```bash
-tloop launch
-```
-
-Unity が起動すると、パッケージがプロジェクトにインストールされます。次のステップでは、インストールされたパッケージからスキルを読み取ります。
-
-### ステップ 3：スキルをインストールする
-
-使っている LLM ツールに合わせて、Unity プロジェクトのルートで実行します：
-
-```bash
+```sh
 # Claude Code
 tloop skills install --claude
 
-# Codex など .agents/skills を読むツール
+# Codex and other tools that read .agents/skills
 tloop skills install --agents
-
-# Unity プロジェクトを含む Git リポジトリのルートにインストール
-tloop skills install --claude --root git
-
-# プロジェクトではなくグローバルにインストール
-tloop skills install --claude --global
-
-# 任意のディレクトリ（外部のスキルパッケージストアなど）へ
-tloop skills install --output-dir path/to/skills
 ```
 
-## Unity の UI から入れる場合
+Editor の `Window > Tuanjie CLI Loop > Settings` から **Install CLI**、**Install Skills** を使うこともできます。既存の `uloop-*` skills とは別名でインストールされます。
 
-### ステップ 1：Unity パッケージをインストールする
+### 4. 接続と操作
 
-`Window > Package Manager` の「+」から **Add package from git URL** を選び、次の URL を入力します：
+最初に Tuanjie でプロジェクトを開いて保存し、`ProjectSettings/ProjectVersion.txt` に Tuanjie の Editor バージョンを記録してください。プロジェクトのルートで使用します。
 
-```text
-https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src
-```
-
-<details>
-<summary>OpenUPM の scoped registry から入れる場合</summary>
-
-1. `Project Settings > Package Manager` の Scoped Registries に以下を追加します：
-```text
-Name: OpenUPM
-URL: https://package.openupm.com
-Scope(s): io.github.tongguang.tloop
-```
-2. `Window > Package Manager` で My Registries の OpenUPM を選び、Tuanjie CLI Loop をインストールします。
-
-</details>
-
-### ステップ 2：CLI をインストールする
-
-`Window > Tuanjie CLI Loop > Settings` を開き、**Install CLI** を押します：
-
-<img width="350" alt="CLI未インストール状態のSettingsウィンドウ。Install CLIボタンが表示されている" src="Packages/src/Documentation~/images/settings-cli-not-installed.png" />
-
-CLI のバージョンが表示され、ボタンが **Uninstall CLI** に変われば完了です：
-
-<img width="350" alt="CLI検出に成功したSettingsウィンドウ。緑のインジケータとCLIバージョンが表示されている" src="Packages/src/Documentation~/images/settings-cli-installed.png" />
-
-### ステップ 3：スキルをインストールする
-
-同じ Settings ウィンドウで対象を選び（**Claude Code**、または Codex など `.agents/skills` を読むツール向けの **Common (.agents)**）、**Install Skills** を押します：
-
-<img width="350" alt="SettingsウィンドウのSkillsセクション。対象を選択してInstall Skillsボタンが押せる状態" src="Packages/src/Documentation~/images/settings-skills-install.png" />
-
-<details>
-<summary>V2 プロジェクトと併用する場合</summary>
-
-V2 のパッケージを使っているプロジェクトと V3 のプロジェクトは、同じマシンで併用できます。V3 の CLI をインストールしたままにしておけば、V2 のプロジェクトでは `tloop` コマンドが自動的に V2 の CLI を使います（初回に自動でダウンロードされます。Node.js 22 以降が必要です）。
-
-V2 のプロジェクトの Settings ウィンドウで **Update CLI** や **Downgrade CLI** を押したり、V2 の CLI を `npm install -g tloop-cli` で入れ直したりしないでください。古い npm 版の `tloop` が V3 の CLI を隠してしまいます。すでにそうなっている場合は `npm uninstall -g tloop-cli` を実行してから、「ターミナルから入れる場合」のステップ 1 の CLI インストーラをもう一度実行するか、Settings ウィンドウで **Install CLI** を押してください。
-
-</details>
-
-これで完了です！Skillsをインストールすると、LLMツールが以下のような指示に自動で対応できるようになります：
-
-| あなたの指示 | LLMツールが使うSkill |
-|---|---|
-| 「このプロジェクトのUnityを起動して」 | `/tloop-launch` |
-| 「コンパイルエラーを直して」 | `/tloop-compile` |
-| 「この修正をコンパイルせずに今すぐ反映して」 | `/tloop-hot-reload` |
-| 「テストを実行して失敗原因を教えて」 | `/tloop-run-tests` + `/tloop-get-logs` |
-| 「シーンの階層構造を確認して」 | `/tloop-get-hierarchy` |
-| 「Unityを再生させて、Unityを前面に出して」 | `/tloop-control-play-mode` + `/tloop-focus-window` |
-| 「Prefabのパラメータを一括修正して」 | `/tloop-execute-dynamic-code` |
-| 「Game Viewのスクショを撮って、UIレイアウトを調整して」 | `/tloop-screenshot` + `/tloop-execute-dynamic-code` |
-| 「記録した入力を再生して」 | `/tloop-replay-input` |
-| 「バグの原因をこの行で止めて調べて」 | `/tloop-pause-point` |
-
-
-<details>
-<summary>バンドルされている全21個のSkills一覧</summary>
-
-- `/tloop-launch` - 正しいバージョンでUnityを起動
-- `/tloop-status` - Unityが今コマンドを受け付けられるかを確認し、BUSYでコマンドが拒否され続けるときは実行中のコマンドをキャンセル
-- `/tloop-compile` - コンパイルの実行
-- `/tloop-get-logs` - Consoleログの取得
-- `/tloop-run-tests` - テストの実行
-- `/tloop-hot-reload` - メソッド本体の変更を再コンパイルなしで実行中のコードへ即時適用
-- `/tloop-clear-console` - Consoleのクリア
-- `/tloop-focus-window` - Unity Editorを前面に表示
-- `/tloop-get-hierarchy` - シーン階層の取得
-- `/tloop-find-game-objects` - GameObject検索
-- `/tloop-screenshot` - EditorWindowのキャプチャ
-- `/tloop-pause-point` - 任意の行で実行を止めて変数をキャプチャ
-- `/tloop-set-game-view-size` - Game Viewのカスタム解像度の取得・設定
-- `/tloop-game-view-mode` - Game ViewタブがGame / Simulatorのどちらかを確認し、切り替えて向きを合わせ、端末も選べる
-- `/tloop-record-video` - Game ViewやEditorウィンドウを録画し、agentが読めるフレームのシートと変化量を返す。操作をはさんだ録画も1コマンドで可能
-- `/tloop-simulate-mouse-ui` - PlayMode UI要素のクリック・長押し・ドラッグシミュレーション
-- `/tloop-simulate-mouse-input` - Input System経由のPlayModeマウス入力シミュレーション
-- `/tloop-simulate-keyboard` - Input System経由のPlayModeキーボード入力シミュレーション
-- `/tloop-replay-input` - Recordingsウィンドウで記録した入力のPlayMode再生
-- `/tloop-control-play-mode` - Play Modeの制御
-- `/tloop-execute-dynamic-code` - 動的C#コード実行
-
-</details>
-
-<details>
-<summary>CLIの直接利用（上級者向け）</summary>
-
-Skillsを使わずにCLIを直接呼び出すこともできます：
-
-```bash
-# 利用可能なツール一覧を取得
+```sh
+tloop status
 tloop list
-
-# 正しいバージョンでUnityプロジェクトを起動
-tloop launch
-
-# ビルドターゲットを指定して起動（Android, iOS, StandaloneOSX など）
-tloop launch -p Android
-
-# 実行中のUnityを終了して再起動
-tloop launch -r
-
-# コンパイルを実行
 tloop compile
-
-# Domain Reloadを待たずにコンパイルを開始
-tloop compile --no-wait-for-domain-reload
-
-# 変更した.csのメソッド本体を再コンパイルなしで実行中のコードへ適用
-tloop hot-reload
-
-# ログを取得
 tloop get-logs --max-count 10
-
-# テストを実行
-tloop run-tests --filter-type all
-
-# 動的コードを実行
-tloop execute-dynamic-code --code 'using UnityEngine; Debug.Log("Hello from CLI!");'
+tloop run-tests --filter-type class --filter-value YourTestClass
 ```
 
-</details>
+Editor が起動していなければ `tloop launch` を使用できます。プロジェクトに記録された `m_EditorVersion` と Tuanjie Hub の登録情報、既定のインストール先から Editor を探します。`2022.3.62t15` が Editor バージョン、`1.10.3` が製品バージョンです。
 
-## Claude Codeを使う場合の設定
+各コマンドの引数は `tloop <command> --help`、利用例と全体の説明は [中国語 README](README.md) を参照してください。Linux では `focus-window` は利用できません。
 
-Claude Codeはシェルコマンドをサンドボックス内で実行し、サンドボックスは通信をデフォルトで遮断します。UnityとのIPC接続も対象になるため、`tloop` はUnityが正常に動いていても、接続しようとした時点で `UNITY_NOT_REACHABLE`（`connect: operation not permitted`）で失敗します。
+## 参考
 
-`~/.claude/settings.json` の `sandbox.excludedCommands` に `tloop *` を追加して、`tloop` コマンドをサンドボックスの対象外にしてください。
+- [Tuanjie 互換性と環境の分離](docs/tuanjie-compatibility.md)
+- [カスタムツールの開発](Packages/src/Documentation~/custom-tools.md)
+- [Project runner pin](docs/project-runner-pin.md)
+- [UPM リリースのフロー](docs/unity-package-release.md)
+- [上流のデモ](https://github.com/hatayama/unity-cli-loop#demos): 上流作者による Unity / `uloop` の映像です。Tuanjie の検証結果ではありません。リポジトリ内のロゴ、スクリーンショット、デモ素材も上流由来です。上流ロゴには Daft Punk の *Human After All* のジャケットに着想を得たとの注記があります。
 
-```json
-{
-  "sandbox": {
-    "excludedCommands": ["tloop *"]
-  }
-}
-```
+## ライセンスと謝辞
 
-このパターンは**入力されたコマンド文字列**に対して照合されるため、`tloop` で始まる呼び出しが対象外になります。詳細と検証結果は [docs/claude-code-sandbox.md](docs/claude-code-sandbox.md) を参照してください。
+上流の **MIT License** を継承しています。
 
-# 仕組み
+> Copyright (c) 2025 Masamichi Hatayama
 
-`tloop` コマンドがUnity Editorに届くまでの流れは次のとおりです。
+著作権表示、許諾条件、免責条項の全文は [LICENSE.md](LICENSE.md) に保持しています。名称の変更や Tuanjie 対応によって、上流コードの著作者の帰属は変わりません。コピー、変更、再配布の際には、元の著作権表示とライセンス全文を保持してください。
 
-- **グローバル `tloop` dispatcher** — PATH上に1つだけ置かれる入口。コマンドを解釈し、対象プロジェクト用のrunnerへ委譲します
-- **`tloop-project-runner`** — プロジェクトごとのrunner。使用するバージョンは各プロジェクトの `.tloop/project-runner-pin.json`（pin）で決まり、バージョン別のユーザーキャッシュへ自動的にダウンロードされます。そのため、異なるバージョンの複数プロジェクトを1台のマシンで共存させられます → [project runner pinの詳細](docs/project-runner-pin.md)
-- **Unity Editor内のIPCサーバー** — runnerからの接続を受け取り、Unity APIを実行して結果を返します
+同梱の第三者コンポーネントについては [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md) と各プラグインのライセンスも参照してください。
 
-接続には**TCPポートを使いません**。macOS/LinuxではUnixドメインソケット、Windowsでは名前付きパイプで接続するため、ポートの設定も、他のEditorインスタンスとのポート衝突もありません。
-
-# 設計思想
-
-Tuanjie CLI Loop はツールの数を追い求めません。C#コードの動的実行（`execute-dynamic-code`）があれば、Unity Editor上のほとんどの操作はそれ一つで実現できます。
-
-ツールを増やしすぎると、AIがどのツールを使うべきか適切に判断できなくなります。さらに、たとえSkill化したとしても各ツールのdescriptionはコンテキストウィンドウを消費します。必要最低限に絞ることがよい設計だと考えています。
-
-専用ツールを設けているのは、フレームをまたぐ入力シミュレーションやスクリーンショット取得のように動的コード実行では原理的に対応できない操作と、compile・get-logsのように開発ループの中で繰り返し呼ばれる操作です。後者を専用ツール化することで、毎回C#コードを生成するトークンコストを削減しています。
-
-新しい専用ツールが欲しくなったときも、その多くはSkill化で足ります。定型の操作をSKILL.mdの手順、シェルスクリプト、`execute-dynamic-code` に渡すC#スニペットとして書いておけば、AIはそれを呼び出すだけで済みます。Skillの本体は起動時にしか読み込まれず、実行のたびにコードを生成し直す必要もないため、追加のトークン消費はほぼゼロです。作り方は[カスタムツール開発ガイド](Packages/src/Documentation~/custom-tools_ja.md#カスタムツール用-skills)を参照してください。
-
-# 主要機能
-
-各ツールの詳しい説明と使用例は **[ツールリファレンス](Packages/src/Documentation~/tools_ja.md)** を参照してください。
-
-## 自律開発ループ系ツール
-- `compile` - コンパイルを実行し、エラー・警告を返す
-- `get-logs` - Consoleと同じ内容のログを、種類や検索文字列で絞り込んで取得
-- `run-tests` - Unity Test Runnerを実行（PlayMode / EditMode対応）
-- `hot-reload` - メソッド本体の変更を再コンパイルなしで実行中のコードへ即時適用
-- `pause-point` - コードを書き換えずに任意の行でPlayModeを止め、その瞬間の変数を読む
-
-## Unity Editor 自動化・探索ツール
-- `clear-console` - Consoleのログをクリア
-- `find-game-objects` - シーン内のオブジェクトを検索し、コンポーネントを調査
-- `get-hierarchy` - シーン構造をJSONで取得
-- `focus-window` - Unity Editorウィンドウを前面化
-- `screenshot` - EditorWindowやGame Viewのスクリーンショットを保存
-- `set-game-view-size` - Game Viewのカスタム解像度を取得・設定
-- `game-view-mode` - Game ViewタブがGame / Simulatorのどちらかを確認し、切り替えて向きを合わせ、端末も選べる
-- `record-video` - Game ViewやEditorウィンドウをMP4（LinuxではWebM）へ録画し、フレームのシートとフレームごとの変化量を返す。ffmpegがあれば後から切り出し可能
-- `control-play-mode` - Play Modeの再生・停止・一時停止
-- `execute-dynamic-code` - 動的C#コード実行
-
-## PlayMode 自動テスト系ツール
-- `simulate-mouse-ui` - UI要素へのマウス操作シミュレーション（EventSystem経由）
-- `simulate-mouse-input` - Input System経由のマウス入力シミュレーション
-- `simulate-keyboard` - Input System経由のキーボード入力シミュレーション
-- `replay-input` - Recordingsウィンドウで記録した入力のPlayMode再生
-
-## Tuanjie CLI Loop 拡張ツールの開発
-
-コアパッケージに手を入れることなく、プロジェクト固有のカスタムツールを型安全に追加できます。`Skill/SKILL.md` を添えれば、AIエージェントがカスタムツールを自動認識します。
-
-実装手順とSkillsの書き方は **[カスタムツール開発ガイド](Packages/src/Documentation~/custom-tools_ja.md)** を参照してください。
-
-## その他
-
-### Tuanjie CLI Loop 関連ファイル
-
-`UserSettings/UnityCliLoopSettings.json` はユーザー個別のエディタ設定を保持するため、常にローカル専用です。
-
-プロジェクトルートの `.tloop/` ディレクトリには、CLIキャッシュ、ツールレジストリ、ランタイム出力が格納されます。大半はローカル専用ですが、一部のファイルはチーム共有のためにオプションでgit管理できます。
-
-| ファイル | 用途 | git管理 |
-|---------|------|---------|
-| `project-runner-pin.json` | グローバルdispatcherが使うproject runnerのバージョン契約 | 任意 |
-| `settings.tools.json` | ツールごとの有効・無効設定 | 任意 |
-| `settings.skills.json` | スキルのインストール先（Unityプロジェクトルート / Gitリポジトリルート） | 任意 |
-| `tools.json` | 自動生成されるCLIツールレジストリ | No |
-| `outputs/` | ランタイム出力（テスト結果、スクリーンショット、ヒエラルキーダンプ） | No |
-
-> [!TIP]
-> **推奨 `.gitignore` パターン**
->
-> ```gitignore
-> **/.tloop/*
-> !**/.tloop/settings.tools.json
-> !**/.tloop/settings.skills.json
-> ```
->
-> 自動生成ファイルやランタイム出力を無視しつつ、チーム共有の設定ファイルをgit管理できます。
-> ツールの有効・無効設定やスキルのインストール先を共有しない場合は、該当する `!` の行を削除してください。
->
-> `project-runner-pin.json` はgit管理しなくても動きます。エディタがプロジェクトを開くたびに書き直し、`tloop` はインストール済みパッケージ内のpinにもフォールバックするためです。Unityで一度も開いていない新規クローン（CIなど）で、pinで決まるproject runnerを使う `tloop` コマンドを実行する場合だけ、`!**/.tloop/project-runner-pin.json` を追加してgit管理してください。
-
-## ライセンス
-MIT License
+初回リリースの UPM / CLI アーカイブにはプロジェクト自身のライセンスが同梱されていません。これらを保存・再配布する際は [LICENSE.md](https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/LICENSE.md) も保持してください。現在のソースと今後のパッケージングには修正を追加しており、公開済みアーカイブは上書きしません。

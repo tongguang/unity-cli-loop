@@ -38,10 +38,11 @@ write_checksum() {
 }
 
 write_executable "$PAYLOAD_DIR/tloop-project-runner" "real"
+cp "$ROOT_DIR/LICENSE.md" "$PAYLOAD_DIR/LICENSE.md"
 
-tar -czf "$RELEASE_DIR/tloop-project-runner-darwin-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner
-tar -czf "$RELEASE_DIR/tloop-project-runner-darwin-arm64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner
-tar -czf "$RELEASE_DIR/tloop-project-runner-linux-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner
+tar -czf "$RELEASE_DIR/tloop-project-runner-darwin-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner ./LICENSE.md
+tar -czf "$RELEASE_DIR/tloop-project-runner-darwin-arm64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner ./LICENSE.md
+tar -czf "$RELEASE_DIR/tloop-project-runner-linux-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner ./LICENSE.md
 write_checksum "tloop-project-runner-darwin-amd64.tar.gz"
 write_checksum "tloop-project-runner-darwin-arm64.tar.gz"
 write_checksum "tloop-project-runner-linux-amd64.tar.gz"
@@ -54,7 +55,7 @@ fi
 write_executable "$PAYLOAD_DIR/tloop-project-runner.exe" "real"
 (
   cd "$PAYLOAD_DIR"
-  zip -q "$RELEASE_DIR/tloop-project-runner-windows-amd64.zip" tloop-project-runner.exe
+  zip -q "$RELEASE_DIR/tloop-project-runner-windows-amd64.zip" tloop-project-runner.exe LICENSE.md
 )
 write_checksum "tloop-project-runner-windows-amd64.zip"
 
@@ -78,8 +79,26 @@ corrupt_linux_checksum() {
 replace_linux_archive_without_executable() {
   case_payload_dir=$(mktemp -d "$TEST_ROOT/payload.XXXXXX")
   printf '%s\n' "unrelated" > "$case_payload_dir/README"
-  tar -czf "$1/$LINUX_ARCHIVE" -C "$case_payload_dir" ./README
+  cp "$ROOT_DIR/LICENSE.md" "$case_payload_dir/LICENSE.md"
+  tar -czf "$1/$LINUX_ARCHIVE" -C "$case_payload_dir" ./README ./LICENSE.md
   write_checksum "$LINUX_ARCHIVE" "$1"
+}
+
+# Verifies a valid executable and checksum cannot hide a missing tarball license.
+replace_linux_archive_without_license() {
+  tar -czf "$1/$LINUX_ARCHIVE" -C "$PAYLOAD_DIR" ./tloop-project-runner
+  write_checksum "$LINUX_ARCHIVE" "$1"
+}
+
+# Verifies the Windows zip must also retain the project's license.
+replace_windows_archive_without_license() {
+  case_archive="tloop-project-runner-windows-amd64.zip"
+  rm "$1/$case_archive"
+  (
+    cd "$PAYLOAD_DIR"
+    zip -q "$1/$case_archive" tloop-project-runner.exe
+  )
+  write_checksum "$case_archive" "$1"
 }
 
 # Each case breaks exactly one Linux asset property in a copy of the valid
@@ -115,3 +134,5 @@ expect_listed_asset "$LINUX_ARCHIVE.sha256"
 expect_verify_fails remove_linux_archive "$LINUX_ARCHIVE"
 expect_verify_fails corrupt_linux_checksum "$LINUX_ARCHIVE"
 expect_verify_fails replace_linux_archive_without_executable "$LINUX_ARCHIVE"
+expect_verify_fails replace_linux_archive_without_license "LICENSE.md"
+expect_verify_fails replace_windows_archive_without_license "LICENSE.md"

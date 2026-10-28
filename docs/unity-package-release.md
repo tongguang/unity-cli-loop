@@ -19,6 +19,8 @@ release, so consumers never see a published release without its package asset.
 2. **Pack.** A read-only job checks out the package release commit and copies
    `Packages/src` into the archive's `package/` directory. The tarball includes
    every source file, asset `.meta`, and skill in tilde-suffixed directories.
+   `Packages/src/LICENSE.md` preserves the root project license and upstream
+   copyright verbatim, alongside the existing third-party notices.
    No external package-signing binary or credentials run in this job.
 3. **Stage.** `cmd/stage-unity-package` checks the package name, release version,
    and completeness against the source tree, then names the archive

@@ -110,4 +110,9 @@ require_tar_entry "tloop-project-runner-darwin-arm64.tar.gz" "tloop-project-runn
 require_tar_entry "tloop-project-runner-linux-amd64.tar.gz" "tloop-project-runner"
 require_zip_entry "tloop-project-runner-windows-amd64.zip" "tloop-project-runner.exe"
 
+require_tar_entry "tloop-project-runner-darwin-amd64.tar.gz" "LICENSE.md"
+require_tar_entry "tloop-project-runner-darwin-arm64.tar.gz" "LICENSE.md"
+require_tar_entry "tloop-project-runner-linux-amd64.tar.gz" "LICENSE.md"
+require_zip_entry "tloop-project-runner-windows-amd64.zip" "LICENSE.md"
+
 echo "Native CLI release assets are complete."

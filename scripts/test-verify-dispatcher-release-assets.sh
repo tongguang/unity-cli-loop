@@ -42,10 +42,11 @@ printf '%s\n' "install" > "$RELEASE_DIR/install.ps1"
 write_checksum "install.sh"
 write_checksum "install.ps1"
 write_executable "$PAYLOAD_DIR/tloop" "dispatcher"
+cp "$ROOT_DIR/LICENSE.md" "$PAYLOAD_DIR/LICENSE.md"
 
-tar -czf "$RELEASE_DIR/tloop-dispatcher-darwin-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop
-tar -czf "$RELEASE_DIR/tloop-dispatcher-darwin-arm64.tar.gz" -C "$PAYLOAD_DIR" ./tloop
-tar -czf "$RELEASE_DIR/tloop-dispatcher-linux-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop
+tar -czf "$RELEASE_DIR/tloop-dispatcher-darwin-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop ./LICENSE.md
+tar -czf "$RELEASE_DIR/tloop-dispatcher-darwin-arm64.tar.gz" -C "$PAYLOAD_DIR" ./tloop ./LICENSE.md
+tar -czf "$RELEASE_DIR/tloop-dispatcher-linux-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop ./LICENSE.md
 write_checksum "tloop-dispatcher-darwin-amd64.tar.gz"
 write_checksum "tloop-dispatcher-darwin-arm64.tar.gz"
 write_checksum "tloop-dispatcher-linux-amd64.tar.gz"
@@ -58,7 +59,7 @@ fi
 write_executable "$PAYLOAD_DIR/tloop.exe" "dispatcher"
 (
   cd "$PAYLOAD_DIR"
-  zip -q "$RELEASE_DIR/tloop-dispatcher-windows-amd64.zip" tloop.exe
+  zip -q "$RELEASE_DIR/tloop-dispatcher-windows-amd64.zip" tloop.exe LICENSE.md
 )
 write_checksum "tloop-dispatcher-windows-amd64.zip"
 
@@ -82,8 +83,26 @@ corrupt_linux_checksum() {
 replace_linux_archive_without_executable() {
   case_payload_dir=$(mktemp -d "$TEST_ROOT/payload.XXXXXX")
   printf '%s\n' "unrelated" > "$case_payload_dir/README"
-  tar -czf "$1/$LINUX_ARCHIVE" -C "$case_payload_dir" ./README
+  cp "$ROOT_DIR/LICENSE.md" "$case_payload_dir/LICENSE.md"
+  tar -czf "$1/$LINUX_ARCHIVE" -C "$case_payload_dir" ./README ./LICENSE.md
   write_checksum "$LINUX_ARCHIVE" "$1"
+}
+
+# Verifies a valid executable and checksum cannot hide a missing tarball license.
+replace_linux_archive_without_license() {
+  tar -czf "$1/$LINUX_ARCHIVE" -C "$PAYLOAD_DIR" ./tloop
+  write_checksum "$LINUX_ARCHIVE" "$1"
+}
+
+# Verifies the Windows zip must also retain the project's license.
+replace_windows_archive_without_license() {
+  case_archive="tloop-dispatcher-windows-amd64.zip"
+  rm "$1/$case_archive"
+  (
+    cd "$PAYLOAD_DIR"
+    zip -q "$1/$case_archive" tloop.exe
+  )
+  write_checksum "$case_archive" "$1"
 }
 
 # Each case breaks exactly one Linux asset property in a copy of the valid
@@ -119,3 +138,5 @@ expect_listed_asset "$LINUX_ARCHIVE.sha256"
 expect_verify_fails remove_linux_archive "$LINUX_ARCHIVE"
 expect_verify_fails corrupt_linux_checksum "$LINUX_ARCHIVE"
 expect_verify_fails replace_linux_archive_without_executable "$LINUX_ARCHIVE"
+expect_verify_fails replace_linux_archive_without_license "LICENSE.md"
+expect_verify_fails replace_windows_archive_without_license "LICENSE.md"
