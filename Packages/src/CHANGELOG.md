@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.22.1](https://github.com/tongguang/unity-cli-loop/compare/v3.22.0...v3.22.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* document Tuanjie fork and preserve upstream licenses ([6a661e9](https://github.com/tongguang/unity-cli-loop/commit/6a661e9f9519e6a92382289fff5e822e05215858))
+
 ## [3.22.0](https://github.com/tongguang/unity-cli-loop/compare/v3.21.1...v3.22.0) (2026-10-28)
 
 
