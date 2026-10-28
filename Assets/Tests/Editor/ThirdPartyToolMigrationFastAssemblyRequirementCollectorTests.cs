@@ -18,7 +18,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private const string AssemblyDirectoryKey = "<PROJECT_ROOT>/Assets/VendorTools";
 
         private const string LegacyToolSource =
-            "using io.github.tongguang.tloop;\n" +
+            "using io.github.hatayama.uLoopMCP;\n" +
             "[McpTool] public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse> {}";
 
         private const string CurrentApplicationSource =

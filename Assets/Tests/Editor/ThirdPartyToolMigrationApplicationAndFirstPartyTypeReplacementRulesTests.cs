@@ -17,7 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ReplaceLegacyApplicationTypeNamesInCode_WhenTypeIsLegacyQualified_RewritesToToolContracts()
         {
-            const string source = "io.github.tongguang.tloop.SwitchToMainThreadAwaitable awaitable;";
+            const string source = "io.github.hatayama.uLoopMCP.SwitchToMainThreadAwaitable awaitable;";
             int replacementCount = 0;
 
             string content =
@@ -92,7 +92,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ReplaceLegacyFirstPartyScreenshotTypeNamesInCode_WhenTypeIsLegacyQualified_RewritesToToolContracts()
         {
-            const string source = "io.github.tongguang.tloop.WindowMatchMode mode;";
+            const string source = "io.github.hatayama.uLoopMCP.WindowMatchMode mode;";
             int replacementCount = 0;
 
             string content =

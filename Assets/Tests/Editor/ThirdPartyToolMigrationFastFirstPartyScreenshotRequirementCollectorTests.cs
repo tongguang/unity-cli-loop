@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     public sealed class ThirdPartyToolMigrationFastFirstPartyScreenshotRequirementCollectorTests
     {
         private const string LegacyCaptureSource =
-            "using io.github.tongguang.tloop;\n" +
+            "using io.github.hatayama.uLoopMCP;\n" +
             "using UnityEditor;\n" +
             "public sealed class ScreenshotTool\n" +
             "{\n" +

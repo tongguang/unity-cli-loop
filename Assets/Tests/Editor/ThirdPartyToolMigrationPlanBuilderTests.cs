@@ -71,7 +71,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Directory.CreateDirectory(toolDirectory);
             File.WriteAllText(
                 Path.Combine(toolDirectory, "HelloTool.cs"),
-                "using io.github.tongguang.tloop; [McpTool] public sealed class HelloTool {}");
+                "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class HelloTool {}");
             using (CancellationTokenSource cancellation = new CancellationTokenSource())
             {
                 // One C# file is three work items; the third is reported by the C# planning loop.

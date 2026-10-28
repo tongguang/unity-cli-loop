@@ -38,7 +38,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void HasMigrationTargetAsync_WhenOnlyCommentMentionsLegacyNamespace_ReturnsFalse()
         {
-            WriteAssetFile("Notes.cs", "// using io.github.tongguang.tloop;\npublic sealed class Notes {}");
+            WriteAssetFile("Notes.cs", "// using io.github.hatayama.uLoopMCP;\npublic sealed class Notes {}");
 
             Task<bool> task = ThirdPartyToolMigrationTargetScanner.HasMigrationTargetAsync(_projectRoot, CancellationToken.None);
 

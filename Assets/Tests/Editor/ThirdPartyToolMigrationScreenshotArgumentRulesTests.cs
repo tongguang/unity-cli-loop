@@ -138,7 +138,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void ReplaceLegacyToolInfoConstructorsInCode_WhenConstructorIsLegacyNamespaceQualified_RewritesConstructor()
         {
             string source =
-                "ToolInfo info = new io.github.tongguang.tloop.ToolInfo(\"sample-tool\", \"Sample description\", schema);\n";
+                "ToolInfo info = new io.github.hatayama.uLoopMCP.ToolInfo(\"sample-tool\", \"Sample description\", schema);\n";
             int replacementCount = 0;
 
             string content = ThirdPartyToolMigrationMetadataConstructorRules.ReplaceLegacyToolInfoConstructorsInCode(

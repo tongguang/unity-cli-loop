@@ -77,7 +77,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ReplaceLegacyTimerDelayNamedArgumentsInCode_WhenCallIsFullyQualified_RewritesWithoutBareMigration()
         {
-            const string source = "io.github.tongguang.tloop.TimerDelay.Wait(1, cancellationToken: ct);";
+            const string source = "io.github.hatayama.uLoopMCP.TimerDelay.Wait(1, cancellationToken: ct);";
 
             (string content, int replacementCount) =
                 ThirdPartyToolMigrationDelayRules.ReplaceLegacyTimerDelayNamedArgumentsInCode(
@@ -85,7 +85,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     Array.Empty<string>(),
                     false);
 
-            Assert.That(content, Is.EqualTo("io.github.tongguang.tloop.TimerDelay.Wait(1, ct: ct);"));
+            Assert.That(content, Is.EqualTo("io.github.hatayama.uLoopMCP.TimerDelay.Wait(1, ct: ct);"));
             Assert.That(replacementCount, Is.EqualTo(1));
         }
 
@@ -142,7 +142,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ReplaceLegacyMainThreadSwitcherCallsInCode_WhenCallIsLegacyQualified_RewritesWithoutBareMigration()
         {
-            const string source = "io.github.tongguang.tloop.MainThreadSwitcher.SwitchToMainThread(cancellationToken: ct);";
+            const string source = "io.github.hatayama.uLoopMCP.MainThreadSwitcher.SwitchToMainThread(cancellationToken: ct);";
 
             (string content, int replacementCount) =
                 ThirdPartyToolMigrationDelayRules.ReplaceLegacyMainThreadSwitcherCallsInCode(
@@ -154,7 +154,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             Assert.That(
                 content,
-                Is.EqualTo("io.github.tongguang.tloop.MainThreadSwitcher.SwitchToMainThread(ct: ct);"));
+                Is.EqualTo("io.github.hatayama.uLoopMCP.MainThreadSwitcher.SwitchToMainThread(ct: ct);"));
             Assert.That(replacementCount, Is.EqualTo(1));
         }
 

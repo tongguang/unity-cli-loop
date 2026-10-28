@@ -15,7 +15,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     public sealed class ThirdPartyToolMigrationPreflightScannerTests
     {
         private const string LegacyToolSource =
-            "using io.github.tongguang.tloop; [McpTool] public sealed class HelloTool {}";
+            "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class HelloTool {}";
 
         private string _projectRoot;
 

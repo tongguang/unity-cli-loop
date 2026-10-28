@@ -9,7 +9,7 @@ English | [日本語](migration-v2-to-v3_ja.md)
 
 Read on if either of these applies to your project:
 
-- **You have C# custom tools written against the V2 API** — classes deriving from the V2 tool base type, or anything else importing the `io.github.tongguang.tloop` namespace. Follow Step 1 through Step 2; the migration wizard rewrites them for you.
+- **You have C# custom tools written against the V2 API** — classes deriving from the V2 tool base type, or anything else importing the `io.github.hatayama.uLoopMCP` namespace. Follow Step 1 through Step 2; the migration wizard rewrites them for you.
 - **You have `SKILL.md` files, Markdown docs, POSIX shell scripts, or PowerShell scripts that invoke `tloop`** — V3 changed the boolean option syntax and removed several commands, so existing invocations can silently break. Follow Step 3 onward.
 
 If both apply, work through the guide from the top in order.
@@ -79,7 +79,7 @@ At that point the rewritten sources compile, and the errors you saw on startup a
 
 ### What the wizard rewrites
 
-- **Namespace** — `io.github.tongguang.tloop` becomes `io.github.hatayama.UnityCliLoop.ToolContracts` for tool contract types.
+- **Namespace** — `io.github.hatayama.uLoopMCP` becomes `io.github.hatayama.UnityCliLoop.ToolContracts` for tool contract types.
 - **Base types** — `AbstractUnityTool` becomes `UnityCliLoopTool<TSchema, TResponse>`, `BaseToolSchema` becomes `UnityCliLoopToolSchema`, and `BaseToolResponse` becomes `UnityCliLoopToolResponse`.
 - **Attribute** — `[McpTool]` becomes `[UnityCliLoopTool]`. The `Description` argument is dropped, while `DisplayDevelopmentOnly` and `RequiredSecuritySetting` are carried over.
 - **Assembly definition references** — `uLoopMCP.Editor` and `uLoopMCP.Runtime` references in your `.asmdef` files are repointed at the V3 assemblies.
@@ -187,7 +187,7 @@ tloop list
 
 ## Manual migration reference
 
-If you prefer to migrate by hand, these are the concrete replacements the wizard performs. The legacy namespace is `io.github.tongguang.tloop`; the V3 tool contract namespace is `io.github.hatayama.UnityCliLoop.ToolContracts`.
+If you prefer to migrate by hand, these are the concrete replacements the wizard performs. The legacy namespace is `io.github.hatayama.uLoopMCP`; the V3 tool contract namespace is `io.github.hatayama.UnityCliLoop.ToolContracts`.
 
 | V2 type | V3 type |
 |---|---|

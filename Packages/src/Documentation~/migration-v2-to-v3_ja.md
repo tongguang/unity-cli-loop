@@ -9,7 +9,7 @@
 
 次のどちらかに当てはまる場合は、続きを読んでください。
 
-- **V2 APIで書いたC#カスタムツールがある** — V2のツール基底型を継承したクラスや、`io.github.tongguang.tloop` 名前空間をimportしているコードがある場合です。Step 1〜Step 2に従ってください。移行ウィザードが自動で書き換えます。
+- **V2 APIで書いたC#カスタムツールがある** — V2のツール基底型を継承したクラスや、`io.github.hatayama.uLoopMCP` 名前空間をimportしているコードがある場合です。Step 1〜Step 2に従ってください。移行ウィザードが自動で書き換えます。
 - **`tloop` を呼び出す `SKILL.md`・Markdownドキュメント・POSIXシェルスクリプト・PowerShellスクリプトがある** — V3ではbooleanオプションの書式が変わり、いくつかのコマンドが削除されたため、既存の呼び出しが気づかないうちに壊れる可能性があります。Step 3以降に従ってください。
 
 両方に当てはまる場合は、このガイドを上から順に進めてください。
@@ -79,7 +79,7 @@ Editorが起動すると、`Tuanjie CLI Loop Migration` ウィンドウが**自�
 
 ### ウィザードが書き換える内容
 
-- **名前空間** — ツールの契約型について、`io.github.tongguang.tloop` が `io.github.hatayama.UnityCliLoop.ToolContracts` になります。
+- **名前空間** — ツールの契約型について、`io.github.hatayama.uLoopMCP` が `io.github.hatayama.UnityCliLoop.ToolContracts` になります。
 - **基底型** — `AbstractUnityTool` が `UnityCliLoopTool<TSchema, TResponse>` に、`BaseToolSchema` が `UnityCliLoopToolSchema` に、`BaseToolResponse` が `UnityCliLoopToolResponse` になります。
 - **属性** — `[McpTool]` が `[UnityCliLoopTool]` になります。`Description` 引数は削除され、`DisplayDevelopmentOnly` と `RequiredSecuritySetting` は引き継がれます。
 - **asmdefの参照** — `.asmdef` ファイル内の `uLoopMCP.Editor` と `uLoopMCP.Runtime` への参照が、V3のアセンブリに張り替えられます。
@@ -187,7 +187,7 @@ tloop list
 
 ## 手動移行のリファレンス
 
-手作業で移行したい場合のために、ウィザードが行う具体的な置き換えを示します。旧名前空間は `io.github.tongguang.tloop`、V3のツール契約名前空間は `io.github.hatayama.UnityCliLoop.ToolContracts` です。
+手作業で移行したい場合のために、ウィザードが行う具体的な置き換えを示します。旧名前空間は `io.github.hatayama.uLoopMCP`、V3のツール契約名前空間は `io.github.hatayama.UnityCliLoop.ToolContracts` です。
 
 | V2の型 | V3の型 |
 |---|---|

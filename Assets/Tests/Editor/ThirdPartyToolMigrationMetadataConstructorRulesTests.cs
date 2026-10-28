@@ -143,7 +143,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void ReplaceLegacyToolSettingsCatalogItemConstructorsInCode_WhenConstructorIsFullyQualified_RewritesWithoutBareMigration()
         {
             const string source =
-                "new io.github.tongguang.tloop.ToolSettingsCatalogItem(\"a\", \"desc\", dev, third);";
+                "new io.github.hatayama.uLoopMCP.ToolSettingsCatalogItem(\"a\", \"desc\", dev, third);";
             int replacementCount = 0;
 
             string content =

@@ -147,7 +147,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ReplaceLegacyEditorDelayFrameCallsInCode_WhenCallIsFullyQualified_RewritesToQualifiedCurrentNames()
         {
-            const string source = "io.github.tongguang.tloop.EditorDelay.DelayFrame(2);";
+            const string source = "io.github.hatayama.uLoopMCP.EditorDelay.DelayFrame(2);";
 
             (string content, int replacementCount) =
                 ThirdPartyToolMigrationEditorDelayRules.ReplaceLegacyEditorDelayFrameCallsInCode(
