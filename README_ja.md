@@ -104,4 +104,3 @@ Editor が起動していなければ `tloop launch` を使用できます。プ
 
 同梱の第三者コンポーネントについては [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md) と各プラグインのライセンスも参照してください。
 
-初回リリースの UPM / CLI アーカイブにはプロジェクト自身のライセンスが同梱されていません。これらを保存・再配布する際は [LICENSE.md](https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/LICENSE.md) も保持してください。現在のソースと今後のパッケージングには修正を追加しており、公開済みアーカイブは上書きしません。

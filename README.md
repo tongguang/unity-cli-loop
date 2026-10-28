@@ -176,4 +176,3 @@ tloop execute-dynamic-code --code 'using UnityEngine; Debug.Log("Hello from tloo
 
 包内第三方组件另见 [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md) 及相应插件目录的许可证。这些声明继续随插件分发。
 
-首次发布的 UPM / CLI 归档遗漏了项目主许可证；保存或再分发这些归档时，请同时保留 [LICENSE.md](https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/LICENSE.md)。当前源码和后续打包规则已补齐，该修正不会覆盖已发布的归档。
