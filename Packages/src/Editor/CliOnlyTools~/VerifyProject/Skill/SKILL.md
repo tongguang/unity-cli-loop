@@ -6,7 +6,7 @@ internal: true
 
 # tloop verify-project
 
-Check the project's files the way Tuanjie reads them on its next import, without starting Unity.
+Check the project's files the way Tuanjie reads them on its next import, without starting Tuanjie.
 When Tuanjie opens a project with these problems, it silently gives assets new GUIDs and deletes
 orphaned `.meta` files, which breaks references in ways that cannot be undone. Run this first and
 fix what it finds while the old GUIDs still exist.

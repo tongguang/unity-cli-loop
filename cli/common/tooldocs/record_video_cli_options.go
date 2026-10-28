@@ -38,7 +38,7 @@ func RecordVideoCLIOnlyOptions() []PausePointCLIOnlyOption {
 			FlagName: RecordVideoVideoFlagName,
 			Type:     "string",
 			Description: "Extraction: the recorded video to cut frames from (the OutputPath of a stop or one-shot response). " +
-				"Requires ffmpeg; does not contact Unity. Use with --frame-at or --sheet-from/--sheet-to.",
+				"Requires ffmpeg; does not contact Tuanjie. Use with --frame-at or --sheet-from/--sheet-to.",
 		},
 		{
 			FlagName:    RecordVideoFrameAtFlagName,

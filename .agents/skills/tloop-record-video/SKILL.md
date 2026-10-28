@@ -54,7 +54,7 @@ tloop record-video --video <file> --frame-at <s> | --sheet-from <s> --sheet-to <
 | `--output-path` | string | empty | Output file path. Empty uses `.tloop/outputs/Videos/gameview_<yyyyMMdd_HHmmss_fff>.mp4` (`.webm` on Linux). Extension must be `.mp4` (H.264) or `.webm` (VP8). Linux rejects `.mp4`. Used by `start` only. |
 | `--seconds` | integer | - | CLI-only. Record one clip in a single command: start, the trigger, a mark, wait this long, stop. 1–600, at most `--max-duration-seconds` (default 60); raise both for a longer clip. |
 | `--trigger` | string | - | CLI-only. tloop command run after start, then marked. Implies `--seconds 3`. |
-| `--video` | string | - | CLI-only. Recorded video to cut frames from (`OutputPath`). Needs ffmpeg; does not contact Unity. |
+| `--video` | string | - | CLI-only. Recorded video to cut frames from (`OutputPath`). Needs ffmpeg; does not contact Tuanjie. |
 | `--frame-at` | number | - | CLI-only. Write the full-size frame at these seconds beside the video. |
 | `--sheet-from` | number | - | CLI-only. Start of a range to write as a sheet of up to 40 frames. Requires `--sheet-to`. |
 | `--sheet-to` | number | - | CLI-only. End of the `--sheet-from` range. |
