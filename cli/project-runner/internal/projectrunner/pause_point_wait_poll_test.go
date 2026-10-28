@@ -29,7 +29,7 @@ const argumentErrorTriggerStderr = `{"Success":false,"Error":{"ErrorCode":"INVAL
 // never reaches Unity at all, so it is as permanent a rejection as a bad argument value.
 const unknownCommandTriggerStderr = `{"Success":false,"Error":{"ErrorCode":"UNKNOWN_COMMAND",` +
 	`"Phase":"dispatch","Message":"Unknown command: simulate-keybord","Retryable":false,` +
-	`"SafeToRetry":false,"NextActions":["Run ` + "`uloop list`" + ` to see the available commands."]}}`
+	`"SafeToRetry":false,"NextActions":["Run ` + "`tloop list`" + ` to see the available commands."]}}`
 
 // pausePointArmedStatusResponse is an armed-but-never-hit marker with a lifetime long enough that
 // RemainingMilliseconds stays positive, so the abort response can be asserted to carry it.
@@ -57,11 +57,11 @@ func TestWaitForPausePointAbortsWhenTheConnectIsRefused(t *testing.T) {
 	}()
 
 	refusedConnect := &unityipc.ConnectionAttemptError{
-		Endpoint: "/tmp/uloop-501/UnityCliLoop-sample.sock",
+		Endpoint: "/tmp/tloop-501/TuanjieCliLoop-sample.sock",
 		Cause: &net.OpError{
 			Op:   "dial",
 			Net:  "unix",
-			Addr: &net.UnixAddr{Name: "/tmp/uloop-501/UnityCliLoop-sample.sock", Net: "unix"},
+			Addr: &net.UnixAddr{Name: "/tmp/tloop-501/TuanjieCliLoop-sample.sock", Net: "unix"},
 			Err:  os.NewSyscallError("connect", syscall.EPERM),
 		},
 	}
@@ -248,7 +248,7 @@ func TestRunWaitForPausePointKeepsMarkerWhenTriggerRejectsArguments(t *testing.T
 	if !strings.Contains(nextActions, "--trigger") {
 		t.Fatalf("recovery guidance must point at the --trigger value to fix: %#v", envelope.Error.NextActions)
 	}
-	if !strings.Contains(nextActions, `uloop await-pause-point --id "jump"`) {
+	if !strings.Contains(nextActions, `tloop await-pause-point --id "jump"`) {
 		t.Fatalf("expected a copy-pasteable await command carrying the real id: %#v", envelope.Error.NextActions)
 	}
 }
@@ -860,11 +860,11 @@ func TestWaitForPausePointUnarmedErrorOmitsStatusSuffixWhenArmQueryFails(t *test
 	}()
 
 	refusedConnect := &unityipc.ConnectionAttemptError{
-		Endpoint: "/tmp/uloop-501/UnityCliLoop-sample.sock",
+		Endpoint: "/tmp/tloop-501/TuanjieCliLoop-sample.sock",
 		Cause: &net.OpError{
 			Op:   "dial",
 			Net:  "unix",
-			Addr: &net.UnixAddr{Name: "/tmp/uloop-501/UnityCliLoop-sample.sock", Net: "unix"},
+			Addr: &net.UnixAddr{Name: "/tmp/tloop-501/TuanjieCliLoop-sample.sock", Net: "unix"},
 			Err:  os.NewSyscallError("connect", syscall.EPERM),
 		},
 	}

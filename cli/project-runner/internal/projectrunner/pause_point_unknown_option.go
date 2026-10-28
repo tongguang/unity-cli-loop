@@ -57,7 +57,7 @@ func pausePointUnknownOptionError(command string, name string) *clierrors.Argume
 		Message:     message,
 		Option:      "--" + name,
 		Command:     command,
-		NextActions: []string{fmt.Sprintf("Run `uloop %s --help` to list the accepted options.", command)},
+		NextActions: []string{fmt.Sprintf("Run `tloop %s --help` to list the accepted options.", command)},
 	}
 }
 

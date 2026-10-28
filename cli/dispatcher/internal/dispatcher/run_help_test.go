@@ -15,7 +15,7 @@ func TestPrintUnityToolCommandHelpReportsEmptyCache(t *testing.T) {
 
 	printUnityToolCommandHelp(&stdout, clicore.ToolsCache{}, true)
 
-	if !strings.Contains(stdout.String(), "No cached Unity tools found. Run `uloop sync` while Unity is running.") {
+	if !strings.Contains(stdout.String(), "No cached Unity tools found. Run `tloop sync` while Unity is running.") {
 		t.Fatalf("missing empty-cache line: %s", stdout.String())
 	}
 	if strings.Contains(stdout.String(), "refresh this list") {

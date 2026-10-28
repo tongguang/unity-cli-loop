@@ -38,7 +38,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // runtime, because the Mono PipeSecurity overload silently ignores ACLs and the
             // factory is the only path that actually applies the descriptor.
             string sddl = WindowsOwnerOnlyNamedPipeFactory.BuildCurrentUserOnlySddl();
-            string pipeName = "uloop-factory-test-" + System.Guid.NewGuid().ToString("N").Substring(0, 8);
+            string pipeName = "tloop-factory-test-" + System.Guid.NewGuid().ToString("N").Substring(0, 8);
 
             using NamedPipeServerStream server = WindowsOwnerOnlyNamedPipeFactory.CreateServer(pipeName, sddl);
 
@@ -53,7 +53,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // the first is still open, because the accept loop creates a new instance per
             // client and the ACL must not break PIPE_UNLIMITED_INSTANCES.
             string sddl = WindowsOwnerOnlyNamedPipeFactory.BuildCurrentUserOnlySddl();
-            string pipeName = "uloop-factory-test-" + System.Guid.NewGuid().ToString("N").Substring(0, 8);
+            string pipeName = "tloop-factory-test-" + System.Guid.NewGuid().ToString("N").Substring(0, 8);
 
             using NamedPipeServerStream first = WindowsOwnerOnlyNamedPipeFactory.CreateServer(pipeName, sddl);
             using NamedPipeServerStream second = WindowsOwnerOnlyNamedPipeFactory.CreateServer(pipeName, sddl);

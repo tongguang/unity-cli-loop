@@ -7,7 +7,7 @@ namespace io.github.hatayama.UnityCliLoop.Application
     public static class UnityCliLoopUIConstants
     {
         // Tool Settings
-        public const string TOOL_SETTINGS_MENU_PATH = "Window > Unity CLI Loop > Settings";
-        public const string PROJECT_REPOSITORY_URL = "https://github.com/hatayama/unity-cli-loop";
+        public const string TOOL_SETTINGS_MENU_PATH = "Window > Tuanjie CLI Loop > Settings";
+        public const string PROJECT_REPOSITORY_URL = "https://github.com/tongguang/unity-cli-loop";
     }
 }

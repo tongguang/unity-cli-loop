@@ -144,8 +144,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         public async Task ResolveAsync_WhenCs0246IdentifierIsKnownNamespace_DoesNotInjectOrAttribute()
         {
             AutoUsingResolver resolver = new();
-            string sourcePath = Path.Combine(Path.GetTempPath(), "uloop-autousing-known-namespace.cs");
-            string dllPath = Path.Combine(Path.GetTempPath(), "uloop-autousing-known-namespace.dll");
+            string sourcePath = Path.Combine(Path.GetTempPath(), "tloop-autousing-known-namespace.cs");
+            string dllPath = Path.Combine(Path.GetTempPath(), "tloop-autousing-known-namespace.dll");
             CompilerMessage[] cs0246 = { CreateCs0246("System") };
 
             try
@@ -185,8 +185,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         public async Task ResolveAsync_WhenCs0246IdentifierIsNormalType_RecordsAttribution()
         {
             AutoUsingResolver resolver = new();
-            string sourcePath = Path.Combine(Path.GetTempPath(), "uloop-autousing-normal-type.cs");
-            string dllPath = Path.Combine(Path.GetTempPath(), "uloop-autousing-normal-type.dll");
+            string sourcePath = Path.Combine(Path.GetTempPath(), "tloop-autousing-normal-type.cs");
+            string dllPath = Path.Combine(Path.GetTempPath(), "tloop-autousing-normal-type.dll");
             int buildCalls = 0;
 
             try

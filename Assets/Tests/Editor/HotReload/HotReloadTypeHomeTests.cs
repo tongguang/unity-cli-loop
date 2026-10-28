@@ -41,7 +41,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [Test]
         public void ScriptAssembliesUnderProject_VirtualPlayerRoot_PointsAtTheMainProjectsCompiledAssembly()
         {
-            string mainRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            string mainRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             string playerRoot = Path.Combine(mainRoot, "Library", "VP", "mppm1");
 
             HotReloadTypeHome home = HotReloadTypeHome.ScriptAssembliesUnderProject(playerRoot, "A");

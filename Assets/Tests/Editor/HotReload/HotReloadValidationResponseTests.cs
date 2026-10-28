@@ -45,7 +45,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     Is.EqualTo(
                         new[]
                         {
-                            "Run 'uloop compile' to create source snapshots.",
+                            "Run 'tloop compile' to create source snapshots.",
                             "Pass project-relative .cs paths with --files (required for new files "
                             + "that have not been compiled yet)."
                         }));
@@ -101,7 +101,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     new[]
                     {
-                        "Run 'uloop hot-reload --status' with no other flags to inspect active patches.",
+                        "Run 'tloop hot-reload --status' with no other flags to inspect active patches.",
                         "To apply or revert patches, drop --status and pass --files or --revert-all."
                     }));
         }

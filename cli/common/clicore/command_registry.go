@@ -37,14 +37,14 @@ const (
 
 var NativeCommands = []NativeCommandEntry{
 	{Name: LaunchCommandName, Description: "Open this Unity project with the matching Editor version", Owner: DispatcherOwned},
-	// Why compile-check is hidden: its place beside `uloop compile` is not settled, so it stays
+	// Why compile-check is hidden: its place beside `tloop compile` is not settled, so it stays
 	// runnable for development while nothing user-facing advertises it (ADR 0018, amendment).
 	{Name: CompileCheckCommandName, Description: "Compile changed assemblies with the Editor's bundled C# compiler without launching Unity", Owner: DispatcherOwned, Hidden: true},
 	// Why verify-project is hidden: Unity's official CLI already covers these project-file checks,
 	// so this project does not need to offer its own.
 	{Name: VerifyProjectCommandName, Description: "Check .meta files, GUIDs, merge conflict markers, and Packages/manifest.json without Unity", Owner: DispatcherOwned, Hidden: true},
 	{Name: "list", Description: "Show Unity tools currently exposed by the Editor", Owner: RunnerOwned},
-	{Name: "sync", Description: "Refresh .uloop/tools.json from the running Editor", Owner: RunnerOwned},
+	{Name: "sync", Description: "Refresh .tloop/tools.json from the running Editor", Owner: RunnerOwned},
 	{Name: "focus-window", Description: "Bring the Unity Editor window to the foreground", Owner: RunnerOwned},
 	{Name: PausePointAwaitCommandName, Description: "Wait until a named UloopPausePoint.Pause marker pauses Unity", Owner: RunnerOwned},
 	{Name: PausePointStatusUserCommandName, Description: "Show one pause point marker's state, or list all registered markers when no target is given", Owner: RunnerOwned},
@@ -52,11 +52,11 @@ var NativeCommands = []NativeCommandEntry{
 	{Name: StatusCommandName, Description: "Report whether the Unity Editor for this project can take a command now, without changing anything", Owner: RunnerOwned},
 	{Name: CancelCommandName, Description: "Cancel the tool the Unity Editor for this project is running now", Owner: RunnerOwned},
 	{Name: SkillsCommandName, Description: "List, install, or uninstall agent skills", Owner: DispatcherOwned},
-	{Name: PackageCommandName, Description: "Install or inspect the Unity CLI Loop package in a project", Owner: DispatcherOwned},
-	{Name: InstallCommandName, Description: "Configure the global uloop dispatcher binary", Owner: DispatcherOwned},
-	{Name: UpdateCommandName, Description: "Update the global uloop dispatcher binary", Owner: DispatcherOwned},
-	{Name: UninstallCommandName, Description: "Remove the global uloop dispatcher binary", Owner: DispatcherOwned},
-	{Name: VersionCommandName, Description: "Show the installed uloop version", Owner: DispatcherOwned},
+	{Name: PackageCommandName, Description: "Install or inspect the Tuanjie CLI Loop package in a project", Owner: DispatcherOwned},
+	{Name: InstallCommandName, Description: "Configure the global tloop dispatcher binary", Owner: DispatcherOwned},
+	{Name: UpdateCommandName, Description: "Update the global tloop dispatcher binary", Owner: DispatcherOwned},
+	{Name: UninstallCommandName, Description: "Remove the global tloop dispatcher binary", Owner: DispatcherOwned},
+	{Name: VersionCommandName, Description: "Show the installed tloop version", Owner: DispatcherOwned},
 }
 
 // IsDispatcherOwnedCommandName reports whether a native command belongs to the

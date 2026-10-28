@@ -30,7 +30,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _directory = Path.Combine(Path.GetTempPath(), "uloop-session-analysis-" + Guid.NewGuid().ToString("N"));
+            _directory = Path.Combine(Path.GetTempPath(), "tloop-session-analysis-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_directory);
             _videoPath = Path.Combine(_directory, "clip.mp4");
             _now = 0.0;

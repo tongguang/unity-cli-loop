@@ -33,7 +33,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 actualData.Value<int>("requiredProtocolVersion"),
                 Is.EqualTo(CliConstants.REQUIRED_CLI_PROTOCOL_VERSION));
-            Assert.That(actualData.Value<string>("updateCommand"), Is.EqualTo("uloop update"));
+            Assert.That(actualData.Value<string>("updateCommand"), Is.EqualTo("tloop update"));
         }
 
         private static JObject ReadSharedErrorDataFieldShape()

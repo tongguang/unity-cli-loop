@@ -57,7 +57,7 @@ const fixtureCatalogContent = `{
 `
 
 const fixtureKeyboardSkill = `---
-name: uloop-simulate-keyboard
+name: tloop-simulate-keyboard
 toolName: simulate-keyboard
 description: "Simulate keyboard input in PlayMode."
 ---
@@ -70,14 +70,14 @@ description: "Simulate keyboard input in PlayMode."
 `
 
 const fixtureFocusWindowSkill = `---
-name: uloop-focus-window
+name: tloop-focus-window
 description: "Bring the Unity Editor window to front."
 ---
 
-# uloop focus-window
+# tloop focus-window
 `
 
-// writeGeneratorFixture builds a repository holding the uloop package and the catalog file, and
+// writeGeneratorFixture builds a repository holding the tloop package and the catalog file, and
 // returns its root.
 func writeGeneratorFixture(t *testing.T, skills map[string]string, catalogContent string) string {
 	t.Helper()
@@ -87,7 +87,7 @@ func writeGeneratorFixture(t *testing.T, skills map[string]string, catalogConten
 	if err := os.MkdirAll(filepath.Join(packageRoot, "Editor", "FirstPartyTools"), 0o755); err != nil {
 		t.Fatalf("failed to create the package root: %v", err)
 	}
-	writeFixtureFile(t, filepath.Join(packageRoot, "package.json"), `{"name":"io.github.hatayama.uloopmcp"}`)
+	writeFixtureFile(t, filepath.Join(packageRoot, "package.json"), `{"name":"io.github.tongguang.tloop"}`)
 	writeFixtureFile(t, filepath.Join(repositoryRoot, filepath.FromSlash(CatalogRelativePath)), catalogContent)
 
 	for relativeDirectory, content := range skills {
@@ -301,7 +301,7 @@ const fixtureRunTestsCatalogEntry = `{
     `
 
 const fixtureRunTestsSkill = `---
-name: uloop-run-tests
+name: tloop-run-tests
 toolName: run-tests
 description: "Run Unity tests."
 ---
@@ -346,7 +346,7 @@ const fixtureRecordVideoCatalogEntry = `{
     `
 
 const fixtureRecordVideoSkill = `---
-name: uloop-record-video
+name: tloop-record-video
 toolName: record-video
 description: "Record the Game View."
 ---

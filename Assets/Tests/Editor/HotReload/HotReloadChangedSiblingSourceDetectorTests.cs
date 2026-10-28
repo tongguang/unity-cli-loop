@@ -967,7 +967,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             string projectRoot = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-sibling-scan-" + Guid.NewGuid().ToString("N"));
+                "tloop-sibling-scan-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(projectRoot);
             return projectRoot;
         }

@@ -63,7 +63,7 @@ namespace io.github.hatayama.UnityCliLoop.Application
 
             if (CliVersionComparer.IsVersionGreaterThanOrEqual(cliVersion, requiredCliVersion))
             {
-                return $"{managedDescription} CLI v{cliVersion} did not answer as the required uloop CLI.\n"
+                return $"{managedDescription} CLI v{cliVersion} did not answer as the required tloop CLI.\n"
                     + reinstallGuidance;
             }
 

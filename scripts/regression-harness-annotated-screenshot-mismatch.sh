@@ -13,8 +13,8 @@ set -e
 # Prerequisites:
 #   - Assets/RegressionHarness/AnnotatedScreenshotMismatch/AnnotatedScreenshotMismatch.unity
 #     must be open in a running Unity Editor
-#   - uloop CLI must be installed (for local checkout validation, put dist/<platform> on PATH
-#     so `uloop` resolves to the development binary rather than a released dispatcher)
+#   - tloop CLI must be installed (for local checkout validation, put dist/<platform> on PATH
+#     so `tloop` resolves to the development binary rather than a released dispatcher)
 #   - jq must be installed
 
 PROJECT_PATH=""
@@ -32,11 +32,11 @@ ELEMENTS_ONLY_FILE="$(mktemp)"
 CLICK_FILE="$(mktemp)"
 FAILED=0
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        uloop "$@" --project-path "$PROJECT_PATH"
+        tloop "$@" --project-path "$PROJECT_PATH"
     else
-        uloop "$@"
+        tloop "$@"
     fi
 }
 
@@ -46,7 +46,7 @@ log() {
 
 cleanup() {
     rm -f "$CAPTURE_FILE" "$ELEMENTS_ONLY_FILE" "$CLICK_FILE"
-    run_uloop control-play-mode --action Stop >/dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop >/dev/null 2>&1 || true
 }
 
 trap cleanup EXIT
@@ -79,10 +79,10 @@ abs_diff_ok() {
 }
 
 log "Entering Play Mode (already-playing is treated as success)..."
-run_uloop control-play-mode --action Play >/dev/null
+run_tloop control-play-mode --action Play >/dev/null
 
 log "Capturing rendering screenshot with --annotate-elements..."
-run_uloop screenshot --capture-mode rendering --annotate-elements >"$CAPTURE_FILE"
+run_tloop screenshot --capture-mode rendering --annotate-elements >"$CAPTURE_FILE"
 
 NO_RAYCASTER="$(element_json "$CAPTURE_FILE" "Button_NoRaycaster")"
 if [ -z "$NO_RAYCASTER" ]; then
@@ -109,7 +109,7 @@ else
     SIM_X="$(printf '%s\n' "$CENTER_BLOCKED" | jq -r '.SimX')"
     SIM_Y="$(printf '%s\n' "$CENTER_BLOCKED" | jq -r '.SimY')"
     log "Clicking Button_CenterBlocked at SimX=$SIM_X SimY=$SIM_Y..."
-    run_uloop simulate-mouse-ui --action Click --x "$SIM_X" --y "$SIM_Y" >"$CLICK_FILE"
+    run_tloop simulate-mouse-ui --action Click --x "$SIM_X" --y "$SIM_Y" >"$CLICK_FILE"
     HIT_NAME="$(jq -r '.HitGameObjectName // empty' "$CLICK_FILE")"
     if [ "$HIT_NAME" = "Button_CenterBlocked" ]; then
         log "S3: PASS Button_CenterBlocked is listed and SimX/SimY click hits Button_CenterBlocked"
@@ -129,7 +129,7 @@ if [ "${S3_PRESENT:-0}" -ne 1 ]; then
     log "S5: SKIP Button_CenterBlocked absent; ElementsOnly coordinate compare is not applicable"
 else
     log "Capturing --elements-only rendering annotation..."
-    run_uloop screenshot --capture-mode rendering --annotate-elements --elements-only >"$ELEMENTS_ONLY_FILE"
+    run_tloop screenshot --capture-mode rendering --annotate-elements --elements-only >"$ELEMENTS_ONLY_FILE"
     ELEMENTS_ONLY_CENTER="$(element_json "$ELEMENTS_ONLY_FILE" "Button_CenterBlocked")"
     if [ -z "$ELEMENTS_ONLY_CENTER" ]; then
         log "S5: FAIL Button_CenterBlocked missing from ElementsOnly AnnotatedElements"

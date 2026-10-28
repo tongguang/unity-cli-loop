@@ -62,7 +62,7 @@ func (err launchStartupTimeoutError) ToCLIError(context clierrors.ErrorContext) 
 		Command:     context.Command,
 		NextActions: []string{
 			"Wait for Unity to finish importing assets, compiling scripts, or reloading the domain.",
-			"After the Editor becomes responsive, continue with the uloop command you wanted to run.",
+			"After the Editor becomes responsive, continue with the tloop command you wanted to run.",
 			"If Unity appears stuck, focus the Editor and check the Console or Editor log.",
 		},
 		Details: details,

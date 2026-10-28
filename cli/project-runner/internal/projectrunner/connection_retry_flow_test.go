@@ -38,8 +38,8 @@ func refusedDialAttempt() sendAttempt {
 		outcome: unityipc.UnitySendOutcome{},
 		err: &unityipc.ConnectionAttemptError{
 			ProjectRoot: "/projects/sample",
-			Endpoint:    "/tmp/uloop/sample.sock",
-			Cause:       errors.New("dial unix /tmp/uloop/sample.sock: connect: connection refused"),
+			Endpoint:    "/tmp/tloop/sample.sock",
+			Cause:       errors.New("dial unix /tmp/tloop/sample.sock: connect: connection refused"),
 		},
 	}
 }
@@ -159,7 +159,7 @@ func TestFinishUndispatchedRetryProbeReportsUnityNotRunningWhenNoProcessIsFound(
 	}
 	connection := unityipc.Connection{
 		ProjectRoot: t.TempDir(),
-		Endpoint:    unityipc.Endpoint{Address: "/tmp/uloop/sample.sock"},
+		Endpoint:    unityipc.Endpoint{Address: "/tmp/tloop/sample.sock"},
 	}
 	currentAttempt := refusedDialAttempt()
 
@@ -383,7 +383,7 @@ func TestFinishNonRetryableConnectionAttemptWrapsAPreAcceptTimeoutAsUnityNotResp
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
 			connection := unityipc.Connection{
-				Endpoint:    unityipc.Endpoint{Network: "unix", Address: "/tmp/uloop/sample.sock"},
+				Endpoint:    unityipc.Endpoint{Network: "unix", Address: "/tmp/tloop/sample.sock"},
 				ProjectRoot: t.TempDir(),
 			}
 			current := sendAttempt{outcome: unityipc.UnitySendOutcome{RequestDispatched: true}, err: os.ErrDeadlineExceeded}
@@ -587,7 +587,7 @@ func TestReportUnityExitDuringRequest(t *testing.T) {
 			deps.findRunningUnityProcess = testCase.lookup
 			connection := unityipc.Connection{
 				ProjectRoot: t.TempDir(),
-				Endpoint:    unityipc.Endpoint{Address: "/tmp/uloop/sample.sock"},
+				Endpoint:    unityipc.Endpoint{Address: "/tmp/tloop/sample.sock"},
 			}
 
 			err := reportUnityExitDuringRequest(ctx, connection, testCase.outcome, testCase.err, deps)
@@ -619,7 +619,7 @@ func TestReportUnityExitDuringRequestLogsAFailedLookup(t *testing.T) {
 	}
 	connection := unityipc.Connection{
 		ProjectRoot: t.TempDir(),
-		Endpoint:    unityipc.Endpoint{Address: "/tmp/uloop/sample.sock"},
+		Endpoint:    unityipc.Endpoint{Address: "/tmp/tloop/sample.sock"},
 	}
 
 	_ = reportUnityExitDuringRequest(

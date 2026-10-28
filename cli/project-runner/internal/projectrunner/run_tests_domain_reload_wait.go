@@ -288,8 +288,8 @@ func runTestsWaitTimeoutError(projectRoot string, timeout time.Duration) clierro
 		Command:     clicore.RunTestsCommandName,
 		NextActions: []string{
 			"Increase --timeout-seconds for long PlayMode suites and rerun with --respect-enter-play-mode-settings.",
-			"Run a light command such as `uloop get-logs --max-count 1` to check whether Unity is responsive before treating this as a freeze.",
-			"Only if Unity does not respond to any command, restart it with `uloop launch -r`.",
+			"Run a light command such as `tloop get-logs --max-count 1` to check whether Unity is responsive before treating this as a freeze.",
+			"Only if Unity does not respond to any command, restart it with `tloop launch -r`.",
 		},
 	}
 }

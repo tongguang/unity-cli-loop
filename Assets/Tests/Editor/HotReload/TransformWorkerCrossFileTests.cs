@@ -537,7 +537,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string temporaryDirectory = Path.Combine(
                 projectRoot,
                 "Library",
-                "UloopHotReload",
+                "TloopHotReload",
                 "TestSources",
                 "CrossFile");
             Directory.CreateDirectory(temporaryDirectory);

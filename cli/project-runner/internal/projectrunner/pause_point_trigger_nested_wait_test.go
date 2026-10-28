@@ -65,13 +65,13 @@ func TestEnablePausePoint_RejectsNestedWaitTrigger(t *testing.T) {
 	}
 }
 
-// Verifies a leading "uloop" before a nested pause-point wait is not offered back as a usable
+// Verifies a leading "tloop" before a nested pause-point wait is not offered back as a usable
 // correction under the pause-point rules, so the next action falls back to the generic example.
-func TestParsePausePointTriggerCommand_LeadingUloopNestedWaitFallsBackToExample(t *testing.T) {
-	_, _, err := parsePausePointTriggerCommand(clicore.PausePointAwaitCommandName, "uloop enable-pause-point --id x")
+func TestParsePausePointTriggerCommand_LeadingTloopNestedWaitFallsBackToExample(t *testing.T) {
+	_, _, err := parsePausePointTriggerCommand(clicore.PausePointAwaitCommandName, "tloop enable-pause-point --id x")
 
 	assertArgumentErrorEqual(t, err, &clierrors.ArgumentError{
-		Message: pausePointTriggerLeadingUloopMessage,
+		Message: pausePointTriggerLeadingTloopMessage,
 		Option:  "--trigger",
 		Command: clicore.PausePointAwaitCommandName,
 		NextActions: []string{

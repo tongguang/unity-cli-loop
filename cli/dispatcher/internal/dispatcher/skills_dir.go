@@ -2,12 +2,12 @@ package dispatcher
 
 // --output-dir mode syncs skills flat into a caller-chosen directory (for example an
 // external skill-package store such as APM). Unlike target installs, the
-// destination may hold files uloop does not own (package manifests placed next
+// destination may hold files tloop does not own (package manifests placed next
 // to SKILL.md), so every operation here touches only entries that exist in the
 // skill source directory — and only inside skill directories that carry
-// evidence of a uloop install (see dirSkillHasInstallEvidence): a name match
+// evidence of a tloop install (see dirSkillHasInstallEvidence): a name match
 // alone never authorizes replacing or deleting anything. A skill whose name is
-// occupied by content uloop cannot manage is reported as a per-skill conflict
+// occupied by content tloop cannot manage is reported as a per-skill conflict
 // and the run continues, so one occupied name cannot leave the rest of the
 // store half-synced with no summary.
 //
@@ -16,7 +16,7 @@ package dispatcher
 // disabledTools hide a skill from install and list, and install removes a
 // disabled skill already in the store through the same evidence-gated path as
 // uninstall. Deprecated-skill cleanup deliberately does not run here: deleting
-// directories whose names uloop merely used in the past would break the
+// directories whose names tloop merely used in the past would break the
 // guarantee that only source-owned entries are ever removed. The same
 // trade-off applies within a skill: ownership derives from the current source
 // and no manifest is written into the store, so a top-level entry that a newer
@@ -42,7 +42,7 @@ func runSkillsDirInstall(
 	stderr io.Writer,
 ) int {
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Installing uloop skills (directory)...")
+	clicore.WriteLine(stdout, "Installing tloop skills (directory)...")
 	clicore.WriteLine(stdout, "")
 	result := skillInstallResult{}
 	disabledRemoved := 0
@@ -110,7 +110,7 @@ func writeSkillStoreConflictError(stderr io.Writer, blockedReasons []string) {
 
 func runSkillsDirUninstall(absDir string, skills []skillDefinition, stdout io.Writer, stderr io.Writer) int {
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Uninstalling uloop skills (directory)...")
+	clicore.WriteLine(stdout, "Uninstalling tloop skills (directory)...")
 	clicore.WriteLine(stdout, "")
 	removed := 0
 	notFound := 0
@@ -141,7 +141,7 @@ func runSkillsDirList(
 	stderr io.Writer,
 ) int {
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "uloop Skills Status:")
+	clicore.WriteLine(stdout, "tloop Skills Status:")
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Directory:")
 	clicore.WriteFormat(stdout, "Location: %s\n", absDir)
@@ -171,7 +171,7 @@ func runSkillsDirList(
 }
 
 // installSkillIntoDir syncs one skill and returns the conflict reason when the
-// skill's name is occupied by content uloop cannot manage; the caller reports
+// skill's name is occupied by content tloop cannot manage; the caller reports
 // it and continues with the remaining skills.
 func installSkillIntoDir(baseDir string, skill skillDefinition, result *skillInstallResult) (string, error) {
 	// State first: its Lstat guard classifies a symlink or file occupying the
@@ -214,10 +214,10 @@ func installSkillIntoDir(baseDir string, skill skillDefinition, result *skillIns
 // partially removed install (references/ left behind without SKILL.md) is
 // cleaned up while its content still matches the current source, whereas a
 // hand-authored directory that merely uses a skill's name — possibly in a
-// store uloop never installed into — is preserved and reported as not found.
+// store tloop never installed into — is preserved and reported as not found.
 // Names are matched by their exact on-disk spelling, the skill directory
-// itself included, so a case-insensitive filesystem cannot make uloop delete a
-// user's Uloop-Sample/, skill.md, or References/ as if they were uloop's.
+// itself included, so a case-insensitive filesystem cannot make tloop delete a
+// user's Tloop-Sample/, skill.md, or References/ as if they were tloop's.
 func uninstallSkillFromDir(baseDir string, skill skillDefinition) (bool, error) {
 	baseEntries, err := os.ReadDir(baseDir)
 	if err != nil {
@@ -238,7 +238,7 @@ func uninstallSkillFromDir(baseDir string, skill skillDefinition) (bool, error) 
 	if err != nil {
 		return false, err
 	}
-	// Artifacts carry the uloop namespace marker, so they are uloop's own
+	// Artifacts carry the tloop namespace marker, so they are tloop's own
 	// debris by construction and are cleaned up regardless of install evidence.
 	artifactsRemoved, err := removeStaleSyncArtifacts(skillDir, ownedEntries)
 	if err != nil {
@@ -257,7 +257,7 @@ func uninstallSkillFromDir(baseDir string, skill skillDefinition) (bool, error) 
 			return false, nil
 		}
 		// Without evidence even "ignorable" leftovers may be user data, so the
-		// directory goes only when removing uloop's artifacts emptied it.
+		// directory goes only when removing tloop's artifacts emptied it.
 		return false, removeSkillDirIfEmpty(skillDir)
 	}
 	removedAny, err := removeOwnedEntries(skillDir, ownedEntries, dirEntries)
@@ -351,7 +351,7 @@ func writeSkillFileAtomically(destinationPath string, content []byte) error {
 }
 
 // sourceOwnedEntries lists the top-level entries of a skill source after the
-// skip rules — exactly the set of entries uloop owns inside an installed skill
+// skip rules — exactly the set of entries tloop owns inside an installed skill
 // directory. Every consumer of the ownership rule derives from this one
 // listing so status, sync, and uninstall cannot disagree on what is owned.
 func sourceOwnedEntries(sourceDir string) ([]os.DirEntry, error) {

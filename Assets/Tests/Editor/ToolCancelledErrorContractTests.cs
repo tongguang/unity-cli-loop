@@ -24,7 +24,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             JObject expected = ReadSharedErrorData();
             ToolCancelledErrorData errorData = new ToolCancelledErrorData(
                 runningToolName: "run-tests",
-                message: "'run-tests' was cancelled by uloop cancel.");
+                message: "'run-tests' was cancelled by tloop cancel.");
 
             string json = JsonConvert.SerializeObject(
                 errorData,

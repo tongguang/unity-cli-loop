@@ -14,15 +14,15 @@ import (
 
 const (
 	readinessTestVersion       = "3.0.0-beta.6"
-	readinessTestRunnerTag     = "uloop-project-runner-v3.0.0-beta.6"
+	readinessTestRunnerTag     = "tloop-project-runner-v3.0.0-beta.6"
 	readinessTestDispatcherTag = "dispatcher-v3.0.0"
 	readinessTestTagCommit     = "1111111111111111111111111111111111111111"
 	readinessTestRunbook       = "docs/release-recovery-runbook.md"
 )
 
 var (
-	readinessTestRunnerAssets     = []string{"uloop-project-runner-darwin-arm64.tar.gz", "uloop-project-runner-darwin-arm64.tar.gz.sha256"}
-	readinessTestDispatcherAssets = []string{"install.sh", "uloop-dispatcher-darwin-arm64.tar.gz"}
+	readinessTestRunnerAssets     = []string{"tloop-project-runner-darwin-arm64.tar.gz", "tloop-project-runner-darwin-arm64.tar.gz.sha256"}
+	readinessTestDispatcherAssets = []string{"install.sh", "tloop-dispatcher-darwin-arm64.tar.gz"}
 )
 
 // readinessTestRepo is a git repository whose HEAD is a follow-up commit after the release-please
@@ -68,7 +68,7 @@ func writeReadinessReleaseFiles(t *testing.T, root string, version string, packa
   "packages": {
     %q: {"component": "unity-package", "include-v-in-tag": true, "include-component-in-tag": false, "changelog-path": %q},
     "cli/dispatcher": {"component": "dispatcher", "include-v-in-tag": true, "include-component-in-tag": true, "changelog-path": "CHANGELOG.md"},
-    "cli/project-runner": {"component": "uloop-project-runner", "include-v-in-tag": true, "include-component-in-tag": true, "changelog-path": "CHANGELOG.md"}
+    "cli/project-runner": {"component": "tloop-project-runner", "include-v-in-tag": true, "include-component-in-tag": true, "changelog-path": "CHANGELOG.md"}
   }
 }
 `, packageKey, changelogPath))
@@ -317,7 +317,7 @@ func TestCheckUnityPackageReleaseReadinessReadsDependenciesAtTheReleaseCommit(t 
 	if !run.github.ran(lookup+readinessTestRunnerTag) || !run.github.ran(lookup+readinessTestDispatcherTag) {
 		t.Fatalf("commands = %v, want the releases the release commit records looked up", run.github.commands)
 	}
-	if run.github.ran(lookup+"uloop-project-runner-v3.0.0-beta.7") || run.github.ran(lookup+"dispatcher-v3.1.0") {
+	if run.github.ran(lookup+"tloop-project-runner-v3.0.0-beta.7") || run.github.ran(lookup+"dispatcher-v3.1.0") {
 		t.Fatalf("commands = %v, want no release that only the later commit records", run.github.commands)
 	}
 }

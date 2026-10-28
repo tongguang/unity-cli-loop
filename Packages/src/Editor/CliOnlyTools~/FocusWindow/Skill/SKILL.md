@@ -1,16 +1,16 @@
 ---
-name: uloop-focus-window
-description: "Bring the Unity Editor window to front. Use when Unity must be visible for visual checks or user-facing interaction."
+name: tloop-focus-window
+description: "Bring the Tuanjie Editor window to front. Use when Tuanjie must be visible for visual checks or user-facing interaction."
 ---
 
-# uloop focus-window
+# tloop focus-window
 
-Bring Unity Editor window to front using OS-level commands.
+Bring Tuanjie Editor window to front using OS-level commands.
 
 ## Usage
 
 ```bash
-uloop focus-window
+tloop focus-window
 ```
 
 ## Output
@@ -18,8 +18,8 @@ uloop focus-window
 Returns JSON with:
 
 - `Success`: Whether the focus operation succeeded
-- `Message`: Status message (e.g. `Unity Editor window focused (PID: 12345)`, or the failure reason such as `Unity project not found` / `No running Unity process found for this project` / `Failed to focus Unity window: <reason>`)
+- `Message`: Status message (e.g. `Tuanjie Editor window focused (PID: 12345)`, or the failure reason such as `Tuanjie project not found` / `No running Tuanjie process found for this project` / `Failed to focus Tuanjie window: <reason>`)
 
 ## Notes
 
-- Useful before `uloop screenshot` to ensure the target window is visible
+- Useful before `tloop screenshot` to ensure the target window is visible

@@ -524,7 +524,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 + "            System.Action handler = AddedHandler;\n            handler();\n        }\n\n"
                 + "        private void AddedHandler()\n        {\n        }");
 
-            AssertHasSkip(result, "OnEnable", "uloop compile");
+            AssertHasSkip(result, "OnEnable", "tloop compile");
             Assert.That(FindSkipReason(result, "OnEnable"), Does.Not.Contain("lambda"));
         }
 

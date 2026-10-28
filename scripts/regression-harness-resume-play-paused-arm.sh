@@ -12,7 +12,7 @@ set -e
 # Prerequisites:
 #   - Assets/RegressionHarness/KeyStateAfterPauseInterruption/KeyStateAfterPauseInterruption.unity
 #     must be open in a running Unity Editor
-#   - uloop CLI must be installed
+#   - tloop CLI must be installed
 #   - jq must be installed
 
 PROJECT_PATH=""
@@ -31,11 +31,11 @@ MARKER_LINE="19"
 PRESS_DURATION="5"
 RESULT_FILE="$(mktemp)"
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        uloop "$@" --project-path "$PROJECT_PATH"
+        tloop "$@" --project-path "$PROJECT_PATH"
     else
-        uloop "$@"
+        tloop "$@"
     fi
 }
 
@@ -45,27 +45,27 @@ log() {
 
 cleanup() {
     rm -f "$RESULT_FILE"
-    run_uloop clear-pause-point --all > /dev/null 2>&1 || true
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop clear-pause-point --all > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
 log "Stopping any existing Play Mode session..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
 log "Clearing any existing pause-point markers..."
-run_uloop clear-pause-point --all > /dev/null
+run_tloop clear-pause-point --all > /dev/null
 
 log "Starting Play Mode..."
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 
 log "Pausing Play Mode before arming..."
-run_uloop control-play-mode --action Pause > /dev/null
+run_tloop control-play-mode --action Pause > /dev/null
 
 log "Arming + awaiting with --resume-play --trigger on $MARKER_FILE:$MARKER_LINE..."
 # Why: TimeoutSeconds is not frozen during a manual Pause, so keep the window
 # generous enough for resume + trigger + hit under a slow Editor tick.
-run_uloop enable-pause-point \
+run_tloop enable-pause-point \
     --file "$MARKER_FILE" \
     --line "$MARKER_LINE" \
     --timeout-seconds 60 \

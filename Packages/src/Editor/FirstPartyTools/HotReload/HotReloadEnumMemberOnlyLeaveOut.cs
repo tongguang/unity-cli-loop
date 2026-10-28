@@ -36,7 +36,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             "Left '{0}' out of this reload: --files was omitted and the file only adds enum members "
             + "({1}), which hot reload cannot add. Keeping it would build the enum from source and skip "
             + "the added members that pass the enum to or take it from compiled code or an introduced "
-            + "type. Run 'uloop compile' to add the enum members.";
+            + "type. Run 'tloop compile' to add the enum members.";
 
         /// <summary>
         /// Returns, in file order, the default-selected files whose only change is added enum

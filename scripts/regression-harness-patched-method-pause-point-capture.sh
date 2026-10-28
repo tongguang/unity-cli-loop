@@ -12,7 +12,7 @@ set -e
 #
 # Prerequisites:
 #   - A running Unity Editor for this project
-#   - dist/<platform>/uloop must be built (this checkout's development binary)
+#   - dist/<platform>/tloop must be built (this checkout's development binary)
 #   - jq must be installed
 
 PROJECT_PATH=""
@@ -33,12 +33,12 @@ REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 case "$(uname -s)" in
     Darwin)
         case "$(uname -m)" in
-            arm64) ULOOP_BIN="$REPO_ROOT/dist/darwin-arm64/uloop" ;;
-            *) ULOOP_BIN="$REPO_ROOT/dist/darwin-amd64/uloop" ;;
+            arm64) TLOOP_BIN="$REPO_ROOT/dist/darwin-arm64/tloop" ;;
+            *) TLOOP_BIN="$REPO_ROOT/dist/darwin-amd64/tloop" ;;
         esac
         ;;
     MINGW*|MSYS*|CYGWIN*)
-        ULOOP_BIN="$REPO_ROOT/dist/windows-amd64/uloop.exe"
+        TLOOP_BIN="$REPO_ROOT/dist/windows-amd64/tloop.exe"
         ;;
     *)
         printf '%s\n' "Unsupported platform: $(uname -s)" >&2
@@ -46,8 +46,8 @@ case "$(uname -s)" in
         ;;
 esac
 
-if [ ! -x "$ULOOP_BIN" ]; then
-    printf '%s\n' "uloop binary not found or not executable: $ULOOP_BIN" >&2
+if [ ! -x "$TLOOP_BIN" ]; then
+    printf '%s\n' "tloop binary not found or not executable: $TLOOP_BIN" >&2
     printf '%s\n' "Build with scripts/build-go-cli.sh first." >&2
     exit 2
 fi
@@ -88,8 +88,8 @@ CLEANED_UP="0"
 
 cp "$SOURCE_ABS" "$SOURCE_BACKUP"
 
-run_uloop() {
-    "$ULOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
+run_tloop() {
+    "$TLOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
 }
 
 log() {
@@ -106,7 +106,7 @@ restore_source() {
 
 allow_auto_refresh() {
     if [ "$AUTO_REFRESH_DISALLOWED" = "1" ]; then
-        if ! run_uloop execute-dynamic-code --code "
+        if ! run_tloop execute-dynamic-code --code "
 using UnityEditor;
 AssetDatabase.AllowAutoRefresh();
 return \"AllowAutoRefresh\";
@@ -123,10 +123,10 @@ cleanup() {
     fi
     CLEANED_UP="1"
     restore_source
-    run_uloop clear-pause-point --all > /dev/null 2>&1 || true
-    run_uloop hot-reload --revert-all > /dev/null 2>&1 || true
+    run_tloop clear-pause-point --all > /dev/null 2>&1 || true
+    run_tloop hot-reload --revert-all > /dev/null 2>&1 || true
     allow_auto_refresh
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
     rm -f "$RESULT_FILE" "$SOURCE_BACKUP" "${SOURCE_ABS}.tmp"
 }
 trap cleanup EXIT
@@ -135,7 +135,7 @@ trap 'cleanup; exit 143' TERM
 trap 'cleanup; exit 129' HUP
 
 disallow_auto_refresh() {
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEditor;
 AssetDatabase.DisallowAutoRefresh();
 return \"DisallowAutoRefresh\";
@@ -144,7 +144,7 @@ return \"DisallowAutoRefresh\";
 }
 
 open_harness_scene() {
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEditor.SceneManagement;
 EditorSceneManager.OpenScene(\"$SCENE_FILE\");
 return \"opened\";
@@ -194,7 +194,7 @@ assert_good_capture() {
 await_capture() {
     label="$1"
     expect_retarget="$2"
-    run_uloop enable-pause-point \
+    run_tloop enable-pause-point \
         --file "$SOURCE_FILE" \
         --line "$MARKER_LINE" \
         --method ApplyMove \
@@ -232,20 +232,20 @@ log "Opening harness scene..."
 open_harness_scene
 
 log "Stopping any existing Play Mode session..."
-run_uloop control-play-mode --action Stop > /dev/null
-run_uloop clear-pause-point --all > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
+run_tloop clear-pause-point --all > /dev/null
 # Why revert before (A): a leftover patch from a previous run would retarget (A)
 # and let a false compile-time baseline pass.
 log "Reverting leftover hot-reload patches before compile-time capture..."
-run_uloop hot-reload --revert-all > /dev/null
+run_tloop hot-reload --revert-all > /dev/null
 
 log "Starting Play Mode..."
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 
 log "(A) compile-time capture on ${SOURCE_FILE}:${MARKER_LINE}..."
 await_capture "A" "0"
-run_uloop clear-pause-point --all > /dev/null
-run_uloop control-play-mode --action Resume > /dev/null 2>&1 || true
+run_tloop clear-pause-point --all > /dev/null
+run_tloop control-play-mode --action Resume > /dev/null 2>&1 || true
 
 log "Sed-editing in-body literal ${OLD_LITERAL} -> ${NEW_LITERAL}..."
 SOURCE_DIRTY="1"
@@ -257,7 +257,7 @@ if ! grep -F -q "$NEW_LITERAL" "$SOURCE_ABS"; then
 fi
 
 log "Applying hot-reload to $SOURCE_FILE..."
-run_uloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
+run_tloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
 success="$(jq -r '.Success' "$RESULT_FILE")"
 patched_total="$(jq -r '.PatchedTotal // 0' "$RESULT_FILE")"
 if [ "$success" != "true" ] || [ "$patched_total" -lt 1 ]; then

@@ -2,12 +2,12 @@
 
 Choose the capture mode when enabling a pause point:
 
-- `single-shot` is the default. The first hit pauses Unity and disarms the marker.
-- `continuous` pauses Unity on every hit and remains armed.
+- `single-shot` is the default. The first hit pauses Tuanjie and disarms the marker.
+- `continuous` pauses Tuanjie on every hit and remains armed.
 - `trace` remains armed and records each hit without pausing Unity.
 - In every mode, `CapturedVariables` holds the latest hit and `CapturedVariableHistory` holds only strictly older frames, so with a single hit the history is empty (for `single-shot` it always is). When the latest-hit frame is excluded, `CapturedVariableHistoryNote` explains that the latest hit's variables are in `CapturedVariables`.
 - Prefer tracing a line that executes conditionally: a line that runs every frame fills the capped history within a fraction of a second and drops everything recorded before it. When only an every-frame line is available, gate it with `--hit-when` (see [Conditional capture](#conditional-capture-with---hit-when)).
-- On every Hit, the response carries a StatusNote. In trace mode it says Play Mode was not paused (the marker fired while the game kept running). An await response also says that the wait returned on the first hit and directs you to query `pause-point-status` after the trigger when counting hits over a period. In single-shot and continuous it says Unity pauses at the next frame boundary, so live reads after the hit reflect post-frame state; use CapturedVariables for at-line values.
+- On every Hit, the response carries a StatusNote. In trace mode it says Play Mode was not paused (the marker fired while the game kept running). An await response also says that the wait returned on the first hit and directs you to query `pause-point-status` after the trigger when counting hits over a period. In single-shot and continuous it says Tuanjie pauses at the next frame boundary, so live reads after the hit reflect post-frame state; use CapturedVariables for at-line values.
 - An Expired response carries a RecommendedNextAction: re-enable the pause point with a longer --timeout-seconds (default 30) and trigger the code path again; clearing the expired marker first is not required (clear only when you also want the leftover code patch removed).
 - Expired responses include `MethodEntryCount`: `0` means the armed method was never invoked; a positive value means the method ran but never reached the armed line (branch not taken). For `async` and iterator methods the count is state-machine `MoveNext` entries, so each `await` resumption (async) or iteration step (iterator) increments it.
 - This interpretation applies to `--file`/`--line` markers only — a named `UloopPausePoint.Pause` marker enabled with `--id` has no instrumented method, always reports `MethodEntryCount: 0`, and expires with the generic message.
@@ -17,7 +17,7 @@ Choose the capture mode when enabling a pause point:
 
 ## Conditional capture with `--hit-when`
 
-`--hit-when "<name> <op> <literal>"` (file:line markers only) evaluates the named captured variable — a local, parameter, field, or `this` — every time the line executes, and turns only matching executions into hits: non-matching executions do not pause Unity, do not enter `trace` history, and are counted in `HitWhenSkippedCount` instead.
+`--hit-when "<name> <op> <literal>"` (file:line markers only) evaluates the named captured variable — a local, parameter, field, or `this` — every time the line executes, and turns only matching executions into hits: non-matching executions do not pause Tuanjie, do not enter `trace` history, and are counted in `HitWhenSkippedCount` instead.
 
 - Operators are `==`, `!=`, `>`, `>=`, `<`, `<=`. Literals are `null`, `true`/`false`, an invariant-culture number, or a quoted string (`'…'` or `"…"`, no escape syntax). Ordering operators require a numeric literal.
 - The comparison runs against the live runtime value, not the serialized `Value` string: string literals compare ordinally to string variables, and numeric literals compare to numeric primitives (enums and chars do not qualify). Numeric comparisons are evaluated in `double`, so `==` on floats or on integers beyond double's exact integer range can miss — prefer `>=`/`<=` ranges there.

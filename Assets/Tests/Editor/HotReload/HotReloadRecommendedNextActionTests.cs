@@ -33,7 +33,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 action,
                 Is.EqualTo(
-                    "Partially applied. Fix the failed declarations or methods and rerun, run 'uloop compile' to apply every edit, or run 'uloop hot-reload --revert-all' to discard the applied patches."));
+                    "Partially applied. Fix the failed declarations or methods and rerun, run 'tloop compile' to apply every edit, or run 'tloop hot-reload --revert-all' to discard the applied patches."));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 action,
                 Is.EqualTo(
-                    "Partially applied. Fix the failed declarations or methods and rerun, run 'uloop compile' to apply every edit, or run 'uloop hot-reload --revert-all' to discard the applied patches."));
+                    "Partially applied. Fix the failed declarations or methods and rerun, run 'tloop compile' to apply every edit, or run 'tloop hot-reload --revert-all' to discard the applied patches."));
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             Assert.That(
                 action,
-                Is.EqualTo("Fix the failed declarations or methods and rerun, or run 'uloop compile'."));
+                Is.EqualTo("Fix the failed declarations or methods and rerun, or run 'tloop compile'."));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 action,
                 Is.EqualTo(
-                    "Partially applied. Fix the failed declarations or methods and rerun, run 'uloop compile' to apply every edit, or run 'uloop hot-reload --revert-all' to discard the applied patches."));
+                    "Partially applied. Fix the failed declarations or methods and rerun, run 'tloop compile' to apply every edit, or run 'tloop hot-reload --revert-all' to discard the applied patches."));
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 action,
                 Is.EqualTo(
-                    "Each Skipped row's Methods[].Reason names what to change (a file to pass with --files, an initializer to drop, a shape hot reload can patch; see Warnings); do that and rerun. Run 'uloop compile' to apply the Skipped edits as they are instead."));
+                    "Each Skipped row's Methods[].Reason names what to change (a file to pass with --files, an initializer to drop, a shape hot reload can patch; see Warnings); do that and rerun. Run 'tloop compile' to apply the Skipped edits as they are instead."));
         }
 
         /// <summary>

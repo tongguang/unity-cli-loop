@@ -363,7 +363,7 @@ func controlPlayModeWaitTimeoutError(
 		Command:     controlPlayModeCommandName,
 		NextActions: []string{
 			"Check Unity Console logs for PlayMode transition errors.",
-			"Retry `uloop control-play-mode` after Unity finishes compiling, reloading scripts, or entering PlayMode.",
+			"Retry `tloop control-play-mode` after Unity finishes compiling, reloading scripts, or entering PlayMode.",
 		},
 		Details: map[string]any{
 			"RequestedAction": action,
@@ -394,7 +394,7 @@ func controlPlayModeCompileErrorsError(
 		Command:     controlPlayModeCommandName,
 		NextActions: []string{
 			"Fix the compiler errors reported in the details.",
-			"Run `uloop compile` to verify the project compiles, then retry `uloop control-play-mode --action Play`.",
+			"Run `tloop compile` to verify the project compiles, then retry `tloop control-play-mode --action Play`.",
 		},
 		Details: map[string]any{
 			"RequestedAction":   action,
@@ -420,7 +420,7 @@ func controlPlayModeUnsavedChangesError(
 		Command:     controlPlayModeCommandName,
 		NextActions: []string{
 			"Save or discard the unsaved scene or prefab changes listed in the message, then retry.",
-			"If the active scene has no path (an Untitled scene), give it a path by saving it explicitly before retrying `uloop control-play-mode --action Play`.",
+			"If the active scene has no path (an Untitled scene), give it a path by saving it explicitly before retrying `tloop control-play-mode --action Play`.",
 		},
 		Details: map[string]any{
 			"RequestedAction": action,

@@ -320,7 +320,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
                         : commandResult.ErrorOutput;
                     _dialogs.ShowMessage(
                         "Installation Failed",
-                        $"Failed to install uLoop CLI.\n\n{result.ErrorOutput}\n\n{manualInstallGuidance}");
+                        $"Failed to install tloop CLI.\n\n{result.ErrorOutput}\n\n{manualInstallGuidance}");
                     return;
                 }
 
@@ -409,7 +409,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
                 {
                     _dialogs.ShowMessage(
                         "Uninstallation Failed",
-                        $"Failed to uninstall uloop CLI.\n\n{result.ErrorOutput}");
+                        $"Failed to uninstall tloop CLI.\n\n{result.ErrorOutput}");
                     return;
                 }
             }

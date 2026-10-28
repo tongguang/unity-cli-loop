@@ -68,7 +68,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void ReleaseCodeOptimizationRecommendedNextAction_EndsWithApprovedPersistenceGuidance()
         {
             const string expectedSuffix =
-                "To make Unity start in Debug permanently, run: uloop set-code-optimization debug --startup "
+                "To make Unity start in Debug permanently, run: tloop set-code-optimization debug --startup "
                 + "(machine-wide: applies to every Unity project on this machine; only your project's C# script "
                 + "execution slows down, mainly during Play Mode - the Unity Editor itself is not slowed).";
 

@@ -818,11 +818,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 "AddedMaybe",
                 "Added methods whose bodies access private/internal members");
             AssertHasSkip(result, "AddedMaybe", "Accessor rewrite unavailable:");
-            AssertHasSkip(result, "AddedMaybe", "Run 'uloop compile' to keep the code as written.");
+            AssertHasSkip(result, "AddedMaybe", "Run 'tloop compile' to keep the code as written.");
             string skipReason = FindSkipReason(result, "AddedMaybe");
             Assert.That(skipReason, Is.Not.Null);
             int unavailableIndex = skipReason.IndexOf("Accessor rewrite unavailable:", StringComparison.Ordinal);
-            int compileIndex = skipReason.IndexOf("Run 'uloop compile' to keep the code as written.", StringComparison.Ordinal);
+            int compileIndex = skipReason.IndexOf("Run 'tloop compile' to keep the code as written.", StringComparison.Ordinal);
             Assert.That(unavailableIndex, Is.GreaterThan(-1));
             Assert.That(compileIndex, Is.GreaterThan(unavailableIndex));
             Assert.That(FindEntry(result, "AddedMaybe"), Is.Null);
@@ -894,7 +894,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(added.patchKind, Is.EqualTo(HotReloadConstants.PatchKindAddedMethod));
             Assert.That(
                 result.Output.files[0].declarationDriftWarnings,
-                Has.None.Contain("uloop compile"));
+                Has.None.Contain("tloop compile"));
         }
 
         /// <summary>
@@ -942,8 +942,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             // Why written out: the worker's constant lives in its own program, which the tests
             // cannot reference.
             const string expectedNote =
-                "Test method: not discovered by the Unity Test Runner until 'uloop compile'; "
-                + "'uloop run-tests --skip-compile' will not find or run it.";
+                "Test method: not discovered by the Unity Test Runner until 'tloop compile'; "
+                + "'tloop run-tests --skip-compile' will not find or run it.";
             string onDisk = File.ReadAllText(ResolveHostPath());
             string edited = WithHostMembers(onDisk, addedMember);
             string sourcePath = WriteEdited("AddedTestMethodNote" + methodName + ".cs", edited);

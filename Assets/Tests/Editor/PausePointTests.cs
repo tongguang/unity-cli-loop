@@ -1642,7 +1642,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 response.RecommendedNextAction,
                 Is.EqualTo(
-                    "Run the code path so the marker can hit, then read the outcome with: uloop pause-point-status --id \"jump\". To block until it hits without a trigger command (e.g. waiting for physics or a multi-step action): uloop await-pause-point --id \"jump\" --timeout-seconds <n>. To arm, trigger, and collect in one call: uloop enable-pause-point --await --resume-play --trigger \"<uloop subcommand without the leading 'uloop', e.g. simulate-keyboard --action Press --key Space>\"."));
+                    "Run the code path so the marker can hit, then read the outcome with: tloop pause-point-status --id \"jump\". To block until it hits without a trigger command (e.g. waiting for physics or a multi-step action): tloop await-pause-point --id \"jump\" --timeout-seconds <n>. To arm, trigger, and collect in one call: tloop enable-pause-point --await --resume-play --trigger \"<tloop subcommand without the leading 'tloop', e.g. simulate-keyboard --action Press --key Space>\"."));
         }
 
         [Test]
@@ -1871,7 +1871,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 json,
                 Is.EqualTo(
-                    "{\"Success\":true,\"Message\":\"No pause points are registered.\",\"Count\":0,\"PausePoints\":[],\"NextActions\":[\"Enable one with 'uloop enable-pause-point --id <marker-id>' or '--file <project-relative path> --line <line>'.\"]}"));
+                    "{\"Success\":true,\"Message\":\"No pause points are registered.\",\"Count\":0,\"PausePoints\":[],\"NextActions\":[\"Enable one with 'tloop enable-pause-point --id <marker-id>' or '--file <project-relative path> --line <line>'.\"]}"));
         }
 
         /// <summary>

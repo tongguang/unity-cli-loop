@@ -4,7 +4,7 @@ set -eu
 ROOT_DIR=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
 ACTION="${1:-status}"
 
-command_name="uloop"
+command_name="tloop"
 
 normalize_path_dir() {
   path_dir="$1"
@@ -14,25 +14,25 @@ normalize_path_dir() {
   printf '%s\n' "$path_dir"
 }
 
-select_local_uloop() {
+select_local_tloop() {
   os_name=$(uname -s)
   arch_name=$(uname -m)
 
   case "$os_name:$arch_name" in
     Darwin:arm64|Darwin:aarch64)
-      local_uloop="$ROOT_DIR/dist/darwin-arm64/uloop"
+      local_tloop="$ROOT_DIR/dist/darwin-arm64/tloop"
       ;;
     Darwin:x86_64|Darwin:amd64)
-      local_uloop="$ROOT_DIR/dist/darwin-amd64/uloop"
+      local_tloop="$ROOT_DIR/dist/darwin-amd64/tloop"
       ;;
     *)
-      echo "No built local uloop binary for $os_name $arch_name." >&2
+      echo "No built local tloop binary for $os_name $arch_name." >&2
       exit 1
       ;;
   esac
 
-  if [ ! -x "$local_uloop" ]; then
-    echo "Local uloop binary is missing or not executable: $local_uloop" >&2
+  if [ ! -x "$local_tloop" ]; then
+    echo "Local tloop binary is missing or not executable: $local_tloop" >&2
     exit 1
   fi
 }
@@ -53,14 +53,14 @@ path_contains_dir() {
 }
 
 select_global_bin_dir() {
-  if [ "${ULOOP_GLOBAL_BIN_DIR:-}" ]; then
-    global_bin_dir=$ULOOP_GLOBAL_BIN_DIR
+  if [ "${TLOOP_GLOBAL_BIN_DIR:-}" ]; then
+    global_bin_dir=$TLOOP_GLOBAL_BIN_DIR
     return
   fi
 
-  existing_uloop=$(command -v "$command_name" 2>/dev/null || true)
-  if [ "$existing_uloop" ]; then
-    global_bin_dir=$(dirname "$existing_uloop")
+  existing_tloop=$(command -v "$command_name" 2>/dev/null || true)
+  if [ "$existing_tloop" ]; then
+    global_bin_dir=$(dirname "$existing_tloop")
     return
   fi
 
@@ -76,81 +76,81 @@ select_global_bin_dir() {
     return
   fi
 
-  echo "No PATH directory found for global uloop. Set ULOOP_GLOBAL_BIN_DIR." >&2
+  echo "No PATH directory found for global tloop. Set TLOOP_GLOBAL_BIN_DIR." >&2
   exit 1
 }
 
 print_status() {
-  echo "Global uloop path: $global_uloop"
-  if [ -L "$global_uloop" ]; then
-    echo "Global uloop symlink target: $(readlink "$global_uloop")"
-  elif [ -e "$global_uloop" ]; then
-    echo "Global uloop is a regular file or directory."
+  echo "Global tloop path: $global_tloop"
+  if [ -L "$global_tloop" ]; then
+    echo "Global tloop symlink target: $(readlink "$global_tloop")"
+  elif [ -e "$global_tloop" ]; then
+    echo "Global tloop is a regular file or directory."
   else
-    echo "Global uloop does not exist."
+    echo "Global tloop does not exist."
   fi
 
-  if [ -e "$backup_uloop" ] || [ -L "$backup_uloop" ]; then
-    echo "Backup path: $backup_uloop"
+  if [ -e "$backup_tloop" ] || [ -L "$backup_tloop" ]; then
+    echo "Backup path: $backup_tloop"
   else
     echo "Backup path: none"
   fi
 
-  echo "Local branch uloop: $local_uloop"
-  if [ -x "$global_uloop" ]; then
-    echo "Selected global uloop version:"
-    "$global_uloop" --version || true
+  echo "Local branch tloop: $local_tloop"
+  if [ -x "$global_tloop" ]; then
+    echo "Selected global tloop version:"
+    "$global_tloop" --version || true
   fi
 
   if command -v "$command_name" >/dev/null 2>&1; then
-    echo "Resolved uloop: $(command -v "$command_name")"
+    echo "Resolved tloop: $(command -v "$command_name")"
   fi
 }
 
-link_local_uloop() {
+link_local_tloop() {
   mkdir -p "$global_bin_dir"
 
-  if [ -L "$global_uloop" ] && [ "$(readlink "$global_uloop")" = "$local_uloop" ]; then
-    echo "Global uloop already points to this checkout."
+  if [ -L "$global_tloop" ] && [ "$(readlink "$global_tloop")" = "$local_tloop" ]; then
+    echo "Global tloop already points to this checkout."
     print_status
     return
   fi
 
-  if [ -e "$global_uloop" ] || [ -L "$global_uloop" ]; then
-    if [ -e "$backup_uloop" ] || [ -L "$backup_uloop" ]; then
-      echo "Backup already exists, refusing to overwrite it: $backup_uloop" >&2
+  if [ -e "$global_tloop" ] || [ -L "$global_tloop" ]; then
+    if [ -e "$backup_tloop" ] || [ -L "$backup_tloop" ]; then
+      echo "Backup already exists, refusing to overwrite it: $backup_tloop" >&2
       echo "Run '$0 restore' first or move the backup manually." >&2
       exit 1
     fi
 
-    mv "$global_uloop" "$backup_uloop"
-    echo "Backed up existing global uloop to $backup_uloop"
+    mv "$global_tloop" "$backup_tloop"
+    echo "Backed up existing global tloop to $backup_tloop"
   fi
 
-  ln -s "$local_uloop" "$global_uloop"
+  ln -s "$local_tloop" "$global_tloop"
   print_status
 }
 
-restore_global_uloop() {
-  if [ ! -e "$backup_uloop" ] && [ ! -L "$backup_uloop" ]; then
-    echo "No backup found: $backup_uloop" >&2
+restore_global_tloop() {
+  if [ ! -e "$backup_tloop" ] && [ ! -L "$backup_tloop" ]; then
+    echo "No backup found: $backup_tloop" >&2
     exit 1
   fi
 
-  if [ -L "$global_uloop" ]; then
-    current_target=$(readlink "$global_uloop")
-    if [ "$current_target" != "$local_uloop" ]; then
-      echo "Refusing to remove unexpected uloop symlink: $global_uloop -> $current_target" >&2
+  if [ -L "$global_tloop" ]; then
+    current_target=$(readlink "$global_tloop")
+    if [ "$current_target" != "$local_tloop" ]; then
+      echo "Refusing to remove unexpected tloop symlink: $global_tloop -> $current_target" >&2
       exit 1
     fi
 
-    rm "$global_uloop"
-  elif [ -e "$global_uloop" ]; then
-    echo "Refusing to overwrite unexpected global uloop: $global_uloop" >&2
+    rm "$global_tloop"
+  elif [ -e "$global_tloop" ]; then
+    echo "Refusing to overwrite unexpected global tloop: $global_tloop" >&2
     exit 1
   fi
 
-  mv "$backup_uloop" "$global_uloop"
+  mv "$backup_tloop" "$global_tloop"
   print_status
 }
 
@@ -159,18 +159,18 @@ usage() {
   exit 1
 }
 
-select_local_uloop
+select_local_tloop
 select_global_bin_dir
 
-global_uloop="$global_bin_dir/$command_name"
-backup_uloop="$global_bin_dir/$command_name.before-local-link"
+global_tloop="$global_bin_dir/$command_name"
+backup_tloop="$global_bin_dir/$command_name.before-local-link"
 
 case "$ACTION" in
   link)
-    link_local_uloop
+    link_local_tloop
     ;;
   restore)
-    restore_global_uloop
+    restore_global_tloop
     ;;
   status)
     print_status

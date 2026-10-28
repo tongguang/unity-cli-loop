@@ -288,7 +288,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             detector.Installed = installed;
             detector.CachedVersion = "9.8.7";
             detector.CachedIsDispatcher = cachedIsDispatcher;
-            detector.CachedExecutablePath = "<PROJECT_ROOT>/bin/uloop";
+            detector.CachedExecutablePath = "<PROJECT_ROOT>/bin/tloop";
             CliSetupApplicationService service = CreateService(
                 detector,
                 new RecordingNativeCliInstaller(),
@@ -298,7 +298,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(service.IsCliInstalled(), Is.EqualTo(installed));
             Assert.That(service.GetCachedCliVersion(), Is.EqualTo("9.8.7"));
             Assert.That(service.GetCachedCliIsDispatcher(), Is.EqualTo(cachedIsDispatcher));
-            Assert.That(service.GetCachedCliExecutablePath(), Is.EqualTo("<PROJECT_ROOT>/bin/uloop"));
+            Assert.That(service.GetCachedCliExecutablePath(), Is.EqualTo("<PROJECT_ROOT>/bin/tloop"));
         }
 
         /// <summary>
@@ -359,7 +359,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void InstallerQueries_WhenInstallerOwnsInstall_ReturnInstallerAnswersForArguments()
         {
             RecordingNativeCliInstaller installer = new RecordingNativeCliInstaller();
-            installer.OwnedPath = "<PROJECT_ROOT>/owned/uloop";
+            installer.OwnedPath = "<PROJECT_ROOT>/owned/tloop";
             installer.ManagedKind = ManagedCliKind.Homebrew;
             installer.OwnedInstallPlatform = RuntimePlatform.WindowsEditor;
             CliSetupApplicationService service = CreateService(
@@ -368,15 +368,15 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ScriptedPinReader.WithBootstrapPin("dispatcher-v1.0.0"));
 
             Assert.That(
-                service.IsPackageOwnedCurrentUserInstallPath("<PROJECT_ROOT>/owned/uloop", RuntimePlatform.WindowsEditor),
+                service.IsPackageOwnedCurrentUserInstallPath("<PROJECT_ROOT>/owned/tloop", RuntimePlatform.WindowsEditor),
                 Is.True);
             Assert.That(
-                service.IsPackageOwnedCurrentUserInstallPath("<PROJECT_ROOT>/other/uloop", RuntimePlatform.WindowsEditor),
+                service.IsPackageOwnedCurrentUserInstallPath("<PROJECT_ROOT>/other/tloop", RuntimePlatform.WindowsEditor),
                 Is.False);
-            Assert.That(service.ResolveManagedCliKind("<PROJECT_ROOT>/owned/uloop"), Is.EqualTo(ManagedCliKind.Homebrew));
+            Assert.That(service.ResolveManagedCliKind("<PROJECT_ROOT>/owned/tloop"), Is.EqualTo(ManagedCliKind.Homebrew));
             Assert.That(service.HasPackageOwnedCurrentUserInstall(RuntimePlatform.WindowsEditor), Is.True);
             Assert.That(service.HasPackageOwnedCurrentUserInstall(RuntimePlatform.OSXEditor), Is.False);
-            Assert.That(installer.ResolvedKindPaths, Is.EqualTo(new[] { "<PROJECT_ROOT>/owned/uloop" }));
+            Assert.That(installer.ResolvedKindPaths, Is.EqualTo(new[] { "<PROJECT_ROOT>/owned/tloop" }));
         }
 
         /// <summary>

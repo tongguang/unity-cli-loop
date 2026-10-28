@@ -1,17 +1,17 @@
 ---
-name: uloop-clear-console
+name: tloop-clear-console
 toolName: clear-console
-description: "Clear Unity Console entries. Use before compile, tests, or debugging when stale logs would hide the current result."
+description: "Clear Tuanjie Console entries. Use before compile, tests, or debugging when stale logs would hide the current result."
 ---
 
-# uloop clear-console
+# tloop clear-console
 
-Clear Unity console logs.
+Clear Tuanjie console logs.
 
 ## Usage
 
 ```bash
-uloop clear-console [--add-confirmation-message]
+tloop clear-console [--add-confirmation-message]
 ```
 
 ## Parameters

@@ -87,7 +87,7 @@ namespace io.github.hatayama.UnityCliLoop.Application
                     Explanation = cancelledException.Message,
                     Solutions = new List<string>
                     {
-                        "Run uloop status to confirm the Editor is Ready before the next command"
+                        "Run tloop status to confirm the Editor is Ready before the next command"
                     }
                 };
             }

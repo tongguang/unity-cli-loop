@@ -11,13 +11,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Why compile is the unconditional release: a revert cannot unload the assembly that
         // carries an introduced type, so a run that introduced one stays held after --revert-all.
         internal const string NewlyArmedMessageSuffix =
-            "Auto Refresh is held while hot-reload changes are active, so returning focus to the Editor will not recompile; run 'uloop compile' to release it ('--revert-all' releases it only when no introduced type remains).";
+            "Auto Refresh is held while hot-reload changes are active, so returning focus to the Editor will not recompile; run 'tloop compile' to release it ('--revert-all' releases it only when no introduced type remains).";
 
         internal const string ReleaseDeferredWarning =
-            "Auto Refresh hold released; pending script edits import on the next focus return or 'uloop compile'.";
+            "Auto Refresh hold released; pending script edits import on the next focus return or 'tloop compile'.";
 
         internal const string SceneRefreshBlockedWarning =
-            "Auto Refresh hold released, but the open scene has unsaved changes and was modified on disk; resolve it, then run 'uloop compile'.";
+            "Auto Refresh hold released, but the open scene has unsaved changes and was modified on disk; resolve it, then run 'tloop compile'.";
 
         internal const string VibeArmed = "hot_reload_auto_refresh_hold_armed";
         internal const string VibeReleased = "hot_reload_auto_refresh_hold_released";

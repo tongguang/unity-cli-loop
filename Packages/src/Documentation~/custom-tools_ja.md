@@ -2,7 +2,7 @@
 
 [English](custom-tools.md) | 日本語
 
-Unity CLI Loopはコアパッケージへの変更を必要とせず、プロジェクト固有のツールを効率的に開発できます。
+Tuanjie CLI Loopはコアパッケージへの変更を必要とせず、プロジェクト固有のツールを効率的に開発できます。
 型安全な設計により、信頼性の高いカスタムツールを短時間で実装可能です。
 (AIに依頼すればすぐに作ってくれるはずです✨)
 
@@ -97,7 +97,7 @@ public class MyCustomTool : UnityCliLoopTool<MyCustomSchema, MyCustomResponse>
 **仕組み:**
 1. カスタムツールのフォルダ内に `Skill/` サブフォルダを作成
 2. `Skill/` フォルダ内に `SKILL.md` ファイルを配置
-3. `uloop skills install --claude` を実行（バンドル + プロジェクトのSkillsをまとめてインストール）
+3. `tloop skills install --claude` を実行（バンドル + プロジェクトのSkillsをまとめてインストール）
 4. LLMツールがカスタムSkillを自動認識
 
 **ディレクトリ構造:**
@@ -113,11 +113,11 @@ Assets/Editor/CustomTools/MyTool/
 **SKILL.md のフォーマット:**
 ```markdown
 ---
-name: uloop-my-custom-tool
+name: tloop-my-custom-tool
 description: "ツールの説明と使用タイミング"
 ---
 
-# uloop my-custom-tool
+# tloop my-custom-tool
 
 ツールの詳細ドキュメント...
 ```

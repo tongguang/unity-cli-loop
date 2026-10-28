@@ -43,7 +43,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             // index answer without reading the dll and break every LoadCount expectation.
             _temporaryDirectory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-referenced-method-index-" + Guid.NewGuid().ToString("N"));
+                "tloop-referenced-method-index-" + Guid.NewGuid().ToString("N"));
             _persistenceDirectory = Path.Combine(_temporaryDirectory, "persisted");
         }
 

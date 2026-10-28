@@ -58,7 +58,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Assert.That(
                     storedResult.ResultJson,
                     Does.Contain(
-                        "Unity's API Updater requested consent to rewrite source files ('Script Updating Consent' dialog). uloop declines this automatically: source files are not rewritten without explicit user consent. The obsolete-API compile errors it would have fixed are reported in Errors."));
+                        "Unity's API Updater requested consent to rewrite source files ('Script Updating Consent' dialog). tloop declines this automatically: source files are not rewritten without explicit user consent. The obsolete-API compile errors it would have fixed are reported in Errors."));
             }
             finally
             {

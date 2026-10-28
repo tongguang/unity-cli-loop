@@ -18,7 +18,7 @@ set -e
 # Prerequisites:
 #   - Assets/RegressionHarness/KeyStateAfterPauseInterruption/KeyStateAfterPauseInterruption.unity
 #     must be open in a running Unity Editor
-#   - uloop CLI must be installed
+#   - tloop CLI must be installed
 #   - jq must be installed
 
 PROJECT_PATH=""
@@ -41,11 +41,11 @@ APPLY_TIMEOUT_SECONDS="5"
 RESULT_FILE="$(mktemp)"
 PROBE_FILE="$(mktemp)"
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        uloop "$@" --project-path "$PROJECT_PATH"
+        tloop "$@" --project-path "$PROJECT_PATH"
     else
-        uloop "$@"
+        tloop "$@"
     fi
 }
 
@@ -55,8 +55,8 @@ log() {
 
 cleanup() {
     rm -f "$RESULT_FILE" "$PROBE_FILE"
-    run_uloop clear-pause-point --all > /dev/null 2>&1 || true
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop clear-pause-point --all > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
@@ -64,7 +64,7 @@ trap cleanup EXIT
 # When clear_sticky=1, clears SpaceHoldPoller's sticky latch before reading.
 probe_space_state() {
     clear_sticky="$1"
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEngine;
 using UnityEngine.InputSystem;
 using io.github.hatayama.UnityCliLoop.RegressionHarness;
@@ -78,20 +78,20 @@ return \"devicePressed=\" + devicePressed + \" isSpaceHeld=\" + poller.IsSpaceHe
 
 # --- Scenario 1: interrupt reports InterruptedByPausePoint ---
 log "Stopping any existing Play Mode session..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
 log "Clearing any existing pause-point markers..."
-run_uloop clear-pause-point --all > /dev/null
+run_tloop clear-pause-point --all > /dev/null
 
 log "Starting Play Mode..."
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 
 log "Arming pause-point on $MARKER_FILE:$MARKER_LINE (before Press starts)..."
-run_uloop enable-pause-point --file "$MARKER_FILE" --line "$MARKER_LINE" --timeout-seconds 30 > /dev/null
+run_tloop enable-pause-point --file "$MARKER_FILE" --line "$MARKER_LINE" --timeout-seconds 30 > /dev/null
 
 log "Pressing Space for ${PRESS_DURATION}s (the key-down should hit the marker)..."
 START_SECONDS=$(date +%s)
-run_uloop simulate-keyboard --action Press --key Space --duration "$PRESS_DURATION" > "$RESULT_FILE" 2>&1 || true
+run_tloop simulate-keyboard --action Press --key Space --duration "$PRESS_DURATION" > "$RESULT_FILE" 2>&1 || true
 # Why interrupt clock starts here: delayed-apply Red only fires when resume is within
 # EDITOR_FRAME_WAIT_TIMEOUT_MS of the interrupt, not of the Play CLI call.
 INTERRUPT_AT=$(date +%s)
@@ -145,7 +145,7 @@ if [ "$SECONDS_SINCE_INTERRUPT" -ge "$APPLY_TIMEOUT_SECONDS" ]; then
     exit 1
 fi
 
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 RESUME_AT=$(date +%s)
 INTERRUPT_TO_RESUME=$(( RESUME_AT - INTERRUPT_AT ))
 if [ "$INTERRUPT_TO_RESUME" -ge "$APPLY_TIMEOUT_SECONDS" ]; then
@@ -176,14 +176,14 @@ esac
 
 log "PASS scenario 2: no re-press after resume ${INTERRUPT_TO_RESUME}s after interrupt ($PROBE_AFTER)."
 
-run_uloop clear-pause-point --all > /dev/null
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop clear-pause-point --all > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
 # --- Scenario 3: >6s pause → ReleaseAll while paused → capture intact → resume → Press succeeds ---
 log "Scenario 3: interrupt, hold pause >6s, ReleaseAll while paused (captures intact), resume, Press must succeed..."
-run_uloop control-play-mode --action Play > /dev/null
-run_uloop enable-pause-point --file "$MARKER_FILE" --line "$MARKER_LINE" --timeout-seconds 60 > /dev/null
-run_uloop simulate-keyboard --action Press --key Space --duration "$PRESS_DURATION" > "$RESULT_FILE" 2>&1 || true
+run_tloop control-play-mode --action Play > /dev/null
+run_tloop enable-pause-point --file "$MARKER_FILE" --line "$MARKER_LINE" --timeout-seconds 60 > /dev/null
+run_tloop simulate-keyboard --action Press --key Space --duration "$PRESS_DURATION" > "$RESULT_FILE" 2>&1 || true
 INTERRUPTED3="$(jq -r '.InterruptedByPausePoint' "$RESULT_FILE")"
 PAUSE_POINT_ID="$(jq -r '.PausePointId // empty' "$RESULT_FILE")"
 if [ "$INTERRUPTED3" != "true" ]; then
@@ -195,7 +195,7 @@ fi
 sleep 7
 
 # Why before Play: ReleaseAll must work while paused; that is the recovery path under test.
-run_uloop simulate-keyboard --action ReleaseAll > "$RESULT_FILE" 2>&1 || true
+run_tloop simulate-keyboard --action ReleaseAll > "$RESULT_FILE" 2>&1 || true
 RELEASE_SUCCESS="$(jq -r '.Success' "$RESULT_FILE")"
 RELEASE_ACTION="$(jq -r '.Action' "$RESULT_FILE")"
 if [ "$RELEASE_SUCCESS" != "true" ] || [ "$RELEASE_ACTION" != "ReleaseAll" ]; then
@@ -205,7 +205,7 @@ if [ "$RELEASE_SUCCESS" != "true" ] || [ "$RELEASE_ACTION" != "ReleaseAll" ]; th
 fi
 
 # Why: ReleaseAll must not clear pause-point capture holders used by TryGetCapturedValue.
-run_uloop execute-dynamic-code --code "
+run_tloop execute-dynamic-code --code "
 using io.github.hatayama.UnityCliLoop.Runtime;
 (bool found, object value) = UloopPausePoint.TryGetCapturedValue(\"this\");
 return \"captureFound=\" + found;
@@ -220,9 +220,9 @@ case "$CAPTURE_RESULT" in
         ;;
 esac
 
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 
-run_uloop simulate-keyboard --action Press --key Space --duration 0.2 > "$RESULT_FILE" 2>&1 || true
+run_tloop simulate-keyboard --action Press --key Space --duration 0.2 > "$RESULT_FILE" 2>&1 || true
 PRESS_SUCCESS="$(jq -r '.Success' "$RESULT_FILE")"
 PRESS_INTERRUPTED="$(jq -r '.InterruptedByPausePoint // false' "$RESULT_FILE")"
 ALREADY_DOWN="$(jq -r '.PressEdgeKeyAlreadyPressedBeforeQueue // false' "$RESULT_FILE")"

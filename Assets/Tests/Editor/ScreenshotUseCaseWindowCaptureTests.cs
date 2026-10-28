@@ -28,7 +28,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assume.That(OverlayCanvasFactory.TryGetExisting(), Is.Null);
             _outputDirectory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-screenshot-window-" + Guid.NewGuid().ToString("N"));
+                "tloop-screenshot-window-" + Guid.NewGuid().ToString("N"));
         }
 
         [TearDown]

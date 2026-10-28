@@ -52,8 +52,8 @@ func removeSkillDirWithIgnorableDebris(skillDir string, ownedEntries []os.DirEnt
 
 // isIgnorableStoreDebris authorizes deleting a leftover entry along with its
 // skill directory: OS junk, plus the Unity .meta stubs minted for entries
-// uloop itself installed. Only regular files qualify — a directory bearing a
-// debris name is user data whose contents uloop never wrote. A user's own
+// tloop itself installed. Only regular files qualify — a directory bearing a
+// debris name is user data whose contents tloop never wrote. A user's own
 // .meta data file (dataset.meta) keeps the directory alive. Deliberately
 // separate from shouldSkipSkillFile even though the patterns overlap: that
 // one filters what a sync copies, and widening a copy filter must never
@@ -74,7 +74,7 @@ func isIgnorableStoreDebris(entry os.DirEntry, ownedEntries []os.DirEntry) bool 
 }
 
 // removeSkillDirIfEmpty drops the skill directory only when nothing remains at
-// all — the state removing uloop's own sync artifacts leaves behind when they
+// all — the state removing tloop's own sync artifacts leaves behind when they
 // were the directory's sole content.
 func removeSkillDirIfEmpty(skillDir string) error {
 	entries, err := os.ReadDir(skillDir)
@@ -93,7 +93,7 @@ func removeSkillDirIfEmpty(skillDir string) error {
 // removeEntryOfWrongType clears a destination entry whose type does not match
 // the source-owned entry about to be written. Syncs only reach here for skill
 // directories that carry install evidence or hold nothing at owned names, so
-// the occupant is uloop's to replace — but the replace paths cannot do it
+// the occupant is tloop's to replace — but the replace paths cannot do it
 // themselves: replaceSkillDirectory
 // resolves the occupant with os.Stat, which misclassifies a dangling symlink
 // as absent and then fails the rename with a raw ENOTDIR (and would follow a
@@ -119,8 +119,8 @@ func removeEntryOfWrongType(destinationPath string, wantDir bool) error {
 }
 
 // removeStaleSyncArtifacts deletes leftover temp and backup entries that an
-// interrupted sync can leave behind (SKILL.md.uloop-tmp-*, ...). They carry
-// the uloop namespace marker, so they are uloop's own artifacts by
+// interrupted sync can leave behind (SKILL.md.tloop-tmp-*, ...). They carry
+// the tloop namespace marker, so they are tloop's own artifacts by
 // construction and removing them keeps the foreign-file guarantee intact;
 // left alone they would be treated as foreign forever and keep the skill
 // directory from ever being removed on uninstall.
@@ -151,10 +151,10 @@ func removeStaleSyncArtifacts(skillDir string, ownedEntries []os.DirEntry) (bool
 }
 
 // isStaleSyncArtifactName matches the namespaced names the sync helpers mint
-// for temp and backup copies of source-owned entries: the uloop marker
+// for temp and backup copies of source-owned entries: the tloop marker
 // followed by the digits os.CreateTemp and os.MkdirTemp append. The marker
 // claims the namespace and the digit tail keeps a human-named file that
-// merely embeds it (my-archive.uloop-tmp-keepme) out of reach. Matching is
+// merely embeds it (my-archive.tloop-tmp-keepme) out of reach. Matching is
 // not restricted to currently owned entry names: debris minted for an entry a
 // newer skill version dropped or renamed must still be cleaned up.
 func isStaleSyncArtifactName(name string) bool {

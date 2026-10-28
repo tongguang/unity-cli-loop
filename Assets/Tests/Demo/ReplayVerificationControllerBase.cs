@@ -1,4 +1,4 @@
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 #nullable enable
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Demo
     {
         private const int TARGET_FRAME_RATE = 60;
         private const float ROUND_MULTIPLIER = 10000f;
-        public const string LOG_OUTPUT_DIR = ".uloop/outputs/InputRecordings";
+        public const string LOG_OUTPUT_DIR = ".tloop/outputs/InputRecordings";
         public const string RECORDING_LOG_FILE = "recording-event-log.txt";
         public const string REPLAY_LOG_FILE = "replay-event-log.txt";
 

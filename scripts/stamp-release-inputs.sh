@@ -6,12 +6,12 @@ set -eu
 # touches that package root, so changes to shared inputs (the common module,
 # installer assets) need these stamp updates to reach every affected release.
 # SCRIPT_ROOT is the checkout that owns this script so `go run` can find the
-# digest command even when ULOOP_REPO_ROOT points at a fixture repository.
+# digest command even when TLOOP_REPO_ROOT points at a fixture repository.
 SCRIPT_ROOT=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
-ROOT_DIR=${ULOOP_REPO_ROOT:-$SCRIPT_ROOT}
+ROOT_DIR=${TLOOP_REPO_ROOT:-$SCRIPT_ROOT}
 
 cd "$ROOT_DIR"
-# Resolve a relative ULOOP_REPO_ROOT after the cd so later `go run -path`
+# Resolve a relative TLOOP_REPO_ROOT after the cd so later `go run -path`
 # still points at the fixture when the digest command changes directory.
 ROOT_DIR=$(pwd)
 

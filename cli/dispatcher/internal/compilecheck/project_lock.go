@@ -14,7 +14,7 @@ const (
 	// Why the lock sits beside the output root rather than inside it: the output directory is
 	// documented as disposable, and deleting a held lock file lets the next run lock a fresh file
 	// while the first still writes, which is exactly the overlap the lock exists to prevent.
-	projectLockPath = "Library/uloop/compile-check.lock"
+	projectLockPath = "Library/tloop/compile-check.lock"
 	// Why minutes rather than seconds: an --all run of a large project compiles every assembly and
 	// takes minutes, so a shorter wait would turn ordinary queuing behind it into a failure.
 	defaultProjectLockTimeout = 5 * time.Minute

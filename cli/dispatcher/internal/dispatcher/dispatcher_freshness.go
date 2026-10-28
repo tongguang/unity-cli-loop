@@ -78,7 +78,7 @@ func enforceDispatcherFreshnessWithDeps(ctx context.Context, pin dispatcherPin, 
 
 // detectManagedDispatcherInstall reports whether a package manager owns this dispatcher binary.
 // Why: freshness is best-effort background work — path resolution failures stay false here so
-// ordinary commands keep running; explicit `uloop update` is what surfaces resolution errors.
+// ordinary commands keep running; explicit `tloop update` is what surfaces resolution errors.
 func detectManagedDispatcherInstall() sharedupdate.ManagedInstall {
 	executablePath, err := resolveUpdateExecutablePathFunc()
 	if err != nil {
@@ -106,7 +106,7 @@ func decideDispatcherFreshness(inputs dispatcherFreshnessInputs) dispatcherFresh
 			Action:         dispatcherFreshnessManualUpdateRequired,
 			MinimumVersion: minimumVersion,
 			Reason:         dispatcherFreshnessReasonSelfUpdateDisabled,
-			NextAction:     "Run `uloop update` and retry the command.",
+			NextAction:     "Run `tloop update` and retry the command.",
 		}
 	}
 	if updateRequired {
@@ -119,7 +119,7 @@ func decideDispatcherFreshness(inputs dispatcherFreshnessInputs) dispatcherFresh
 }
 
 func managedInstallFreshnessReason(managedInstall sharedupdate.ManagedInstall) string {
-	return "This uloop install is managed by " + managedInstall.DisplayName + ". Run `" + managedInstall.UpgradeCommand + "` to update."
+	return "This tloop install is managed by " + managedInstall.DisplayName + ". Run `" + managedInstall.UpgradeCommand + "` to update."
 }
 
 func executeDispatcherFreshnessPlan(ctx context.Context, plan dispatcherFreshnessPlan, stderr io.Writer, deps dispatcherRunDeps) (bool, int) {
@@ -160,7 +160,7 @@ func runDispatcherFreshnessUpdate(ctx context.Context, plan dispatcherFreshnessP
 	if plan.Action == dispatcherFreshnessRunRequiredUpdate {
 		plan.Action = dispatcherFreshnessManualUpdateRequired
 		plan.Reason = "Automatic update failed: " + err.Error()
-		plan.NextAction = "Run `uloop update` and retry the command."
+		plan.NextAction = "Run `tloop update` and retry the command."
 		return executeDispatcherFreshnessPlan(ctx, plan, stderr, deps)
 	}
 
@@ -194,7 +194,7 @@ func writeDispatcherSelfUpdateRequiredError(stderr io.Writer, updatedVersion str
 		Message:     message,
 		Retryable:   true,
 		SafeToRetry: true,
-		NextActions: []string{"Retry the same uloop command."},
+		NextActions: []string{"Retry the same tloop command."},
 		Details:     details,
 	})
 }
@@ -203,7 +203,7 @@ func writeDispatcherManualUpdateRequiredError(stderr io.Writer, plan dispatcherF
 	clierrors.WriteErrorEnvelope(stderr, clierrors.CLIError{
 		ErrorCode:   clierrors.ErrorCodeCLIUpdateRequired,
 		Phase:       clierrors.ErrorPhaseExecution,
-		Message:     "This project requires uloop dispatcher >= " + plan.MinimumVersion + ". " + plan.Reason,
+		Message:     "This project requires tloop dispatcher >= " + plan.MinimumVersion + ". " + plan.Reason,
 		Retryable:   true,
 		SafeToRetry: true,
 		NextActions: []string{plan.NextAction},

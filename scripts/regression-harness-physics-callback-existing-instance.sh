@@ -43,7 +43,7 @@ set -e
 # Prerequisites:
 #   - Assets/RegressionHarness/PhysicsCallbackExistingInstance/PhysicsCallbackExistingInstance.unity
 #     must be open in a running Unity Editor
-#   - uloop CLI must be installed
+#   - tloop CLI must be installed
 #   - jq must be installed
 
 PROJECT_PATH=""
@@ -61,11 +61,11 @@ DYNAMIC_CODE_FILE="$(mktemp)"
 RELOAD_RECOVERY_RETRIES=15
 RELOAD_RECOVERY_INTERVAL_SECONDS=2
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        uloop "$@" --project-path "$PROJECT_PATH"
+        tloop "$@" --project-path "$PROJECT_PATH"
     else
-        uloop "$@"
+        tloop "$@"
     fi
 }
 
@@ -75,8 +75,8 @@ log() {
 
 cleanup() {
     rm -f "$RESULT_FILE" "$DYNAMIC_CODE_FILE"
-    run_uloop clear-pause-point --all > /dev/null 2>&1 || true
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop clear-pause-point --all > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
@@ -86,7 +86,7 @@ using io.github.hatayama.UnityCliLoop.RegressionHarness;
 
 return HarnessDomainMarker.Id;
 EOF
-    run_uloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" 2>/dev/null | jq -r '.Result // empty'
+    run_tloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" 2>/dev/null | jq -r '.Result // empty'
 }
 
 # Reads one of the harness component's own hit counters (not the pause-point's own hit state) --
@@ -104,7 +104,7 @@ GameObject target = GameObject.Find("$OBJECT_NAME");
 $COMPONENT_TYPE component = target.GetComponent<$COMPONENT_TYPE>();
 return component.$FIELD_NAME.ToString();
 EOF
-    run_uloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" 2>/dev/null | jq -r '.Result // empty'
+    run_tloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" 2>/dev/null | jq -r '.Result // empty'
 }
 
 # Forces a fresh domain reload without touching any file, so this run's counter/IsHit checks are
@@ -127,7 +127,7 @@ using UnityEditor;
 EditorUtility.RequestScriptReload();
 return "Requested script reload";
 EOF
-    run_uloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" > /dev/null 2>&1 || true
+    run_tloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" > /dev/null 2>&1 || true
 
     log "Waiting for the domain marker to change (proves the reload actually completed)..."
     ATTEMPT=1
@@ -155,7 +155,7 @@ ballBody.velocity = Vector2.zero;
 ball.transform.position = new Vector3(0f, 3f, 0f);
 return "ball reset";
 EOF
-    run_uloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" > /dev/null
+    run_tloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" > /dev/null
 }
 
 # Informational-only probe: this workaround was investigated and found to not be validated (every
@@ -176,7 +176,7 @@ component.enabled = false;
 component.enabled = true;
 return "toggled";
 EOF
-    run_uloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" > /dev/null
+    run_tloop execute-dynamic-code --code-file "$DYNAMIC_CODE_FILE" > /dev/null
 }
 
 # Arms a pause point, triggers a fresh contact (reset_ball) after arming, and classifies the
@@ -192,7 +192,7 @@ verify_gap() {
     MARKER_ID="${MARKER_FILE}:${MARKER_LINE}"
 
     log "[$LABEL] Arming pause-point on the pre-existing instance..."
-    run_uloop enable-pause-point --file "$MARKER_FILE" --line "$MARKER_LINE" --timeout-seconds 30 > /dev/null
+    run_tloop enable-pause-point --file "$MARKER_FILE" --line "$MARKER_LINE" --timeout-seconds 30 > /dev/null
 
     COUNTER_BEFORE="$(read_counter "$OBJECT_NAME" "$COMPONENT_TYPE" "$COUNTER_FIELD")"
     if [ -z "$COUNTER_BEFORE" ]; then
@@ -205,12 +205,12 @@ verify_gap() {
     sleep 3
 
     COUNTER_AFTER="$(read_counter "$OBJECT_NAME" "$COMPONENT_TYPE" "$COUNTER_FIELD")"
-    run_uloop pause-point-status --id "$MARKER_ID" > "$RESULT_FILE"
+    run_tloop pause-point-status --id "$MARKER_ID" > "$RESULT_FILE"
     IS_HIT="$(jq -r '.IsHit' "$RESULT_FILE")"
 
     if [ "$IS_HIT" = "true" ]; then
         log "[$LABEL] PASS (did not reproduce in this environment; environment-dependent, see PR #1922): the fresh contact was captured by the pause point ($COUNTER_FIELD $COUNTER_BEFORE -> $COUNTER_AFTER)."
-        run_uloop clear-pause-point --all > /dev/null
+        run_tloop clear-pause-point --all > /dev/null
         return 0
     fi
 
@@ -221,28 +221,28 @@ verify_gap() {
         toggle_enabled "$OBJECT_NAME" "$COMPONENT_TYPE"
         reset_ball
         sleep 3
-        run_uloop pause-point-status --id "$MARKER_ID" > "$RESULT_FILE"
+        run_tloop pause-point-status --id "$MARKER_ID" > "$RESULT_FILE"
         PROBE_IS_HIT="$(jq -r '.IsHit' "$RESULT_FILE")"
         log "[$LABEL] Toggle probe result (informational only): IsHit=$PROBE_IS_HIT"
-        run_uloop clear-pause-point --all > /dev/null
+        run_tloop clear-pause-point --all > /dev/null
         exit 1
     fi
 
     log "[$LABEL] FAIL: harness self-failure -- reset_ball did not produce a fresh contact ($COUNTER_FIELD stayed at $COUNTER_BEFORE); this scenario never actually exercised the pause point."
-    run_uloop clear-pause-point --all > /dev/null
+    run_tloop clear-pause-point --all > /dev/null
     exit 1
 }
 
 log "Stopping any existing Play Mode session..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
 log "Clearing any existing pause-point markers..."
-run_uloop clear-pause-point --all > /dev/null
+run_tloop clear-pause-point --all > /dev/null
 
 force_clean_domain
 
 log "Starting Play Mode (Floor/TriggerZone/Ball already exist before any pause point is armed)..."
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 
 log "Waiting for the ball's initial fall to land on Floor (this priming contact seeds both HitCount and IndirectHitCount before any pause point is armed)..."
 sleep 3

@@ -17,7 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.RegressionHarness
         private double _lastUpdateTime;
         private float _angleDegrees;
 
-        [MenuItem("Window/uloop/HotReload EditMode Demo")]
+        [MenuItem("Window/tloop/HotReload EditMode Demo")]
         private static void Open()
         {
             HotReloadEditorWindowDemo window = GetWindow<HotReloadEditorWindowDemo>(WindowTitle);

@@ -65,7 +65,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         /// <summary>
         /// Returns the path of a cached publicized copy of <paramref name="home"/>'s image,
         /// writing it on first use. Only a publicizable home is accepted, and its image must sit
-        /// under <c>Library/ScriptAssemblies/</c> or <c>Library/UloopHotReload/IntroducedTypes/</c>
+        /// under <c>Library/ScriptAssemblies/</c> or <c>Library/TloopHotReload/IntroducedTypes/</c>
         /// — engine and system assemblies must not be rewritten.
         /// <paramref name="resolverSearchDirectories"/> are extra Cecil search dirs derived by the
         /// caller from compilation references (Unity Editor layout must not be hardcoded).
@@ -308,7 +308,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             Debug.Assert(
                 underAcceptedDirectory,
                 "ReferencePublicizer only accepts DLLs under the compiled assemblies directory or "
-                + "Library/UloopHotReload/IntroducedTypes/.");
+                + "Library/TloopHotReload/IntroducedTypes/.");
         }
 
         private static bool IsUnderDirectory(

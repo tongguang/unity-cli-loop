@@ -14,7 +14,7 @@ import (
 func TestMatchMacUnityProcessExtractsProjectPath(t *testing.T) {
 	editorProcess, matched := matchMacUnityProcess(
 		123,
-		`/Applications/Unity/Hub/Editor/6000.0.0f1/Unity.app/Contents/MacOS/Unity -projectPath "/Users/<USER_NAME>/My Project" -useHub -hubIPC`)
+		`/Applications/Tuanjie/Hub/Editor/6000.0.0f1/Tuanjie.app/Contents/MacOS/Tuanjie -projectPath "/Users/<USER_NAME>/My Project" -useHub -hubIPC`)
 	if !matched {
 		t.Fatal("expected the Unity editor process to match")
 	}
@@ -24,14 +24,14 @@ func TestMatchMacUnityProcessExtractsProjectPath(t *testing.T) {
 
 	_, batchmodeMatched := matchMacUnityProcess(
 		456,
-		`/Applications/Unity/Hub/Editor/6000.0.0f1/Unity.app/Contents/MacOS/Unity -batchmode -projectPath "/Users/<USER_NAME>/Batch"`)
+		`/Applications/Tuanjie/Hub/Editor/6000.0.0f1/Tuanjie.app/Contents/MacOS/Tuanjie -batchmode -projectPath "/Users/<USER_NAME>/Batch"`)
 	if batchmodeMatched {
 		t.Fatal("expected a -batchmode process to be skipped")
 	}
 
 	unquotedProcess, unquotedMatched := matchMacUnityProcess(
 		789,
-		`/Applications/Unity/Hub/Editor/6000.0.0f1/Unity.app/Contents/MacOS/Unity -projectPath /Users/<USER_NAME>/Other -logFile -`)
+		`/Applications/Tuanjie/Hub/Editor/6000.0.0f1/Tuanjie.app/Contents/MacOS/Tuanjie -projectPath /Users/<USER_NAME>/Other -logFile -`)
 	if !unquotedMatched {
 		t.Fatal("expected an unquoted project path process to match")
 	}
@@ -103,8 +103,8 @@ func TestParseWindowsUnityProcessesExtractsProjectPath(t *testing.T) {
 	encode := func(commandLine string) string {
 		return base64.StdEncoding.EncodeToString([]byte(commandLine))
 	}
-	output := "123|" + encode(`C:\Program Files\Unity\Hub\Editor\6000.0.0f1\Editor\Unity.exe -projectPath "C:\Users\<USER_NAME>\My Project" -useHub`) + "\r\n" +
-		"456|" + encode(`C:\Program Files\Unity\Hub\Editor\6000.0.0f1\Editor\Unity.exe -batchmode -projectPath "C:\Users\<USER_NAME>\Batch"`) + "\r\n"
+	output := "123|" + encode(`C:\Program Files\Unity\Hub\Editor\6000.0.0f1\Editor\Tuanjie.exe -projectPath "C:\Users\<USER_NAME>\My Project" -useHub`) + "\r\n" +
+		"456|" + encode(`C:\Program Files\Unity\Hub\Editor\6000.0.0f1\Editor\Tuanjie.exe -batchmode -projectPath "C:\Users\<USER_NAME>\Batch"`) + "\r\n"
 
 	processes := parseWindowsUnityProcesses(output)
 
@@ -118,7 +118,7 @@ func TestParseWindowsUnityProcessesExtractsProjectPath(t *testing.T) {
 
 // Verifies a Windows Editor whose command line does not name its project is kept with no project path.
 func TestParseWindowsUnityProcessesKeepsAnEditorWithoutProjectPathUnidentified(t *testing.T) {
-	output := "123|" + base64.StdEncoding.EncodeToString([]byte(`C:\Editor\Unity.exe -useHub -hubIPC`)) + "\r\n"
+	output := "123|" + base64.StdEncoding.EncodeToString([]byte(`C:\Editor\Tuanjie.exe -useHub -hubIPC`)) + "\r\n"
 
 	processes := parseWindowsUnityProcesses(output)
 
@@ -130,7 +130,7 @@ func TestParseWindowsUnityProcessesKeepsAnEditorWithoutProjectPathUnidentified(t
 // Verifies non-ASCII project paths survive the PowerShell boundary because command lines travel as UTF-8 Base64.
 func TestParseWindowsUnityProcessesPreservesNonASCIIProjectPath(t *testing.T) {
 	projectPath := `C:\Users\<USER_NAME>\test[1] 検証用\proj`
-	commandLine := `C:\Program Files\Unity\Hub\Editor\2022.3.62f3\Editor\Unity.exe -projectPath "` + projectPath + `" -useHub`
+	commandLine := `C:\Program Files\Unity\Hub\Editor\2022.3.62f3\Editor\Tuanjie.exe -projectPath "` + projectPath + `" -useHub`
 	output := "123|" + base64.StdEncoding.EncodeToString([]byte(commandLine)) + "\r\n"
 
 	processes := parseWindowsUnityProcesses(output)
@@ -148,7 +148,7 @@ func TestParseWindowsUnityProcessesSkipsNonBase64CommandLines(t *testing.T) {
 	// 0x8C9F 0x8FD8 0x9770 is the measured CP932 byte sequence for "検証用"
 	// that Windows PowerShell 5.1 emitted before the Base64 contract.
 	cp932KenshouYou := string([]byte{0x8C, 0x9F, 0x8F, 0xD8, 0x97, 0x70})
-	output := "123|" + `C:\Editor\Unity.exe -projectPath "C:\Users\<USER_NAME>\` + cp932KenshouYou + `\proj"` + "\r\n"
+	output := "123|" + `C:\Editor\Tuanjie.exe -projectPath "C:\Users\<USER_NAME>\` + cp932KenshouYou + `\proj"` + "\r\n"
 
 	processes := parseWindowsUnityProcesses(output)
 
@@ -224,8 +224,8 @@ func TestNormalizeComparablePathPreservesCaseOutsideWindows(t *testing.T) {
 
 // Verifies a /proc/<pid>/cmdline buffer splits on NUL into argv, keeping spaces inside arguments.
 func TestParseLinuxProcCmdlineSplitsOnNul(t *testing.T) {
-	args := parseLinuxProcCmdline([]byte("/opt/Unity/Editor/Unity\x00-projectpath\x00/work/My Project\x00"))
-	expected := []string{"/opt/Unity/Editor/Unity", "-projectpath", "/work/My Project"}
+	args := parseLinuxProcCmdline([]byte("/opt/Tuanjie/Editor/Tuanjie\x00-projectpath\x00/work/My Project\x00"))
+	expected := []string{"/opt/Tuanjie/Editor/Tuanjie", "-projectpath", "/work/My Project"}
 	if len(args) != len(expected) {
 		t.Fatalf("argv length mismatch: %#v", args)
 	}
@@ -251,13 +251,13 @@ func TestMatchLinuxUnityProcessExtractsProjectPath(t *testing.T) {
 		args         []string
 		expectedPath string
 	}{
-		{"separate value keeps spaces", []string{"/opt/Unity/Editor/Unity", "-projectpath", "/work/My Project"}, "/work/My Project"},
-		{"equals form with mixed case", []string{"/opt/Unity/Editor/Unity", "-projectPath=/work/p"}, "/work/p"},
-		{"project path containing batchmode", []string{"/opt/Unity/Editor/Unity", "-projectpath", "/work/nightly-batchmode"}, "/work/nightly-batchmode"},
-		{"project path containing assetimportworker", []string{"/opt/Unity/Editor/Unity", "-projectpath", "/work/AssetImportWorker-lab"}, "/work/AssetImportWorker-lab"},
-		{"create project", []string{"/opt/Unity/Editor/Unity", "-createProject", "/work/New Project", "-cloneFromTemplate", "/tmp/template.tgz"}, "/work/New Project"},
-		{"create project equals form", []string{"/opt/Unity/Editor/Unity", "-createproject=/work/new"}, "/work/new"},
-		{"unity hub hardlink name with lowercase projectpath", []string{"/home/user/Unity/Hub/Editor/2022.3.62f3/Editor/unityhub-unity-editor-2022.3.62f3", "-projectpath", "/home/user/project", "-acceptSoftwareTermsForThisRunOnly", "-useHub", "-hubIPC", "-cloudEnvironment", "production", "-licensingIpc", "LicenseClient-user", "-hubSessionId", "session-placeholder", "-accessToken", "token-placeholder"}, "/home/user/project"},
+		{"separate value keeps spaces", []string{"/opt/Tuanjie/Editor/Tuanjie", "-projectpath", "/work/My Project"}, "/work/My Project"},
+		{"equals form with mixed case", []string{"/opt/Tuanjie/Editor/Tuanjie", "-projectPath=/work/p"}, "/work/p"},
+		{"project path containing batchmode", []string{"/opt/Tuanjie/Editor/Tuanjie", "-projectpath", "/work/nightly-batchmode"}, "/work/nightly-batchmode"},
+		{"project path containing assetimportworker", []string{"/opt/Tuanjie/Editor/Tuanjie", "-projectpath", "/work/AssetImportWorker-lab"}, "/work/AssetImportWorker-lab"},
+		{"create project", []string{"/opt/Tuanjie/Editor/Tuanjie", "-createProject", "/work/New Project", "-cloneFromTemplate", "/tmp/template.tgz"}, "/work/New Project"},
+		{"create project equals form", []string{"/opt/Tuanjie/Editor/Tuanjie", "-createproject=/work/new"}, "/work/new"},
+		{"Hub launch arguments with lowercase projectpath", []string{"/home/user/Unity/Hub/Editor/2022.3.62f3/Editor/Tuanjie", "-projectpath", "/home/user/project", "-acceptSoftwareTermsForThisRunOnly", "-useHub", "-hubIPC", "-cloudEnvironment", "production", "-licensingIpc", "LicenseClient-user", "-hubSessionId", "session-placeholder", "-accessToken", "token-placeholder"}, "/home/user/project"},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -278,8 +278,8 @@ func TestMatchLinuxUnityProcessKeepsAnEditorWithoutProjectPathUnidentified(t *te
 		name string
 		args []string
 	}{
-		{"no project path flag", []string{"/opt/Unity/Editor/Unity"}},
-		{"project path flag without value", []string{"/opt/Unity/Editor/Unity", "-projectpath"}},
+		{"no project path flag", []string{"/opt/Tuanjie/Editor/Tuanjie"}},
+		{"project path flag without value", []string{"/opt/Tuanjie/Editor/Tuanjie", "-projectpath"}},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -297,10 +297,10 @@ func TestMatchLinuxUnityProcessRejectsNonEditorProcesses(t *testing.T) {
 		name string
 		args []string
 	}{
-		{"batchmode", []string{"/opt/Unity/Editor/Unity", "-batchmode", "-projectpath", "/work/p"}},
-		{"asset import worker", []string{"/opt/Unity/Editor/Unity", "-projectpath", "/work/p", "-name", "AssetImportWorker0"}},
+		{"batchmode", []string{"/opt/Tuanjie/Editor/Tuanjie", "-batchmode", "-projectpath", "/work/p"}},
+		{"asset import worker", []string{"/opt/Tuanjie/Editor/Tuanjie", "-projectpath", "/work/p", "-name", "AssetImportWorker0"}},
 		{"executable name is not Unity", []string{"/opt/Unity/Editor/Data/Tools/UnityShaderCompiler", "-projectpath", "/work/p"}},
-		{"asset import worker with relative hub hardlink name", []string{"unityhub-unity-editor-2022.3.62f3", "-batchMode", "-name", "AssetImportWorker0", "-projectPath", "/home/user/project"}},
+		{"asset import worker with relative hub hardlink name", []string{"Tuanjie", "-batchMode", "-name", "AssetImportWorker0", "-projectPath", "/home/user/project"}},
 		{"unrelated executable with unityhub prefix in directory only", []string{"/home/user/Unity/Hub/Editor/2022.3.62f3/Editor/Data/Tools/UnityShaderCompiler", "-projectpath", "/home/user/project"}},
 		{"empty argv", []string{}},
 	}

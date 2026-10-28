@@ -1,16 +1,16 @@
 ---
-name: uloop-execute-dynamic-code
+name: tloop-execute-dynamic-code
 toolName: execute-dynamic-code
-description: "Execute C# with Unity APIs when existing uloop tools cannot inspect or edit enough. Use for reachable scene/component state, scene/prefab/menu automation, and PlayMode checks"
+description: "Execute C# with Tuanjie APIs when existing tloop tools cannot inspect or edit enough. Use for reachable scene/component state, scene/prefab/menu automation, and PlayMode checks"
 ---
 
 # Task
 
-Run focused C# snippets in the active Unity Editor with `uloop execute-dynamic-code`.
+Run focused C# snippets in the active Tuanjie Editor with `tloop execute-dynamic-code`.
 
-For basic selected GameObject discovery or property inspection, use `find-game-objects --search-mode selected` first. Use this tool when the built-in inspection tools are not enough or when you need to modify Unity state.
+For basic selected GameObject discovery or property inspection, use `find-game-objects --search-mode selected` first. Use this tool when the built-in inspection tools are not enough or when you need to modify Tuanjie state.
 
-This tool can inspect reachable Unity state — GameObjects, components, public properties, static values, method results — but it cannot read local variables or intermediate calculations inside an already-running method. When those values matter, follow the `uloop-pause-point` skill: a pause point's `CapturedVariables` carries the locals, parameters, and instance fields at that line with no code edit or recompile, and while Unity stays paused `UloopPausePoint.TryGetCapturedValue(name)` gives this tool live captured references (it returns `(bool Found, object Value)`; see its `references/captured-variables.md`). That skill also covers the reverse combination — registering an `EditorApplication.update` watcher from this tool that freezes Unity on the first frame a runtime condition holds. Never poll or sleep inside a snippet: the body runs on the main thread, and a long await keeps other tool commands BUSY — pass `ct` (see [references/cancellation.md](references/cancellation.md)).
+This tool can inspect reachable Tuanjie state — GameObjects, components, public properties, static values, method results — but it cannot read local variables or intermediate calculations inside an already-running method. When those values matter, follow the `tloop-pause-point` skill: a pause point's `CapturedVariables` carries the locals, parameters, and instance fields at that line with no code edit or recompile, and while Tuanjie stays paused `UloopPausePoint.TryGetCapturedValue(name)` gives this tool live captured references (it returns `(bool Found, object Value)`; see its `references/captured-variables.md`). That skill also covers the reverse combination — registering an `EditorApplication.update` watcher from this tool that freezes Tuanjie on the first frame a runtime condition holds. Never poll or sleep inside a snippet: the body runs on the main thread, and a long await keeps other tool commands BUSY — pass `ct` (see [references/cancellation.md](references/cancellation.md)).
 
 Live state injection: when a running PlayMode session is merely in the wrong state — a stuck end-to-end scenario, a camera angle a raycast can never hit, a private flag blocking the path under test — fix the state instead of the code: write the field directly from this tool (reflection reaches private fields) and steer the session onward. Nothing recompiles or reloads, so the session's in-memory state survives. The snippet is a one-off diagnostic that never lands in source files, so project rules against reflection in production code do not apply.
 
@@ -20,7 +20,7 @@ Live state injection: when a running PlayMode session is merely in the wrong sta
 |-----------|------|---------|-------------|
 | `--code` | string | - | Inline C# statements to execute. Direct statements only; `return` is optional, and `using` directives may appear at the top of the snippet. |
 | `--parameters` | object | - | Shell-quoted JSON object literal for reusing a snippet with varying data or keeping values outside the code. Values are exposed as `parameters["param0"]`, `parameters["param1"]`, and so on. Omit for most snippets; never pass a JSON string value. |
-| `--wait-for-domain-reload` | flag | - | Wait for Domain Reload recovery after snippets that intentionally trigger Unity script reload or import work. Omit for normal inspection and editor-state workflows. |
+| `--wait-for-domain-reload` | flag | - | Wait for Domain Reload recovery after snippets that intentionally trigger Tuanjie script reload or import work. Omit for normal inspection and editor-state workflows. |
 | `--yield-to-foreground-requests` | flag | - | Allow foreground requests to preempt this execution |
 
 CLI-only flag, accepted instead of a schema parameter:
@@ -29,7 +29,7 @@ CLI-only flag, accepted instead of a schema parameter:
 
 ## Code Rules
 
-Write direct statements from your own Unity API knowledge — no class/namespace/method wrappers. Return is optional. `await` works, and a returned `Task` is awaited: its value becomes `Result`, its exception a failure.
+Write direct statements from your own Tuanjie API knowledge — no class/namespace/method wrappers. Return is optional. `await` works, and a returned `Task` is awaited: its value becomes `Result`, its exception a failure.
 
 ```csharp
 using UnityEngine;
@@ -70,14 +70,14 @@ Returns JSON:
 
 - `Success`: boolean — overall execution success
 - `Result`: string — value of the snippet's `return` statement (empty when omitted)
-- `Logs`: string[] — execution messages from the dynamic-code tool; read Unity Console `Debug.Log` output with `get-logs`
+- `Logs`: string[] — execution messages from the dynamic-code tool; read Tuanjie Console `Debug.Log` output with `get-logs`
 - `PartialResults` (object, optional): values that a snippet explicitly saves before it completes or fails
 - `CompilationErrors`: object[] — Roslyn diagnostics with `Message`, `Line`, `Column`, `ErrorCode`, optional `Hint` and `Suggestions`
 - `Error` / `ErrorMessage`: string — top-level failure summary (empty on success)
 - `UpdatedCode`: string|null — the wrapped form actually compiled (handy when debugging using-statement reordering)
 - `DiagnosticsSummary`: string|null — compact summary when diagnostics are available
 - `Diagnostics`: object[] — structured diagnostics; same shape as `CompilationErrors`, usually populated with it
-- `Warning` (string, optional): Set when Play Mode is running while the Unity Editor is unfocused. Progress may be throttled; run `uloop focus-window`, or use the `pause-point --await`/`--trigger` flow instead of polling for progress.
+- `Warning` (string, optional): Set when Play Mode is running while the Tuanjie Editor is unfocused. Progress may be throttled; run `tloop focus-window`, or use the `pause-point --await`/`--trigger` flow instead of polling for progress.
 
 To retain an intermediate value across a later exception, opt in before the risky code:
 

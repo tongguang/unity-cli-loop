@@ -22,7 +22,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 message,
                 Is.EqualTo(
-                    "0 change(s) currently active. 2 change(s) were discarded by the domain reload when Play Mode was entered — hot-reloaded edits that were never compiled are not in effect. Re-apply 'uloop hot-reload', or edit the files and run 'uloop compile'."));
+                    "0 change(s) currently active. 2 change(s) were discarded by the domain reload when Play Mode was entered — hot-reloaded edits that were never compiled are not in effect. Re-apply 'tloop hot-reload', or edit the files and run 'tloop compile'."));
         }
 
         /// <summary>

@@ -1,19 +1,19 @@
 ---
-name: uloop-get-hierarchy
+name: tloop-get-hierarchy
 toolName: get-hierarchy
-description: "Get the Unity scene hierarchy as a structured tree. Use for parent-child structure, descendants, roots, or subtrees under objects the user currently selected."
+description: "Get the Tuanjie scene hierarchy as a structured tree. Use for parent-child structure, descendants, roots, or subtrees under objects the user currently selected."
 ---
 
-# uloop get-hierarchy
+# tloop get-hierarchy
 
-Get Unity Hierarchy structure from the whole scene, a root path, or selected Hierarchy objects.
+Get Tuanjie Hierarchy structure from the whole scene, a root path, or selected Hierarchy objects.
 
 Use this for hierarchy structure, especially descendants under the current selection. Use `find-game-objects --search-mode selected` when you need selected object details or component properties.
 
 ## Usage
 
 ```bash
-uloop get-hierarchy [options]
+tloop get-hierarchy [options]
 ```
 
 ## Parameters

@@ -70,18 +70,18 @@ func statusText(status string) string {
 
 func printSkillsHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop skills list [options]")
-	clicore.WriteLine(stdout, "  uloop skills install [options]")
-	clicore.WriteLine(stdout, "  uloop skills uninstall [options]")
-	clicore.WriteLine(stdout, "  uloop skills install-v3-migration [options]")
-	clicore.WriteLine(stdout, "  uloop skills uninstall-v3-migration [options]")
+	clicore.WriteLine(stdout, "  tloop skills list [options]")
+	clicore.WriteLine(stdout, "  tloop skills install [options]")
+	clicore.WriteLine(stdout, "  tloop skills uninstall [options]")
+	clicore.WriteLine(stdout, "  tloop skills install-v3-migration [options]")
+	clicore.WriteLine(stdout, "  tloop skills uninstall-v3-migration [options]")
 	clicore.WriteLine(stdout, "")
 	printGlobalOptionsHelp(stdout)
 }
 
 func printSkillsSubcommandHelp(command string, stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteFormat(stdout, "  uloop skills %s [options]\n", command)
+	clicore.WriteFormat(stdout, "  tloop skills %s [options]\n", command)
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Options:")
 	clicore.WriteLine(stdout, "  -g, --global")
@@ -93,7 +93,7 @@ func printSkillsSubcommandHelp(command string, stdout io.Writer) {
 	printSkillTargetFlagLines(stdout, "      ")
 	clicore.WriteLine(stdout, "")
 	if command == "install" {
-		clicore.WriteLine(stdout, "Targets under the install root that already contain uloop skills are refreshed")
+		clicore.WriteLine(stdout, "Targets under the install root that already contain tloop skills are refreshed")
 		clicore.WriteLine(stdout, "automatically, even when their flag is omitted, so previously installed copies")
 		clicore.WriteLine(stdout, "never go stale. Copies under the other root are left untouched when the root changes.")
 		clicore.WriteLine(stdout, "")
@@ -104,7 +104,7 @@ func printSkillsSubcommandHelp(command string, stdout io.Writer) {
 	clicore.WriteLine(stdout, "")
 	if skillsSubcommandSupportsOutputDir(command) {
 		clicore.WriteLine(stdout, "With --output-dir, skills are managed flat as <path>/<skill-name> with no")
-		clicore.WriteLine(stdout, "target subdirectories. Top-level files uloop does not manage are left untouched,")
+		clicore.WriteLine(stdout, "target subdirectories. Top-level files tloop does not manage are left untouched,")
 		clicore.WriteLine(stdout, "while source-owned directories such as references/ are replaced wholly on")
 		clicore.WriteLine(stdout, "update. Skills are sourced from the Unity project, so run this inside a")
 		clicore.WriteLine(stdout, "Unity project or pass --project-path.")

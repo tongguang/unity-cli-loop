@@ -93,8 +93,8 @@ func parsePausePointTriggerCommand(command string, value string) (string, []stri
 }
 
 // parseTriggerCommandValue holds the --trigger checks every caller shares: quoting, an empty value,
-// a leading "uloop", and --project-path. validate adds the caller's own rules between the
-// leading-uloop and --project-path checks, and is also what decides whether a leading-uloop
+// a leading "tloop", and --project-path. validate adds the caller's own rules between the
+// leading-tloop and --project-path checks, and is also what decides whether a leading-tloop
 // correction can be offered back, so each caller judges corrections by its own rules.
 func parseTriggerCommandValue(
 	command string,
@@ -119,10 +119,10 @@ func parseTriggerCommandValue(
 	triggerCommand := tokens[0]
 	triggerArgs := tokens[1:]
 
-	// The value is dispatched in-process as argv, not through a shell. A leading "uloop" is
+	// The value is dispatched in-process as argv, not through a shell. A leading "tloop" is
 	// therefore a command name, not a prefix, and becomes UNKNOWN_COMMAND after arming.
 	if triggerCommand == pausePointTriggerLeadingDispatcherToken {
-		return "", nil, rejectLeadingUloopTrigger(command, triggerArgs, validate)
+		return "", nil, rejectLeadingTloopTrigger(command, triggerArgs, validate)
 	}
 
 	if err := validate(command, triggerCommand, triggerArgs); err != nil {
@@ -166,15 +166,15 @@ func rejectNestedPausePointWaitTrigger(command string, triggerCommand string, _ 
 }
 
 const (
-	pausePointTriggerLeadingDispatcherToken   = "uloop"
-	pausePointTriggerLeadingUloopMessage      = `--trigger must name the uloop subcommand without the leading "uloop": the value runs in-process, not through a shell.`
+	pausePointTriggerLeadingDispatcherToken   = "tloop"
+	pausePointTriggerLeadingTloopMessage      = `--trigger must name the tloop subcommand without the leading "tloop": the value runs in-process, not through a shell.`
 	pausePointTriggerExampleWithoutDispatcher = `simulate-keyboard --action Press --key Space`
 )
 
-// rejectLeadingUloopTrigger reports a parse-time ArgumentError so a prefixed --trigger never
+// rejectLeadingTloopTrigger reports a parse-time ArgumentError so a prefixed --trigger never
 // reaches dispatch. Why not reuse pausePointTriggerCommandString: that helper joins tokens
 // without quoting, which would flatten a whitespace-bearing argument such as "10 20".
-func rejectLeadingUloopTrigger(command string, triggerArgs []string, validate triggerCommandValidator) error {
+func rejectLeadingTloopTrigger(command string, triggerArgs []string, validate triggerCommandValidator) error {
 	corrected := pausePointTriggerExampleWithoutDispatcher
 	if len(triggerArgs) > 0 {
 		candidate := formatPausePointTriggerTokens(triggerArgs)
@@ -183,7 +183,7 @@ func rejectLeadingUloopTrigger(command string, triggerArgs []string, validate tr
 		}
 	}
 	return &clierrors.ArgumentError{
-		Message: pausePointTriggerLeadingUloopMessage,
+		Message: pausePointTriggerLeadingTloopMessage,
 		Option:  "--" + tooldocs.PausePointTriggerFlagName,
 		Command: command,
 		NextActions: []string{
@@ -195,8 +195,8 @@ func rejectLeadingUloopTrigger(command string, triggerArgs []string, validate tr
 // pausePointTriggerCorrectionIsReusable reports whether a reconstructed --trigger value can be
 // pasted back as-is. Why not present every remainder: empty or quote-bearing tokens do not
 // round-trip through the tokenizer, and nested-wait / --project-path remainders are rejected
-// on the next parse. Why refuse a remainder that still starts with uloop: re-parsing it would
-// re-enter rejectLeadingUloopTrigger; a leftover prefix is already an unusable correction.
+// on the next parse. Why refuse a remainder that still starts with tloop: re-parsing it would
+// re-enter rejectLeadingTloopTrigger; a leftover prefix is already an unusable correction.
 func pausePointTriggerCorrectionIsReusable(
 	command string,
 	original []string,
@@ -256,7 +256,7 @@ func quotePausePointTriggerFlagValue(value string) string {
 // tokenizePausePointTriggerValue splits a --trigger value into argv-style tokens, honoring single
 // and double quotes so an argument value (for example a key name) can contain a space. This is
 // intentionally not a full shell parser (no escape sequences, no nested quoting) — the trigger
-// strings this flag targets are plain `uloop` subcommand invocations, not shell pipelines.
+// strings this flag targets are plain `tloop` subcommand invocations, not shell pipelines.
 func tokenizePausePointTriggerValue(raw string) ([]string, error) {
 	var tokens []string
 	var current strings.Builder

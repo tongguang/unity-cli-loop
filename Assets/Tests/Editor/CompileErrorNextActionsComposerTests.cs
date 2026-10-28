@@ -44,7 +44,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private const string UnrelatedError = "error CS0000: sample compile error";
 
         private const string ExistingNextAction =
-            "Wait for domain reload to complete, then run `uloop compile` without --force-recompile to obtain a definitive result.";
+            "Wait for domain reload to complete, then run `tloop compile` without --force-recompile to obtain a definitive result.";
 
         private const string ApiUpdaterNextAction =
             "Fix the obsolete API usages reported in Errors, or ask the user to accept the Script Updating Consent dialog in an interactive Unity session.";
@@ -56,13 +56,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             "CS0234: The type or namespace name 'InputSystem' does not exist in the namespace 'UnityEngine' (are you missing an assembly reference?)";
 
         private const string InputSystemNextAction =
-            "error CS0234: 'UnityEngine.InputSystem' is declared in assembly 'Unity.InputSystem'. Add the assembly to the failing script's .asmdef references and run 'uloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
+            "error CS0234: 'UnityEngine.InputSystem' is declared in assembly 'Unity.InputSystem'. Add the assembly to the failing script's .asmdef references and run 'tloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
 
         private const string DualAssemblyNextAction =
-            "error CS0234: 'UnityEngine.InputSystem' is declared in assemblies 'Alpha.Assembly', 'Zebra.Assembly'. Add the assembly to the failing script's .asmdef references and run 'uloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
+            "error CS0234: 'UnityEngine.InputSystem' is declared in assemblies 'Alpha.Assembly', 'Zebra.Assembly'. Add the assembly to the failing script's .asmdef references and run 'tloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
 
         private const string TripleAssemblyNextAction =
-            "error CS0234: 'UnityEngine.InputSystem' is declared in assemblies 'A.Assembly', 'B.Assembly', 'C.Assembly'. Add the assembly to the failing script's .asmdef references and run 'uloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
+            "error CS0234: 'UnityEngine.InputSystem' is declared in assemblies 'A.Assembly', 'B.Assembly', 'C.Assembly'. Add the assembly to the failing script's .asmdef references and run 'tloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
 
         private const string Cs0246Error =
             "error CS0246: The type or namespace name 'InputSystem' could not be found (are you missing a using directive or an assembly reference?)";
@@ -71,7 +71,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             "error CS0234: The type or namespace name 'Framework' does not exist in the namespace 'NUnit' (are you missing an assembly reference?)";
 
         private const string NUnitFrameworkNextAction =
-            "error CS0234: 'NUnit.Framework' is declared in assembly 'nunit.framework'. Add the assembly to the failing script's .asmdef references and run 'uloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
+            "error CS0234: 'NUnit.Framework' is declared in assembly 'nunit.framework'. Add the assembly to the failing script's .asmdef references and run 'tloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
 
         private const string UnknownCs0234Error =
             "error CS0234: The type or namespace name 'NoSuchInner' does not exist in the namespace 'NoSuchOuter' (are you missing an assembly reference?)";
@@ -526,7 +526,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             const string scriptPath = "Assets/Tests/Editor/CompileErrorNextActionsComposerTests.cs";
             const string expectedHint =
-                "error CS0246: 'InputSystem' could not be found from a script under 'Assets/Tests/Editor/UnityCLILoop.Tests.Editor.asmdef'. If that type lives in another assembly (for example the script was recently moved under a new asmdef), add the declaring assembly to that asmdef's references and run 'uloop compile' again; if the name is a typo, fix the name instead.";
+                "error CS0246: 'InputSystem' could not be found from a script under 'Assets/Tests/Editor/UnityCLILoop.Tests.Editor.asmdef'. If that type lives in another assembly (for example the script was recently moved under a new asmdef), add the declaring assembly to that asmdef's references and run 'tloop compile' again; if the name is a typo, fix the name instead.";
             CompileResponse response = CreateResponse(success: false);
             CompilerMessage error = new CompilerMessage
             {

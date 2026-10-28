@@ -26,7 +26,7 @@ namespace io.github.hatayama.UnityCliLoop.Domain
                 if (RepositoryValue == null)
                 {
                     throw new InvalidOperationException(
-                        "Unity CLI Loop pending-compile session repository is not registered.");
+                        "Tuanjie CLI Loop pending-compile session repository is not registered.");
                 }
 
                 return RepositoryValue;

@@ -8,7 +8,7 @@ import (
 	"github.com/hatayama/unity-cli-loop/common/unityipc"
 )
 
-const expectedMainThreadWaitBusyMessage = "'get-logs' was not executed because 'execute-dynamic-code' holds Unity's single-flight slot but is not running tool code: it is waiting for the Editor main thread, which has not responded for 42s (e.g. a synchronous asset refresh or script compilation). No uloop command can run until the main thread resumes. Wait for the Editor to become responsive; restart with `uloop launch -r` only if it stays unresponsive for several minutes."
+const expectedMainThreadWaitBusyMessage = "'get-logs' was not executed because 'execute-dynamic-code' holds Unity's single-flight slot but is not running tool code: it is waiting for the Editor main thread, which has not responded for 42s (e.g. a synchronous asset refresh or script compilation). No tloop command can run until the main thread resumes. Wait for the Editor to become responsive; restart with `tloop launch -r` only if it stays unresponsive for several minutes."
 
 // Verifies a busy rejection whose holder only waits for a main thread stalled past the threshold
 // says the holder is waiting, not running, and names the stall length.
@@ -45,7 +45,7 @@ func TestUnityServerBusyNextActions_WhenHolderWaitsForStalledMainThread_GuidesWa
 	expected := []string{
 		"'execute-dynamic-code' is waiting for the Editor main thread, not running tool code; the Editor itself must become responsive first.",
 		"Wait for the Editor to become responsive (a synchronous asset refresh or script compilation can block it for minutes), then run the command again.",
-		"Restart with `uloop launch -r` only if the Editor stays unresponsive for several minutes.",
+		"Restart with `tloop launch -r` only if the Editor stays unresponsive for several minutes.",
 	}
 	if strings.Join(actions, "\n") != strings.Join(expected, "\n") {
 		t.Fatalf("actions mismatch: %#v", actions)

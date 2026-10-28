@@ -137,14 +137,14 @@ func TestCompileCheckNextActionsLeavesOutFullWhileErrorsRemain(t *testing.T) {
 }
 
 // Verifies that a clean run that only fast-checked an assembly, as a body edit of a large leaf
-// assembly does, asks for --full first and then for uloop compile, in that order.
+// assembly does, asks for --full first and then for tloop compile, in that order.
 func TestCompileCheckNextActionsAsksForFullAfterAFastCheck(t *testing.T) {
 	assertCompileCheckNextActions(t, compileCheckResponse{
 		FastCheckedAssemblies: compileCheckMessageNames(1),
 	}, []string{compileCheckFullRunAction, compileCheckUnityCompileAction})
 }
 
-// Verifies that a clean run that only reused a previous result still points at uloop compile,
+// Verifies that a clean run that only reused a previous result still points at tloop compile,
 // because a reused result differs from the Unity build just as a compiled one does.
 func TestCompileCheckNextActionsPointsAtUnityCompileForAReusedResult(t *testing.T) {
 	assertCompileCheckNextActions(t, compileCheckResponse{
@@ -152,7 +152,7 @@ func TestCompileCheckNextActionsPointsAtUnityCompileForAReusedResult(t *testing.
 	}, []string{compileCheckUnityCompileAction})
 }
 
-// Verifies that a clean run without a fast check points only at uloop compile.
+// Verifies that a clean run without a fast check points only at tloop compile.
 func TestCompileCheckNextActionsPointsAtUnityCompileOnSuccess(t *testing.T) {
 	assertCompileCheckNextActions(t, compileCheckResponse{
 		CompiledAssemblies: compileCheckMessageNames(1),

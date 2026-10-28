@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     [TestFixture]
     public sealed class WatchSessionStateStoreTests
     {
-        private const string RecordsKey = "io.github.hatayama.uloopmcp.watch.persistedRecords";
+        private const string RecordsKey = "io.github.tongguang.tloop.watch.persistedRecords";
 
         private string _originalValue;
 

@@ -7,8 +7,8 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     {
         internal static readonly string[] ReturnStringShapes =
         {
-            "return \"Unity CLI Loop dynamic code prewarm\";",
-            "return\n  \"Unity CLI Loop dynamic code prewarm\";"
+            "return \"Tuanjie CLI Loop dynamic code prewarm\";",
+            "return\n  \"Tuanjie CLI Loop dynamic code prewarm\";"
         };
     }
 }

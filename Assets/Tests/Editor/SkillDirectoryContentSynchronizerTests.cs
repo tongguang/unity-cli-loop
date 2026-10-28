@@ -22,7 +22,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUpTemporaryRoot()
         {
-            _temporaryRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _temporaryRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_temporaryRoot);
         }
 
@@ -41,7 +41,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void SyncInstalledSkillDirectory_WhenDirectoryHasStaleFiles_ReplacesContentAndRemovesStaleEntries()
         {
-            string skillDirectory = Path.Combine(_temporaryRoot, "uloop-compile");
+            string skillDirectory = Path.Combine(_temporaryRoot, "tloop-compile");
             WriteTextFile(Path.Combine(skillDirectory, "SKILL.md"), "old skill");
             WriteTextFile(Path.Combine(skillDirectory, "stale.md"), "stale");
             WriteTextFile(Path.Combine(skillDirectory, "old", "nested", "reference.md"), "old reference");
@@ -62,7 +62,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void SyncInstalledSkillDirectory_WhenDirectoryHasExcludedSidecar_KeepsIt()
         {
-            string skillDirectory = Path.Combine(_temporaryRoot, "uloop-compile");
+            string skillDirectory = Path.Combine(_temporaryRoot, "tloop-compile");
             WriteTextFile(Path.Combine(skillDirectory, "SKILL.md"), "skill");
             WriteTextFile(Path.Combine(skillDirectory, "SKILL.md.meta"), "meta");
             Dictionary<string, byte[]> skillFiles = new(StringComparer.Ordinal)
@@ -81,7 +81,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ReadSkillFilesForRollback_WhenDirectoryHasExcludedSidecar_SkipsIt()
         {
-            string skillDirectory = Path.Combine(_temporaryRoot, "uloop-compile");
+            string skillDirectory = Path.Combine(_temporaryRoot, "tloop-compile");
             WriteTextFile(Path.Combine(skillDirectory, "SKILL.md"), "skill");
             WriteTextFile(Path.Combine(skillDirectory, "SKILL.md.meta"), "meta");
 
@@ -97,7 +97,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void SyncInstalledSkillDirectory_WhenWriteFailsInExistingDirectory_RestoresOriginalFiles()
         {
-            string skillDirectory = Path.Combine(_temporaryRoot, "uloop-compile");
+            string skillDirectory = Path.Combine(_temporaryRoot, "tloop-compile");
             WriteTextFile(Path.Combine(skillDirectory, "SKILL.md"), "original skill");
             WriteTextFile(Path.Combine(skillDirectory, "notes.md"), "original notes");
             SortedDictionary<string, byte[]> skillFiles = CreateSkillFilesThatFailAfterWritingSkillFile();
@@ -117,7 +117,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void SyncInstalledSkillDirectory_WhenWriteFailsInNewDirectory_RemovesPartialDirectory()
         {
-            string skillDirectory = Path.Combine(_temporaryRoot, "uloop-compile");
+            string skillDirectory = Path.Combine(_temporaryRoot, "tloop-compile");
             SortedDictionary<string, byte[]> skillFiles = CreateSkillFilesThatFailAfterWritingSkillFile();
 
             Assert.That(

@@ -128,7 +128,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     second,
                     "patching all methods",
                     "No compile could give this file a baseline, so the run must not report its "
-                    + "absence as something 'uloop compile' would fix.");
+                    + "absence as something 'tloop compile' would fix.");
                 AssertWarningContaining(
                     second,
                     "declares a type hot reload introduced",
@@ -297,7 +297,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                         "The owner file of the type the revert left loaded must be selected after the changed file.");
                     Assert.That(
                         selection.SelectionMessage,
-                        Does.Contain("entering Play Mode or 'uloop hot-reload --revert-all' dropped what earlier reloads had applied from them: " + RevertedOwnerPath + "."));
+                        Does.Contain("entering Play Mode or 'tloop hot-reload --revert-all' dropped what earlier reloads had applied from them: " + RevertedOwnerPath + "."));
 
                     HotReloadOrchestratorResult reselected = await HotReloadCompositionRoot.Services.Orchestrator.RunAsync(
                         selection.Files,

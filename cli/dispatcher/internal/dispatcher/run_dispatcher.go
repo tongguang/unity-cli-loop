@@ -17,15 +17,15 @@ import (
 )
 
 const (
-	dispatcherDisableSelfUpdateEnvName = "ULOOP_DISABLE_SELF_UPDATE"
+	dispatcherDisableSelfUpdateEnvName = "TLOOP_DISABLE_SELF_UPDATE"
 	dispatcherVersionsDirectoryName    = "versions"
 	dispatcherUpdateStateFileName      = "dispatcher-update.json"
-	dispatcherProjectPinRelativePath   = ".uloop/project-runner-pin.json"
+	dispatcherProjectPinRelativePath   = ".tloop/project-runner-pin.json"
 	dispatcherPackagePinFileName       = "project-runner-pin.json"
-	dispatcherUnityPackageName         = "io.github.hatayama.uloopmcp"
-	dispatcherRealCLIUnixFileName      = "uloop-project-runner"
-	dispatcherRealCLIWindowsFileName   = "uloop-project-runner.exe"
-	dispatcherReleaseRepository        = "hatayama/unity-cli-loop"
+	dispatcherUnityPackageName         = "io.github.tongguang.tloop"
+	dispatcherRealCLIUnixFileName      = "tloop-project-runner"
+	dispatcherRealCLIWindowsFileName   = "tloop-project-runner.exe"
+	dispatcherReleaseRepository        = "tongguang/unity-cli-loop"
 	dispatcherReleaseBaseURL           = "https://github.com/" + dispatcherReleaseRepository + "/releases/download"
 	dispatcherSelfUpdateInterval       = 24 * time.Hour
 )
@@ -277,10 +277,10 @@ func runRealCLICommand(ctx context.Context, realCLIPath string, args []string, s
 		clierrors.WriteErrorEnvelope(stderr, clierrors.CLIError{
 			ErrorCode:   clierrors.ErrorCodeInternalError,
 			Phase:       clierrors.ErrorPhaseExecution,
-			Message:     "Failed to run resolved uloop CLI: " + err.Error(),
+			Message:     "Failed to run resolved tloop CLI: " + err.Error(),
 			Retryable:   true,
 			SafeToRetry: true,
-			NextActions: []string{"Retry after checking the cached uloop CLI file permissions."},
+			NextActions: []string{"Retry after checking the cached tloop CLI file permissions."},
 			Details: map[string]any{
 				"ExecutablePath": realCLIPath,
 			},
@@ -294,13 +294,13 @@ func dispatcherPinResolutionError(projectRoot string, cause error) clierrors.CLI
 	return clierrors.CLIError{
 		ErrorCode:   clierrors.ErrorCodeInternalError,
 		Phase:       clierrors.ErrorPhaseProjectResolve,
-		Message:     "Could not resolve the required uloop project runner for this Unity project.",
+		Message:     "Could not resolve the required tloop project runner for this Unity project.",
 		Retryable:   true,
 		SafeToRetry: true,
 		ProjectRoot: projectRoot,
 		NextActions: []string{
-			"Open the Unity project once so Unity CLI Loop can write `.uloop/project-runner-pin.json`.",
-			"Run the CLI setup from Unity CLI Loop Settings if the pin file is still missing.",
+			"Open the Unity project once so Tuanjie CLI Loop can write `.tloop/project-runner-pin.json`.",
+			"Run the CLI setup from Tuanjie CLI Loop Settings if the pin file is still missing.",
 		},
 		Details: map[string]any{
 			"Cause": cause.Error(),
@@ -329,11 +329,11 @@ func dispatcherRealCLIResolutionError(projectRoot string, pin dispatcherPin, cau
 	nextActions = append(nextActions,
 		"For dogfooding checkouts with an unpublished pin, set "+
 			nativepath.ProjectRunnerPathEnvName+
-			" to a locally built uloop-project-runner binary to bypass the download.")
+			" to a locally built tloop-project-runner binary to bypass the download.")
 	return clierrors.CLIError{
 		ErrorCode:   clierrors.ErrorCodeInternalError,
 		Phase:       clierrors.ErrorPhaseExecution,
-		Message:     "Could not prepare the pinned uloop project runner version.",
+		Message:     "Could not prepare the pinned tloop project runner version.",
 		Retryable:   true,
 		SafeToRetry: true,
 		ProjectRoot: projectRoot,

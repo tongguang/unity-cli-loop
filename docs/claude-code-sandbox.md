@@ -1,17 +1,17 @@
 # Claude Code Sandbox and Unity IPC
 
-Read this when a `uloop` command fails against a running, healthy Unity Editor while an AI agent
+Read this when a `tloop` command fails against a running, healthy Unity Editor while an AI agent
 (Claude Code or similar) is executing it through a sandboxed shell. The symptom looks like an IPC
 bug and has already cost one full investigation (2026-07-26) that ended in "the Editor was fine
 all along" — this document exists so nobody walks that path again.
 
 ## Symptom
 
-- Any `uloop` command that talks to the Unity Editor (`compile`, `run-tests`, `get-logs`,
+- Any `tloop` command that talks to the Unity Editor (`compile`, `run-tests`, `get-logs`,
   `simulate-*`, ...) fails, while Unity itself is demonstrably healthy and the server side never
   sees the connection attempt (server-side logs are VibeLogger-based and exist only when the
-  `ULOOP_DEBUG` scripting define is set — do not read missing log lines as evidence either way).
-- Commands that never touch the Editor (`uloop --version`, `uloop --help`) work normally.
+  `TLOOP_DEBUG` scripting define is set — do not read missing log lines as evidence either way).
+- Commands that never touch the Editor (`tloop --version`, `tloop --help`) work normally.
 - The reported error names the refusal: the command fails on the first attempt with
   `ErrorCode: UNITY_NOT_REACHABLE`, `Retryable: false`, `SafeToRetry: false`, and
   `Details.Cause` carrying the syscall error verbatim
@@ -24,7 +24,7 @@ all along" — this document exists so nobody walks that path again.
 
 Claude Code runs shell commands inside a sandbox that denies `connect()` and `bind()` on Unix
 domain sockets with EPERM, so the project socket
-(`/tmp/uloop-<euid>/UnityCliLoop-<hash>.sock`, where `<hash>` is the first 16 hex digits of the
+(`/tmp/tloop-<euid>/TuanjieCliLoop-<hash>.sock`, where `<hash>` is the first 16 hex digits of the
 SHA-256 of the canonical project root — see `CreateEndpoint` in `cli/common/project/project.go`)
 is unreachable from a sandboxed command.
 
@@ -44,12 +44,12 @@ Claude Code 2.1.220, macOS/Seatbelt). All three of the following were true at on
 - an allowlisted socket and a non-allowlisted one behaved identically, which is what rules the
   setting out rather than merely failing to confirm it.
 
-A directory path in `allowUnixSockets` (`/tmp/uloop-<euid>/`) was measured too, with the same
+A directory path in `allowUnixSockets` (`/tmp/tloop-<euid>/`) was measured too, with the same
 result. Do not spend time on this setting again without new evidence that its behaviour changed;
 use the remedies below.
 
 The block is not specific to the transport: with the default `allowedHosts` policy the sandbox
-also stops V2's localhost TCP connection (verified 2026-07-27), so a plain `uloop ...` command
+also stops V2's localhost TCP connection (verified 2026-07-27), so a plain `tloop ...` command
 succeeding proves only that `excludedCommands` took it out of the sandbox — not that Unix sockets
 are the problem and TCP would get through. The difference is only in the escape hatch each one
 has: a TCP host can be put on `allowedHosts`, while the equivalent for a Unix socket is the
@@ -63,26 +63,26 @@ EPERM-shaped failure there with the same suspicion before blaming the Editor.
 ## Why this repository gets hit harder than game projects
 
 Claude Code's sandbox supports an `excludedCommands` list (personal `settings.json`), and a
-typical entry is `"uloop *"`. That pattern matches the **command text**, with these verified
+typical entry is `"tloop *"`. That pattern matches the **command text**, with these verified
 consequences (2026-07-26, all measured in a live sandboxed session):
 
-| Invocation | Matches `uloop *` | Result |
+| Invocation | Matches `tloop *` | Result |
 |---|---|---|
-| `uloop get-logs ...` (dispatcher from PATH) | yes — runs outside the sandbox | works |
-| `SOME_VAR=... uloop ...` (env-var prefix) | yes (verified empirically) | works |
-| `ULOOP_PROJECT_RUNNER_PATH=<dist runner> uloop ...` (or `export` first, then plain `uloop ...`) | yes — the command text still starts with `uloop` | works |
-| `dist/darwin-arm64/uloop compile ...` | **no** (verified with the plain literal path) | EPERM |
+| `tloop get-logs ...` (dispatcher from PATH) | yes — runs outside the sandbox | works |
+| `SOME_VAR=... tloop ...` (env-var prefix) | yes (verified empirically) | works |
+| `TLOOP_PROJECT_RUNNER_PATH=<dist runner> tloop ...` (or `export` first, then plain `tloop ...`) | yes — the command text still starts with `tloop` | works |
+| `dist/darwin-arm64/tloop compile ...` | **no** (verified with the plain literal path) | EPERM |
 | raw `socket.connect()` from a script | no | EPERM |
 
 The exclusion is decided on the **typed command text**, not on which binary ultimately does the
-work: the `ULOOP_PROJECT_RUNNER_PATH` row runs a locally built dev runner yet stays excluded,
+work: the `TLOOP_PROJECT_RUNNER_PATH` row runs a locally built dev runner yet stays excluded,
 while the `dist/...` row runs the same kind of dispatcher binary yet gets sandboxed. Game
-projects invoke plain `uloop ...` (optionally with the env override) and never notice the
+projects invoke plain `tloop ...` (optionally with the env override) and never notice the
 sandbox. This repository's development rule (see `CLAUDE.md` — always validate with the built
-`dist/<platform>/uloop` binary) produces exactly the command shape the exclusion does
+`dist/<platform>/tloop` binary) produces exactly the command shape the exclusion does
 **not** match.
 
-Note the corollary: a successful `uloop ...` command in a sandboxed session does not mean the
+Note the corollary: a successful `tloop ...` command in a sandboxed session does not mean the
 sandbox permits Unity IPC — it means the command was excluded from sandboxing entirely.
 
 ## Remedies
@@ -92,16 +92,16 @@ Pick one:
 1. Run dev-binary commands with the sandbox disabled for that command (Claude Code:
    `dangerouslyDisableSandbox`; users can manage restrictions via `/sandbox`).
 2. Add the dev-binary shapes to `excludedCommands` in the personal Claude Code settings:
-   `"dist/*/uloop *"` alongside the existing `"uloop *"`, an anchored absolute-path entry such as
-   `"/Users/<user>/ghq/<org>/*/dist/*/uloop *"` if you ever type the binary's full path, and the
-   two `ULOOP_PROJECT_RUNNER_PATH=*` entries from the next section if you pass the override from
+   `"dist/*/tloop *"` alongside the existing `"tloop *"`, an anchored absolute-path entry such as
+   `"/Users/<user>/ghq/<org>/*/dist/*/tloop *"` if you ever type the binary's full path, and the
+   two `TLOOP_PROJECT_RUNNER_PATH=*` entries from the next section if you pass the override from
    a shell variable. All of these are measured, not suggestions (2026-07-27); the next section
    says which command shapes each one covers.
 3. When the change under review lives in the project runner, keep the sandbox on and run
-   `ULOOP_PROJECT_RUNNER_PATH=<absolute path to the dist runner> uloop ...` — the plain-`uloop`
+   `TLOOP_PROJECT_RUNNER_PATH=<absolute path to the dist runner> tloop ...` — the plain-`tloop`
    command text stays excluded while the dev runner does the work (the override is documented in
    `docs/project-runner-pin.md`). This does not exercise dispatcher-side changes; for those, use
-   remedy 1 or 2. Taking the path from a shell variable in the same command as `uloop` needs an
+   remedy 1 or 2. Taking the path from a shell variable in the same command as `tloop` needs an
    `excludedCommands` entry that names the variable (see the next section); without one, write
    the value literally or `export` it as a separate command first.
 
@@ -111,42 +111,42 @@ saw the connection attempt.
 ## Which command shapes the exclusion actually covers
 
 Measured 2026-07-27 in a live sandboxed session. Each row was decided by whether the command
-reached Unity or failed at `connect()`. The entries in play were `"uloop *"`, `"dist/*/uloop *"`,
-an anchored absolute-path entry (`"/Users/<user>/ghq/<org>/*/dist/*/uloop *"`), and the two
+reached Unity or failed at `connect()`. The entries in play were `"tloop *"`, `"dist/*/tloop *"`,
+an anchored absolute-path entry (`"/Users/<user>/ghq/<org>/*/dist/*/tloop *"`), and the two
 variable-named entries shown below.
 
 | Command as typed | Excluded |
 |---|---|
-| `dist/darwin-arm64/uloop get-logs ...` | yes |
-| `/Users/<user>/.../dist/darwin-arm64/uloop get-logs ...` (absolute) | yes, via the anchored entry |
-| `echo hello; /Users/<user>/.../dist/darwin-arm64/uloop get-logs ...` (compound) | yes |
-| `SOME_VAR=abc dist/darwin-arm64/uloop get-logs ...` (literal env value) | yes |
-| `dist/darwin-arm64/uloop get-logs --project-path "$(git rev-parse --show-toplevel)"` | yes |
-| `P=/path; dist/darwin-arm64/uloop get-logs --project-path "$P"` (variable in an argument) | yes |
-| `mkdir -p somewhere; dist/darwin-arm64/uloop get-logs ...` (compound) | yes |
-| `echo start; uloop get-logs ...` (compound) | yes |
-| `P=/path; uloop get-logs --project-path "$P"` | yes |
-| `V=abc; export SOME_VAR="$V"` first, then `dist/darwin-arm64/uloop get-logs ...` | yes |
-| `R=<path>; ULOOP_PROJECT_RUNNER_PATH="$R" uloop get-logs ...` | yes, via the variable-named entry |
-| `R=<path>; ULOOP_PROJECT_RUNNER_PATH="$R" dist/darwin-arm64/uloop get-logs ...` | yes, via the variable-named entry |
-| **`V=abc; SOME_VAR="$V" uloop get-logs ...`** (no entry names `SOME_VAR`) | **no — denied** |
+| `dist/darwin-arm64/tloop get-logs ...` | yes |
+| `/Users/<user>/.../dist/darwin-arm64/tloop get-logs ...` (absolute) | yes, via the anchored entry |
+| `echo hello; /Users/<user>/.../dist/darwin-arm64/tloop get-logs ...` (compound) | yes |
+| `SOME_VAR=abc dist/darwin-arm64/tloop get-logs ...` (literal env value) | yes |
+| `dist/darwin-arm64/tloop get-logs --project-path "$(git rev-parse --show-toplevel)"` | yes |
+| `P=/path; dist/darwin-arm64/tloop get-logs --project-path "$P"` (variable in an argument) | yes |
+| `mkdir -p somewhere; dist/darwin-arm64/tloop get-logs ...` (compound) | yes |
+| `echo start; tloop get-logs ...` (compound) | yes |
+| `P=/path; tloop get-logs --project-path "$P"` | yes |
+| `V=abc; export SOME_VAR="$V"` first, then `dist/darwin-arm64/tloop get-logs ...` | yes |
+| `R=<path>; TLOOP_PROJECT_RUNNER_PATH="$R" tloop get-logs ...` | yes, via the variable-named entry |
+| `R=<path>; TLOOP_PROJECT_RUNNER_PATH="$R" dist/darwin-arm64/tloop get-logs ...` | yes, via the variable-named entry |
+| **`V=abc; SOME_VAR="$V" tloop get-logs ...`** (no entry names `SOME_VAR`) | **no — denied** |
 
 Command substitution in an argument, a variable in an argument, and being part of a compound
 command are all harmless, and matching happens per sub-command — `echo hello;` in front of an
 absolute-path invocation does not stop it being excluded. Two shapes need an entry of their own:
 
-- **An absolute path.** The glob is matched against the typed text, so `dist/*/uloop *` only
+- **An absolute path.** The glob is matched against the typed text, so `dist/*/tloop *` only
   matches text beginning with `dist/`. An entry whose leading segment is literal —
-  `"/Users/<user>/ghq/<org>/*/dist/*/uloop *"` — covers it. Anchoring costs nothing in practice
-  because matching is per sub-command. A leading wildcard (`"*/dist/*/uloop *"`) would also cover
+  `"/Users/<user>/ghq/<org>/*/dist/*/tloop *"` — covers it. Anchoring costs nothing in practice
+  because matching is per sub-command. A leading wildcard (`"*/dist/*/tloop *"`) would also cover
   checkouts outside that root, but how it behaves was not measured, so prefer adding another
   anchored entry when a new root appears.
-- **A shell variable expanded into an env-var prefix.** `SOME_VAR="$V" uloop ...` is denied while
-  `SOME_VAR=abc uloop ...` is not, and the same variable expanded into an *argument* is fine. An
+- **A shell variable expanded into an env-var prefix.** `SOME_VAR="$V" tloop ...` is denied while
+  `SOME_VAR=abc tloop ...` is not, and the same variable expanded into an *argument* is fine. An
   entry that spells the variable out restores it; both of these were verified:
 
-      "ULOOP_PROJECT_RUNNER_PATH=* uloop *",
-      "ULOOP_PROJECT_RUNNER_PATH=* dist/*/uloop *"
+      "TLOOP_PROJECT_RUNNER_PATH=* tloop *",
+      "TLOOP_PROJECT_RUNNER_PATH=* dist/*/tloop *"
 
   That is the shape remedy 3 uses. Without such an entry, write the value literally or `export`
   it as a separate command first.
@@ -158,7 +158,7 @@ of thumb for predicting new cases, not as fact: it is inferred from the measurem
 from Claude Code's implementation. Measure before relying on a shape that is not in the table.
 
 The denied row also reproduces the misdiagnosis this document warns about. Because the installed
-`uloop` resolves a *released* project runner, its failure is not the refusal report above but
+`tloop` resolves a *released* project runner, its failure is not the refusal report above but
 `... i/o timeout` after the retry window — the pre-fix behaviour described under Symptom. Seeing
 `i/o timeout` therefore still means the runner that served the command predates the fix, not
 that the Editor is slow.

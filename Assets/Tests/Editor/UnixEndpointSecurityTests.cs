@@ -14,8 +14,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     public class UnixEndpointSecurityTests
     {
         private const string ParentPath = "/tmp";
-        private const string EndpointDirectoryPath = "/tmp/uloop-501";
-        private const string SocketPath = EndpointDirectoryPath + "/UnityCliLoop-test.sock";
+        private const string EndpointDirectoryPath = "/tmp/tloop-501";
+        private const string SocketPath = EndpointDirectoryPath + "/TuanjieCliLoop-test.sock";
         private const uint EffectiveUserId = 501;
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             UnixNativeFileSystem fileSystem = new();
             string directoryPath = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-native-stat-test-" + Guid.NewGuid().ToString("N"));
+                "tloop-native-stat-test-" + Guid.NewGuid().ToString("N"));
             UnixNativeOperationResult createResult = fileSystem.CreateDirectory(directoryPath, 0x1C0);
             Assert.That(createResult.Success, Is.True, $"mkdir errno {createResult.ErrorCode}");
 

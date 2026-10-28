@@ -28,7 +28,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(Path.Combine(_projectRoot, "Assets"));
         }
 

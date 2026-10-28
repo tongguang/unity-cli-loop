@@ -20,12 +20,12 @@ func TestFormatConnectionAttemptErrorExplainsDialFailureWithoutDisconnectClaim(t
 	connection := Connection{
 		Endpoint: Endpoint{
 			Network: "unix",
-			Address: "/tmp/uloop/UnityCliLoop-sample.sock",
+			Address: "/tmp/tloop/TuanjieCliLoop-sample.sock",
 		},
 		ProjectRoot: "/tmp/MyProject",
 	}
 
-	err := formatConnectionAttemptError(connection, errors.New("dial unix /tmp/uloop/UnityCliLoop-sample.sock: connect: no such file or directory"))
+	err := formatConnectionAttemptError(connection, errors.New("dial unix /tmp/tloop/TuanjieCliLoop-sample.sock: connect: no such file or directory"))
 	connectionErr, ok := err.(*ConnectionAttemptError)
 	if !ok {
 		t.Fatalf("expected ConnectionAttemptError, got %T", err)
@@ -33,10 +33,10 @@ func TestFormatConnectionAttemptErrorExplainsDialFailureWithoutDisconnectClaim(t
 	if connectionErr.ProjectRoot != "/tmp/MyProject" {
 		t.Fatalf("project root mismatch: %s", connectionErr.ProjectRoot)
 	}
-	if connectionErr.Endpoint != "/tmp/uloop/UnityCliLoop-sample.sock" {
+	if connectionErr.Endpoint != "/tmp/tloop/TuanjieCliLoop-sample.sock" {
 		t.Fatalf("endpoint mismatch: %s", connectionErr.Endpoint)
 	}
-	if connectionErr.Unwrap().Error() != "dial unix /tmp/uloop/UnityCliLoop-sample.sock: connect: no such file or directory" {
+	if connectionErr.Unwrap().Error() != "dial unix /tmp/tloop/TuanjieCliLoop-sample.sock: connect: no such file or directory" {
 		t.Fatalf("cause mismatch: %v", connectionErr.Unwrap())
 	}
 }
@@ -241,12 +241,12 @@ func captureClientMetadataRequest(
 func assertClientMetadataRequest(t *testing.T, request map[string]any) {
 	t.Helper()
 
-	if _, ok := request["x-uloop"]; ok {
-		t.Fatalf("request should not include x-uloop metadata: %#v", request["x-uloop"])
+	if _, ok := request["x-tloop"]; ok {
+		t.Fatalf("request should not include x-tloop metadata: %#v", request["x-tloop"])
 	}
 	metadata, ok := request["uloop"].(map[string]any)
 	if !ok {
-		t.Fatalf("request should include uloop metadata: %#v", request)
+		t.Fatalf("request should include tloop metadata: %#v", request)
 	}
 	if metadata["projectRunnerVersion"] != "3.0.0-beta.6" {
 		t.Fatalf("project runner version metadata mismatch: %#v", metadata)

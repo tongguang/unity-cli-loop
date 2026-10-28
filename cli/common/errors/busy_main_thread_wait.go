@@ -18,7 +18,7 @@ func isWaitingForStalledMainThread(data serverBusyErrorData) bool {
 // tool code at the moment, so an agent reading "running" waits for, retries, or restarts the wrong thing.
 func mainThreadWaitBusyMessage(requestedToolName string, runningToolName string, stalledSeconds float64) string {
 	return fmt.Sprintf(
-		"'%s' was not executed because '%s' holds Unity's single-flight slot but is not running tool code: it is waiting for the Editor main thread, which has not responded for %ds (e.g. a synchronous asset refresh or script compilation). No uloop command can run until the main thread resumes. Wait for the Editor to become responsive; restart with `uloop launch -r` only if it stays unresponsive for several minutes.",
+		"'%s' was not executed because '%s' holds Unity's single-flight slot but is not running tool code: it is waiting for the Editor main thread, which has not responded for %ds (e.g. a synchronous asset refresh or script compilation). No tloop command can run until the main thread resumes. Wait for the Editor to become responsive; restart with `tloop launch -r` only if it stays unresponsive for several minutes.",
 		requestedToolName,
 		runningToolName,
 		int(stalledSeconds))
@@ -32,6 +32,6 @@ func mainThreadWaitBusyNextActions(runningToolName string) []string {
 			"'%s' is waiting for the Editor main thread, not running tool code; the Editor itself must become responsive first.",
 			runningToolName),
 		"Wait for the Editor to become responsive (a synchronous asset refresh or script compilation can block it for minutes), then run the command again.",
-		"Restart with `uloop launch -r` only if the Editor stays unresponsive for several minutes.",
+		"Restart with `tloop launch -r` only if the Editor stays unresponsive for several minutes.",
 	}
 }

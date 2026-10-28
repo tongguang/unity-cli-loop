@@ -1,5 +1,5 @@
 <#
-Endurance (soak) harness for the uloop CLI against a real Unity project.
+Endurance (soak) harness for the tloop CLI against a real Unity project.
 Windows/PowerShell port of scripts/soak-loop.sh - same iteration plan, same
 CSV schema. Full guide (expected failures, safety, reading results):
 docs/soak-testing.md
@@ -19,14 +19,14 @@ Usage:
   pwsh -NoProfile -File .\scripts\soak-loop.ps1 -ProjectPath C:\path\to\unity-project -Iterations 20 -TestAssembly YourProject.Tests.Editor
 
 Environment:
-  ULOOP_BIN  uloop binary to use (default: uloop from PATH - the realistic
-             release configuration; point at a dist\windows-amd64\uloop.exe
+  TLOOP_BIN  tloop binary to use (default: tloop from PATH - the realistic
+             release configuration; point at a dist\windows-amd64\tloop.exe
              to soak unreleased CLI code)
 
 Prerequisites:
-  - uloop package installed in the target project
+  - tloop package installed in the target project
   - Unity Editor may or may not be running: a busy editor is waited on, and
-    a missing one is launched via `uloop launch`
+    a missing one is launched via `tloop launch`
 
 All generated files live under Assets/UloopSoak/ in the target project (the
 recompile scratch script, the PlayMode ticker script, and the pause-point
@@ -43,13 +43,13 @@ param(
     [string]$ProjectPath,
     # Total iterations.
     [int]$Iterations = 100,
-    # Run `uloop launch -r` every N iterations (0 = never).
+    # Run `tloop launch -r` every N iterations (0 = never).
     [int]$RestartEvery = 25,
     # Use compile --force-recompile every N iterations (0 = never).
     [int]$ForceEvery = 10,
     # Run a PlayMode cycle (UI click + pause-point) every N iterations (0 = never).
     [int]$PauseEvery = 5,
-    # Run `uloop run-tests` every N iterations (0 = never).
+    # Run `tloop run-tests` every N iterations (0 = never).
     [int]$TestsEvery = 10,
     # Test assembly passed to run-tests --filter-type assembly (required when
     # -TestsEvery > 0; never run the full suite of a large project).
@@ -58,7 +58,7 @@ param(
     # PlayMode cycle switches a Release editor to Debug for the duration of the
     # run, because pause points cannot be armed by file and line otherwise.
     [switch]$KeepCodeOptimization,
-    # Kill bound for a single uloop call. Raise it for a large project, and
+    # Kill bound for a single tloop call. Raise it for a large project, and
     # especially for parallel soaks: a full recompile of one large project took
     # over 10 minutes with three editors compiling at once.
     [int]$CommandTimeoutSeconds = 600,
@@ -69,16 +69,16 @@ param(
     [int]$CompileWaitTimeoutSeconds = 0,
     # Pause between iterations.
     [int]$SleepSeconds = 0,
-    # Results directory (default: .\uloop-soak-results\<timestamp>).
+    # Results directory (default: .\tloop-soak-results\<timestamp>).
     [string]$OutDir = ""
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-[string]$UloopBin = "uloop"
-if (-not [string]::IsNullOrWhiteSpace($env:ULOOP_BIN)) {
-    $UloopBin = $env:ULOOP_BIN
+[string]$UloopBin = "tloop"
+if (-not [string]::IsNullOrWhiteSpace($env:TLOOP_BIN)) {
+    $UloopBin = $env:TLOOP_BIN
 }
 
 if (-not (Test-Path -LiteralPath $ProjectPath)) {
@@ -110,7 +110,7 @@ else {
 
 if ([string]::IsNullOrWhiteSpace($OutDir)) {
     [string]$stamp = (Get-Date).ToString("yyyyMMdd-HHmmss")
-    $OutDir = Join-Path (Get-Location).Path "uloop-soak-results\$stamp"
+    $OutDir = Join-Path (Get-Location).Path "tloop-soak-results\$stamp"
 }
 $null = New-Item -ItemType Directory -Path $OutDir -Force
 [string]$ResolvedOutDir = (Resolve-Path -LiteralPath $OutDir).Path
@@ -236,7 +236,7 @@ function Get-FileByteLength {
     return [int64](Get-Item -LiteralPath $Path).Length
 }
 
-# Every uloop call runs under a kill watchdog: a hung IPC call - e.g. a frozen
+# Every tloop call runs under a kill watchdog: a hung IPC call - e.g. a frozen
 # editor that accepted the connection but never answers - must surface as one
 # failed, finite sample so the consecutive-failure recovery can fire, instead
 # of blocking the unattended soak forever. The bound has to stay above the
@@ -245,7 +245,7 @@ function Get-FileByteLength {
 # ~8 minutes on its own and longer while other editors compile in parallel.
 #
 # Reported for a killed command; matches the exit code GNU timeout(1) uses, so
-# a timeout is distinguishable from any exit code uloop itself returns.
+# a timeout is distinguishable from any exit code tloop itself returns.
 [int]$TimeoutExitCode = 124
 
 function Invoke-Uloop {
@@ -298,7 +298,7 @@ function Invoke-Uloop {
 # CSV stays the unfiltered record, the log and the summary stay signal.
 [hashtable]$ToleratedCounts = @{}
 
-# uloop is single-flight: while Unity runs one tool, every other command is
+# tloop is single-flight: while Unity runs one tool, every other command is
 # refused at dispatch with UNITY_SERVER_BUSY. That is back-pressure from work
 # the harness itself started - a compile that outlived the runner's own wait
 # keeps the editor busy for minutes - not a defect, and counting it would fail
@@ -306,7 +306,7 @@ function Invoke-Uloop {
 # are waited out instead, and only the decisive attempt is recorded, so
 # commands.csv keeps one row per intended invocation.
 #
-# The wait is driven by uloop's own SafeToRetry classification rather than by
+# The wait is driven by tloop's own SafeToRetry classification rather than by
 # matching one hardcoded error code. Busy is not the only transient state a
 # soak crosses: an editor whose domain reload has torn the IPC pipe down
 # answers UNITY_NOT_REACHABLE (Phase "connection") for as long as the reload
@@ -318,7 +318,7 @@ function Invoke-Uloop {
 # cli/common/errors: Retryable says the condition is transient, while
 # SafeToRetry says re-issuing cannot double-apply the command. Unity may
 # already have received a request that failed after dispatch, and this harness
-# re-issues commands that mutate project and scene state, so anything uloop
+# re-issues commands that mutate project and scene state, so anything tloop
 # marks SafeToRetry:false is reported as a failure instead of being retried.
 [regex]$SafeToRetryPattern = [regex]::new('"SafeToRetry"\s*:\s*true', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
 [regex]$ErrorCodePattern = [regex]::new('"ErrorCode"\s*:\s*"([^"]+)"')
@@ -338,7 +338,7 @@ function Invoke-Uloop {
     "Dynamic-code runtime was disposed during a server reset or domain reload" = "DYNAMIC_CODE_RUNTIME_RESTARTING"
 }
 
-# uloop marks every launch failure SafeToRetry:true, and for the CLI that is
+# tloop marks every launch failure SafeToRetry:true, and for the CLI that is
 # correct - re-running launch cannot double-apply anything. It is wrong for
 # this harness. Re-issuing `launch -r` restarts the editor again, minutes at a
 # time, and restart recovery is already owned here (Wait-Editor after every
@@ -434,7 +434,7 @@ function Save-FailurePayload {
     }
 }
 
-# Runs one uloop command, appends a CSV row, and returns the command result.
+# Runs one tloop command, appends a CSV row, and returns the command result.
 # ToleratedPatterns names the documented outcomes for this command that are
 # expected to fail without being a defect (see docs/soak-testing.md); a
 # non-zero exit whose payload contains one is reported as TOLERATED, and the
@@ -475,7 +475,7 @@ function Invoke-TimedUloop {
         if ($retryReason -ne $lastRetryReason) {
             $waitedForEditor = $true
             $lastRetryReason = $retryReason
-            Write-SoakLog -Message "iter=$Iteration $Label deferred on $retryReason (uloop reports it safe to retry), retrying every ${BusyRetryDelaySeconds}s"
+            Write-SoakLog -Message "iter=$Iteration $Label deferred on $retryReason (tloop reports it safe to retry), retrying every ${BusyRetryDelaySeconds}s"
         }
         Start-Sleep -Seconds $BusyRetryDelaySeconds
     }
@@ -625,7 +625,7 @@ function Get-TickerPauseLine {
     throw "The generated ticker source no longer contains its pause-point line."
 }
 
-# The uloop relative paths use forward slashes; joining them onto a Windows
+# The tloop relative paths use forward slashes; joining them onto a Windows
 # root needs the separators normalized first.
 function Resolve-ProjectRelativePath {
     param(
@@ -719,7 +719,7 @@ function Invoke-EnsureSoakScene {
 }
 
 function Get-UnityProcessForProject {
-    [object[]]$processes = @(Get-CimInstance Win32_Process -Filter "Name = 'Unity.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine })
+    [object[]]$processes = @(Get-CimInstance Win32_Process -Filter "Name = 'Tuanjie.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine })
     foreach ($process in $processes) {
         if ($process.CommandLine.IndexOf($ResolvedProjectPath, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
             return $process
@@ -730,7 +730,7 @@ function Get-UnityProcessForProject {
 }
 
 function Get-OutputsDirectoryKb {
-    [string]$outputsPath = Join-Path $ResolvedProjectPath ".uloop\outputs"
+    [string]$outputsPath = Join-Path $ResolvedProjectPath ".tloop\outputs"
     if (-not (Test-Path -LiteralPath $outputsPath)) {
         return 0
     }
@@ -754,7 +754,7 @@ function Write-Metrics {
         $workingSetKb = [string][int64]([int64]$unityProcess.WorkingSetSize / 1KB)
     }
 
-    [int]$runnerCount = @(Get-Process -Name "uloop-project-runner" -ErrorAction SilentlyContinue).Count
+    [int]$runnerCount = @(Get-Process -Name "tloop-project-runner" -ErrorAction SilentlyContinue).Count
     Add-TextLine -Path $MetricsCsv -Line ("{0},{1},{2},{3},{4}" -f (Get-EpochMilliseconds), $Iteration, $workingSetKb, $runnerCount, (Get-OutputsDirectoryKb))
 }
 
@@ -781,7 +781,7 @@ function Wait-Editor {
 [string]$PreviousCodeOptimization = ""
 
 # Re-applied after every editor restart, not just at setup: the mode does not
-# survive `uloop launch -r`. An editor that comes back on the project's own
+# survive `tloop launch -r`. An editor that comes back on the project's own
 # Release setting cannot arm pause points at all, which silently turned every
 # post-restart pause cycle into a failure until this was found.
 function Set-DebugCodeOptimization {
@@ -1051,7 +1051,7 @@ function Invoke-PauseCycle {
 }
 
 try {
-    Write-SoakLog -Message "Soak start: $Iterations iterations against $ResolvedProjectPath (uloop: $ResolvedUloopBin)"
+    Write-SoakLog -Message "Soak start: $Iterations iterations against $ResolvedProjectPath (tloop: $ResolvedUloopBin)"
     Write-SoakLog -Message "restart-every=$RestartEvery force-every=$ForceEvery pause-every=$PauseEvery tests-every=$TestsEvery sleep=${SleepSeconds}s command-timeout=${CommandTimeoutSeconds}s"
 
     # A freshly launched editor can be busy importing/compiling for a long time
@@ -1065,7 +1065,7 @@ try {
             Write-SoakLog -Message "Editor busy - waiting up to 15 minutes for it to answer"
         }
         else {
-            Write-SoakLog -Message "Editor not running - launching it with uloop launch"
+            Write-SoakLog -Message "Editor not running - launching it with tloop launch"
             if ((Invoke-TimedUloop -Iteration 0 -Label "launch-start" -CommandArguments @("launch")).ExitCode -ne 0) {
                 Write-SoakLog -Message "Preflight failed: could not launch the editor."
                 exit 1
@@ -1073,7 +1073,7 @@ try {
         }
 
         if (-not (Wait-Editor)) {
-            Write-SoakLog -Message "Preflight failed: uloop cannot reach the editor."
+            Write-SoakLog -Message "Preflight failed: tloop cannot reach the editor."
             exit 1
         }
     }
@@ -1199,7 +1199,7 @@ try {
         if ($testsDue) {
             $testsDeferred = $false
             # Red project tests are not a soak failure - the harness measures
-            # whether uloop transported and completed the run, so only a
+            # whether tloop transported and completed the run, so only a
             # missing test report (no TestCount in the response) counts against
             # the iteration.
             [pscustomobject]$testsResult = Invoke-TimedUloop -Iteration $i -Label "run-tests" -CommandArguments @("run-tests", "--test-mode", "EditMode", "--filter-type", "assembly", "--filter-value", $TestAssembly) -ToleratedPatterns @('"TestCount"')

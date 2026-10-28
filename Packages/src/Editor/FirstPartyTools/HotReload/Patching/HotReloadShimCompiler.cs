@@ -322,7 +322,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             return Path.Combine(
                 projectRoot,
                 "Library",
-                "UloopHotReload",
+                "TloopHotReload",
                 "ShimCompile",
                 Guid.NewGuid().ToString("N"));
         }

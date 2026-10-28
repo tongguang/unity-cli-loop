@@ -9,7 +9,7 @@ import (
 
 const (
 	movedFrameworkResponseSuffix = ".mvfrm.rsp"
-	compileCheckOutputRoot       = "Library/uloop/compile-check"
+	compileCheckOutputRoot       = "Library/tloop/compile-check"
 	dependencyReasonPrefix       = "depends on "
 )
 

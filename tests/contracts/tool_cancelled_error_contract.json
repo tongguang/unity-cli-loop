@@ -2,7 +2,7 @@
   "comment": "Representative tool_cancelled error.data payload with every ToolCancelledErrorData field present. Go and C# contract tests decode this same frame.",
   "errorData": {
     "type": "tool_cancelled",
-    "message": "'run-tests' was cancelled by uloop cancel.",
+    "message": "'run-tests' was cancelled by tloop cancel.",
     "runningToolName": "run-tests"
   }
 }

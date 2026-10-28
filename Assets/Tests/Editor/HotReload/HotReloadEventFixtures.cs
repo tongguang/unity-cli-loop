@@ -6,7 +6,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     /// <summary>
     /// Compiled fixture for the field-like event e2e: subscribing must hot-reload while the
     /// raising method is reported as Skipped. The on-disk source path is passed as files[];
-    /// edited copies live under Library/UloopHotReload/TestSources/.
+    /// edited copies live under Library/TloopHotReload/TestSources/.
     /// </summary>
     public class HotReloadEventFixture
     {

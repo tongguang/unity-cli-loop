@@ -247,7 +247,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         public void Build_UsesTheResolverSearchDirectoriesItIsGiven()
         {
             string externalName = "GivenSearchEnumFixture_" + Guid.NewGuid().ToString("N");
-            string externalDirectory = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            string externalDirectory = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             try
             {
                 InternalsExposureTestImage target =

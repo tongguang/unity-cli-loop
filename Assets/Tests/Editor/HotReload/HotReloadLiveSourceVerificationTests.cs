@@ -26,7 +26,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _temporaryRoot = Path.Combine(Path.GetTempPath(), "uloop-live-source-" + Guid.NewGuid().ToString("N"));
+            _temporaryRoot = Path.Combine(Path.GetTempPath(), "tloop-live-source-" + Guid.NewGuid().ToString("N"));
         }
 
         [TearDown]

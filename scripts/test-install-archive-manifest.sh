@@ -1,5 +1,5 @@
 #!/bin/sh
-# Verifies install.sh's ULOOP_ARCHIVE_MANIFEST verification handles a matching
+# Verifies install.sh's TLOOP_ARCHIVE_MANIFEST verification handles a matching
 # digest, a mismatch, a missing entry, and an unset env consistently. Locks in
 # the exact POSIX-sh semantics so a later refactor cannot silently regress the
 # defense-in-depth over the same-origin .sha256 file.
@@ -29,7 +29,7 @@ TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT INT HUP TERM
 
 tmp_dir="$TMP_DIR"
-asset_name="uloop-dispatcher-darwin-arm64.zip"
+asset_name="tloop-dispatcher-darwin-arm64.zip"
 printf 'archive payload\n' > "$tmp_dir/$asset_name"
 
 # Compute the reference digest with whichever sha tool we have available.
@@ -65,25 +65,25 @@ expect_fail() {
 # 1. Unset env: first installation has no preverified manifest, so accepting
 #    it would permit the same-origin checksum-only fallback that the approved
 #    trust model forbids.
-unset ULOOP_ARCHIVE_MANIFEST || true
+unset TLOOP_ARCHIVE_MANIFEST || true
 expect_fail "unset manifest fails closed"
 
 # 2. Matching manifest entry: accept and continue.
-ULOOP_ARCHIVE_MANIFEST="$actual_hash  $asset_name
+TLOOP_ARCHIVE_MANIFEST="$actual_hash  $asset_name
 0000000000000000000000000000000000000000000000000000000000000000  install.sh"
-export ULOOP_ARCHIVE_MANIFEST
+export TLOOP_ARCHIVE_MANIFEST
 expect_pass "matching manifest digest accepted"
 
 # 3. Mismatched digest: reject.
-ULOOP_ARCHIVE_MANIFEST="0000000000000000000000000000000000000000000000000000000000000000  $asset_name"
-export ULOOP_ARCHIVE_MANIFEST
+TLOOP_ARCHIVE_MANIFEST="0000000000000000000000000000000000000000000000000000000000000000  $asset_name"
+export TLOOP_ARCHIVE_MANIFEST
 expect_fail "mismatched manifest digest rejected"
 
 # 4. Missing asset entry: reject rather than silently pass, otherwise a
 #    tampered filename could bypass the check by omitting itself from the
 #    manifest.
-ULOOP_ARCHIVE_MANIFEST="1111111111111111111111111111111111111111111111111111111111111111  install.sh"
-export ULOOP_ARCHIVE_MANIFEST
+TLOOP_ARCHIVE_MANIFEST="1111111111111111111111111111111111111111111111111111111111111111  install.sh"
+export TLOOP_ARCHIVE_MANIFEST
 expect_fail "missing manifest entry for asset_name rejected"
 
 echo "OK"

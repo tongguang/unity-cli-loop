@@ -2,7 +2,7 @@
 set -e
 # Regression harness for the HotReload trap:
 # PlayMode logs a string literal from Update each frame. The driver sed-edits that
-# in-body literal on disk, applies uloop hot-reload (no domain reload), asserts
+# in-body literal on disk, applies tloop hot-reload (no domain reload), asserts
 # get-logs shows the new value, restores the source, reverts patches, and asserts
 # the old value returns. Sed must target a method-body literal — not a class-level
 # const or field initializer (those resolve from the stale compiled assembly).
@@ -12,7 +12,7 @@ set -e
 #
 # Prerequisites:
 #   - Assets/RegressionHarness/HotReload/HotReload.unity must be open in a running Unity Editor
-#   - dist/<platform>/uloop must be built (this checkout's development binary)
+#   - dist/<platform>/tloop must be built (this checkout's development binary)
 #   - jq must be installed
 
 PROJECT_PATH=""
@@ -33,12 +33,12 @@ REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 case "$(uname -s)" in
     Darwin)
         case "$(uname -m)" in
-            arm64) ULOOP_BIN="$REPO_ROOT/dist/darwin-arm64/uloop" ;;
-            *) ULOOP_BIN="$REPO_ROOT/dist/darwin-amd64/uloop" ;;
+            arm64) TLOOP_BIN="$REPO_ROOT/dist/darwin-arm64/tloop" ;;
+            *) TLOOP_BIN="$REPO_ROOT/dist/darwin-amd64/tloop" ;;
         esac
         ;;
     MINGW*|MSYS*|CYGWIN*)
-        ULOOP_BIN="$REPO_ROOT/dist/windows-amd64/uloop.exe"
+        TLOOP_BIN="$REPO_ROOT/dist/windows-amd64/tloop.exe"
         ;;
     *)
         printf '%s\n' "Unsupported platform: $(uname -s)" >&2
@@ -46,13 +46,13 @@ case "$(uname -s)" in
         ;;
 esac
 
-if [ ! -x "$ULOOP_BIN" ]; then
-    printf '%s\n' "uloop binary not found or not executable: $ULOOP_BIN" >&2
+if [ ! -x "$TLOOP_BIN" ]; then
+    printf '%s\n' "tloop binary not found or not executable: $TLOOP_BIN" >&2
     printf '%s\n' "Build with scripts/build-go-cli.sh first." >&2
     exit 2
 fi
 
-# Why sed and uloop must share one root: --project-path selects the Unity project whose
+# Why sed and tloop must share one root: --project-path selects the Unity project whose
 # Assets file we mutate; resolving SOURCE_ABS from the script checkout alone would edit one
 # tree while hot-reloading another.
 if [ -n "$PROJECT_PATH" ]; then
@@ -93,8 +93,8 @@ CLEANED_UP="0"
 # working tree clean, so the pristine bytes are snapshotted before the first edit.
 cp "$SOURCE_ABS" "$SOURCE_BACKUP"
 
-run_uloop() {
-    "$ULOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
+run_tloop() {
+    "$TLOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
 }
 
 log() {
@@ -112,7 +112,7 @@ restore_source() {
 allow_auto_refresh() {
     if [ "$AUTO_REFRESH_DISALLOWED" = "1" ]; then
         # Why best-effort: cleanup must not fail the harness after assertions already passed.
-        if ! run_uloop execute-dynamic-code --code "
+        if ! run_tloop execute-dynamic-code --code "
 using UnityEditor;
 AssetDatabase.AllowAutoRefresh();
 return \"AllowAutoRefresh\";
@@ -130,9 +130,9 @@ cleanup() {
     fi
     CLEANED_UP="1"
     restore_source
-    run_uloop hot-reload --revert-all > /dev/null 2>&1 || true
+    run_tloop hot-reload --revert-all > /dev/null 2>&1 || true
     allow_auto_refresh
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
     # Why: a killed sed→mv window can leave SOURCE_ABS.tmp; Unity may then create .tmp.meta
     # which is not gitignored.
     rm -f "$RESULT_FILE" "$LOG_FILE" "$SOURCE_BACKUP" "${SOURCE_ABS}.tmp"
@@ -149,7 +149,7 @@ disallow_auto_refresh() {
     # and erase the hot-reload patches (or race the Mvid guard) before get-logs can assert.
     # The package hold (HotReloadAutoRefreshHold) only arms after a successful hot-reload, so
     # this local pair still covers the sed window. The two counters nest and stay balanced.
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEditor;
 AssetDatabase.DisallowAutoRefresh();
 return \"DisallowAutoRefresh\";
@@ -163,10 +163,10 @@ await_marker_in_logs() {
     # Why 30s: cold PlayMode entry (import / domain reload) can exceed 10s before the first Update.
     max_attempts=30
     while [ "$attempt" -le "$max_attempts" ]; do
-        run_uloop clear-console > /dev/null
+        run_tloop clear-console > /dev/null
         # Why sleep: Update logs once per frame; give PlayMode a beat to emit after clear.
         sleep 1
-        run_uloop get-logs --log-type Log --max-count 50 --search-text "$expected_marker" > "$LOG_FILE"
+        run_tloop get-logs --log-type Log --max-count 50 --search-text "$expected_marker" > "$LOG_FILE"
         displayed="$(jq -r '.DisplayedCount // 0' "$LOG_FILE")"
         if [ "$displayed" -gt 0 ]; then
             return 0
@@ -182,10 +182,10 @@ log "Disallowing AssetDatabase auto-refresh for the sed window..."
 disallow_auto_refresh
 
 log "Stopping any existing Play Mode session..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
 log "Starting Play Mode..."
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 
 log "Asserting baseline ${OLD_LITERAL} before hot-reload..."
 await_marker_in_logs "$OLD_MARKER"
@@ -202,7 +202,7 @@ if ! grep -q "$NEW_LITERAL" "$SOURCE_ABS"; then
 fi
 
 log "Applying hot-reload to $SOURCE_FILE..."
-run_uloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
+run_tloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
 success="$(jq -r '.Success' "$RESULT_FILE")"
 patched_total="$(jq -r '.PatchedTotal // 0' "$RESULT_FILE")"
 if [ "$success" != "true" ] || [ "$patched_total" -lt 1 ]; then
@@ -217,7 +217,7 @@ await_marker_in_logs "$NEW_MARKER"
 
 log "Restoring source and reverting all hot-reload patches..."
 restore_source
-run_uloop hot-reload --revert-all > "$RESULT_FILE"
+run_tloop hot-reload --revert-all > "$RESULT_FILE"
 revert_success="$(jq -r '.Success' "$RESULT_FILE")"
 if [ "$revert_success" != "true" ]; then
     log "FAIL: --revert-all did not succeed"

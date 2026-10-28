@@ -22,7 +22,7 @@ func TestIsPermanentConnectErrorMatchesWindowsAccessDenied(t *testing.T) {
 	deniedPipe := &unityipc.ConnectionAttemptError{
 		Cause: &os.PathError{
 			Op:   "open",
-			Path: `\\.\pipe\UnityCliLoop-sample`,
+			Path: `\\.\pipe\TuanjieCliLoop-sample`,
 			Err:  windowsErrorAccessDenied,
 		},
 	}

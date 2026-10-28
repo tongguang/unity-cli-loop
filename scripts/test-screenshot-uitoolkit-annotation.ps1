@@ -1,6 +1,6 @@
 <#
 E2E verification that screenshot --annotate-elements lists UI Toolkit controls and that simulate-mouse-ui and
-simulate-mouse-input press and drag them at the annotated points, using the uloop CLI against UIToolkitAnnotationDemoScene.
+simulate-mouse-input press and drag them at the annotated points, using the tloop CLI against UIToolkitAnnotationDemoScene.
 Safe to run repeatedly: it stops PlayMode and restores the Game View size on exit, and never saves the scene, so
 the listener and EventSystem changes made in PlayMode are discarded.
 
@@ -10,7 +10,7 @@ Usage:
 
 Prerequisites:
   - Unity Editor is running
-  - uloop is available on PATH
+  - tloop is available on PATH
 #>
 
 [CmdletBinding()]
@@ -78,7 +78,7 @@ function Invoke-UloopCapture {
     [string]$previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     try {
-        [object[]]$output = & uloop @arguments 2>&1
+        [object[]]$output = & tloop @arguments 2>&1
         [int]$exitCode = $LASTEXITCODE
     }
     finally {
@@ -105,7 +105,7 @@ function Invoke-UloopJson {
             Write-Host $result.Text
         }
 
-        [string]$commandText = "uloop " + ($result.Arguments -join " ")
+        [string]$commandText = "tloop " + ($result.Arguments -join " ")
         throw "$commandText failed with exit code $($result.ExitCode)"
     }
 

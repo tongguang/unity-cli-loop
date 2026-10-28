@@ -22,7 +22,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             "CS0246: The type or namespace name 'InputSystem' could not be found (are you missing a using directive or an assembly reference?)";
 
         private const string Cs0246Hint =
-            "error CS0246: 'InputSystem' could not be found from a script under 'Assets/Scripts/Gameplay/Gameplay.asmdef'. If that type lives in another assembly (for example the script was recently moved under a new asmdef), add the declaring assembly to that asmdef's references and run 'uloop compile' again; if the name is a typo, fix the name instead.";
+            "error CS0246: 'InputSystem' could not be found from a script under 'Assets/Scripts/Gameplay/Gameplay.asmdef'. If that type lives in another assembly (for example the script was recently moved under a new asmdef), add the declaring assembly to that asmdef's references and run 'tloop compile' again; if the name is a typo, fix the name instead.";
 
         private const string Cs0234Error =
             "error CS0234: The type or namespace name 'InputSystem' does not exist in the namespace 'UnityEngine' (are you missing an assembly reference?)";

@@ -42,14 +42,14 @@ type v2ServerReadyTimeoutError struct {
 }
 
 func (err v2ServerReadyTimeoutError) Error() string {
-	return fmt.Sprintf("timed out waiting for V2 uloop server readiness in %s", err.projectRoot)
+	return fmt.Sprintf("timed out waiting for V2 tloop server readiness in %s", err.projectRoot)
 }
 
 func (err v2ServerReadyTimeoutError) ToCLIError(context clierrors.ErrorContext) clierrors.CLIError {
 	return clierrors.CLIError{
 		ErrorCode:   clierrors.ErrorCodeUnityStartupTimeout,
 		Phase:       clierrors.ErrorPhaseConnection,
-		Message:     "Unity opened the V2 project, but the V2 uloop server did not become reachable before the launch timeout.",
+		Message:     "Unity opened the V2 project, but the V2 tloop server did not become reachable before the launch timeout.",
 		Retryable:   true,
 		SafeToRetry: true,
 		ProjectRoot: context.ProjectRoot,
@@ -57,7 +57,7 @@ func (err v2ServerReadyTimeoutError) ToCLIError(context clierrors.ErrorContext) 
 		NextActions: []string{
 			"Check whether the uLoopMCP server is running in the Unity Editor window for this project.",
 			"Check whether another process is holding the server port and forcing the V2 server into a retry loop.",
-			"Retry with uloop launch -r to restart Unity and the V2 server.",
+			"Retry with tloop launch -r to restart Unity and the V2 server.",
 		},
 		Details: map[string]any{
 			"ProjectRoot":    err.projectRoot,

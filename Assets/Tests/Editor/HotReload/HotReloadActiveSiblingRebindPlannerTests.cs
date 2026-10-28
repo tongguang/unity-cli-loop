@@ -38,7 +38,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             _access = new HotReloadDomainTestAccess();
             _workerSourceByPath = new Dictionary<string, string>(StringComparer.Ordinal);
             _matchesVerifiedBaseline = (path, workerSourcePath) => false;
-            _temporaryDirectory = Path.Combine(Path.GetTempPath(), "uloop-sibling-planner-" + Guid.NewGuid());
+            _temporaryDirectory = Path.Combine(Path.GetTempPath(), "tloop-sibling-planner-" + Guid.NewGuid());
             Directory.CreateDirectory(_temporaryDirectory);
         }
 

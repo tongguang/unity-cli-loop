@@ -1,6 +1,6 @@
 # Glossary
 
-Ubiquitous language for Unity CLI Loop. Code identifiers, docs, commit messages, and reviews
+Ubiquitous language for Tuanjie CLI Loop. Code identifiers, docs, commit messages, and reviews
 should use these terms with the meanings defined here.
 
 ## Naming policy
@@ -15,6 +15,11 @@ conflicts, keep the identifier and document the mismatch here instead.
 The following public identifiers are kept by policy even though their names do not fully
 match the current glossary:
 
+- This Tuanjie-only branch retains assembly and extension API identifiers, the Go
+  `unityprocess` package and `UnityProcess` type, the internal JSON-RPC metadata key `uloop`,
+  and response fields such as `UnityVersion` and `UnityProcessRunning`. They describe the
+  Tuanjie Editor here. Runtime identities (command, package, IPC, caches, settings, and
+  installed skills) belong to `tloop` and are isolated from the original Unity CLI.
 - `UnityCliLoopConstants.COMMAND_NAME_AWAIT_PAUSE_POINT` and
   `UnityCliLoopConstants.COMMAND_NAME_PAUSE_POINT_STATUS` are used as tool catalog names,
   not internal bridge commands.
@@ -45,7 +50,7 @@ extension-facing tool registry (for example `get-version`, `get-compile-status`)
 Routed by `InternalBridgeCommandRouter`; names use `UnityCliLoopConstants.COMMAND_NAME_*`
 constants. The exceptions are `get-editor-status` and `cancel-running-tool`:
 `UnityCliLoopExecutionRouter` answers them before switching to the Editor main thread, without
-going through `InternalBridgeCommandRouter`, because `uloop status` and `uloop cancel` must
+going through `InternalBridgeCommandRouter`, because `tloop status` and `tloop cancel` must
 answer while that thread is blocked.
 Anything an end user or third-party extension should call is a tool, not an internal bridge
 command.
@@ -67,13 +72,13 @@ editor readiness.
 
 ### CLI
 
-The `uloop` command-line interface as a whole — the user-facing entry point that talks to
+The `tloop` command-line interface as a whole — the user-facing entry point that talks to
 the server over local IPC. Physically it consists of two Go binaries: the dispatcher and
 the project runner.
 
 ### Dispatcher
 
-The globally installed `uloop` binary. It resolves the target Unity project, ensures the
+The globally installed `tloop` binary. It resolves the target Unity project, ensures the
 pinned project runner release is installed (downloading it when needed), keeps itself
 up to date against the pin's `minimumDispatcherVersion`, and delegates command execution
 to the project runner. Released via release-please from `cli/dispatcher/`.
@@ -88,7 +93,7 @@ release-please from `cli/project-runner/`.
 ### Pin
 
 `Packages/src/project-runner-pin.json` (mirrored byte-identically to
-`.uloop/project-runner-pin.json`), the single source for cross-component version
+`.tloop/project-runner-pin.json`), the single source for cross-component version
 requirements: `projectRunnerVersion` (stamped by release-please) and
 `minimumDispatcherVersion` (the manually maintained dispatcher floor). The pin evolves
 additively only — existing fields are never deleted or renamed.
@@ -102,12 +107,12 @@ when the wire format breaks compatibility.
 
 ### Skill
 
-A generated instruction document that teaches an AI agent how to use a `uloop` command.
+A generated instruction document that teaches an AI agent how to use a `tloop` command.
 Skill sources live in the package; the copies under `.agents/` and `.claude/` are
 generated and must not be edited directly.
 
 A skill is also the single source of truth for the tool and parameter descriptions the CLI
-prints. `--help` and `uloop list` read the parameter table out of the installed package's
+prints. `--help` and `tloop list` read the parameter table out of the installed package's
 skill at render time, and the embedded catalog (`cli/common/tools/default-tools.json`) is
 generated from those same tables. Descriptions are therefore edited in the skill and nowhere
 else.
@@ -141,7 +146,7 @@ The directory whose agent directories (`.claude/skills`, `.agents/skills`, ...) 
 project-local skills: the Unity project root (`unity`, the default) or the root of the Git
 repository that contains it (`git`, the nearest ancestor of the Unity project root, inclusive,
 holding a `.git` directory or file). The Editor saves the choice in
-`.uloop/settings.skills.json`, which a team can commit to share it; `uloop skills` follows it
+`.tloop/settings.skills.json`, which a team can commit to share it; `tloop skills` follows it
 and `--root` overrides it for one invocation. Only the destination moves — skill sources and tool settings always come from the
 Unity project root. Distinct from the *project root*, which always means the Unity project.
 
@@ -201,7 +206,7 @@ clipped any evidence.
 One C# expression registered with `enable-watch` and evaluated once per paused frame, whose
 bounded value history is read back with `get-watch-values`. Watch expressions are stored in
 Editor session state and are restored — recompiled and re-registered — after a domain reload,
-including the reload a `uloop compile` or a Play entry with Domain Reload enabled
+including the reload a `tloop compile` or a Play entry with Domain Reload enabled
 causes; they are lost when the Editor process exits. Value history does not cross a
 reload: a restored watch starts from a new baseline.
 
@@ -212,8 +217,8 @@ replaying the response files of the last Unity build through the C# compiler bun
 Editor install. It never launches or contacts the Editor, and nothing it produces is loaded by
 Unity. When the project moved in a way the last build cannot describe, it refuses with
 `COMPILE_CHECK_UNITY_BUILD_REQUIRED` rather than guess. It is a hidden command: routable by
-name, but left out of `--help`, `uloop list`, shell completion and skill installs until its place
-beside `uloop compile` is settled. See `docs/compile-check.md` and
+name, but left out of `--help`, `tloop list`, shell completion and skill installs until its place
+beside `tloop compile` is settled. See `docs/compile-check.md` and
 `docs/adr/0018-compile-check-is-its-own-command-and-is-shown.md`.
 
 ### Hot reload
@@ -222,8 +227,8 @@ The first-party tool `hot-reload` that replaces method bodies in a running Unity
 from edited project source files without a domain reload. It transforms each editable
 method into a static shim, compiles that shim against publicized references, loads the
 shim assembly, and transplants the shim IL into the original method via a Harmony
-transpiler (`io.github.hatayama.uloop.hot-reload`). Patches are static Editor state and
-disappear on domain reload by design; a later `uloop compile` converges to the same
+transpiler (`io.github.tongguang.tloop.hot-reload`). Patches are static Editor state and
+disappear on domain reload by design; a later `tloop compile` converges to the same
 source behavior. Hot reload targets Play entry without a domain reload; with Domain Reload
 enabled on Play entry it only announces the loss and brings changes back on a re-apply. See
 `docs/adr/0009-hot-reload-targets-play-mode-without-domain-reload.md`.
@@ -231,7 +236,7 @@ enabled on Play entry it only announces the loss and brings changes back on a re
 ### Source snapshot
 
 A per-assembly byte-exact copy of project source files under
-`Library/UloopHotReload/SourceSnapshot/<assemblyName>-<mvid>/`, captured after domain
+`Library/TloopHotReload/SourceSnapshot/<assemblyName>-<mvid>/`, captured after domain
 reload. Hot reload adopts a snapshot as the edited-method baseline only when its bytes
 match the corresponding portable-PDB document checksum for that source file; otherwise
 the file falls back to patching every editable method.
@@ -275,15 +280,15 @@ the capture call is re-injected into the patched body; on revert, the same reque
 re-resolved against the compiled assembly. A marker that re-targets onto a patched body
 reports `RetargetedToHotReloadPatch: true`; one that cannot be re-targeted is suppressed
 (`SuppressedByHotReload: true`, with a reason) until a later transition or
-`uloop compile` makes its line resolvable again.
+`tloop compile` makes its line resolvable again.
 
 ### Publicized reference
 
-A Cecil-rewritten copy of a project assembly under `Library/UloopHotReload/PublicizedRefs/fmt2/`
+A Cecil-rewritten copy of a project assembly under `Library/TloopHotReload/PublicizedRefs/fmt2/`
 in which every type and member is public — except field-like event backing fields, which stay
 non-public so shim compilation does not see both the event and its same-named backing field
 (CS0229). A project assembly other than the edited one that grants the edited assembly no
-internals is copied under `Library/UloopHotReload/PublicizedExternalRefs/fmt1/` instead, where its
+internals is copied under `Library/TloopHotReload/PublicizedExternalRefs/fmt1/` instead, where its
 top-level internal types and its private, internal and private protected members stay as they
 are, so shim compilation sees no more of it than the edited assembly's own compile did, apart from
 protected members and nested types. Hot reload uses these copies only as compile-time

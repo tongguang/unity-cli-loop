@@ -45,7 +45,7 @@ func formatToolListResult(result json.RawMessage, projectRoot string) json.RawMe
 	cache = clicore.ApplyEmbeddedDescriptionFallback(cache)
 
 	// The installed package's SKILL.md tables win over both the cache and the embedded catalog, so
-	// list reports the same text `uloop <command> --help` does.
+	// list reports the same text `tloop <command> --help` does.
 	cache = skilldocs.ApplyToCatalog(cache, projectRoot)
 
 	content, err := json.Marshal(newListCatalog(cache))

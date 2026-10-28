@@ -157,7 +157,7 @@ func downloadDispatcherRealCLIForPin(ctx context.Context, cacheRoot string, pin 
 	checksumPath := archivePath + ".sha256"
 	assetURL := dispatcherReleaseAssetURL(pin.ProjectRunnerVersion, assetName)
 	releaseTag := sharedupdate.ProjectRunnerReleaseTag(pin.ProjectRunnerVersion)
-	clicore.WriteFormat(stderr, "uloop: downloading pinned project runner %s for %s...\n", pin.ProjectRunnerVersion, dispatcherPlatformName(goos, goarch))
+	clicore.WriteFormat(stderr, "tloop: downloading pinned project runner %s for %s...\n", pin.ProjectRunnerVersion, dispatcherPlatformName(goos, goarch))
 	if err := downloadDispatcherFile(ctx, assetURL, archivePath); err != nil {
 		return "", err
 	}
@@ -219,7 +219,7 @@ func removeDispatcherRealCLIReady(realCLIPath string) error {
 }
 
 func dispatcherReleaseAssetName(goos string, goarch string) (string, error) {
-	assetPrefix := "uloop-project-runner"
+	assetPrefix := "tloop-project-runner"
 	switch goos {
 	case "darwin":
 		if goarch != "arm64" && goarch != "amd64" {

@@ -1,6 +1,6 @@
 package dispatcher
 
-// Flag parsing and validation for `uloop skills` subcommands.
+// Flag parsing and validation for `tloop skills` subcommands.
 
 import (
 	"strings"
@@ -56,7 +56,7 @@ func appendSkillTarget(options *skillCommandOptions, seenTargets map[string]bool
 			Message:     "Unknown skills option: " + arg,
 			Option:      arg,
 			Command:     clicore.SkillsCommandName,
-			NextActions: []string{"Run `uloop skills --help` to inspect supported skills options."},
+			NextActions: []string{"Run `tloop skills --help` to inspect supported skills options."},
 		}
 	}
 	if seenTargets[targetID] {
@@ -71,7 +71,7 @@ func appendSkillTarget(options *skillCommandOptions, seenTargets map[string]bool
 // either value form and returns the index of the last consumed token.
 func parseOutputDirOption(options *skillCommandOptions, args []string, index int) (int, error) {
 	// Rejected rather than letting the last occurrence win, matching
-	// `uloop install --dir`: two destinations in one invocation is
+	// `tloop install --dir`: two destinations in one invocation is
 	// ambiguous, and silently syncing only one of them would hide it.
 	if options.outputDir != "" {
 		return index, duplicateSkillsOutputDirError()
@@ -110,7 +110,7 @@ func missingSkillsOutputDirValueError() error {
 		Option:  skillsOutputDirFlagName,
 		Command: clicore.SkillsCommandName,
 		NextActions: []string{
-			"Pass the destination directory, e.g. `uloop skills install --output-dir path/to/skills`.",
+			"Pass the destination directory, e.g. `tloop skills install --output-dir path/to/skills`.",
 			"Use the --output-dir=<path> form when the destination path starts with a dash.",
 		},
 	}

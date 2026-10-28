@@ -1,4 +1,4 @@
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 #nullable enable
 using System;
 using NUnit.Framework;
@@ -52,7 +52,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.PlayMode
             Assert.That(
                 response.Message,
                 Is.EqualTo(
-                    "Mouse input stopped because Unity paused during Pause Point inspection. Button 'Left' was released from Unity CLI Loop bookkeeping; the queued input edge was discarded before any gameplay update processed it, so the game never observed a press and it is safe to retry after resume."));
+                    "Mouse input stopped because Unity paused during Pause Point inspection. Button 'Left' was released from Tuanjie CLI Loop bookkeeping; the queued input edge was discarded before any gameplay update processed it, so the game never observed a press and it is safe to retry after resume."));
             Assert.That(response.Action, Is.EqualTo(UnityCliLoopMouseInputAction.Click.ToString()));
             Assert.That(response.Button, Is.EqualTo("Left"));
             Assert.That(response.PositionX, Is.EqualTo(inputPosition.x));

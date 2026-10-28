@@ -395,12 +395,12 @@ func TestRunLaunchWritesReadyResponseAfterToolReadiness(t *testing.T) {
 	}
 	output := stdout.String()
 	for _, expected := range []string{
-		"Waiting for Unity CLI Loop server readiness...",
+		"Waiting for Tuanjie CLI Loop server readiness...",
 		`"Success": true`,
 		`"Ready": true`,
 		`"ServerReady": true`,
 		`"ProjectIpcReady": true`,
-		`"Message": "Unity CLI Loop is ready."`,
+		`"Message": "Tuanjie CLI Loop is ready."`,
 	} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("launch output missing %q:\n%s", expected, output)
@@ -444,7 +444,7 @@ func TestRunLaunchForV2ProjectWaitsForLockfileAndServerReady(t *testing.T) {
 	if !response.Success || !response.Ready || !response.ServerReady || response.ProjectIpcReady {
 		t.Fatalf("V2 launch readiness flags = %#v", response)
 	}
-	if !strings.Contains(response.Message, "V2 uloop server is ready") {
+	if !strings.Contains(response.Message, "V2 tloop server is ready") {
 		t.Fatalf("V2 launch message = %q", response.Message)
 	}
 }
@@ -608,7 +608,7 @@ func TestRunLaunchForV2ProjectReportsServerReadyTimeout(t *testing.T) {
 	if code != 1 {
 		t.Fatalf("V2 timeout exit code = %d stdout=%s", code, stdout.String())
 	}
-	if !strings.Contains(stderr.String(), "V2 uloop server did not become reachable") {
+	if !strings.Contains(stderr.String(), "V2 tloop server did not become reachable") {
 		t.Fatalf("stderr missing V2 timeout message:\n%s", stderr.String())
 	}
 	if !strings.Contains(stderr.String(), clierrors.ErrorCodeUnityStartupTimeout) {
@@ -639,7 +639,7 @@ func TestWaitForLaunchReadinessWrapsStartupTimeout(t *testing.T) {
 	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
 		return clierrors.UnityServerNotRespondingError{
 			ProjectRoot: projectRoot,
-			Endpoint:    "/tmp/uloop/UnityCliLoop-sample.sock",
+			Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
 			Cause:       errors.New("timed out waiting for Unity tool readiness"),
 		}
 	}
@@ -658,7 +658,7 @@ func TestWaitForLaunchReadinessWrapsInternalProbeDeadline(t *testing.T) {
 	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
 		return clierrors.UnityServerNotRespondingError{
 			ProjectRoot: projectRoot,
-			Endpoint:    "/tmp/uloop/UnityCliLoop-sample.sock",
+			Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
 			Cause:       fmt.Errorf("probe deadline: %w", context.DeadlineExceeded),
 		}
 	}
@@ -680,7 +680,7 @@ func TestWaitForLaunchReadinessPreservesNoProcessReachability(t *testing.T) {
 	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
 		return fmt.Errorf("timed out waiting for Unity tool readiness: %w", &unityipc.ConnectionAttemptError{
 			ProjectRoot: projectRoot,
-			Endpoint:    "/tmp/uloop/UnityCliLoop-sample.sock",
+			Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
 			Cause:       errors.New("connect failed"),
 		})
 	}
@@ -819,7 +819,7 @@ func TestRunLaunchRequiresRestartForEditorVersionWithExistingUnityProcess(t *tes
 	if readinessChecked {
 		t.Fatal("launch should not report an existing process as ready for a different requested Editor version")
 	}
-	if !strings.Contains(stderr.String(), "`uloop launch --restart --editor-version 6000.0.0f1`") {
+	if !strings.Contains(stderr.String(), "`tloop launch --restart --editor-version 6000.0.0f1`") {
 		t.Fatalf("stderr should guide restart with the requested version:\n%s", stderr.String())
 	}
 }
@@ -1780,7 +1780,7 @@ func TestRunLaunchRestartDoesNotUseIpcProbeFallback(t *testing.T) {
 // Verifies the Linux Editor candidate points at the Unity Hub install under the home directory.
 func TestLinuxUnityExecutableCandidatesUseUnityHubUnderHome(t *testing.T) {
 	candidates := linuxUnityExecutableCandidates("6000.0.1f1", "/home/tester")
-	expected := []string{"/home/tester/Unity/Hub/Editor/6000.0.1f1/Editor/Unity"}
+	expected := []string{"/home/tester/Tuanjie/Hub/Editor/6000.0.1f1/Editor/Tuanjie"}
 	if len(candidates) != len(expected) || candidates[0] != expected[0] {
 		t.Fatalf("candidates mismatch: %#v", candidates)
 	}
@@ -2026,7 +2026,7 @@ func TestResolveExistingUnityExecutablePathFindsCandidateOrRejectsPlatform(t *te
 	if err != nil || path != existing {
 		t.Fatalf("unexpected result: path=%q err=%v", path, err)
 	}
-	if _, err := resolveExistingUnityExecutablePath("2022.3.0f1", nil); err == nil || err.Error() != "unity launch is not supported on "+runtime.GOOS {
+	if _, err := resolveExistingUnityExecutablePath("2022.3.0f1", nil); err == nil || err.Error() != "tuanjie launch is not supported on "+runtime.GOOS {
 		t.Fatalf("expected the unsupported platform error, got %v", err)
 	}
 }

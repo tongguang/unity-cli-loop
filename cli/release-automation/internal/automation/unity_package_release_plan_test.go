@@ -12,11 +12,11 @@ import (
 )
 
 const (
-	unityPackageReleaseTestWaitingFor  = "Project runner release uloop-project-runner-v3.10.0 is not published with complete assets yet; the Unity package release v3.14.0 waits for it."
+	unityPackageReleaseTestWaitingFor  = "Project runner release tloop-project-runner-v3.10.0 is not published with complete assets yet; the Unity package release v3.14.0 waits for it."
 	unityPackageReleaseTestTagRef      = "refs/tags/v3.14.0"
-	unityPackageReleaseTestPublished   = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "io.github.hatayama.uloopmcp-3.14.0.tgz", "size": 2048}]}`
+	unityPackageReleaseTestPublished   = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "io.github.tongguang.tloop-3.14.0.tgz", "size": 2048}]}`
 	unityPackageReleaseTestUnsigned    = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "notes.txt", "size": 10}]}`
-	unityPackageReleaseTestEmptyAsset  = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "io.github.hatayama.uloopmcp-3.14.0.tgz", "size": 0}]}`
+	unityPackageReleaseTestEmptyAsset  = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "io.github.tongguang.tloop-3.14.0.tgz", "size": 0}]}`
 	unityPackageReleaseTestPlanVersion = `{"Packages/src": "3.14.0", "cli/dispatcher": "3.8.1"}`
 )
 
@@ -133,7 +133,7 @@ func TestPlanUnityPackageReleaseDecidesFromReleaseState(t *testing.T) {
 			want := fmt.Sprintf("sign=%t\npublish=%t\n", test.wantSign, test.wantPublish) +
 				"tag=v3.14.0\n" +
 				"version=3.14.0\n" +
-				"asset-name=io.github.hatayama.uloopmcp-3.14.0.tgz\n" +
+				"asset-name=io.github.tongguang.tloop-3.14.0.tgz\n" +
 				"source-ref=" + test.wantSourceRef + "\n"
 			if stdout != want {
 				t.Fatalf("stdout = %q, want %q", stdout, want)

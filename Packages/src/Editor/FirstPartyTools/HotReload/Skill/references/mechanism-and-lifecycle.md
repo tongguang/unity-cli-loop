@@ -5,7 +5,7 @@
 1. Resolves each file to its compiled assembly via `CompilationPipeline`, then groups the files by that assembly. Each group runs the worker once and produces one shim assembly, so the members one file adds are visible to the bodies edited in its siblings; groups are processed one after another and never affect each other.
 2. Rewrites each editable method body of the group into a static shim in an out-of-process Roslyn worker. When an async, iterator, lambda, local-function, or LINQ-query body touches private/internal members, those accesses are rewritten to accessor delegates so the body can compile and run from the shim assembly (the delegation shape in step 4). An `internal` member of a type the reload was not given cannot be rewritten this way, so such a body is `Skipped` (`scope-and-limits.md`).
 3. Compiles the group's shims into one assembly against publicized reference copies, loads the result into the Editor domain, and binds every shim type's accessor delegates (`__BindAccessors`) before any patch is applied.
-4. Patches each original method with a Harmony transpiler (ID `io.github.hatayama.uloop.hot-reload`) in one of two shapes: transplant copies the shim's IL into the original method, while delegation rewrites the original to forward its arguments to the shim, which runs as normally compiled code.
+4. Patches each original method with a Harmony transpiler (ID `io.github.tongguang.tloop.hot-reload`) in one of two shapes: transplant copies the shim's IL into the original method, while delegation rewrites the original to forward its arguments to the shim, which runs as normally compiled code.
 
 Re-running on the same method after a real edit replaces its previous patch;
 `ActivePatchTotal` tracks the ledger across runs. Reloading a file whose source is
@@ -19,21 +19,21 @@ patch binds to the newest shim. Edit the file and reload again to apply new chan
 
 ## Convergence and Lifecycle
 
-- The input is the real project source file, so a later `uloop compile` (real compile +
+- The input is the real project source file, so a later `tloop compile` (real compile +
   domain reload) lands the exact same edit permanently. There is nothing to undo first;
   behavior converges by construction.
 - Patches and loaded shim assemblies are static Editor state and disappear on the next
   domain reload — that includes entering Play Mode with Domain Reload enabled (the
-  default for projects created before Unity 6.6), `uloop compile`, and the compile `uloop run-tests` runs first unless given `--skip-compile`. `uloop control-play-mode --action Play` warns with
+  default for projects created before Tuanjie 6.6), `tloop compile`, and the compile `tloop run-tests` runs first unless given `--skip-compile`. `tloop control-play-mode --action Play` warns with
   the counts when it is about to drop patches or pause points. There is no persistence
   and no automatic re-apply.
-  A compile Unity starts on its own ends them too: the hold that keeps a returning focus from
-  recompiling (`AutoRefreshHeld`) stops only Unity's Auto Refresh, so an editor script or
+  A compile Tuanjie starts on its own ends them too: the hold that keeps a returning focus from
+  recompiling (`AutoRefreshHeld`) stops only Tuanjie's Auto Refresh, so an editor script or
   package that calls `AssetDatabase.Refresh()` itself — some do after every domain reload —
-  still imports the edits saved since the last compile, and Unity compiles them. The compiled
+  still imports the edits saved since the last compile, and Tuanjie compiles them. The compiled
   code then contains those edits, so behavior still converges.
 - Never reflected by hot reload: initializer changes on compiled fields and new
-  types. Those always need `uloop compile`. Signature changes — return type,
+  types. Those always need `tloop compile`. Signature changes — return type,
   rename, parameter list — are handled through the added-member rules and the
   return-type gate in [scope-and-limits.md](scope-and-limits.md): same reload, same Editor session, compiled callers
   protected by skip or warning.
@@ -49,21 +49,21 @@ patch binds to the newest shim. Edit the file and reload again to apply new chan
 
 ## Running tests while patches are live
 
-- `uloop run-tests` compiles first by default. That compile reloads the domain and drops every live
+- `tloop run-tests` compiles first by default. That compile reloads the domain and drops every live
   patch; the edited source is compiled in, so the code changes stay without re-applying them, but
   values wired into fields that hot reload added are not kept (they return to their initializer or
   default values). The response's `CompileNote` carries the count, in the form
   `1 active hot-reload change(s) were live when this compile was requested.`
 - `--skip-compile` runs the tests against the live patches; added `[Test]` methods are not enumerated
   that way, so compile first for those. Its `Warning` is a fixed notice that changes were live when the
-  run started and does not say whether they survived; read `uloop hot-reload --status` for that. While
+  run started and does not say whether they survived; read `tloop hot-reload --status` for that. While
   hot reload holds Auto Refresh (the state an apply leaves), a verified run kept the patches live.
 - There is no default switch: choose per call.
 
 ## Editor-Code Iteration Without PlayMode
 
 Hot reload also patches static methods in Editor assemblies. Combined with
-`uloop execute-dynamic-code` invoking the patched method, this gives a
+`tloop execute-dynamic-code` invoking the patched method, this gives a
 compile-free loop for editor tooling: edit the method body, run
-`uloop hot-reload --files <file>`, then re-invoke it via `execute-dynamic-code`
+`tloop hot-reload --files <file>`, then re-invoke it via `execute-dynamic-code`
 and read the returned value.

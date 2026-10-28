@@ -70,12 +70,12 @@ func (err UnityNotRunningError) message(launching bool) string {
 func (err UnityNotRunningError) nextActions(launching bool, safeToRetry bool) []string {
 	actions := err.EditorLogNextActions()
 	if launching {
-		return append(actions, "Run `uloop launch` again.")
+		return append(actions, "Run `tloop launch` again.")
 	}
 	if !safeToRetry {
 		actions = append(actions, "The command may have partly run before Unity exited; check the project and scene state before running it again.")
 	}
-	return append(actions, "Run `uloop launch` to start Unity, then run the command again.")
+	return append(actions, "Run `tloop launch` to start Unity, then run the command again.")
 }
 
 // EditorLogNextActions returns the step that sends the caller to this Editor's log before launching Unity

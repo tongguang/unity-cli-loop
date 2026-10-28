@@ -38,9 +38,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
                 DynamicCodeConstants.DEFAULT_CLASS_NAME);
 
             Assert.IsNotNull(prepared.PreparedSource);
-            StringAssert.Contains("string __uloop_literal_0 = (string)parameters[\"__uloop_literal_0\"];", prepared.PreparedSource);
+            StringAssert.Contains("string __tloop_literal_0 = (string)parameters[\"__tloop_literal_0\"];", prepared.PreparedSource);
             Assert.Less(
-                prepared.PreparedSource.IndexOf("string __uloop_literal_0 = (string)parameters[\"__uloop_literal_0\"];", System.StringComparison.Ordinal),
+                prepared.PreparedSource.IndexOf("string __tloop_literal_0 = (string)parameters[\"__tloop_literal_0\"];", System.StringComparison.Ordinal),
                 prepared.PreparedSource.IndexOf(WrapperTemplate.UserCodeStartMarker, System.StringComparison.Ordinal));
         }
 

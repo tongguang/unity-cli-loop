@@ -19,7 +19,7 @@ import (
 func TestRunHotReloadRunsFallbackCompileAndAdoptsItsSuccess(t *testing.T) {
 	stdout, stderr, compileCalls, code := runHotReloadWithFakeCompile(
 		t,
-		`{"Success":false,"CompileFallback":"Requested","RecommendedNextAction":"Run 'uloop compile'","Message":"Hot reload finished with one or more Failed outcomes."}`,
+		`{"Success":false,"CompileFallback":"Requested","RecommendedNextAction":"Run 'tloop compile'","Message":"Hot reload finished with one or more Failed outcomes."}`,
 		compileExecutionResult{result: json.RawMessage(`{"Success":true,"Message":"ok"}`), exitCode: 0},
 	)
 
@@ -109,7 +109,7 @@ func TestRunHotReloadReportsFallbackCompileFailure(t *testing.T) {
 	if err := json.Unmarshal(fields["RecommendedNextAction"], &nextAction); err != nil {
 		t.Fatalf("RecommendedNextAction must be a string: %v\n%s", err, stdout)
 	}
-	if nextAction != "Fix the errors in Compile.Errors, then rerun 'uloop compile' or 'uloop hot-reload'." {
+	if nextAction != "Fix the errors in Compile.Errors, then rerun 'tloop compile' or 'tloop hot-reload'." {
 		t.Fatalf("RecommendedNextAction mismatch: %q", nextAction)
 	}
 }
@@ -125,8 +125,8 @@ func TestInjectHotReloadCompileFallbackPromotesTheCompileNextActions(t *testing.
 	}{
 		{
 			name:        "one next action",
-			compile:     `{"Success":false,"NextActions":["Run 'uloop control-play-mode --action Stop' to leave Play Mode, then rerun 'uloop compile'."]}`,
-			wantNextAct: "Run 'uloop control-play-mode --action Stop' to leave Play Mode, then rerun 'uloop compile'.",
+			compile:     `{"Success":false,"NextActions":["Run 'tloop control-play-mode --action Stop' to leave Play Mode, then rerun 'tloop compile'."]}`,
+			wantNextAct: "Run 'tloop control-play-mode --action Stop' to leave Play Mode, then rerun 'tloop compile'.",
 		},
 		{
 			name:        "several next actions",
@@ -136,7 +136,7 @@ func TestInjectHotReloadCompileFallbackPromotesTheCompileNextActions(t *testing.
 		{
 			name:        "empty next actions",
 			compile:     `{"Success":false,"NextActions":[]}`,
-			wantNextAct: "Fix the errors in Compile.Errors, then rerun 'uloop compile' or 'uloop hot-reload'.",
+			wantNextAct: "Fix the errors in Compile.Errors, then rerun 'tloop compile' or 'tloop hot-reload'.",
 		},
 	}
 	for _, tc := range cases {

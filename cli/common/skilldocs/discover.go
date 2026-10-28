@@ -18,7 +18,7 @@ const (
 	skillDocsLogOperation = "skill_docs_render"
 )
 
-// Load reads every skill in the installed uloop package and returns what each one documents, keyed
+// Load reads every skill in the installed tloop package and returns what each one documents, keyed
 // by tool name. A project without the package, an unreadable file, or a skill that documents nothing
 // yields no entry for the affected tools; callers then fall back to the descriptions they already
 // had. Help that prints stale text is a nuisance, help that fails to print is a broken CLI.
@@ -29,7 +29,7 @@ func Load(projectRoot string) map[string]ToolDocs {
 
 	packageRoot := skillscan.ResolvePackageRoot(projectRoot)
 	if packageRoot == "" {
-		logSkillDocsFallback(projectRoot, "uloop package root not found; keeping embedded descriptions", nil)
+		logSkillDocsFallback(projectRoot, "tloop package root not found; keeping embedded descriptions", nil)
 		return nil
 	}
 
@@ -86,7 +86,7 @@ func skillFilePaths(packageRoot string) []string {
 }
 
 // logSkillDocsFallback records why a layer was skipped. The fallback is deliberately silent on
-// stdout - a diagnostic line would corrupt `uloop list` output - so this log is the only trace.
+// stdout - a diagnostic line would corrupt `tloop list` output - so this log is the only trace.
 func logSkillDocsFallback(projectRoot string, message string, context map[string]any) {
 	if !vibelog.IsCLIVibeLogEnabled() {
 		return

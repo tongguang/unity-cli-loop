@@ -21,7 +21,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-warm-up-source-" + Guid.NewGuid().ToString("N"));
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-warm-up-source-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_projectRoot);
             _state = new HotReloadEditorStateSnapshot(false, false, false);
         }

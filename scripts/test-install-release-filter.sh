@@ -4,9 +4,9 @@ set -eu
 ROOT_DIR=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
 TMP_DIR=$(mktemp -d)
 ORIGINAL_PATH=$PATH
-ULOOP_ARCHIVE_MANIFEST='fakehash  uloop-dispatcher-darwin-arm64.tar.gz
-fakehash  uloop-dispatcher-windows-amd64.zip'
-export ULOOP_ARCHIVE_MANIFEST
+TLOOP_ARCHIVE_MANIFEST='fakehash  tloop-dispatcher-darwin-arm64.tar.gz
+fakehash  tloop-dispatcher-windows-amd64.zip'
+export TLOOP_ARCHIVE_MANIFEST
 
 cleanup() {
   rm -rf "$TMP_DIR"
@@ -58,12 +58,12 @@ write_releases_json() {
     "prerelease": true,
     "assets": [
       {
-        "name": "uloop-dispatcher-darwin-arm64.tar.gz",
-        "browser_download_url": "https://github.com/hatayama/unity-cli-loop/releases/download/dispatcher-v3.0.0-beta.2/uloop-dispatcher-darwin-arm64.tar.gz"
+        "name": "tloop-dispatcher-darwin-arm64.tar.gz",
+        "browser_download_url": "https://github.com/tongguang/unity-cli-loop/releases/download/dispatcher-v3.0.0-beta.2/tloop-dispatcher-darwin-arm64.tar.gz"
       },
       {
-        "name": "uloop-dispatcher-windows-amd64.zip",
-        "browser_download_url": "https://github.com/hatayama/unity-cli-loop/releases/download/dispatcher-v3.0.0-beta.2/uloop-dispatcher-windows-amd64.zip"
+        "name": "tloop-dispatcher-windows-amd64.zip",
+        "browser_download_url": "https://github.com/tongguang/unity-cli-loop/releases/download/dispatcher-v3.0.0-beta.2/tloop-dispatcher-windows-amd64.zip"
       }
     ]
   },
@@ -73,12 +73,12 @@ write_releases_json() {
     "prerelease": false,
     "assets": [
       {
-        "name": "uloop-dispatcher-darwin-arm64.tar.gz",
-        "browser_download_url": "https://github.com/hatayama/unity-cli-loop/releases/download/dispatcher-v2.0.0/uloop-dispatcher-darwin-arm64.tar.gz"
+        "name": "tloop-dispatcher-darwin-arm64.tar.gz",
+        "browser_download_url": "https://github.com/tongguang/unity-cli-loop/releases/download/dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz"
       },
       {
-        "name": "uloop-dispatcher-windows-amd64.zip",
-        "browser_download_url": "https://github.com/hatayama/unity-cli-loop/releases/download/dispatcher-v2.0.0/uloop-dispatcher-windows-amd64.zip"
+        "name": "tloop-dispatcher-windows-amd64.zip",
+        "browser_download_url": "https://github.com/tongguang/unity-cli-loop/releases/download/dispatcher-v2.0.0/tloop-dispatcher-windows-amd64.zip"
       }
     ]
   }
@@ -130,7 +130,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 case "$url" in
-  https://api.github.com/repos/hatayama/unity-cli-loop/releases*)
+  https://api.github.com/repos/tongguang/unity-cli-loop/releases*)
     cat "$RELEASES_JSON"
     exit 0
     ;;
@@ -149,49 +149,49 @@ case "$url" in
     cat "$PIN_JSON"
     exit 0
     ;;
-  *dispatcher-v2.0.0/uloop-dispatcher-darwin-arm64.tar.gz)
+  *dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz)
     : > "$output_file"
     ;;
-  *dispatcher-v2.0.0/uloop-dispatcher-darwin-arm64.tar.gz.sha256)
-    printf '%s  uloop-dispatcher-darwin-arm64.tar.gz\n' "${MOCK_ASSET_DIGEST:-fakehash}" > "$output_file"
+  *dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz.sha256)
+    printf '%s  tloop-dispatcher-darwin-arm64.tar.gz\n' "${MOCK_ASSET_DIGEST:-fakehash}" > "$output_file"
     ;;
-  *dispatcher-v2.0.0/uloop-dispatcher-windows-amd64.zip)
+  *dispatcher-v2.0.0/tloop-dispatcher-windows-amd64.zip)
     if [ -n "${MOCK_REAL_ZIP:-}" ]; then
       cat "$MOCK_REAL_ZIP" > "$output_file"
     else
       : > "$output_file"
     fi
     ;;
-  *dispatcher-v2.0.0/uloop-dispatcher-windows-amd64.zip.sha256)
-    printf '%s  uloop-dispatcher-windows-amd64.zip\n' "${MOCK_ASSET_DIGEST:-fakehash}" > "$output_file"
+  *dispatcher-v2.0.0/tloop-dispatcher-windows-amd64.zip.sha256)
+    printf '%s  tloop-dispatcher-windows-amd64.zip\n' "${MOCK_ASSET_DIGEST:-fakehash}" > "$output_file"
     ;;
-  *dispatcher-v3.0.0-beta.2/uloop-dispatcher-darwin-arm64.tar.gz)
-    if [ "${ULOOP_VERSION:-}" != "latest-beta" ]; then
+  *dispatcher-v3.0.0-beta.2/tloop-dispatcher-darwin-arm64.tar.gz)
+    if [ "${TLOOP_VERSION:-}" != "latest-beta" ]; then
       echo "Prerelease asset should not be downloaded: $url" >&2
       exit 1
     fi
     : > "$output_file"
     ;;
-  *dispatcher-v3.0.0-beta.2/uloop-dispatcher-darwin-arm64.tar.gz.sha256)
-    if [ "${ULOOP_VERSION:-}" != "latest-beta" ]; then
+  *dispatcher-v3.0.0-beta.2/tloop-dispatcher-darwin-arm64.tar.gz.sha256)
+    if [ "${TLOOP_VERSION:-}" != "latest-beta" ]; then
       echo "Prerelease checksum should not be downloaded: $url" >&2
       exit 1
     fi
-    printf '%s  uloop-dispatcher-darwin-arm64.tar.gz\n' "${MOCK_ASSET_DIGEST:-fakehash}" > "$output_file"
+    printf '%s  tloop-dispatcher-darwin-arm64.tar.gz\n' "${MOCK_ASSET_DIGEST:-fakehash}" > "$output_file"
     ;;
-  *dispatcher-v3.0.0-beta.2/uloop-dispatcher-windows-amd64.zip)
-    if [ "${ULOOP_VERSION:-}" != "latest-beta" ]; then
+  *dispatcher-v3.0.0-beta.2/tloop-dispatcher-windows-amd64.zip)
+    if [ "${TLOOP_VERSION:-}" != "latest-beta" ]; then
       echo "Prerelease asset should not be downloaded: $url" >&2
       exit 1
     fi
     : > "$output_file"
     ;;
-  *dispatcher-v3.0.0-beta.2/uloop-dispatcher-windows-amd64.zip.sha256)
-    if [ "${ULOOP_VERSION:-}" != "latest-beta" ]; then
+  *dispatcher-v3.0.0-beta.2/tloop-dispatcher-windows-amd64.zip.sha256)
+    if [ "${TLOOP_VERSION:-}" != "latest-beta" ]; then
       echo "Prerelease checksum should not be downloaded: $url" >&2
       exit 1
     fi
-    printf '%s  uloop-dispatcher-windows-amd64.zip\n' "${MOCK_ASSET_DIGEST:-fakehash}" > "$output_file"
+    printf '%s  tloop-dispatcher-windows-amd64.zip\n' "${MOCK_ASSET_DIGEST:-fakehash}" > "$output_file"
     ;;
   *)
     echo "unexpected curl url: $url" >&2
@@ -242,14 +242,14 @@ if [ -z "$extract_dir" ]; then
   exit 1
 fi
 
-cat > "$extract_dir/uloop" <<'ULOOP'
+cat > "$extract_dir/tloop" <<'TLOOP'
 #!/bin/sh
 set -eu
 
 if [ "${1:-}" = "--version" ] && [ "${MOCK_FINAL_VERSION_FAIL:-0}" = "1" ]; then
   case $0 in
-    */.uloop-install*)
-      echo "uloop mock version"
+    */.tloop-install*)
+      echo "tloop mock version"
       exit 0
       ;;
   esac
@@ -267,7 +267,7 @@ if [ "${1:-}" = "install" ]; then
       exit 0
     fi
     echo "mock install help"
-    echo "On macOS, updates shell PATH and removes legacy npm uloop-cli launchers."
+    echo "On macOS, updates shell PATH and removes legacy npm tloop-cli launchers."
     exit 0
   fi
   if [ -n "${NATIVE_INSTALL_LOG:-}" ]; then
@@ -276,9 +276,9 @@ if [ "${1:-}" = "install" ]; then
   exit "${MOCK_NATIVE_INSTALL_EXIT_CODE:-0}"
 fi
 
-echo "uloop mock version"
-ULOOP
-  chmod +x "$extract_dir/uloop"
+echo "tloop mock version"
+TLOOP
+  chmod +x "$extract_dir/tloop"
 MOCK_TAR
 
   cat > "$mock_bin/unzip" <<'MOCK_UNZIP'
@@ -301,14 +301,14 @@ if [ -z "$extract_dir" ]; then
   exit 1
 fi
 
-cat > "$extract_dir/uloop.exe" <<'ULOOP'
+cat > "$extract_dir/tloop.exe" <<'TLOOP'
 #!/bin/sh
 set -eu
 
 if [ "${1:-}" = "--version" ] && [ "${MOCK_FINAL_VERSION_FAIL:-0}" = "1" ]; then
   case $0 in
-    */.uloop-install*)
-      echo "uloop mock version"
+    */.tloop-install*)
+      echo "tloop mock version"
       exit 0
       ;;
   esac
@@ -326,7 +326,7 @@ if [ "${1:-}" = "install" ]; then
       exit 0
     fi
     echo "mock install help"
-    echo "On Windows, updates User PATH and removes legacy npm uloop-cli launchers."
+    echo "On Windows, updates User PATH and removes legacy npm tloop-cli launchers."
     exit 0
   fi
   if [ -n "${NATIVE_INSTALL_LOG:-}" ]; then
@@ -335,9 +335,9 @@ if [ "${1:-}" = "install" ]; then
   exit "${MOCK_NATIVE_INSTALL_EXIT_CODE:-0}"
 fi
 
-echo "uloop mock version"
-ULOOP
-chmod +x "$extract_dir/uloop.exe"
+echo "tloop mock version"
+TLOOP
+chmod +x "$extract_dir/tloop.exe"
 MOCK_UNZIP
 
   cat > "$mock_bin/npm" <<'MOCK_NPM'
@@ -345,14 +345,14 @@ MOCK_UNZIP
 set -eu
 
 printf '%s\n' "$*" >> "$NPM_LOG"
-if [ "$1" = "uninstall" ] && [ "$2" = "-g" ] && [ "$3" = "--prefix" ] && [ "$5" = "uloop-cli" ]; then
-  rm -f "$LEGACY_ULOOP"
+if [ "$1" = "uninstall" ] && [ "$2" = "-g" ] && [ "$3" = "--prefix" ] && [ "$5" = "tloop-cli" ]; then
+  rm -f "$LEGACY_TLOOP"
   exit 0
 fi
 
-if [ "$1" = "uninstall" ] && [ "$2" = "-g" ] && [ "$3" = "uloop-cli" ]; then
-  if [ -n "${DEFAULT_LEGACY_ULOOP:-}" ]; then
-    rm -f "$DEFAULT_LEGACY_ULOOP"
+if [ "$1" = "uninstall" ] && [ "$2" = "-g" ] && [ "$3" = "tloop-cli" ]; then
+  if [ -n "${DEFAULT_LEGACY_TLOOP:-}" ]; then
+    rm -f "$DEFAULT_LEGACY_TLOOP"
   fi
   exit 0
 fi
@@ -370,7 +370,7 @@ MOCK_NPM
 write_pin_json() {
   output_path=$1
   digest=${PIN_ASSET_DIGEST:-${MOCK_ASSET_DIGEST:-fakehash}}
-  asset_name=${PIN_ASSET_NAME:-uloop-dispatcher-darwin-arm64.tar.gz}
+  asset_name=${PIN_ASSET_NAME:-tloop-dispatcher-darwin-arm64.tar.gz}
 
   cat > "$output_path" <<PIN
 {
@@ -382,21 +382,21 @@ write_pin_json() {
 PIN
 }
 
-write_legacy_npm_uloop_shim() {
-  legacy_uloop=$1
+write_legacy_npm_tloop_shim() {
+  legacy_tloop=$1
   target=$2
 
-  if ln -s "$target" "$legacy_uloop" 2>/dev/null && [ -L "$legacy_uloop" ]; then
+  if ln -s "$target" "$legacy_tloop" 2>/dev/null && [ -L "$legacy_tloop" ]; then
     return
   fi
 
-  rm -f "$legacy_uloop"
-  cat > "$legacy_uloop" <<'SHIM'
+  rm -f "$legacy_tloop"
+  cat > "$legacy_tloop" <<'SHIM'
 #!/bin/sh
-# node_modules/uloop-cli shim marker
-echo "legacy uloop"
+# node_modules/tloop-cli shim marker
+echo "legacy tloop"
 SHIM
-  chmod +x "$legacy_uloop"
+  chmod +x "$legacy_tloop"
 }
 
 write_required_tool_links() {
@@ -423,20 +423,20 @@ require_python3_or_skip() {
   return 1
 }
 
-# Writes a real zip whose root entry is uloop.exe so tar/bsdtar can extract
+# Writes a real zip whose root entry is tloop.exe so tar/bsdtar can extract
 # it without a mock unzip.
 write_real_windows_dispatcher_zip() {
   zip_path=$1
   payload_dir=$(mktemp -d)
-  cat > "$payload_dir/uloop.exe" <<'ULOOP'
+  cat > "$payload_dir/tloop.exe" <<'TLOOP'
 #!/bin/sh
 set -eu
 if [ "${1:-}" = "install" ]; then
   exit 1
 fi
-echo "uloop mock version"
-ULOOP
-  python3 -c "import zipfile, sys; archive = zipfile.ZipFile(sys.argv[1], 'w'); archive.write(sys.argv[2], 'uloop.exe')" "$zip_path" "$payload_dir/uloop.exe"
+echo "tloop mock version"
+TLOOP
+  python3 -c "import zipfile, sys; archive = zipfile.ZipFile(sys.argv[1], 'w'); archive.write(sys.argv[2], 'tloop.exe')" "$zip_path" "$payload_dir/tloop.exe"
   rm -rf "$payload_dir"
 }
 
@@ -459,7 +459,7 @@ prepare_isolated_windows_zip_install() {
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
-  real_zip="$work_dir/uloop-dispatcher-windows-amd64.zip"
+  real_zip="$work_dir/tloop-dispatcher-windows-amd64.zip"
   mkdir -p "$work_dir"
   : > "$curl_log"
   : > "$npm_log"
@@ -481,13 +481,13 @@ run_isolated_mingw_zip_install() {
   PATH="$isolated_path" \
     MOCK_UNAME_OS=MINGW64_NT-10.0-26100 \
     MOCK_UNAME_ARCH=x86_64 \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_REAL_ZIP="$real_zip" \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$output_txt" 2> "$stderr_txt" || status=$?
 }
 
@@ -516,37 +516,37 @@ test_posix_latest_skips_prerelease_assets() {
   work_dir="$TMP_DIR/posix-latest"
   mock_bin="$work_dir/bin"
   legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/uloop-cli/dist"
+  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
   install_dir="$work_dir/install"
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
-  legacy_uloop="$legacy_bin/uloop"
+  legacy_tloop="$legacy_bin/tloop"
   mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist"
   : > "$curl_log"
   : > "$npm_log"
   printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
   chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_uloop_shim "$legacy_uloop" "../lib/node_modules/uloop-cli/dist/cli.bundle.cjs"
+  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
   PATH="$legacy_bin:$mock_bin:$ORIGINAL_PATH" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="$legacy_uloop" \
+    LEGACY_TLOOP="$legacy_tloop" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
-  assert_contains "$curl_log" "dispatcher-v2.0.0/uloop-dispatcher-darwin-arm64.tar.gz"
-  assert_contains "$curl_log" "dispatcher-v2.0.0/uloop-dispatcher-darwin-arm64.tar.gz.sha256"
+  assert_contains "$curl_log" "dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz"
+  assert_contains "$curl_log" "dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz.sha256"
   assert_not_contains "$curl_log" "dispatcher-v3.0.0-beta.2"
-  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global uloop-cli"
-  if [ -e "$legacy_uloop" ]; then
-    echo "Expected mocked npm uninstall to remove the legacy Node uloop shim: $legacy_uloop" >&2
+  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global tloop-cli"
+  if [ -e "$legacy_tloop" ]; then
+    echo "Expected mocked npm uninstall to remove the legacy Node tloop shim: $legacy_tloop" >&2
     exit 1
   fi
 }
@@ -565,19 +565,19 @@ test_posix_latest_beta_selects_prerelease_assets() {
   write_mock_commands "$mock_bin"
 
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    ULOOP_VERSION=latest-beta \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest-beta \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
-  assert_contains "$curl_log" "dispatcher-v3.0.0-beta.2/uloop-dispatcher-darwin-arm64.tar.gz"
-  assert_contains "$curl_log" "dispatcher-v3.0.0-beta.2/uloop-dispatcher-darwin-arm64.tar.gz.sha256"
-  assert_not_contains "$curl_log" "dispatcher-v2.0.0/uloop-dispatcher-darwin-arm64.tar.gz"
-  assert_not_contains "$npm_log" "uninstall -g uloop-cli"
+  assert_contains "$curl_log" "dispatcher-v3.0.0-beta.2/tloop-dispatcher-darwin-arm64.tar.gz"
+  assert_contains "$curl_log" "dispatcher-v3.0.0-beta.2/tloop-dispatcher-darwin-arm64.tar.gz.sha256"
+  assert_not_contains "$curl_log" "dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz"
+  assert_not_contains "$npm_log" "uninstall -g tloop-cli"
 }
 
 test_posix_invokes_native_install_setup() {
@@ -596,17 +596,17 @@ test_posix_invokes_native_install_setup() {
   write_mock_commands "$mock_bin"
 
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     NATIVE_INSTALL_LOG="$native_install_log" \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_contains "$native_install_log" "install --dir $install_dir"
-  assert_contains "$work_dir/output.txt" "uloop mock version"
+  assert_contains "$work_dir/output.txt" "tloop mock version"
 }
 
 test_posix_help_only_native_probe_uses_fallback() {
@@ -628,19 +628,19 @@ test_posix_help_only_native_probe_uses_fallback() {
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
     HOME="$home_dir" \
     SHELL="/bin/zsh" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     NATIVE_INSTALL_LOG="$native_install_log" \
     MOCK_NATIVE_INSTALL_HELP_ONLY=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_not_contains "$native_install_log" "install --dir $install_dir"
-  assert_contains "$work_dir/output.txt" "Installed uloop to $install_dir, but that directory is not in PATH."
-  assert_contains "$work_dir/output.txt" "uloop mock version"
+  assert_contains "$work_dir/output.txt" "Installed tloop to $install_dir, but that directory is not in PATH."
+  assert_contains "$work_dir/output.txt" "tloop mock version"
 }
 
 test_posix_native_failure_uses_fallback() {
@@ -662,57 +662,57 @@ test_posix_native_failure_uses_fallback() {
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
     HOME="$home_dir" \
     SHELL="/bin/zsh" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     NATIVE_INSTALL_LOG="$native_install_log" \
     MOCK_NATIVE_INSTALL_EXIT_CODE=7 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_contains "$native_install_log" "install --dir $install_dir"
   assert_contains "$work_dir/stderr.txt" "Native install setup failed."
-  assert_contains "$work_dir/output.txt" "Installed uloop to $install_dir, but that directory is not in PATH."
-  assert_contains "$work_dir/output.txt" "uloop mock version"
+  assert_contains "$work_dir/output.txt" "Installed tloop to $install_dir, but that directory is not in PATH."
+  assert_contains "$work_dir/output.txt" "tloop mock version"
 }
 
 test_posix_native_path_cleans_preinstall_legacy_shim() {
   work_dir="$TMP_DIR/posix-native-preinstall-legacy"
   mock_bin="$work_dir/bin"
   legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/uloop-cli/dist"
+  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
   install_dir="$work_dir/install"
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
   native_install_log="$work_dir/native-install.log"
-  legacy_uloop="$legacy_bin/uloop"
+  legacy_tloop="$legacy_bin/tloop"
   mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist" "$install_dir"
   : > "$curl_log"
   : > "$npm_log"
   : > "$native_install_log"
   printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
   chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_uloop_shim "$legacy_uloop" "../lib/node_modules/uloop-cli/dist/cli.bundle.cjs"
+  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
   PATH="$install_dir:$legacy_bin:$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     NATIVE_INSTALL_LOG="$native_install_log" \
-    LEGACY_ULOOP="$legacy_uloop" \
+    LEGACY_TLOOP="$legacy_tloop" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_contains "$native_install_log" "install --dir $install_dir"
-  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global uloop-cli"
-  if [ -e "$legacy_uloop" ]; then
-    echo "Expected pre-install legacy npm shim to be removed: $legacy_uloop" >&2
+  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global tloop-cli"
+  if [ -e "$legacy_tloop" ]; then
+    echo "Expected pre-install legacy npm shim to be removed: $legacy_tloop" >&2
     exit 1
   fi
 }
@@ -737,13 +737,13 @@ test_posix_prints_zsh_path_guidance_without_writing_profile() {
     HOME="$home_dir" \
     ZDOTDIR="$zdot_dir" \
     SHELL="/bin/zsh" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_contains "$work_dir/output.txt" "Detected shell: zsh"
@@ -772,13 +772,13 @@ test_posix_prints_bash_path_guidance_without_modifying_existing_profile() {
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
     HOME="$home_dir" \
     SHELL="/bin/bash" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_contains "$work_dir/output.txt" "Detected shell: bash"
@@ -810,13 +810,13 @@ test_posix_prints_fish_path_guidance_without_writing_profile() {
     HOME="$home_dir" \
     XDG_CONFIG_HOME="$xdg_config_home" \
     SHELL="/opt/homebrew/bin/fish" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_contains "$work_dir/output.txt" "Detected shell: fish"
@@ -843,13 +843,13 @@ test_posix_prints_generic_path_guidance_for_unknown_shell() {
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
     HOME="$home_dir" \
     SHELL="/bin/ksh" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_contains "$work_dir/output.txt" "Add this directory to PATH in your shell profile:"
@@ -862,39 +862,39 @@ test_posix_skips_default_npm_cleanup_when_native_command_is_first() {
   work_dir="$TMP_DIR/posix-native-first"
   mock_bin="$work_dir/bin"
   legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/uloop-cli/dist"
+  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
   install_dir="$work_dir/install"
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
-  legacy_uloop="$legacy_bin/uloop"
-  native_uloop="$install_dir/uloop"
+  legacy_tloop="$legacy_bin/tloop"
+  native_tloop="$install_dir/tloop"
   mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist" "$install_dir"
   : > "$curl_log"
   : > "$npm_log"
-  printf '%s\n' '#!/bin/sh' 'echo v3.0.0-beta.2' > "$native_uloop"
-  chmod +x "$native_uloop"
+  printf '%s\n' '#!/bin/sh' 'echo v3.0.0-beta.2' > "$native_tloop"
+  chmod +x "$native_tloop"
   printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
   chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_uloop_shim "$legacy_uloop" "../lib/node_modules/uloop-cli/dist/cli.bundle.cjs"
+  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
   PATH="$install_dir:$legacy_bin:$mock_bin:$ORIGINAL_PATH" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="$legacy_uloop" \
-    DEFAULT_LEGACY_ULOOP="$legacy_uloop" \
+    LEGACY_TLOOP="$legacy_tloop" \
+    DEFAULT_LEGACY_TLOOP="$legacy_tloop" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
-  assert_not_contains "$npm_log" "uninstall -g uloop-cli"
-  assert_not_contains "$npm_log" "uninstall -g --prefix $install_dir uloop-cli"
-  if [ ! -e "$legacy_uloop" ]; then
-    echo "Expected hidden npm shim to remain when the detected command is native: $legacy_uloop" >&2
+  assert_not_contains "$npm_log" "uninstall -g tloop-cli"
+  assert_not_contains "$npm_log" "uninstall -g --prefix $install_dir tloop-cli"
+  if [ ! -e "$legacy_tloop" ]; then
+    echo "Expected hidden npm shim to remain when the detected command is native: $legacy_tloop" >&2
     exit 1
   fi
 }
@@ -908,29 +908,29 @@ test_posix_does_not_infer_npm_prefix_from_non_npm_command() {
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
-  non_npm_uloop="$non_npm_bin/uloop"
+  non_npm_tloop="$non_npm_bin/tloop"
   mkdir -p "$work_dir" "$non_npm_bin"
   : > "$curl_log"
   : > "$npm_log"
-  printf '%s\n' '#!/bin/sh' 'echo non npm uloop' > "$non_npm_uloop"
-  chmod +x "$non_npm_uloop"
+  printf '%s\n' '#!/bin/sh' 'echo non npm tloop' > "$non_npm_tloop"
+  chmod +x "$non_npm_tloop"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
   PATH="$non_npm_bin:$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
-  assert_not_contains "$npm_log" "uninstall -g uloop-cli"
+  assert_not_contains "$npm_log" "uninstall -g tloop-cli"
   assert_not_contains "$npm_log" "--prefix $non_npm_prefix"
-  if [ ! -x "$non_npm_uloop" ]; then
-    echo "Expected non-npm uloop command to remain untouched: $non_npm_uloop" >&2
+  if [ ! -x "$non_npm_tloop" ]; then
+    echo "Expected non-npm tloop command to remain untouched: $non_npm_tloop" >&2
     exit 1
   fi
 }
@@ -940,35 +940,35 @@ test_posix_silences_legacy_cleanup_when_npm_is_unavailable() {
   mock_bin="$work_dir/bin"
   tool_bin="$work_dir/tools"
   legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/uloop-cli/dist"
+  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
   install_dir="$work_dir/install"
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
-  legacy_uloop="$legacy_bin/uloop"
+  legacy_tloop="$legacy_bin/tloop"
   mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist"
   : > "$curl_log"
   : > "$npm_log"
   printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
   chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_uloop_shim "$legacy_uloop" "../lib/node_modules/uloop-cli/dist/cli.bundle.cjs"
+  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
   rm -f "$mock_bin/npm"
   write_required_tool_links "$tool_bin"
 
   PATH="$legacy_bin:$mock_bin:$tool_bin" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="$legacy_uloop" \
+    LEGACY_TLOOP="$legacy_tloop" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_not_contains "$work_dir/output.txt" "Could not remove the legacy npm package automatically."
-  assert_not_contains "$work_dir/output.txt" "npm uninstall -g --prefix \"$work_dir/npm-global\" uloop-cli"
+  assert_not_contains "$work_dir/output.txt" "npm uninstall -g --prefix \"$work_dir/npm-global\" tloop-cli"
   assert_not_contains "$work_dir/output.txt" "Run this manually if the old npm command still shadows the native CLI:"
 }
 
@@ -980,29 +980,29 @@ test_posix_silences_legacy_cleanup_when_npm_prefix_cannot_be_inferred() {
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
-  legacy_uloop="$legacy_bin/uloop"
+  legacy_tloop="$legacy_bin/tloop"
   mkdir -p "$work_dir" "$legacy_bin"
   : > "$curl_log"
   : > "$npm_log"
-  printf '%s\n' '#!/bin/sh' '# node_modules/uloop-cli custom shim' 'echo legacy uloop' > "$legacy_uloop"
-  chmod +x "$legacy_uloop"
+  printf '%s\n' '#!/bin/sh' '# node_modules/tloop-cli custom shim' 'echo legacy tloop' > "$legacy_tloop"
+  chmod +x "$legacy_tloop"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
   PATH="$legacy_bin:$mock_bin:$ORIGINAL_PATH" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="$legacy_uloop" \
+    LEGACY_TLOOP="$legacy_tloop" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
-  assert_not_contains "$npm_log" "uninstall -g uloop-cli"
+  assert_not_contains "$npm_log" "uninstall -g tloop-cli"
   assert_not_contains "$npm_log" "uninstall -g --prefix"
   assert_not_contains "$work_dir/output.txt" "Could not remove the legacy npm package automatically."
-  assert_not_contains "$work_dir/output.txt" "Legacy uloop command: $legacy_uloop"
+  assert_not_contains "$work_dir/output.txt" "Legacy tloop command: $legacy_tloop"
   assert_not_contains "$work_dir/output.txt" "Run this manually if the old npm command still shadows the native CLI:"
 }
 
@@ -1010,36 +1010,36 @@ test_posix_removes_npm_package_before_replacing_same_bin_path() {
   work_dir="$TMP_DIR/posix-same-bin"
   mock_bin="$work_dir/bin"
   legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/uloop-cli/dist"
+  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
-  legacy_uloop="$legacy_bin/uloop"
+  legacy_tloop="$legacy_bin/tloop"
   mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist"
   : > "$curl_log"
   : > "$npm_log"
   printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
   chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_uloop_shim "$legacy_uloop" "../lib/node_modules/uloop-cli/dist/cli.bundle.cjs"
+  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
   PATH="$legacy_bin:$mock_bin:$ORIGINAL_PATH" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$legacy_bin" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$legacy_bin" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="$legacy_uloop" \
+    LEGACY_TLOOP="$legacy_tloop" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
-  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global uloop-cli"
-  if [ ! -x "$legacy_uloop" ]; then
-    echo "Expected native uloop to remain installed after same-bin npm removal: $legacy_uloop" >&2
+  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global tloop-cli"
+  if [ ! -x "$legacy_tloop" ]; then
+    echo "Expected native tloop to remain installed after same-bin npm removal: $legacy_tloop" >&2
     exit 1
   fi
-  assert_contains "$work_dir/output.txt" "uloop mock version"
+  assert_contains "$work_dir/output.txt" "tloop mock version"
 }
 
 test_powershell_latest_skips_prerelease_assets() {
@@ -1061,7 +1061,7 @@ test_powershell_latest_skips_prerelease_assets() {
   assert_contains "$ROOT_DIR/scripts/install.ps1" 'function Test-UloopPinManifestFormat'
   assert_contains "$ROOT_DIR/scripts/install.ps1" 'raw.githubusercontent.com/$Repository/$PinRef/Packages/src/project-runner-pin.json'
   assert_contains "$ROOT_DIR/scripts/install.ps1" '$DefaultPinRef = "main"'
-  assert_not_contains "$ROOT_DIR/scripts/install.ps1" "ULOOP_REMOVE_LEGACY"
+  assert_not_contains "$ROOT_DIR/scripts/install.ps1" "TLOOP_REMOVE_LEGACY"
 }
 
 test_git_bash_latest_installs_windows_zip_asset() {
@@ -1080,22 +1080,22 @@ test_git_bash_latest_installs_windows_zip_asset() {
   PATH="$mock_bin:$ORIGINAL_PATH" \
     MOCK_UNAME_OS=MINGW64_NT-10.0-26100 \
     MOCK_UNAME_ARCH=x86_64 \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
-  assert_contains "$curl_log" "dispatcher-v2.0.0/uloop-dispatcher-windows-amd64.zip"
-  assert_contains "$curl_log" "dispatcher-v2.0.0/uloop-dispatcher-windows-amd64.zip.sha256"
-  assert_not_contains "$curl_log" "uloop-dispatcher-darwin-arm64.tar.gz"
-  if [ ! -x "$install_dir/uloop.exe" ]; then
-    echo "Expected Git Bash install to create executable uloop.exe: $install_dir/uloop.exe" >&2
+  assert_contains "$curl_log" "dispatcher-v2.0.0/tloop-dispatcher-windows-amd64.zip"
+  assert_contains "$curl_log" "dispatcher-v2.0.0/tloop-dispatcher-windows-amd64.zip.sha256"
+  assert_not_contains "$curl_log" "tloop-dispatcher-darwin-arm64.tar.gz"
+  if [ ! -x "$install_dir/tloop.exe" ]; then
+    echo "Expected Git Bash install to create executable tloop.exe: $install_dir/tloop.exe" >&2
     exit 1
   fi
-  assert_contains "$work_dir/output.txt" "uloop mock version"
+  assert_contains "$work_dir/output.txt" "tloop mock version"
 }
 
 # Verifies a Windows zip install succeeds when unzip is absent from PATH and
@@ -1129,12 +1129,12 @@ test_git_bash_extracts_windows_zip_without_unzip() {
     exit 1
   fi
 
-  if [ ! -x "$install_dir/uloop.exe" ]; then
-    echo "Expected unzip-less zip install to create executable uloop.exe: $install_dir/uloop.exe" >&2
+  if [ ! -x "$install_dir/tloop.exe" ]; then
+    echo "Expected unzip-less zip install to create executable tloop.exe: $install_dir/tloop.exe" >&2
     cat "$work_dir/stderr.txt" >&2
     exit 1
   fi
-  assert_contains "$work_dir/output.txt" "uloop mock version"
+  assert_contains "$work_dir/output.txt" "tloop mock version"
 }
 
 # Verifies unzip failure falls through to a zip-capable tar instead of aborting
@@ -1166,12 +1166,12 @@ test_git_bash_extracts_windows_zip_after_unzip_fails() {
     cat "$work_dir/stderr.txt" >&2
     exit 1
   fi
-  if [ ! -x "$install_dir/uloop.exe" ]; then
-    echo "Expected unzip-fail-then-tar install to create executable uloop.exe: $install_dir/uloop.exe" >&2
+  if [ ! -x "$install_dir/tloop.exe" ]; then
+    echo "Expected unzip-fail-then-tar install to create executable tloop.exe: $install_dir/tloop.exe" >&2
     cat "$work_dir/stderr.txt" >&2
     exit 1
   fi
-  assert_contains "$work_dir/output.txt" "uloop mock version"
+  assert_contains "$work_dir/output.txt" "tloop mock version"
 }
 
 # Verifies a Windows zip install succeeds when only powershell.exe can extract
@@ -1208,12 +1208,12 @@ test_git_bash_extracts_windows_zip_with_powershell() {
     cat "$work_dir/stderr.txt" >&2
     exit 1
   fi
-  if [ ! -x "$install_dir/uloop.exe" ]; then
-    echo "Expected powershell-only zip install to create executable uloop.exe: $install_dir/uloop.exe" >&2
+  if [ ! -x "$install_dir/tloop.exe" ]; then
+    echo "Expected powershell-only zip install to create executable tloop.exe: $install_dir/tloop.exe" >&2
     cat "$work_dir/stderr.txt" >&2
     exit 1
   fi
-  assert_contains "$work_dir/output.txt" "uloop mock version"
+  assert_contains "$work_dir/output.txt" "tloop mock version"
 }
 
 # Verifies zip extract fail-fasts when unzip, tar, and powershell.exe are all
@@ -1241,8 +1241,8 @@ test_git_bash_zip_extract_fails_without_extractors() {
     echo "Expected zip extract to fail when no extractor is on PATH" >&2
     exit 1
   fi
-  assert_contains "$work_dir/stderr.txt" "Unable to extract uloop-dispatcher-windows-amd64.zip"
-  assert_contains "$work_dir/stderr.txt" "or the archive did not contain uloop.exe at its root"
+  assert_contains "$work_dir/stderr.txt" "Unable to extract tloop-dispatcher-windows-amd64.zip"
+  assert_contains "$work_dir/stderr.txt" "or the archive did not contain tloop.exe at its root"
 }
 
 # Verifies zip extract tries unzip, then tar, then Windows Expand-Archive.
@@ -1251,14 +1251,14 @@ test_posix_installer_extracts_zip_with_fallback_chain() {
   assert_contains "$ROOT_DIR/scripts/install.sh" 'try_extract_zip_with_tar'
   assert_contains "$ROOT_DIR/scripts/install.sh" 'try_extract_zip_with_powershell'
   assert_contains "$ROOT_DIR/scripts/install.sh" 'tar -xf "$tmp_dir/$asset_name" -C "$tmp_dir"'
-  assert_contains "$ROOT_DIR/scripts/install.sh" "powershell.exe -NoProfile -Command 'Expand-Archive -LiteralPath \$env:ULOOP_ZIP_PATH -DestinationPath \$env:ULOOP_ZIP_DEST -Force'"
+  assert_contains "$ROOT_DIR/scripts/install.sh" "powershell.exe -NoProfile -Command 'Expand-Archive -LiteralPath \$env:TLOOP_ZIP_PATH -DestinationPath \$env:TLOOP_ZIP_DEST -Force'"
   assert_contains "$ROOT_DIR/scripts/install.sh" 'or the archive did not contain $installed_command_name at its root'
   assert_not_contains "$ROOT_DIR/scripts/install.sh" "unzip is required to extract"
 }
 
 # Verifies install.sh moves an existing destination aside, reclaims stale
 # leftovers, and leaves the backup after a successful replace.
-test_posix_replaces_existing_uloop_by_moving_it_aside() {
+test_posix_replaces_existing_tloop_by_moving_it_aside() {
   work_dir="$TMP_DIR/posix-move-aside"
   mock_bin="$work_dir/bin"
   install_dir="$work_dir/install"
@@ -1268,34 +1268,34 @@ test_posix_replaces_existing_uloop_by_moving_it_aside() {
   mkdir -p "$work_dir" "$install_dir"
   : > "$curl_log"
   : > "$npm_log"
-  printf '%s\n' 'old-binary' > "$install_dir/uloop"
-  chmod +x "$install_dir/uloop"
-  printf '%s\n' 'stale-backup' > "$install_dir/uloop.old-stale"
+  printf '%s\n' 'old-binary' > "$install_dir/tloop"
+  chmod +x "$install_dir/tloop"
+  printf '%s\n' 'stale-backup' > "$install_dir/tloop.old-stale"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
   PATH="$mock_bin:$ORIGINAL_PATH" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
-  if [ ! -x "$install_dir/uloop" ]; then
-    echo "Expected replace install to keep an executable uloop: $install_dir/uloop" >&2
+  if [ ! -x "$install_dir/tloop" ]; then
+    echo "Expected replace install to keep an executable tloop: $install_dir/tloop" >&2
     exit 1
   fi
-  assert_contains "$work_dir/output.txt" "uloop mock version"
-  if [ -e "$install_dir/uloop.old-stale" ]; then
-    echo "Expected stale leftover $install_dir/uloop.old-stale to be reclaimed" >&2
+  assert_contains "$work_dir/output.txt" "tloop mock version"
+  if [ -e "$install_dir/tloop.old-stale" ]; then
+    echo "Expected stale leftover $install_dir/tloop.old-stale to be reclaimed" >&2
     exit 1
   fi
   leftover_count=0
   leftover_path=""
-  for leftover in "$install_dir"/uloop.old-*; do
+  for leftover in "$install_dir"/tloop.old-*; do
     if [ ! -e "$leftover" ]; then
       continue
     fi
@@ -1312,7 +1312,7 @@ test_posix_replaces_existing_uloop_by_moving_it_aside() {
 
 # Verifies the EXIT trap restores the aside backup when placing the staged
 # binary fails.
-test_posix_restores_uloop_backup_when_replace_fails() {
+test_posix_restores_tloop_backup_when_replace_fails() {
   work_dir="$TMP_DIR/posix-restore-aside"
   mock_bin="$work_dir/bin"
   install_dir="$work_dir/install"
@@ -1322,8 +1322,8 @@ test_posix_restores_uloop_backup_when_replace_fails() {
   mkdir -p "$work_dir" "$install_dir"
   : > "$curl_log"
   : > "$npm_log"
-  printf '%s\n' 'old-binary' > "$install_dir/uloop"
-  chmod +x "$install_dir/uloop"
+  printf '%s\n' 'old-binary' > "$install_dir/tloop"
+  chmod +x "$install_dir/tloop"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
@@ -1339,7 +1339,7 @@ case \$dest in
     ;;
 esac
 case \$src in
-  */.uloop-install*)
+  */.tloop-install*)
     echo "mock mv refusing to place staged binary" >&2
     exit 1
     ;;
@@ -1350,24 +1350,24 @@ MOCK_MV
 
   status=0
   PATH="$mock_bin:$ORIGINAL_PATH" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt" || status=$?
   if [ "$status" -eq 0 ]; then
     echo "Expected replace install to fail when placing the staged binary is refused" >&2
     exit 1
   fi
-  assert_contains "$install_dir/uloop" "old-binary"
+  assert_contains "$install_dir/tloop" "old-binary"
 }
 
 # Verifies a failed post-place --version restores the aside backup instead of
 # leaving a broken new binary at the destination.
-test_posix_restores_uloop_backup_when_final_version_fails() {
+test_posix_restores_tloop_backup_when_final_version_fails() {
   work_dir="$TMP_DIR/posix-restore-version"
   mock_bin="$work_dir/bin"
   install_dir="$work_dir/install"
@@ -1377,42 +1377,42 @@ test_posix_restores_uloop_backup_when_final_version_fails() {
   mkdir -p "$work_dir" "$install_dir"
   : > "$curl_log"
   : > "$npm_log"
-  printf '%s\n' 'old-binary' > "$install_dir/uloop"
-  chmod +x "$install_dir/uloop"
+  printf '%s\n' 'old-binary' > "$install_dir/tloop"
+  chmod +x "$install_dir/tloop"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
   status=0
   PATH="$mock_bin:$ORIGINAL_PATH" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
     MOCK_FINAL_VERSION_FAIL=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt" || status=$?
   if [ "$status" -eq 0 ]; then
     echo "Expected replace install to fail when the placed binary --version fails" >&2
     exit 1
   fi
-  assert_contains "$install_dir/uloop" "old-binary"
+  assert_contains "$install_dir/tloop" "old-binary"
 }
 
 # Verifies install.sh uses move-aside + restore instead of mv -f onto the
 # running destination, without $RANDOM.
-test_posix_installer_moves_existing_uloop_aside() {
-  assert_contains "$ROOT_DIR/scripts/install.sh" 'replaced_uloop_backup_path="$final_uloop_path.old-$$-$(date +%s)"'
-  assert_contains "$ROOT_DIR/scripts/install.sh" 'mv "$final_uloop_path" "$replaced_uloop_backup_path"'
-  assert_contains "$ROOT_DIR/scripts/install.sh" 'mv "$staged_uloop_path" "$final_uloop_path"'
-  assert_not_contains "$ROOT_DIR/scripts/install.sh" 'mv -f "$staged_uloop_path" "$final_uloop_path"'
+test_posix_installer_moves_existing_tloop_aside() {
+  assert_contains "$ROOT_DIR/scripts/install.sh" 'replaced_tloop_backup_path="$final_tloop_path.old-$$-$(date +%s)"'
+  assert_contains "$ROOT_DIR/scripts/install.sh" 'mv "$final_tloop_path" "$replaced_tloop_backup_path"'
+  assert_contains "$ROOT_DIR/scripts/install.sh" 'mv "$staged_tloop_path" "$final_tloop_path"'
+  assert_not_contains "$ROOT_DIR/scripts/install.sh" 'mv -f "$staged_tloop_path" "$final_tloop_path"'
   assert_not_contains "$ROOT_DIR/scripts/install.sh" '$RANDOM'
-  assert_contains "$ROOT_DIR/scripts/install.sh" '`uloop update` runs this'
-  assert_contains "$ROOT_DIR/scripts/install.sh" '[ ! -e "$final_uloop_path" ]'
+  assert_contains "$ROOT_DIR/scripts/install.sh" '`tloop update` runs this'
+  assert_contains "$ROOT_DIR/scripts/install.sh" '[ ! -e "$final_tloop_path" ]'
   assert_contains "$ROOT_DIR/scripts/install.sh" 'install_completed=0'
   assert_contains "$ROOT_DIR/scripts/install.sh" 'install_completed=1'
-  assert_contains "$ROOT_DIR/scripts/install.sh" 'rm -f "$final_uloop_path" 2>/dev/null || true'
+  assert_contains "$ROOT_DIR/scripts/install.sh" 'rm -f "$final_tloop_path" 2>/dev/null || true'
   assert_contains "$ROOT_DIR/scripts/install.sh" 'trap "exit 129" INT HUP TERM'
 }
 
@@ -1465,8 +1465,8 @@ test_powershell_installer_avoids_optional_archive_cmdlets() {
 }
 
 test_powershell_installer_uses_non_installer_staged_executable_name() {
-  assert_contains "$ROOT_DIR/scripts/install.ps1" '"uloop-staged-"'
-  assert_not_contains "$ROOT_DIR/scripts/install.ps1" '"uloop-install-"'
+  assert_contains "$ROOT_DIR/scripts/install.ps1" '"tloop-staged-"'
+  assert_not_contains "$ROOT_DIR/scripts/install.ps1" '"tloop-install-"'
 }
 
 test_powershell_native_probe_restores_error_action_preference() {
@@ -1483,14 +1483,14 @@ test_powershell_reports_persisted_path_shadowing() {
   assert_contains "$ROOT_DIR/scripts/install.ps1" '$CandidatePath = Join-Path $NormalizedPathEntry $ShimName'
   assert_contains "$ROOT_DIR/scripts/install.ps1" '[Environment]::GetEnvironmentVariable("Path", "Machine")'
   assert_contains "$ROOT_DIR/scripts/install.ps1" '$ResolvedPath = Get-FirstUloopCommandFromPath -PathValue ([string]::Join(";", @($MachinePath, $UserPath)))'
-  assert_not_contains "$ROOT_DIR/scripts/install.ps1" 'Get-Command uloop -ErrorAction SilentlyContinue'
+  assert_not_contains "$ROOT_DIR/scripts/install.ps1" 'Get-Command tloop -ErrorAction SilentlyContinue'
   assert_not_contains "$ROOT_DIR/scripts/install.ps1" '$RemovedAll'
 }
 
 PIN_TEST_DIGEST="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 PIN_MISMATCH_DIGEST="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 
-# (a) Explicit ULOOP_ARCHIVE_MANIFEST must not fetch the repository pin.
+# (a) Explicit TLOOP_ARCHIVE_MANIFEST must not fetch the repository pin.
 test_posix_explicit_manifest_skips_pin_fetch() {
   work_dir="$TMP_DIR/posix-explicit-manifest-skips-pin"
   mock_bin="$work_dir/bin"
@@ -1507,14 +1507,14 @@ test_posix_explicit_manifest_skips_pin_fetch() {
   write_mock_commands "$mock_bin"
 
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     PIN_JSON="$pin_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_not_contains "$curl_log" "Packages/src/project-runner-pin.json"
@@ -1538,16 +1538,16 @@ test_posix_pin_fallback_installs_pinned_release() {
 
   set +e
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    env -u ULOOP_ARCHIVE_MANIFEST \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    env -u TLOOP_ARCHIVE_MANIFEST \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     PIN_JSON="$pin_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_ASSET_DIGEST="$PIN_TEST_DIGEST" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
   status=$?
   set -e
@@ -1558,11 +1558,11 @@ test_posix_pin_fallback_installs_pinned_release() {
   fi
 
   assert_contains "$curl_log" "Packages/src/project-runner-pin.json"
-  assert_contains "$curl_log" "dispatcher-v2.0.0/uloop-dispatcher-darwin-arm64.tar.gz"
+  assert_contains "$curl_log" "dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz"
   assert_contains "$work_dir/output.txt" "pinned at"
 }
 
-# (c) Pin fetch failure must mention ULOOP_ARCHIVE_MANIFEST.
+# (c) Pin fetch failure must mention TLOOP_ARCHIVE_MANIFEST.
 test_posix_pin_fetch_failure_mentions_manifest_env() {
   work_dir="$TMP_DIR/posix-pin-fetch-fail"
   mock_bin="$work_dir/bin"
@@ -1580,9 +1580,9 @@ test_posix_pin_fetch_failure_mentions_manifest_env() {
 
   set +e
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    env -u ULOOP_ARCHIVE_MANIFEST \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    env -u TLOOP_ARCHIVE_MANIFEST \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     PIN_JSON="$pin_json" \
     CURL_LOG="$curl_log" \
@@ -1590,7 +1590,7 @@ test_posix_pin_fetch_failure_mentions_manifest_env() {
     MOCK_PIN_FETCH_FAIL=1 \
     MOCK_ASSET_DIGEST="$PIN_TEST_DIGEST" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
   status=$?
   set -e
@@ -1598,7 +1598,7 @@ test_posix_pin_fetch_failure_mentions_manifest_env() {
     echo "Expected pin fetch failure to abort install" >&2
     exit 1
   fi
-  assert_contains "$work_dir/stderr.txt" "ULOOP_ARCHIVE_MANIFEST"
+  assert_contains "$work_dir/stderr.txt" "TLOOP_ARCHIVE_MANIFEST"
 }
 
 # (d) Pin digest that does not match the computed archive hash must fail.
@@ -1619,16 +1619,16 @@ test_posix_pin_digest_mismatch_fails() {
 
   set +e
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    env -u ULOOP_ARCHIVE_MANIFEST \
-    ULOOP_VERSION=latest \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    env -u TLOOP_ARCHIVE_MANIFEST \
+    TLOOP_VERSION=latest \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     PIN_JSON="$pin_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_ASSET_DIGEST="$PIN_TEST_DIGEST" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
   status=$?
   set -e
@@ -1638,7 +1638,7 @@ test_posix_pin_digest_mismatch_fails() {
   fi
 }
 
-# (e) Explicit ULOOP_VERSION that disagrees with the pin tag must fail.
+# (e) Explicit TLOOP_VERSION that disagrees with the pin tag must fail.
 test_posix_pin_version_mismatch_fails() {
   work_dir="$TMP_DIR/posix-pin-version-mismatch"
   mock_bin="$work_dir/bin"
@@ -1656,16 +1656,16 @@ test_posix_pin_version_mismatch_fails() {
 
   set +e
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    env -u ULOOP_ARCHIVE_MANIFEST \
-    ULOOP_VERSION=dispatcher-v9.9.9 \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    env -u TLOOP_ARCHIVE_MANIFEST \
+    TLOOP_VERSION=dispatcher-v9.9.9 \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     PIN_JSON="$pin_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_ASSET_DIGEST="$PIN_TEST_DIGEST" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
   status=$?
   set -e
@@ -1673,13 +1673,13 @@ test_posix_pin_version_mismatch_fails() {
     echo "Expected pin tag mismatch to abort install" >&2
     exit 1
   fi
-  assert_contains "$work_dir/stderr.txt" "ULOOP_VERSION"
-  assert_contains "$work_dir/stderr.txt" "ULOOP_ARCHIVE_MANIFEST"
+  assert_contains "$work_dir/stderr.txt" "TLOOP_VERSION"
+  assert_contains "$work_dir/stderr.txt" "TLOOP_ARCHIVE_MANIFEST"
 }
 
-# (f) ULOOP_REF must appear in the pin raw URL.
-test_posix_uloop_ref_appears_in_pin_url() {
-  work_dir="$TMP_DIR/posix-uloop-ref-in-pin-url"
+# (f) TLOOP_REF must appear in the pin raw URL.
+test_posix_tloop_ref_appears_in_pin_url() {
+  work_dir="$TMP_DIR/posix-tloop-ref-in-pin-url"
   mock_bin="$work_dir/bin"
   install_dir="$work_dir/install"
   releases_json="$work_dir/releases.json"
@@ -1695,17 +1695,17 @@ test_posix_uloop_ref_appears_in_pin_url() {
 
   set +e
   PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    env -u ULOOP_ARCHIVE_MANIFEST \
-    ULOOP_VERSION=latest \
-    ULOOP_REF=custom-ref \
-    ULOOP_INSTALL_DIR="$install_dir" \
+    env -u TLOOP_ARCHIVE_MANIFEST \
+    TLOOP_VERSION=latest \
+    TLOOP_REF=custom-ref \
+    TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     PIN_JSON="$pin_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_ASSET_DIGEST="$PIN_TEST_DIGEST" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_ULOOP="" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
   status=$?
   set -e
@@ -1714,7 +1714,7 @@ test_posix_uloop_ref_appears_in_pin_url() {
     cat "$work_dir/stderr.txt" >&2
     exit 1
   fi
-  assert_contains "$curl_log" "raw.githubusercontent.com/hatayama/unity-cli-loop/custom-ref/Packages/src/project-runner-pin.json"
+  assert_contains "$curl_log" "raw.githubusercontent.com/tongguang/unity-cli-loop/custom-ref/Packages/src/project-runner-pin.json"
 }
 
 test_posix_latest_skips_prerelease_assets
@@ -1739,10 +1739,10 @@ test_git_bash_extracts_windows_zip_after_unzip_fails
 test_git_bash_extracts_windows_zip_with_powershell
 test_git_bash_zip_extract_fails_without_extractors
 test_posix_installer_extracts_zip_with_fallback_chain
-test_posix_replaces_existing_uloop_by_moving_it_aside
-test_posix_restores_uloop_backup_when_replace_fails
-test_posix_restores_uloop_backup_when_final_version_fails
-test_posix_installer_moves_existing_uloop_aside
+test_posix_replaces_existing_tloop_by_moving_it_aside
+test_posix_restores_tloop_backup_when_replace_fails
+test_posix_restores_tloop_backup_when_final_version_fails
+test_posix_installer_moves_existing_tloop_aside
 test_powershell_installer_enables_tls12_and_basic_parsing
 test_powershell_installer_avoids_optional_archive_cmdlets
 test_powershell_installer_uses_non_installer_staged_executable_name
@@ -1753,4 +1753,4 @@ test_posix_pin_fallback_installs_pinned_release
 test_posix_pin_fetch_failure_mentions_manifest_env
 test_posix_pin_digest_mismatch_fails
 test_posix_pin_version_mismatch_fails
-test_posix_uloop_ref_appears_in_pin_url
+test_posix_tloop_ref_appears_in_pin_url

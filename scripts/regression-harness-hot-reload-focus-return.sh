@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 # Regression harness for hot-reload + focus-return: Play Mode with an active
-# patch must survive uloop focus-window. Without HotReloadAutoRefreshHold,
+# patch must survive tloop focus-window. Without HotReloadAutoRefreshHold,
 # native Auto Refresh imports the edited .cs, recompiles, and stops Play
 # (ScriptCompilationDuringPlay=2). See docs/regression-harness.md.
 #
@@ -9,7 +9,7 @@ set -e
 #
 # Prerequisites:
 #   - Unity Editor must already be running for this project and unfocused
-#   - dist/<platform>/uloop must be built (this checkout's development binary)
+#   - dist/<platform>/tloop must be built (this checkout's development binary)
 #   - jq must be installed
 #   - Auto Refresh must be enabled
 #   - the harness source must be clean in git
@@ -31,12 +31,12 @@ REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 case "$(uname -s)" in
     Darwin)
         case "$(uname -m)" in
-            arm64) ULOOP_BIN="$REPO_ROOT/dist/darwin-arm64/uloop" ;;
-            *) ULOOP_BIN="$REPO_ROOT/dist/darwin-amd64/uloop" ;;
+            arm64) TLOOP_BIN="$REPO_ROOT/dist/darwin-arm64/tloop" ;;
+            *) TLOOP_BIN="$REPO_ROOT/dist/darwin-amd64/tloop" ;;
         esac
         ;;
     MINGW*|MSYS*|CYGWIN*)
-        ULOOP_BIN="$REPO_ROOT/dist/windows-amd64/uloop.exe"
+        TLOOP_BIN="$REPO_ROOT/dist/windows-amd64/tloop.exe"
         ;;
     *)
         printf '%s\n' "Unsupported platform: $(uname -s)" >&2
@@ -44,8 +44,8 @@ case "$(uname -s)" in
         ;;
 esac
 
-if [ ! -x "$ULOOP_BIN" ]; then
-    printf '%s\n' "uloop binary not found or not executable: $ULOOP_BIN" >&2
+if [ ! -x "$TLOOP_BIN" ]; then
+    printf '%s\n' "tloop binary not found or not executable: $TLOOP_BIN" >&2
     printf '%s\n' "Build with scripts/build-go-cli.sh first." >&2
     exit 2
 fi
@@ -86,8 +86,8 @@ CLEANED_UP="0"
 SOURCE_DIRTY="0"
 SAVED_SCRIPT_COMPILATION=""
 
-run_uloop() {
-    "$ULOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
+run_tloop() {
+    "$TLOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
 }
 
 log() {
@@ -114,7 +114,7 @@ restore_script_compilation() {
 UnityEditor.EditorPrefs.SetInt("ScriptCompilationDuringPlay", $SAVED_SCRIPT_COMPILATION);
 return "restored=" + $SAVED_SCRIPT_COMPILATION;
 EOF
-    run_uloop execute-dynamic-code --code-file "$CODE_FILE" > /dev/null 2>&1 || true
+    run_tloop execute-dynamic-code --code-file "$CODE_FILE" > /dev/null 2>&1 || true
     SAVED_SCRIPT_COMPILATION=""
 }
 
@@ -125,8 +125,8 @@ cleanup() {
     fi
     CLEANED_UP="1"
     restore_source
-    run_uloop hot-reload --revert-all > /dev/null 2>&1 || true
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop hot-reload --revert-all > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
     restore_script_compilation
     cleanup_temps
 }
@@ -142,7 +142,7 @@ fi
 cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorApplication.isFocused.ToString();
 EOF
-if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
     log "FAIL: could not read EditorApplication.isFocused."
     cat "$RESULT_FILE"
     exit 1
@@ -174,7 +174,7 @@ else
 }
 return "disabled=" + disabled.ToString() + " mode=" + mode.ToString() + " legacy=" + legacy.ToString();
 EOF
-if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
     log "FAIL: could not read Auto Refresh prefs."
     cat "$RESULT_FILE"
     exit 1
@@ -191,7 +191,7 @@ log "Auto Refresh precondition ok ($AUTO_REFRESH_STATE)."
 cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorPrefs.GetInt("ScriptCompilationDuringPlay", 0).ToString();
 EOF
-if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
     log "FAIL: could not read ScriptCompilationDuringPlay."
     cat "$RESULT_FILE"
     exit 1
@@ -210,7 +210,7 @@ if [ "$SCRIPT_COMPILATION" != "$STOP_PLAYING_AND_RECOMPILE" ]; then
 UnityEditor.EditorPrefs.SetInt("ScriptCompilationDuringPlay", $STOP_PLAYING_AND_RECOMPILE);
 return UnityEditor.EditorPrefs.GetInt("ScriptCompilationDuringPlay", 0).ToString();
 EOF
-    if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+    if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
         log "FAIL: could not set ScriptCompilationDuringPlay."
         cat "$RESULT_FILE"
         exit 1
@@ -236,12 +236,12 @@ using UnityEditor.SceneManagement;
 EditorSceneManager.OpenScene("Assets/RegressionHarness/HotReload/HotReload.unity");
 return "opened";
 EOF
-run_uloop execute-dynamic-code --code-file "$CODE_FILE" > /dev/null
+run_tloop execute-dynamic-code --code-file "$CODE_FILE" > /dev/null
 
 cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorApplication.isFocused.ToString();
 EOF
-if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
     log "FAIL: could not recheck EditorApplication.isFocused before Play."
     cat "$RESULT_FILE"
     exit 1
@@ -253,10 +253,10 @@ if [ "$IS_FOCUSED" = "True" ]; then
 fi
 
 log "Stopping any existing Play Mode session..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
 log "Starting Play Mode..."
-if ! run_uloop control-play-mode --action Play > "$RESULT_FILE"; then
+if ! run_tloop control-play-mode --action Play > "$RESULT_FILE"; then
     log "FAIL: could not enter Play Mode."
     cat "$RESULT_FILE"
     exit 1
@@ -271,7 +271,7 @@ fi
 cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorApplication.isFocused.ToString();
 EOF
-if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
     log "FAIL: could not recheck EditorApplication.isFocused before editing the harness source."
     cat "$RESULT_FILE"
     exit 1
@@ -293,7 +293,7 @@ if ! grep -q "$NEW_LITERAL" "$SOURCE_ABS"; then
 fi
 
 log "Applying hot-reload to $SOURCE_FILE..."
-if ! run_uloop hot-reload --files "$SOURCE_FILE" > "$APPLY_RESULT_FILE"; then
+if ! run_tloop hot-reload --files "$SOURCE_FILE" > "$APPLY_RESULT_FILE"; then
     log "FAIL: hot-reload command failed."
     cat "$APPLY_RESULT_FILE"
     exit 1
@@ -309,7 +309,7 @@ fi
 log "hot-reload applied (ActivePatchTotal=${ACTIVE_BEFORE}, AutoRefreshHeld=${HELD_AFTER_APPLY})."
 
 log "Returning focus to the Unity Editor..."
-run_uloop focus-window > /dev/null || true
+run_tloop focus-window > /dev/null || true
 
 # Why wait for reachability first: an unfixed Editor imports the edited .cs on
 # focus return, recompiles, and drops the IPC connection. Treating that
@@ -325,13 +325,13 @@ while :; do
     cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorApplication.isFocused.ToString();
 EOF
-    if run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE" 2>/dev/null; then
+    if run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE" 2>/dev/null; then
         FOCUSED="$(jq -r '.Result // empty' "$RESULT_FILE")"
         REACHABLE="1"
         if [ "$FOCUSED" = "True" ]; then
             break
         fi
-        run_uloop focus-window > /dev/null 2>&1 || true
+        run_tloop focus-window > /dev/null 2>&1 || true
     fi
     sleep 2
 done
@@ -349,7 +349,7 @@ while [ "$FOCUSED" != "True" ]; do
     cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorApplication.isFocused.ToString();
 EOF
-    if run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE" 2>/dev/null; then
+    if run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE" 2>/dev/null; then
         FOCUSED="$(jq -r '.Result // empty' "$RESULT_FILE")"
         if [ "$FOCUSED" = "True" ]; then
             break
@@ -366,7 +366,7 @@ log "Waiting 5 seconds for native Auto Refresh / compile..."
 sleep 5
 
 log "Checking Play Mode status after focus return..."
-if ! run_uloop control-play-mode --action Status > "$RESULT_FILE"; then
+if ! run_tloop control-play-mode --action Status > "$RESULT_FILE"; then
     log "FAIL: could not read Play Mode status."
     cat "$RESULT_FILE"
     exit 1
@@ -376,7 +376,7 @@ log "control-play-mode Status after focus return:"
 cat "$RESULT_FILE"
 if [ "$IS_PLAYING" != "true" ] && [ "$IS_PLAYING" != "True" ]; then
     ACTIVE_AFTER_FOCUS="unavailable"
-    if run_uloop hot-reload --status > "$RESULT_FILE"; then
+    if run_tloop hot-reload --status > "$RESULT_FILE"; then
         log "hot-reload --status after Play stopped:"
         cat "$RESULT_FILE"
         ACTIVE_AFTER_FOCUS="$(jq -r '.ActivePatchTotal // 0' "$RESULT_FILE")"
@@ -388,7 +388,7 @@ if [ "$IS_PLAYING" != "true" ] && [ "$IS_PLAYING" != "True" ]; then
     exit 1
 fi
 
-if ! run_uloop hot-reload --status > "$RESULT_FILE"; then
+if ! run_tloop hot-reload --status > "$RESULT_FILE"; then
     log "FAIL: hot-reload --status failed after focus return."
     cat "$RESULT_FILE"
     exit 1
@@ -412,9 +412,9 @@ if [ "$HELD_AFTER_FOCUS" != "true" ]; then
 fi
 
 log "Stopping Play Mode..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
-if ! run_uloop hot-reload --status > "$RESULT_FILE"; then
+if ! run_tloop hot-reload --status > "$RESULT_FILE"; then
     log "FAIL: hot-reload --status failed after Stop."
     cat "$RESULT_FILE"
     exit 1
@@ -430,7 +430,7 @@ UnityEditor.EnterPlayModeOptions options = UnityEditor.EditorSettings.enterPlayM
 bool domainReloadDisabled = optionsEnabled && options.HasFlag(UnityEditor.EnterPlayModeOptions.DisableDomainReload);
 return "enabled=" + optionsEnabled.ToString() + " disableDomainReload=" + domainReloadDisabled.ToString();
 EOF
-if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
     log "FAIL: could not read Enter Play Mode Options."
     cat "$RESULT_FILE"
     exit 1
@@ -457,7 +457,7 @@ esac
 
 log "Restoring source and compiling..."
 restore_source
-if ! run_uloop compile --timeout-seconds 120 > "$RESULT_FILE"; then
+if ! run_tloop compile --timeout-seconds 120 > "$RESULT_FILE"; then
     log "FAIL: compile did not succeed after restore."
     cat "$RESULT_FILE"
     exit 1
@@ -469,7 +469,7 @@ if [ "$COMPILE_SUCCESS" != "true" ] && [ "$COMPILE_SUCCESS" != "True" ]; then
     exit 1
 fi
 
-if ! run_uloop hot-reload --status > "$RESULT_FILE"; then
+if ! run_tloop hot-reload --status > "$RESULT_FILE"; then
     log "FAIL: hot-reload --status failed after compile."
     cat "$RESULT_FILE"
     exit 1

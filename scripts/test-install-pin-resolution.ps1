@@ -82,7 +82,7 @@ function Assert-Throws {
 }
 
 # Script-scope values the extracted helpers close over / read.
-$Repository = "hatayama/unity-cli-loop"
+$Repository = "tongguang/unity-cli-loop"
 $LatestVersion = "latest"
 $LatestBetaVersion = "latest-beta"
 $DefaultPinRef = "main"
@@ -98,7 +98,7 @@ $ResolvedArchiveManifest = $null
 
 $PinJson = @"
 {
-  "dispatcherArchiveManifest": "$Hex64Lower  uloop-dispatcher-windows-amd64.zip\n$Hex64Lower  install.ps1",
+  "dispatcherArchiveManifest": "$Hex64Lower  tloop-dispatcher-windows-amd64.zip\n$Hex64Lower  install.ps1",
   "dispatcherReleaseTag": "dispatcher-v3.1.0-beta.16",
   "minimumDispatcherVersion": "3.0.0-beta.19",
   "projectRunnerVersion": "3.0.0-beta.64"
@@ -114,7 +114,7 @@ $Lines = @($Expanded -split "`n" | Where-Object { -not [string]::IsNullOrEmpty($
 if ($Lines.Count -ne 2) {
     throw "FAIL: expected 2 expanded manifest lines, got $($Lines.Count)"
 }
-if ($Lines[0] -ne "$Hex64Lower  uloop-dispatcher-windows-amd64.zip") {
+if ($Lines[0] -ne "$Hex64Lower  tloop-dispatcher-windows-amd64.zip") {
     throw "FAIL: unexpected first expanded line: $($Lines[0])"
 }
 
@@ -160,8 +160,8 @@ function Get-UloopPinJson {
     return $script:MockPinJsonText
 }
 
-$env:ULOOP_ARCHIVE_MANIFEST = $null
-Remove-Item Env:ULOOP_ARCHIVE_MANIFEST -ErrorAction SilentlyContinue
+$env:TLOOP_ARCHIVE_MANIFEST = $null
+Remove-Item Env:TLOOP_ARCHIVE_MANIFEST -ErrorAction SilentlyContinue
 
 # Explicit manifest: early return without fetching pin or rewriting Version.
 # Why: Windows self-update must keep the requested tag (via env manifest) and
@@ -172,7 +172,7 @@ $script:MockPinJsonText = $PinJson
 $Version = "latest"
 $ResolvedArchiveManifest = $null
 $PinRef = "main"
-$env:ULOOP_ARCHIVE_MANIFEST = "$Hex64Lower  uloop-dispatcher-windows-amd64.zip"
+$env:TLOOP_ARCHIVE_MANIFEST = "$Hex64Lower  tloop-dispatcher-windows-amd64.zip"
 try {
     Resolve-UloopManifestFromPin
     if ($Version -ne "latest") {
@@ -182,7 +182,7 @@ try {
         throw "FAIL: explicit manifest must leave ResolvedArchiveManifest null"
     }
 } finally {
-    Remove-Item Env:ULOOP_ARCHIVE_MANIFEST -ErrorAction SilentlyContinue
+    Remove-Item Env:TLOOP_ARCHIVE_MANIFEST -ErrorAction SilentlyContinue
 }
 
 # Success: latest -> pin tag, ResolvedArchiveManifest populated.
@@ -199,7 +199,7 @@ if ([string]::IsNullOrEmpty($ResolvedArchiveManifest)) {
     throw "FAIL: expected ResolvedArchiveManifest to be set"
 }
 
-# Fetch failure mentions ULOOP_ARCHIVE_MANIFEST.
+# Fetch failure mentions TLOOP_ARCHIVE_MANIFEST.
 $script:MockPinFetchFail = $true
 $Version = "latest"
 $ResolvedArchiveManifest = $null

@@ -14,63 +14,63 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 HotReloadWorkerReasonCode.UnsupportedMemberExplicitAccessor,
                 Plain(
                     "Property setter, init, or indexer accessors are skipped; "
-                    + "run 'uloop compile' to apply accessor edits.",
+                    + "run 'tloop compile' to apply accessor edits.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.UnsupportedMemberUnsupportedKind,
                 Plain(
                     "Constructors, operators, and event accessors are skipped; "
-                    + "run 'uloop compile' to apply these edits.",
+                    + "run 'tloop compile' to apply these edits.",
                     0));
 
             templates.Add(
                 HotReloadWorkerReasonCode.EventCustomAccessor,
                 Plain(
                     "Methods that raise or read an event with custom add/remove accessors are skipped; "
-                    + "there is no backing field for the shim to reach. Use uloop compile.",
+                    + "there is no backing field for the shim to reach. Use tloop compile.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.EventNoBackingField,
                 Plain(
                     "Methods that raise or read an abstract, extern, or interface event are skipped; "
-                    + "there is no backing field for the shim to reach. Use uloop compile.",
+                    + "there is no backing field for the shim to reach. Use tloop compile.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.EventDelegateTypeNotVisible,
                 Plain(
                     "Methods that raise or read an event whose delegate type is not visible from an external "
-                    + "assembly are skipped; the shim cannot name the accessor field type. Use uloop compile.",
+                    + "assembly are skipped; the shim cannot name the accessor field type. Use tloop compile.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.EventAddedInThisEdit,
                 Plain(
                     "Methods that raise a field-like event added in this edit are skipped; "
-                    + "the compiled assembly has no backing field yet. Use uloop compile.",
+                    + "the compiled assembly has no backing field yet. Use tloop compile.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.EventSubscriptionToAddedEvent,
                 Plain(
                     "Subscribes to the event '{0}', which this edit adds; the compiled assembly has no "
-                    + "such event yet, so the subscription cannot bind until 'uloop compile'.",
+                    + "such event yet, so the subscription cannot bind until 'tloop compile'.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.EventNameof,
                 Plain(
                     "Methods that name a field-like event inside nameof are skipped; the shim is a different "
-                    + "type and cannot keep the bare event name. Use uloop compile.",
+                    + "type and cannot keep the bare event name. Use tloop compile.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.EventConditionalReceiver,
                 Plain(
                     "Methods that raise or read a field-like event through a conditional receiver "
                     + "('a?.E') are skipped; the shim cannot name the conditional receiver as the accessor "
-                    + "call's argument. Use uloop compile.",
+                    + "call's argument. Use tloop compile.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.EventPassedByRef,
                 Plain(
                     "Methods that pass a field-like event by ref/out/in are skipped; the shim reads the "
-                    + "event through an accessor call, which cannot be passed by reference. Use uloop compile.",
+                    + "event through an accessor call, which cannot be passed by reference. Use tloop compile.",
                     0));
             // Why the sentence ends in a colon and the separator is empty: the rejected accessor
             // rewrite is the whole reason the method was skipped, so it reads as one sentence.
@@ -226,7 +226,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 Plain(
                     "inaccessible method group '{0}' on the right of '+=' has no accessor rewrite "
                     + "shape. If compiled code removes it with '-= {0}', a lambda here would stay "
-                    + "subscribed after that removal, so run 'uloop compile' instead; otherwise wrapping "
+                    + "subscribed after that removal, so run 'tloop compile' instead; otherwise wrapping "
                     + "the method group in a lambda that calls it{1} keeps hot reloading.",
                     2));
             // Why no lambda is offered: a lambda on the right of '-=' is a new delegate, so the

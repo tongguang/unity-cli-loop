@@ -820,7 +820,7 @@ func TestCompleteCompileResultReturnsTheAnswerAsIs(t *testing.T) {
 // Verifies a pending record that cannot be written produces a warning instead of failing silently.
 func TestPersistCompilePendingRecordOrWarnReportsWriteFailure(t *testing.T) {
 	projectRoot := t.TempDir()
-	writeTestFile(t, filepath.Join(projectRoot, ".uloop"), "not a directory")
+	writeTestFile(t, filepath.Join(projectRoot, ".tloop"), "not a directory")
 	var stderr bytes.Buffer
 
 	persistCompilePendingRecordOrWarn(projectRoot, "compile_persist_fail", &stderr)

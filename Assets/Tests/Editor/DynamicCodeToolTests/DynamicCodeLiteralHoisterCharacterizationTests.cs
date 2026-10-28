@@ -18,16 +18,16 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite("return 42;");
 
-            Assert.That(result.RewrittenSource, Is.EqualTo("return __uloop_literal_0;"));
+            Assert.That(result.RewrittenSource, Is.EqualTo("return __tloop_literal_0;"));
             Assert.That(result.Bindings, Has.Count.EqualTo(1));
-            Assert.That(result.Bindings[0].ParameterName, Is.EqualTo("__uloop_literal_0"));
+            Assert.That(result.Bindings[0].ParameterName, Is.EqualTo("__tloop_literal_0"));
             Assert.That(result.Bindings[0].TypeName, Is.EqualTo("int"));
             Assert.That(result.Bindings[0].Value, Is.EqualTo(42));
             Assert.That(
                 result.DeclarationLines,
                 Is.EqualTo(new[]
                 {
-                    "int __uloop_literal_0 = (int)parameters[\"__uloop_literal_0\"];"
+                    "int __tloop_literal_0 = (int)parameters[\"__tloop_literal_0\"];"
                 }));
         }
 
@@ -39,7 +39,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite("return 10L;");
 
-            Assert.That(result.RewrittenSource, Is.EqualTo("return __uloop_literal_0;"));
+            Assert.That(result.RewrittenSource, Is.EqualTo("return __tloop_literal_0;"));
             Assert.That(result.Bindings, Has.Count.EqualTo(1));
             Assert.That(result.Bindings[0].TypeName, Is.EqualTo("long"));
             Assert.That(result.Bindings[0].Value, Is.EqualTo(10L));
@@ -53,7 +53,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite("return 1 + 2;");
 
-            Assert.That(result.RewrittenSource, Is.EqualTo("return __uloop_literal_0 + __uloop_literal_1;"));
+            Assert.That(result.RewrittenSource, Is.EqualTo("return __tloop_literal_0 + __tloop_literal_1;"));
             Assert.That(result.Bindings, Has.Count.EqualTo(2));
             Assert.That(result.Bindings[0].Value, Is.EqualTo(1));
             Assert.That(result.Bindings[1].Value, Is.EqualTo(2));
@@ -67,7 +67,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite("return \"hello\";");
 
-            Assert.That(result.RewrittenSource, Is.EqualTo("return __uloop_literal_0;"));
+            Assert.That(result.RewrittenSource, Is.EqualTo("return __tloop_literal_0;"));
             Assert.That(result.Bindings, Has.Count.EqualTo(1));
             Assert.That(result.Bindings[0].TypeName, Is.EqualTo("string"));
             Assert.That(result.Bindings[0].Value, Is.EqualTo("hello"));
@@ -75,7 +75,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
                 result.DeclarationLines,
                 Is.EqualTo(new[]
                 {
-                    "string __uloop_literal_0 = (string)parameters[\"__uloop_literal_0\"];"
+                    "string __tloop_literal_0 = (string)parameters[\"__tloop_literal_0\"];"
                 }));
         }
 
@@ -87,7 +87,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite("return \"a\\nb\";");
 
-            Assert.That(result.RewrittenSource, Is.EqualTo("return __uloop_literal_0;"));
+            Assert.That(result.RewrittenSource, Is.EqualTo("return __tloop_literal_0;"));
             Assert.That(result.Bindings, Has.Count.EqualTo(1));
             Assert.That(result.Bindings[0].Value, Is.EqualTo("a\nb"));
         }
@@ -172,7 +172,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite("// note\nreturn 7;");
 
-            Assert.That(result.RewrittenSource, Is.EqualTo("// note\nreturn __uloop_literal_0;"));
+            Assert.That(result.RewrittenSource, Is.EqualTo("// note\nreturn __tloop_literal_0;"));
             Assert.That(result.Bindings, Has.Count.EqualTo(1));
             Assert.That(result.Bindings[0].Value, Is.EqualTo(7));
         }
@@ -185,7 +185,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite("/* c */ return 1;");
 
-            Assert.That(result.RewrittenSource, Is.EqualTo("/* c */ return __uloop_literal_0;"));
+            Assert.That(result.RewrittenSource, Is.EqualTo("/* c */ return __tloop_literal_0;"));
             Assert.That(result.Bindings, Has.Count.EqualTo(1));
             Assert.That(result.Bindings[0].Value, Is.EqualTo(1));
         }
@@ -214,7 +214,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite(
                 "return \"count\" + 3;");
 
-            Assert.That(result.RewrittenSource, Is.EqualTo("return __uloop_literal_0 + __uloop_literal_1;"));
+            Assert.That(result.RewrittenSource, Is.EqualTo("return __tloop_literal_0 + __tloop_literal_1;"));
             Assert.That(result.Bindings, Has.Count.EqualTo(2));
             Assert.That(result.Bindings[0].Value, Is.EqualTo("count"));
             Assert.That(result.Bindings[1].Value, Is.EqualTo(3));

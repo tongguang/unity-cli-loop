@@ -70,7 +70,7 @@ func unknownPackageSubcommandError(subcommand string, context clierrors.ErrorCon
 		Message:     "Unknown package command: " + subcommand,
 		Received:    subcommand,
 		Command:     clicore.PackageCommandName,
-		NextActions: []string{"Use `uloop package install` or `uloop package status`."},
+		NextActions: []string{"Use `tloop package install` or `tloop package status`."},
 	}).ToCLIError(context)
 }
 
@@ -87,7 +87,7 @@ func parsePackageInstallOptions(args []string) (packageInstallOptions, error) {
 				Message:     "Unknown package install option: --" + name,
 				Option:      "--" + name,
 				Command:     clicore.PackageCommandName,
-				NextActions: []string{"Run `uloop package install --help` to inspect supported options."},
+				NextActions: []string{"Run `tloop package install --help` to inspect supported options."},
 			}
 		}
 		if value == "" {
@@ -120,7 +120,7 @@ func parsePackageStatusOptions(args []string) error {
 			Message:     "Unknown package status option: " + arg,
 			Option:      arg,
 			Command:     clicore.PackageCommandName,
-			NextActions: []string{"Run `uloop package status` with no options, or pass `--project-path` as a global flag."},
+			NextActions: []string{"Run `tloop package status` with no options, or pass `--project-path` as a global flag."},
 		}
 	}
 	return nil
@@ -420,7 +420,7 @@ func packageRegistryUnavailableError(projectRoot string, cause error) clierrors.
 		Command:     clicore.PackageCommandName,
 		NextActions: []string{
 			"Retry after the network is available.",
-			"Pin a version with `uloop package install --version <x.y.z>` to skip the registry lookup.",
+			"Pin a version with `tloop package install --version <x.y.z>` to skip the registry lookup.",
 		},
 		Details: map[string]any{
 			"ProjectRoot": projectRoot,
@@ -431,10 +431,10 @@ func packageRegistryUnavailableError(projectRoot string, cause error) clierrors.
 
 func printPackageHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop package install [--version <x.y.z>]")
-	clicore.WriteLine(stdout, "  uloop package status")
+	clicore.WriteLine(stdout, "  tloop package install [--version <x.y.z>]")
+	clicore.WriteLine(stdout, "  tloop package status")
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Install or inspect the Unity CLI Loop package in a Unity project's Packages/manifest.json.")
+	clicore.WriteLine(stdout, "Install or inspect the Tuanjie CLI Loop package in a Unity project's Packages/manifest.json.")
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Subcommands:")
 	clicore.WriteLine(stdout, "  install   Add the OpenUPM scoped registry and package dependency")

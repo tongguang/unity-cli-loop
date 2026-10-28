@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUpTemporaryProjectRoot()
         {
-            _temporaryProjectRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _temporaryProjectRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_temporaryProjectRoot);
         }
 
@@ -46,7 +46,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 hasSkillsDirectory: false,
                 hasExistingSkills: false);
             SkillInstallLayout.SkillSourceInfo skill = new(
-                "uloop-compile",
+                "tloop-compile",
                 "compile",
                 new Dictionary<string, byte[]>(StringComparer.Ordinal)
                 {

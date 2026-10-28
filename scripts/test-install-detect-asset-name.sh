@@ -98,10 +98,10 @@ expect_bash_profile() {
   fi
 }
 
-expect_asset Linux x86_64 uloop-dispatcher-linux-amd64.tar.gz uloop
-expect_asset Darwin arm64 uloop-dispatcher-darwin-arm64.tar.gz uloop
-expect_asset Darwin x86_64 uloop-dispatcher-darwin-amd64.tar.gz uloop
-expect_asset MINGW64_NT-10.0 x86_64 uloop-dispatcher-windows-amd64.zip uloop.exe
+expect_asset Linux x86_64 tloop-dispatcher-linux-amd64.tar.gz tloop
+expect_asset Darwin arm64 tloop-dispatcher-darwin-arm64.tar.gz tloop
+expect_asset Darwin x86_64 tloop-dispatcher-darwin-amd64.tar.gz tloop
+expect_asset MINGW64_NT-10.0 x86_64 tloop-dispatcher-windows-amd64.zip tloop.exe
 expect_reject Linux aarch64 "Unsupported Linux architecture"
 expect_reject FreeBSD x86_64 "Unsupported OS"
 

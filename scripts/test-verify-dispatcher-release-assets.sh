@@ -41,30 +41,30 @@ write_executable "$RELEASE_DIR/install.sh" "install"
 printf '%s\n' "install" > "$RELEASE_DIR/install.ps1"
 write_checksum "install.sh"
 write_checksum "install.ps1"
-write_executable "$PAYLOAD_DIR/uloop" "dispatcher"
+write_executable "$PAYLOAD_DIR/tloop" "dispatcher"
 
-tar -czf "$RELEASE_DIR/uloop-dispatcher-darwin-amd64.tar.gz" -C "$PAYLOAD_DIR" ./uloop
-tar -czf "$RELEASE_DIR/uloop-dispatcher-darwin-arm64.tar.gz" -C "$PAYLOAD_DIR" ./uloop
-tar -czf "$RELEASE_DIR/uloop-dispatcher-linux-amd64.tar.gz" -C "$PAYLOAD_DIR" ./uloop
-write_checksum "uloop-dispatcher-darwin-amd64.tar.gz"
-write_checksum "uloop-dispatcher-darwin-arm64.tar.gz"
-write_checksum "uloop-dispatcher-linux-amd64.tar.gz"
+tar -czf "$RELEASE_DIR/tloop-dispatcher-darwin-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop
+tar -czf "$RELEASE_DIR/tloop-dispatcher-darwin-arm64.tar.gz" -C "$PAYLOAD_DIR" ./tloop
+tar -czf "$RELEASE_DIR/tloop-dispatcher-linux-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop
+write_checksum "tloop-dispatcher-darwin-amd64.tar.gz"
+write_checksum "tloop-dispatcher-darwin-arm64.tar.gz"
+write_checksum "tloop-dispatcher-linux-amd64.tar.gz"
 
 if ! command -v zip >/dev/null 2>&1; then
   echo "zip is required to test dispatcher release asset verification" >&2
   exit 1
 fi
 
-write_executable "$PAYLOAD_DIR/uloop.exe" "dispatcher"
+write_executable "$PAYLOAD_DIR/tloop.exe" "dispatcher"
 (
   cd "$PAYLOAD_DIR"
-  zip -q "$RELEASE_DIR/uloop-dispatcher-windows-amd64.zip" uloop.exe
+  zip -q "$RELEASE_DIR/tloop-dispatcher-windows-amd64.zip" tloop.exe
 )
-write_checksum "uloop-dispatcher-windows-amd64.zip"
+write_checksum "tloop-dispatcher-windows-amd64.zip"
 
 "$ROOT_DIR/scripts/verify-dispatcher-release-assets.sh" "$RELEASE_DIR"
 
-LINUX_ARCHIVE="uloop-dispatcher-linux-amd64.tar.gz"
+LINUX_ARCHIVE="tloop-dispatcher-linux-amd64.tar.gz"
 
 fail() {
   echo "$1" >&2

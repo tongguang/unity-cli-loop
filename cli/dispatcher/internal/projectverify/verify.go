@@ -38,7 +38,7 @@ const (
 	packagesDirectoryName        = "Packages"
 )
 
-// Report is everything one Run found, shaped as the JSON uloop verify-project prints.
+// Report is everything one Run found, shaped as the JSON tloop verify-project prints.
 type Report struct {
 	Success       bool           `json:"Success"`
 	ProjectRoot   string         `json:"ProjectRoot"`

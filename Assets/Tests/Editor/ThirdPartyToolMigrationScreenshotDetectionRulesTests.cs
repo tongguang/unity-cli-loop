@@ -11,7 +11,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     /// </summary>
     public sealed class ThirdPartyToolMigrationScreenshotDetectionRulesTests
     {
-        private const string LegacyCaptureUtility = "io.github.hatayama.uLoopMCP.EditorWindowCaptureUtility";
+        private const string LegacyCaptureUtility = "io.github.tongguang.tloop.EditorWindowCaptureUtility";
 
         /// <summary>
         /// Verifies that a non-awaited legacy CaptureWindowAsync call is detected.
@@ -116,7 +116,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ContainsLegacyFirstPartyScreenshotReference_WhenTypeIsLegacyNamespaceQualified_ReturnsTrue()
         {
-            string source = "object mode = io.github.hatayama.uLoopMCP.WindowMatchMode.Exact;\n";
+            string source = "object mode = io.github.tongguang.tloop.WindowMatchMode.Exact;\n";
 
             bool result = ThirdPartyToolMigrationScreenshotDetectionRules.ContainsLegacyFirstPartyScreenshotReference(
                 source,

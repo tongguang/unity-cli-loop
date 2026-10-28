@@ -135,22 +135,22 @@ func TestParseRecordVideoOneShot_RejectsProjectPathInTrigger(t *testing.T) {
 		[]string{"--trigger", "simulate-keyboard --key C --project-path /other"}, "cannot include --project-path")
 }
 
-// Verifies a leading "uloop" is rejected and its correction is judged by record-video's rules: an
+// Verifies a leading "tloop" is rejected and its correction is judged by record-video's rules: an
 // enable-pause-point trace await is offered back, while a pausing one falls back to the example.
 func TestParseRecordVideoOneShot_LeadingUloopCorrectionUsesRecordVideoRules(t *testing.T) {
 	_, _, err := parseRecordVideoOneShotOptions(
-		[]string{"--trigger", "uloop enable-pause-point --file A.cs --line 3 --mode trace --await"})
+		[]string{"--trigger", "tloop enable-pause-point --file A.cs --line 3 --mode trace --await"})
 	assertArgumentErrorEqual(t, err, &clierrors.ArgumentError{
-		Message:     pausePointTriggerLeadingUloopMessage,
+		Message:     pausePointTriggerLeadingTloopMessage,
 		Option:      "--trigger",
 		Command:     "record-video",
 		NextActions: []string{`Re-run with --trigger "enable-pause-point --file A.cs --line 3 --mode trace --await"`},
 	})
 
 	_, _, err = parseRecordVideoOneShotOptions(
-		[]string{"--trigger", "uloop enable-pause-point --file A.cs --line 3 --await"})
+		[]string{"--trigger", "tloop enable-pause-point --file A.cs --line 3 --await"})
 	assertArgumentErrorEqual(t, err, &clierrors.ArgumentError{
-		Message:     pausePointTriggerLeadingUloopMessage,
+		Message:     pausePointTriggerLeadingTloopMessage,
 		Option:      "--trigger",
 		Command:     "record-video",
 		NextActions: []string{`Re-run with --trigger "simulate-keyboard --action Press --key Space"`},

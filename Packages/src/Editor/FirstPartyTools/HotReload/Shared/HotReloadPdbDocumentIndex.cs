@@ -87,7 +87,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             }
         }
 
-        private const string PersistedFormatHeader = "uloop-pdb-documents 2";
+        private const string PersistedFormatHeader = "tloop-pdb-documents 2";
         private const int PersistedStampFieldCount = 7;
         private const int PersistedDocumentFieldCount = 3;
 

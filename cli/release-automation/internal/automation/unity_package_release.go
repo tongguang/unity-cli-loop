@@ -10,7 +10,7 @@ import (
 
 const (
 	unityPackageManifestKey = "Packages/src"
-	unityPackageName        = "io.github.hatayama.uloopmcp"
+	unityPackageName        = "io.github.tongguang.tloop"
 )
 
 // unityPackageReleaseTagPattern accepts only the Unity package component's tags. The CLI

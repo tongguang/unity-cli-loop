@@ -111,7 +111,7 @@ func TestParsePausePointTriggerCommand(t *testing.T) {
 			wantErrText: "cannot include --project-path",
 		},
 		{
-			name:        "accepts a trigger without a leading uloop token",
+			name:        "accepts a trigger without a leading tloop token",
 			value:       "simulate-keyboard --action Press --key space",
 			wantCommand: "simulate-keyboard",
 			wantArgs:    []string{"--action", "Press", "--key", "space"},
@@ -149,54 +149,54 @@ func TestParsePausePointTriggerCommand(t *testing.T) {
 }
 
 const (
-	wantPausePointTriggerLeadingUloopMessage          = `--trigger must name the uloop subcommand without the leading "uloop": the value runs in-process, not through a shell.`
-	wantPausePointTriggerLeadingUloopCorrection       = `Re-run with --trigger "simulate-keyboard --action Press --key space"`
-	wantPausePointTriggerLeadingUloopExample          = `Re-run with --trigger "simulate-keyboard --action Press --key Space"`
-	wantPausePointTriggerLeadingUloopQuotedCorrection = `Re-run with --trigger 'simulate-mouse-input --action Move --position "10 20"'`
+	wantPausePointTriggerLeadingTloopMessage          = `--trigger must name the tloop subcommand without the leading "tloop": the value runs in-process, not through a shell.`
+	wantPausePointTriggerLeadingTloopCorrection       = `Re-run with --trigger "simulate-keyboard --action Press --key space"`
+	wantPausePointTriggerLeadingTloopExample          = `Re-run with --trigger "simulate-keyboard --action Press --key Space"`
+	wantPausePointTriggerLeadingTloopQuotedCorrection = `Re-run with --trigger 'simulate-mouse-input --action Move --position "10 20"'`
 )
 
-// Verifies a leading uloop token is rejected at parse time, before dispatch, and NextActions
+// Verifies a leading tloop token is rejected at parse time, before dispatch, and NextActions
 // carries the corrected command — including re-quoting tokens that contain whitespace.
-func TestParsePausePointTriggerCommandRejectsLeadingUloop(t *testing.T) {
+func TestParsePausePointTriggerCommandRejectsLeadingTloop(t *testing.T) {
 	cases := []struct {
 		name           string
 		value          string
 		wantNextAction string
 	}{
 		{
-			name:           "strips a leading uloop token and restates the remaining command",
-			value:          "uloop simulate-keyboard --action Press --key space",
-			wantNextAction: wantPausePointTriggerLeadingUloopCorrection,
+			name:           "strips a leading tloop token and restates the remaining command",
+			value:          "tloop simulate-keyboard --action Press --key space",
+			wantNextAction: wantPausePointTriggerLeadingTloopCorrection,
 		},
 		{
-			name:           "uloop alone points at the subcommand format example",
-			value:          "uloop",
-			wantNextAction: wantPausePointTriggerLeadingUloopExample,
+			name:           "tloop alone points at the subcommand format example",
+			value:          "tloop",
+			wantNextAction: wantPausePointTriggerLeadingTloopExample,
 		},
 		{
 			name:           "re-quotes a remaining token that contains whitespace",
-			value:          `uloop simulate-mouse-input --action Move --position "10 20"`,
-			wantNextAction: wantPausePointTriggerLeadingUloopQuotedCorrection,
+			value:          `tloop simulate-mouse-input --action Move --position "10 20"`,
+			wantNextAction: wantPausePointTriggerLeadingTloopQuotedCorrection,
 		},
 		{
 			name:           "empty quoted token falls back to the format example",
-			value:          "uloop compile --flag ''",
-			wantNextAction: wantPausePointTriggerLeadingUloopExample,
+			value:          "tloop compile --flag ''",
+			wantNextAction: wantPausePointTriggerLeadingTloopExample,
 		},
 		{
 			name:           "quote-bearing token falls back to the format example",
-			value:          `uloop compile --value '{"name":"x"}'`,
-			wantNextAction: wantPausePointTriggerLeadingUloopExample,
+			value:          `tloop compile --value '{"name":"x"}'`,
+			wantNextAction: wantPausePointTriggerLeadingTloopExample,
 		},
 		{
-			name:           "nested pause-point wait after uloop falls back to the format example",
-			value:          "uloop await-pause-point --id other",
-			wantNextAction: wantPausePointTriggerLeadingUloopExample,
+			name:           "nested pause-point wait after tloop falls back to the format example",
+			value:          "tloop await-pause-point --id other",
+			wantNextAction: wantPausePointTriggerLeadingTloopExample,
 		},
 		{
-			name:           "project-path after uloop falls back to the format example",
-			value:          "uloop simulate-keyboard --project-path /x",
-			wantNextAction: wantPausePointTriggerLeadingUloopExample,
+			name:           "project-path after tloop falls back to the format example",
+			value:          "tloop simulate-keyboard --project-path /x",
+			wantNextAction: wantPausePointTriggerLeadingTloopExample,
 		},
 	}
 
@@ -204,8 +204,8 @@ func TestParsePausePointTriggerCommandRejectsLeadingUloop(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			_, _, err := parsePausePointTriggerCommand("await-pause-point", testCase.value)
 			argumentError := requireArgumentError(t, err)
-			if argumentError.Message != wantPausePointTriggerLeadingUloopMessage {
-				t.Fatalf("Message mismatch:\nwant %q\ngot  %q", wantPausePointTriggerLeadingUloopMessage, argumentError.Message)
+			if argumentError.Message != wantPausePointTriggerLeadingTloopMessage {
+				t.Fatalf("Message mismatch:\nwant %q\ngot  %q", wantPausePointTriggerLeadingTloopMessage, argumentError.Message)
 			}
 			if argumentError.Option != "--trigger" {
 				t.Fatalf("Option mismatch: got %q, want %q", argumentError.Option, "--trigger")

@@ -213,7 +213,7 @@ func TestUnityBuildRequiredErrorClassifiesToItsOwnErrorCode(t *testing.T) {
 		t.Error("a precondition only a Unity build clears must not be reported as retryable")
 	}
 	if len(classified.NextActions) == 0 {
-		t.Error("the error must tell the user to run uloop compile")
+		t.Error("the error must tell the user to run tloop compile")
 	}
 }
 

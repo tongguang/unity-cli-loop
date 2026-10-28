@@ -53,7 +53,7 @@ const (
 	// A run can leave edits unapplied with no warning at all, and then the reasons are only on the
 	// per-method rows.
 	hotReloadUnappliedInMethodReasons        = "Methods[].Reason"
-	hotReloadCompileFallbackFailedNextAction = "Fix the errors in Compile.Errors, then rerun 'uloop compile' or 'uloop hot-reload'."
+	hotReloadCompileFallbackFailedNextAction = "Fix the errors in Compile.Errors, then rerun 'tloop compile' or 'tloop hot-reload'."
 	// The reload's own Message describes only the reload, so without this suffix a reader who stops at
 	// Message sees failed outcomes even though the compile then applied every edit.
 	hotReloadCompileFallbackSucceededMessageSuffix = " A compile then ran in this same command and succeeded; see CompileFallbackNote."
@@ -286,7 +286,7 @@ func injectHotReloadCompileFallback(raw json.RawMessage, compileRaw json.RawMess
 		fields[hotReloadRecommendedNextActionField] = nextAction
 		return json.Marshal(fields)
 	}
-	// The reload's own next action says to run 'uloop compile', which this command just did.
+	// The reload's own next action says to run 'tloop compile', which this command just did.
 	delete(fields, hotReloadRecommendedNextActionField)
 	// Before the compile sentence is appended, so the hold sentence is still at the end of Message.
 	if err := settleHotReloadStateAfterCompile(fields); err != nil {

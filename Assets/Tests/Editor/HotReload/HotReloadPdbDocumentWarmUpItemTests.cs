@@ -24,7 +24,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _persistenceDirectory = Path.Combine(Path.GetTempPath(), "uloop-pdb-warm-up-" + Guid.NewGuid().ToString("N"));
+            _persistenceDirectory = Path.Combine(Path.GetTempPath(), "tloop-pdb-warm-up-" + Guid.NewGuid().ToString("N"));
         }
 
         [TearDown]

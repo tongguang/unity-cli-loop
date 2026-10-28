@@ -170,7 +170,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                     // Keep restoring the remaining files; a file that cannot be restored keeps
                     // its .bak on disk so the user can recover it manually.
                     UnityEngine.Debug.LogError(
-                        $"[uloop] Migration rollback failed for '{committedWrite.TargetFilePath}': " +
+                        $"[tloop] Migration rollback failed for '{committedWrite.TargetFilePath}': " +
                         $"{restoreException.Message}" +
                         (committedWrite.BackupFilePath == null
                             ? string.Empty
@@ -212,7 +212,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                 // Sidecar cleanup must never fail the migration itself; a stray sidecar is
                 // visible in the project window and harmless to compilation.
                 UnityEngine.Debug.LogError(
-                    $"[uloop] Failed to delete migration sidecar '{sidecarFilePath}': " +
+                    $"[tloop] Failed to delete migration sidecar '{sidecarFilePath}': " +
                     $"{deleteException.Message}");
             }
         }

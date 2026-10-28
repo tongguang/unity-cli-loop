@@ -54,7 +54,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void Execute_WhenExecutableDoesNotExist_ReturnsNull()
         {
             ProcessStartInfo startInfo = CreateStartInfo(
-                "__uloop_missing_cli_detection_test_executable__",
+                "__tloop_missing_cli_detection_test_executable__",
                 string.Empty);
 
             CliDetectionCommandResult result = CliDetectionCommandRunner.Execute(

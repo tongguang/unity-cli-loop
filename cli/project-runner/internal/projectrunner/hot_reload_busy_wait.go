@@ -17,7 +17,7 @@ import (
 const (
 	hotReloadBusyWaitDecidedOperation  = "cli_hot_reload_busy_wait_decided"
 	hotReloadBusyWaitCompleteOperation = "cli_hot_reload_busy_wait_complete"
-	hotReloadBusyUnknownToolName       = "another uloop command"
+	hotReloadBusyUnknownToolName       = "another tloop command"
 )
 
 const (
@@ -44,7 +44,7 @@ type hotReloadBusyWaitOutcome struct {
 	exitCode int
 }
 
-// sendHotReloadWaitingForBusyEditor sends the request once and, when another uloop command holds
+// sendHotReloadWaitingForBusyEditor sends the request once and, when another tloop command holds
 // the Editor, waits for the Editor to be ready and sends the same request once more. It never
 // writes stdout.
 func sendHotReloadWaitingForBusyEditor(

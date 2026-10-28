@@ -8,7 +8,7 @@ installation. Package release preparation must follow this order:
    `dispatcher-publish` workflow does this on its own: after publishing, its
    `post-publish` job runs `push-dispatcher-pin`, which checks out the tip of
    `main`, stamps `Packages/src/project-runner-pin.json`, mirrors it
-   byte-identically to `.uloop/project-runner-pin.json`, re-verifies the stamp
+   byte-identically to `.tloop/project-runner-pin.json`, re-verifies the stamp
    offline and against the published release, and pushes the resulting commit
    straight to `main`. It leaves `minimumDispatcherVersion` alone, is idempotent
    (a re-run with nothing to change pushes nothing), and never stamps a
@@ -31,7 +31,7 @@ any later push to `main`.
 ## Release pull requests
 
 release-please opens **one release pull request per component**: `unity-package`,
-`dispatcher`, and `uloop-project-runner`. The **unity-package** one stays draft
+`dispatcher`, and `tloop-project-runner`. The **unity-package** one stays draft
 and is merged only by automation; the other two are the ones people merge.
 
 1. Merge the **dispatcher** release pull request and approve the `cli-release`
@@ -173,18 +173,18 @@ nor followed by release-please.
 To tell, look a few minutes after the merge:
 
 ```sh
-gh run list --repo hatayama/unity-cli-loop --commit <merge commit sha> --event push
+gh run list --repo tongguang/unity-cli-loop --commit <merge commit sha> --event push
 ```
 
 An empty list means the push never reached Actions. Start, from `main`, what the
 push would have started:
 
-- always: `gh workflow run release-please.yml --repo hatayama/unity-cli-loop --ref main`;
+- always: `gh workflow run release-please.yml --repo tongguang/unity-cli-loop --ref main`;
 - after merging the dispatcher release pull request:
-  `gh workflow run dispatcher-publish.yml --repo hatayama/unity-cli-loop --ref main`,
+  `gh workflow run dispatcher-publish.yml --repo tongguang/unity-cli-loop --ref main`,
   then approve `cli-release` as usual;
 - after merging the project runner release pull request:
-  `gh workflow run native-cli-publish.yml --repo hatayama/unity-cli-loop --ref main`.
+  `gh workflow run native-cli-publish.yml --repo tongguang/unity-cli-loop --ref main`.
 
 A manually started publish run does not check that `main`'s head is the release
 commit. A push run skips when the head commit does not stamp the version, but a

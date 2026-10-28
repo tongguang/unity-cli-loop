@@ -208,7 +208,7 @@ func TestConnectionRetryFocusControllerLogsRestoreSuccessWithAttemptCorrelation(
 	projectRoot := t.TempDir()
 	controller := newConnectionRetryFocusController(
 		unityipc.Connection{
-			Endpoint:    unityipc.Endpoint{Network: "unix", Address: "/tmp/uloop-test/test.sock"},
+			Endpoint:    unityipc.Endpoint{Network: "unix", Address: "/tmp/tloop-test/test.sock"},
 			ProjectRoot: projectRoot,
 		},
 		"get-logs",
@@ -465,7 +465,7 @@ func endpointDirectoryWithRequiredMode(t *testing.T) string {
 
 // Verifies a cancelled command reports the cancellation rather than an unreachable Unity: the
 // process probe inherits the cancellation and fails, and that failure must not be turned into
-// "Unity may be closed, run uloop launch" guidance for a user who pressed Ctrl-C.
+// "Unity may be closed, run tloop launch" guidance for a user who pressed Ctrl-C.
 func TestSendWithTransientConnectionRetryPreservesParentCancellation(t *testing.T) {
 	projectRoot := t.TempDir()
 	t.Setenv(vibelog.CLIVibeLogEnvName, "1")
@@ -675,11 +675,11 @@ func TestConnectionRetryFocusControllerRetriesAfterProcessDiscoveryMiss(t *testi
 // the real syscall error the first attempt already had.
 func TestShouldNotRetryPermanentlyRefusedConnection(t *testing.T) {
 	err := &unityipc.ConnectionAttemptError{
-		Endpoint: "/tmp/uloop-501/UnityCliLoop-sample.sock",
+		Endpoint: "/tmp/tloop-501/TuanjieCliLoop-sample.sock",
 		Cause: &net.OpError{
 			Op:   "dial",
 			Net:  "unix",
-			Addr: &net.UnixAddr{Name: "/tmp/uloop-501/UnityCliLoop-sample.sock", Net: "unix"},
+			Addr: &net.UnixAddr{Name: "/tmp/tloop-501/TuanjieCliLoop-sample.sock", Net: "unix"},
 			Err:  os.NewSyscallError("connect", syscall.EPERM),
 		},
 	}
@@ -704,7 +704,7 @@ func TestSendWithTransientConnectionRetryAbortsOnRefusedConnect(t *testing.T) {
 	// connect, which is the only thing that produces the errno this path classifies. The
 	// directory comes from MkdirTemp rather than t.TempDir because a socket path built from this
 	// test's name exceeds the sockaddr_un limit.
-	endpointDirectory, err := os.MkdirTemp("", "uloop-refused")
+	endpointDirectory, err := os.MkdirTemp("", "tloop-refused")
 	if err != nil {
 		t.Fatalf("failed to create the endpoint directory: %v", err)
 	}
@@ -769,7 +769,7 @@ func TestShouldRetryTransientlyFailedConnection(t *testing.T) {
 
 	for _, cause := range transientCauses {
 		err := &unityipc.ConnectionAttemptError{
-			Endpoint: "/tmp/uloop-501/UnityCliLoop-sample.sock",
+			Endpoint: "/tmp/tloop-501/TuanjieCliLoop-sample.sock",
 			Cause:    cause,
 		}
 		if !shouldRetryUndispatchedConnection(err, unityipc.UnitySendOutcome{}) {

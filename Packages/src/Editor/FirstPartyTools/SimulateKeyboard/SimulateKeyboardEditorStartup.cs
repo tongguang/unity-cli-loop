@@ -1,4 +1,4 @@
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 {
     // Keeps keyboard simulation state recovery inside the simulate-keyboard tool module.

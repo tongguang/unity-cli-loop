@@ -38,7 +38,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             _previousRecording = default;
             Assume.That(RecordVideoService.IsRecording, Is.False);
             _previousRecording = LastCompletedRecordingTestState.TakeAndClear();
-            _outputDirectory = Path.Combine(Path.GetTempPath(), "uloop-record-video-host-" + Guid.NewGuid().ToString("N"));
+            _outputDirectory = Path.Combine(Path.GetTempPath(), "tloop-record-video-host-" + Guid.NewGuid().ToString("N"));
             _now = 0.0;
             _clockThrows = false;
             _encoderRequests = new List<EncoderRequest>();

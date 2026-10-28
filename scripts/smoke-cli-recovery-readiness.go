@@ -17,7 +17,7 @@ import (
 
 const (
 	stateRelativePath         = "Temp/UnityCliLoop/server-state.json"
-	projectRunnerPinPath      = ".uloop/project-runner-pin.json"
+	projectRunnerPinPath      = ".tloop/project-runner-pin.json"
 	expectedDynamicCodeResult = "cli-recovery-readiness-e2e"
 	e2eDynamicCode            = `return "cli-recovery-readiness-e2e";`
 	timeoutExitCode           = 124
@@ -57,7 +57,7 @@ func run() error {
 
 	fmt.Println("=== CLI recovery/readiness smoke ===")
 	fmt.Printf("project_path=%s\n", opts.projectPath)
-	fmt.Printf("uloop_path=%s\n", opts.uloopPath)
+	fmt.Printf("tloop_path=%s\n", opts.uloopPath)
 
 	if err := runLiveRecoverySequence(opts); err != nil {
 		return err
@@ -78,7 +78,7 @@ func parseOptions() (options, error) {
 
 	flagSet := flag.NewFlagSet(filepath.Base(os.Args[0]), flag.ContinueOnError)
 	projectPath := flagSet.String("project-path", "", "Unity project to test")
-	uloopPath := flagSet.String("uloop-path", defaultUloopPath, "uloop binary to execute")
+	uloopPath := flagSet.String("tloop-path", defaultUloopPath, "tloop binary to execute")
 	timeoutSeconds := flagSet.Float64("timeout", 120, "per-command timeout in seconds")
 	launchTimeoutSeconds := flagSet.Float64("launch-timeout", 240, "launch timeout in seconds")
 	if err := flagSet.Parse(os.Args[1:]); err != nil {
@@ -113,7 +113,7 @@ func secondsToDuration(seconds float64) time.Duration {
 }
 
 func defaultUloopPath() (string, error) {
-	envPath := strings.TrimSpace(os.Getenv("ULOOP_BIN"))
+	envPath := strings.TrimSpace(os.Getenv("TLOOP_BIN"))
 	if envPath != "" {
 		return envPath, nil
 	}
@@ -129,9 +129,9 @@ func defaultUloopPath() (string, error) {
 		if runtime.GOARCH == "arm64" {
 			arch = "darwin-arm64"
 		}
-		return filepath.Join(repoRoot, "dist", arch, "uloop"), nil
+		return filepath.Join(repoRoot, "dist", arch, "tloop"), nil
 	case "windows":
-		return filepath.Join(repoRoot, "dist", "windows-amd64", "uloop.exe"), nil
+		return filepath.Join(repoRoot, "dist", "windows-amd64", "tloop.exe"), nil
 	default:
 		return "", nil
 	}
@@ -153,10 +153,10 @@ func validatePaths(projectPath string, uloopPath string) error {
 		return fmt.Errorf("--project-path does not contain ProjectSettings: %s", projectPath)
 	}
 	if strings.TrimSpace(uloopPath) == "" {
-		return errors.New("no built uloop binary is available for this platform. Pass --uloop-path")
+		return errors.New("no built tloop binary is available for this platform. Pass --tloop-path")
 	}
 	if !isFile(uloopPath) {
-		return fmt.Errorf("uloop binary not found: %s", uloopPath)
+		return fmt.Errorf("tloop binary not found: %s", uloopPath)
 	}
 	return nil
 }
@@ -213,7 +213,7 @@ func runLiveRecoverySequence(opts options) error {
 }
 
 func runStaleRecoveryStateIgnoredSequence(uloopPath string, sourceProjectPath string, timeout time.Duration) error {
-	projectPath, err := os.MkdirTemp("", "uloop-stale-state-")
+	projectPath, err := os.MkdirTemp("", "tloop-stale-state-")
 	if err != nil {
 		return err
 	}
@@ -236,7 +236,7 @@ func runStaleRecoveryStateIgnoredSequence(uloopPath string, sourceProjectPath st
 		projectPath,
 		[]string{"get-logs", "--max-count", "1"},
 		timeout,
-		[]string{"ULOOP_FAKE_CONNECTION_FAILURE=1"},
+		[]string{"TLOOP_FAKE_CONNECTION_FAILURE=1"},
 	)
 	if err := assertStaleRecoveryStateIgnored(staleResult); err != nil {
 		return err
@@ -371,7 +371,7 @@ func assertStaleRecoveryStateIgnored(result commandResult) error {
 	combinedOutput := result.stdout + result.stderr
 	requiredFragments := []string{
 		"UNITY_NOT_REACHABLE",
-		"Unity CLI Loop server is not reachable",
+		"Tuanjie CLI Loop server is not reachable",
 	}
 	for _, fragment := range requiredFragments {
 		if !strings.Contains(combinedOutput, fragment) {
@@ -380,8 +380,8 @@ func assertStaleRecoveryStateIgnored(result commandResult) error {
 		}
 	}
 	forbiddenFragments := []string{
-		"uloop " + "fix",
-		"stale Unity CLI Loop recovery state",
+		"tloop " + "fix",
+		"stale Tuanjie CLI Loop recovery state",
 	}
 	for _, fragment := range forbiddenFragments {
 		if strings.Contains(combinedOutput, fragment) {

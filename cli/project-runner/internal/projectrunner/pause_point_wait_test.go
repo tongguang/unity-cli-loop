@@ -143,7 +143,7 @@ func TestRunWaitForPausePointCommandAnnouncesWaitStartOnStderr(t *testing.T) {
 		queryPausePointStatus = originalQuery
 	}()
 
-	const wantAnnounce = "Waiting for pause point jump (up to 7s). The JSON response prints only when the wait ends. If this output gets cut off before then, read the outcome with: uloop pause-point-status --id \"jump\"\n"
+	const wantAnnounce = "Waiting for pause point jump (up to 7s). The JSON response prints only when the wait ends. If this output gets cut off before then, read the outcome with: tloop pause-point-status --id \"jump\"\n"
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	statusCallCount := 0
@@ -209,7 +209,7 @@ func TestRunWaitForPausePointCommandQuotesWhitespaceIdOnStderr(t *testing.T) {
 		queryPausePointStatus = originalQuery
 	}()
 
-	const wantAnnounce = "Waiting for pause point Assets/My Folder/Foo.cs:42 (up to 7s). The JSON response prints only when the wait ends. If this output gets cut off before then, read the outcome with: uloop pause-point-status --id \"Assets/My Folder/Foo.cs:42\"\n"
+	const wantAnnounce = "Waiting for pause point Assets/My Folder/Foo.cs:42 (up to 7s). The JSON response prints only when the wait ends. If this output gets cut off before then, read the outcome with: tloop pause-point-status --id \"Assets/My Folder/Foo.cs:42\"\n"
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	statusCallCount := 0
@@ -588,7 +588,7 @@ func TestPausePointExpiredErrorPrependsRecommendedNextAction(t *testing.T) {
 
 	wantNextActions := []string{
 		expiredNextAction,
-		"Run `uloop enable-pause-point --id <marker-id>` before waiting.",
+		"Run `tloop enable-pause-point --id <marker-id>` before waiting.",
 		"Confirm the code path calls `UloopPausePoint.Pause(\"<marker-id>\")` with the same id.",
 		"Check `Details.Status`, `Details.EditorState`, `Details.ElapsedSinceEnabledMilliseconds`, and `Details.RemainingMilliseconds` to distinguish a missed code path from an already-paused Editor.",
 		"If the marker is inside a custom asmdef, add a reference to `UnityCLILoop.PausePoints.Runtime`.",
@@ -647,7 +647,7 @@ func TestPausePointExpiredErrorOmitsEmptyRecommendedNextAction(t *testing.T) {
 	}, response, pausePointWaitStateExpired, false, false, nil)
 
 	wantNextActions := []string{
-		"Run `uloop enable-pause-point --id <marker-id>` before waiting.",
+		"Run `tloop enable-pause-point --id <marker-id>` before waiting.",
 		"Confirm the code path calls `UloopPausePoint.Pause(\"<marker-id>\")` with the same id.",
 		"Check `Details.Status`, `Details.EditorState`, `Details.ElapsedSinceEnabledMilliseconds`, and `Details.RemainingMilliseconds` to distinguish a missed code path from an already-paused Editor.",
 		"If the marker is inside a custom asmdef, add a reference to `UnityCLILoop.PausePoints.Runtime`.",
@@ -674,7 +674,7 @@ func TestPausePointExpiredErrorUsesFileLineNextActions(t *testing.T) {
 	}, response, pausePointWaitStateExpired, false, false, nil)
 
 	wantNextActions := []string{
-		"Re-arm it with uloop enable-pause-point --file \"Assets/Scripts/Foo.cs\" --line 42 before waiting.",
+		"Re-arm it with tloop enable-pause-point --file \"Assets/Scripts/Foo.cs\" --line 42 before waiting.",
 		"Confirm the code path executes line 42 of Assets/Scripts/Foo.cs while the marker is armed.",
 		"Check `Details.Status`, `Details.EditorState`, `Details.ElapsedSinceEnabledMilliseconds`, and `Details.RemainingMilliseconds` to distinguish a missed code path from an already-paused Editor.",
 		"If the marker is inside a custom asmdef, add a reference to `UnityCLILoop.PausePoints.Runtime`.",
@@ -1567,7 +1567,7 @@ func TestPausePointTimeoutErrorIncludesDiagnosisHint(t *testing.T) {
 				"If the marker targets a Unity message method such as OnCollisionEnter2D/OnTriggerEnter2D, check whether `enable-pause-point`'s response carried a Warning about cached message dispatch: Unity can resolve a GameObject's message dispatch before the marker patch is installed, so a GameObject that already existed at enable time may never reach the marker even though the method body runs. Recreating the GameObject after enabling, or embedding UloopPausePoint.Pause(\"id\") directly in the method body, avoids this. " +
 				"If the target line is inside a very small method, Mono's JIT may have inlined it into callers and the pause point never fires; move the pause point into the calling method. " +
 				"If PlayMode kept progressing on its own while you were arranging state (timers, gravity, spawners), the scenario may have already been consumed before this marker could fire; next time, run `control-play-mode --action Pause` before setup and resume with `control-play-mode --action Play` only after `enable-pause-point` succeeds. " +
-				"If the target line never hit, check the non-firing patterns: (0) the awaited game event never occurred while the marker was armed — check the game state with execute-dynamic-code before suspecting dispatch; (1) the method is a physics/message callback or is called from one on a GameObject that existed before enable — recreate the GameObject or embed UloopPausePoint.Pause; (2) the method was already bound into a delegate/event before enable — the pre-bound invocation path bypasses the patch; (3) the method ran but exited on an earlier branch (for example a guard rejected the action because game state had already moved on) — arm a second marker on the early-return line to see which path ran. (4) the enable response reported LineBasis 'LastCompiledSource' (no verified source snapshot for the file), so the armed line is a compiled line number that may not match the editor — check ResolvedMethod, or run 'uloop compile' and re-enable. For patterns (1) and (2), hot-reloading a temporary log line into the method (`uloop hot-reload`) and re-triggering gives a one-way check: the log appearing proves the body ran even though the marker missed. The log staying absent proves nothing — the same cached dispatch can bypass the hot-reload patch too.",
+				"If the target line never hit, check the non-firing patterns: (0) the awaited game event never occurred while the marker was armed — check the game state with execute-dynamic-code before suspecting dispatch; (1) the method is a physics/message callback or is called from one on a GameObject that existed before enable — recreate the GameObject or embed UloopPausePoint.Pause; (2) the method was already bound into a delegate/event before enable — the pre-bound invocation path bypasses the patch; (3) the method ran but exited on an earlier branch (for example a guard rejected the action because game state had already moved on) — arm a second marker on the early-return line to see which path ran. (4) the enable response reported LineBasis 'LastCompiledSource' (no verified source snapshot for the file), so the armed line is a compiled line number that may not match the editor — check ResolvedMethod, or run 'tloop compile' and re-enable. For patterns (1) and (2), hot-reloading a temporary log line into the method (`tloop hot-reload`) and re-triggering gives a one-way check: the log appearing proves the body ran even though the marker missed. The log staying absent proves nothing — the same cached dispatch can bypass the hot-reload patch too.",
 		},
 	}
 
@@ -1616,7 +1616,7 @@ func TestPausePointExpiredErrorIncludesDiagnosisHint(t *testing.T) {
 				HitCount:    0,
 			},
 			wantHint: "The enable-pause-point --timeout-seconds window (measured from enable, not from this wait) ran out before the marker was hit. " +
-				"If the target line never hit, check the non-firing patterns: (0) the awaited game event never occurred while the marker was armed — check the game state with execute-dynamic-code before suspecting dispatch; (1) the method is a physics/message callback or is called from one on a GameObject that existed before enable — recreate the GameObject or embed UloopPausePoint.Pause; (2) the method was already bound into a delegate/event before enable — the pre-bound invocation path bypasses the patch; (3) the method ran but exited on an earlier branch (for example a guard rejected the action because game state had already moved on) — arm a second marker on the early-return line to see which path ran. (4) the enable response reported LineBasis 'LastCompiledSource' (no verified source snapshot for the file), so the armed line is a compiled line number that may not match the editor — check ResolvedMethod, or run 'uloop compile' and re-enable. For patterns (1) and (2), hot-reloading a temporary log line into the method (`uloop hot-reload`) and re-triggering gives a one-way check: the log appearing proves the body ran even though the marker missed. The log staying absent proves nothing — the same cached dispatch can bypass the hot-reload patch too. Once the cause is addressed, re-enable the marker (raise --timeout-seconds only if the window itself was too short) and trigger the code path again.",
+				"If the target line never hit, check the non-firing patterns: (0) the awaited game event never occurred while the marker was armed — check the game state with execute-dynamic-code before suspecting dispatch; (1) the method is a physics/message callback or is called from one on a GameObject that existed before enable — recreate the GameObject or embed UloopPausePoint.Pause; (2) the method was already bound into a delegate/event before enable — the pre-bound invocation path bypasses the patch; (3) the method ran but exited on an earlier branch (for example a guard rejected the action because game state had already moved on) — arm a second marker on the early-return line to see which path ran. (4) the enable response reported LineBasis 'LastCompiledSource' (no verified source snapshot for the file), so the armed line is a compiled line number that may not match the editor — check ResolvedMethod, or run 'tloop compile' and re-enable. For patterns (1) and (2), hot-reloading a temporary log line into the method (`tloop hot-reload`) and re-triggering gives a one-way check: the log appearing proves the body ran even though the marker missed. The log staying absent proves nothing — the same cached dispatch can bypass the hot-reload patch too. Once the cause is addressed, re-enable the marker (raise --timeout-seconds only if the window itself was too short) and trigger the code path again.",
 		},
 	}
 
@@ -1679,7 +1679,7 @@ func TestPausePointExpiredHintIncludesHotReloadLineDriftCandidate(t *testing.T) 
 	}, pausePointWaitStateExpired, false, false, nil)
 
 	hint, _ := cliErr.Details["Hint"].(string)
-	const candidateFour = "(4) the enable response reported LineBasis 'LastCompiledSource' (no verified source snapshot for the file), so the armed line is a compiled line number that may not match the editor — check ResolvedMethod, or run 'uloop compile' and re-enable."
+	const candidateFour = "(4) the enable response reported LineBasis 'LastCompiledSource' (no verified source snapshot for the file), so the armed line is a compiled line number that may not match the editor — check ResolvedMethod, or run 'tloop compile' and re-enable."
 	threeIndex := strings.Index(hint, "(3) ")
 	fourIndex := strings.Index(hint, candidateFour)
 	if fourIndex < 0 {
@@ -2935,7 +2935,7 @@ func createLaunchTestProject(t *testing.T) string {
 
 func writeToolSettings(t *testing.T, projectRoot string, content string) {
 	t.Helper()
-	settingsDir := filepath.Join(projectRoot, ".uloop")
+	settingsDir := filepath.Join(projectRoot, ".tloop")
 	if err := os.MkdirAll(settingsDir, 0o755); err != nil {
 		t.Fatalf("failed to create settings dir: %v", err)
 	}

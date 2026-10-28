@@ -115,7 +115,7 @@ func TestVisibleOptionEntriesIncludeRunTestsSkipCompile(t *testing.T) {
 func TestLoadToolsFiltersInternalSkillToolsFromCache(t *testing.T) {
 	projectRoot := t.TempDir()
 	writeTestSkill(t, projectRoot, "Assets/Editor/InternalTool/Skill", `---
-name: uloop-internal-tool
+name: tloop-internal-tool
 internal: true
 ---
 
@@ -154,7 +154,7 @@ func TestLoadToolsFiltersSingleQuotedInternalSkillToolsFromCache(t *testing.T) {
 	// Verifies YAML single quotes do not expose internal skill tools from cache-backed help.
 	projectRoot := t.TempDir()
 	writeTestSkill(t, projectRoot, "Assets/Editor/InternalTool/Skill", `---
-name: uloop-internal-tool
+name: tloop-internal-tool
 internal: 'true'
 ---
 
@@ -294,7 +294,7 @@ func TestFindToolForCommandPrefersProjectCacheForDefaultToolNames(t *testing.T) 
 // Tests that internal skills without frontmatter names are filtered by their directory-derived tool names.
 func TestLoadToolsFiltersDerivedInternalSkillToolNameFromCache(t *testing.T) {
 	projectRoot := t.TempDir()
-	writeTestSkill(t, projectRoot, "Assets/Editor/uloop-derived-internal/Skill", `---
+	writeTestSkill(t, projectRoot, "Assets/Editor/tloop-derived-internal/Skill", `---
 internal: true
 ---
 
@@ -410,7 +410,7 @@ func TestLoadProjectToolCacheFiltersInternalToolsAndReportsMissingCache(t *testi
 	}
 
 	projectRoot := t.TempDir()
-	writeTestSkill(t, projectRoot, "Assets/Editor/InternalTool/Skill", "---\nname: uloop-internal-tool\ninternal: true\n---\n")
+	writeTestSkill(t, projectRoot, "Assets/Editor/InternalTool/Skill", "---\nname: tloop-internal-tool\ninternal: true\n---\n")
 	writeToolCache(t, projectRoot, `{"tools":[{"name":"internal-tool"},{"name":"public-tool"}]}`)
 
 	cache, ok := LoadProjectToolCache(projectRoot)

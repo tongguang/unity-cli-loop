@@ -21,13 +21,13 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [
-        "ULOOP_HAS_TEST_FRAMEWORK"
+        "TLOOP_HAS_TEST_FRAMEWORK"
     ],
     "versionDefines": [
         {
             "name": "com.unity.test-framework",
             "expression": "",
-            "define": "ULOOP_HAS_TEST_FRAMEWORK"
+            "define": "TLOOP_HAS_TEST_FRAMEWORK"
         }
     ],
     "noEngineReferences": false

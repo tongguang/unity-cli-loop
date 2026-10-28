@@ -30,7 +30,7 @@ func TestClassifyLaunchStartupTimeoutError(t *testing.T) {
 	}
 	for _, action := range cliErr.NextActions {
 		lowerAction := strings.ToLower(action)
-		if strings.Contains(lowerAction, "package") || strings.Contains(lowerAction, "uloop launch") {
+		if strings.Contains(lowerAction, "package") || strings.Contains(lowerAction, "tloop launch") {
 			t.Fatalf("next action should avoid package guesses and launch retry guidance: %#v", cliErr.NextActions)
 		}
 	}
@@ -76,7 +76,7 @@ func TestClassifyInstallUnsupportedOS(t *testing.T) {
 	if cliErr.Phase != clierrors.ErrorPhaseExecution {
 		t.Fatalf("phase mismatch: %#v", cliErr)
 	}
-	expectedAction := "Run `uloop install` on macOS, Linux, or Windows."
+	expectedAction := "Run `tloop install` on macOS, Linux, or Windows."
 	if len(cliErr.NextActions) == 0 || cliErr.NextActions[0] != expectedAction {
 		t.Fatalf("next actions mismatch: %#v", cliErr.NextActions)
 	}
@@ -85,9 +85,9 @@ func TestClassifyInstallUnsupportedOS(t *testing.T) {
 func TestUnsupportedPlatformErrorPointsAtEverySupportedPlatform(t *testing.T) {
 	// Verifies install, update, and uninstall guidance names Linux too, matching the platforms the commands support.
 	cases := map[string]string{
-		installUnsupportedOSMessage:   "Run `uloop install` on macOS, Linux, or Windows.",
-		updateUnsupportedOSMessage:    "Run `uloop update` on macOS, Linux, or Windows.",
-		uninstallUnsupportedOSMessage: "Run `uloop uninstall` on macOS, Linux, or Windows.",
+		installUnsupportedOSMessage:   "Run `tloop install` on macOS, Linux, or Windows.",
+		updateUnsupportedOSMessage:    "Run `tloop update` on macOS, Linux, or Windows.",
+		uninstallUnsupportedOSMessage: "Run `tloop uninstall` on macOS, Linux, or Windows.",
 	}
 	for message, wantAction := range cases {
 		cliErr, ok := unsupportedPlatformError(message, clierrors.ErrorContext{})

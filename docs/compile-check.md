@@ -1,16 +1,16 @@
 # Offline compile check
 
-`uloop compile-check` reports C# compile errors and warnings without launching the Unity Editor and
+`tloop compile-check` reports C# compile errors and warnings without launching the Unity Editor and
 without contacting a running one. It is a dispatcher-owned command: it needs no IPC connection and
 no project runner.
 
-The command is hidden: it stays runnable, but help, `uloop list --names`, completion, and the
-installed skills do not list it, and its skill is marked `internal: true` so `uloop skills install`
-skips it. It is hidden because its place beside `uloop compile` is not settled, not because of a
+The command is hidden: it stays runnable, but help, `tloop list --names`, completion, and the
+installed skills do not list it, and its skill is marked `internal: true` so `tloop skills install`
+skips it. It is hidden because its place beside `tloop compile` is not settled, not because of a
 detection gap: what it detects and what stays undetected is listed under Limitations, and the
 decision history is in `docs/adr/0018-compile-check-is-its-own-command-and-is-shown.md`.
 
-It is not a replacement for `uloop compile`. Nothing it produces is loaded by Unity, so use it only
+It is not a replacement for `tloop compile`. Nothing it produces is loaded by Unity, so use it only
 when you want to know whether the code compiles — not when you need the result to be live in the
 Editor.
 
@@ -30,7 +30,7 @@ references, scripting defines and analyzers. `compile-check` replays those respo
    there, verbatim, so an assembly whose attributes bake source paths into metadata produces the same
    output here as it does in Unity's own build.
 2. **Find the compiler.** The Editor version comes from `ProjectVersion.txt` (or `--editor-version`),
-   and the Editor install is located the same way `uloop launch` locates it. The compiler is the one
+   and the Editor install is located the same way `tloop launch` locates it. The compiler is the one
    bundled with that install: `csc.dll` under the Editor's Roslyn directory, run through the
    `dotnet` host bundled beside it. Nothing is downloaded, and no system-wide .NET SDK is used. csc is
    started through the Roslyn compiler server the way Unity's Bee starts it, so several assemblies in
@@ -137,7 +137,7 @@ references, scripting defines and analyzers. `compile-check` replays those respo
    The build settings the response files cannot be read back into - scripting defines,
    `csc.rsp`, `defineConstraints` and `versionDefines`, and the package manifest and lock file -
    are recorded by the first run after a Unity build in
-   `Library/uloop/compile-check/<dag>/build-settings.json`, keyed to the build-trace file Bee
+   `Library/tloop/compile-check/<dag>/build-settings.json`, keyed to the build-trace file Bee
    rewrites on every build. A later run against the same build refuses any of them that moved; a
    run after another Unity build replaces the record instead. A scripting define of the active
    build target group that the response files lack is refused whenever `ProjectSettings.asset` was
@@ -324,24 +324,24 @@ about a second.
 The check keeps its state next to the compile outputs: `<Assembly>.fastcheck.json` (the baseline),
 `<Assembly>.generated/` (the saved generator output, whose files the baseline records by content
 hash), `<Assembly>.fastresult.json` (the result of the last changed-files check, reported again
-while nothing it read has changed), and the worker build in `Library/uloop/compile-check/fastcheck-worker/<key>/`. Deleting or
+while nothing it read has changed), and the worker build in `Library/tloop/compile-check/fastcheck-worker/<key>/`. Deleting or
 changing any of them only costs a full compile.
 
 ## One run per project at a time
 
 Two runs against the same project would write the same output directory and the same compiler
 outputs, and could each report what the other half-wrote. A run therefore holds an exclusive lock
-on `Library/uloop/compile-check.lock` from the moment it has found the Bee build until it returns.
+on `Library/tloop/compile-check.lock` from the moment it has found the Bee build until it returns.
 A second run on the same project waits for it, up to five minutes, and then stops with
 `COMPILE_CHECK_PROJECT_BUSY`. Runs on different projects do not wait for each other. The lock is
 the operating system's own (`flock` on macOS and Linux, `LockFileEx` on Windows), so a run that
 crashes or is killed releases it with its process and leaves nothing stale behind. The lock file
-sits outside `Library/uloop/compile-check/` so that deleting the disposable output directory never
+sits outside `Library/tloop/compile-check/` so that deleting the disposable output directory never
 removes a lock another run is holding.
 
 ## Output
 
-The compiled DLLs land in `Library/uloop/compile-check/<dag>/` and are never handed to Unity. The
+The compiled DLLs land in `Library/tloop/compile-check/<dag>/` and are never handed to Unity. The
 directory is disposable; deleting it only costs the next run some time.
 
 `--jobs <n>` bounds how many assemblies compile at the same time; the default is half the machine's
@@ -373,13 +373,13 @@ names were not applied), and `UnaffectedDependents`, how many were left out beca
 of the names. An assembly compiled for its own sources is listed when the change reaches it, so
 `Dependents` and `UnaffectedDependents` need not add up to every dependent.
 `NextActions` names the next step: fix the errors and run again while errors remain; after a clean
-run, `--full` when an assembly was fast-checked and then `uloop compile` to make the result live; and
+run, `--full` when an assembly was fast-checked and then `tloop compile` to make the result live; and
 nothing when no assembly changed since the last Unity build. The
 process exits 1 when
 `ErrorCount` is greater than zero. A failure of the command itself also exits 1 but writes nothing to
 stdout: stderr gets `{"Success": false, "Error": {...}}`, whose `ErrorCode` names the failure.
 
-With the `ULOOP_DEBUG` environment variable set, each run also writes two entries to the CLI
+With the `TLOOP_DEBUG` environment variable set, each run also writes two entries to the CLI
 VibeLog of the project, `cli_compile_check_start` and `cli_compile_check_complete`, with which
 assemblies it compiled, reused, checked on their changed files, or blocked, why each fallback
 happened, and how long each assembly took. `docs/vibe-logs.md` lists their fields.
@@ -398,7 +398,7 @@ happened, and how long each assembly took. `docs/vibe-logs.md` lists their field
   whose folder holds sources the assembly it names does not record (it was added or moved), and a
   recorded source no `.asmref` attaches to its assembly any more (one was removed or retargeted).
   So do the build settings described below. Those cases — and only those — stop the run with
-  `COMPILE_CHECK_UNITY_BUILD_REQUIRED` and ask for `uloop compile`.
+  `COMPILE_CHECK_UNITY_BUILD_REQUIRED` and ask for `tloop compile`.
   Every other edit listed below is invisible to the check: the run proceeds and silently reuses
   what the last build recorded.
 - **Build settings are compared against a record keyed to the last Unity build.** The scripting
@@ -468,7 +468,7 @@ headless run imports the project, writes the response files and exits.
 "C:\Program Files\Unity\Hub\Editor\<version>\Editor\Unity.exe" -batchmode -nographics -quit -projectPath "<PROJECT_ROOT>"
 ```
 
-`uloop launch` is the same first build with the Editor window open; use whichever fits. The run
+`tloop launch` is the same first build with the Editor window open; use whichever fits. The run
 takes as long as the project's initial import (about a minute for a 100-assembly project, longer
 for a large one). Once `Library` exists, compile-check runs without the Editor; it refuses again only
 when it detects an `.asmdef` change or a build setting that moved (see Limitations for what stays
@@ -483,12 +483,12 @@ the Editor, gained a project reference, lost a project reference, turned on `all
 gained a precompiled reference under `overrideReferences`). A lost reference reads
 `no longer references <assembly>`; a reference, by GUID or by name, that matches no `.asmdef` in the project
 makes the check skip that `.asmdef` rather than guess. This is the intended refusal, not a bug. Run
-`uloop compile` once so Unity rewrites the response files, then `compile-check` works again against
+`tloop compile` once so Unity rewrites the response files, then `compile-check` works again against
 the new configuration.
 
 An `.asmdef` edit that is not one of those does **not** raise this error — see Limitations for what
 goes undetected. In that case the run succeeds against the previous configuration, so run
-`uloop compile` yourself after such an edit rather than trusting a clean result.
+`tloop compile` yourself after such an edit rather than trusting a clean result.
 
 **`COMPILE_CHECK_UNITY_BUILD_REQUIRED`: a build setting changed since the last Unity build**
 The message reads `<setting> changed since the last Unity build` - for example
@@ -496,14 +496,14 @@ The message reads `<setting> changed since the last Unity build` - for example
 `defineConstraints or versionDefines of Assets/X/X.asmdef` or `Packages/packages-lock.json` - or
 `scripting define <NAME> is not in the last Unity build`. The response files were written with the
 settings of the last Unity build, so compiling against them would check a configuration the project
-no longer has. Run `uloop compile` once; the build moves the build-trace file forward, the next run
+no longer has. Run `tloop compile` once; the build moves the build-trace file forward, the next run
 records the settings as they are now, and `compile-check` works again.
 
 **`COMPILE_CHECK_UNITY_BUILD_REQUIRED`: a script belongs to an assembly the last build did not produce**
 The message reads `<script> belongs to <assembly>, which the last Unity build did not produce`. The
 script sits outside every `.asmdef`, and Unity's path rules give it to a predefined assembly - such
 as `Assembly-CSharp-Editor` for the first script in an `Editor` folder - that has no response file
-yet. Run `uloop compile` once so Unity creates that assembly.
+yet. Run `tloop compile` once so Unity creates that assembly.
 
 **`COMPILE_CHECK_UNITY_BUILD_REQUIRED`: cannot tell which Bee build to check**
 Both a debug and a release dag exist and neither `tundra.log.json` nor

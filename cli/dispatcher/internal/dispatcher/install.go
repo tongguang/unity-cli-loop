@@ -52,7 +52,7 @@ func tryHandleInstallRequest(ctx context.Context, args []string, stdout io.Write
 		return true, 1
 	}
 
-	clicore.WriteLine(stdout, "Configuring global uloop dispatcher...")
+	clicore.WriteLine(stdout, "Configuring global tloop dispatcher...")
 	command := exec.CommandContext(ctx, installCommand.Name, installCommand.Args...)
 	command.Stdout = stdout
 	var installerStderr bytes.Buffer
@@ -81,7 +81,7 @@ func installSetupFailureError(err error, installerStderr string) clierrors.CLIEr
 		Retryable:   true,
 		SafeToRetry: true,
 		Command:     clicore.InstallCommandName,
-		NextActions: []string{"Retry `uloop install --dir <install-dir>` after checking PATH permissions."},
+		NextActions: []string{"Retry `tloop install --dir <install-dir>` after checking PATH permissions."},
 		Details:     details,
 	}
 }
@@ -111,7 +111,7 @@ func parseInstallOptions(args []string) (installOptions, error) {
 				Message:     "Unknown install option: --" + name,
 				Option:      "--" + name,
 				Command:     clicore.InstallCommandName,
-				NextActions: []string{"Run `uloop install` or `uloop install --dir <install-dir>`."},
+				NextActions: []string{"Run `tloop install` or `tloop install --dir <install-dir>`."},
 			}
 		}
 		if options.installDir != "" {
@@ -137,12 +137,12 @@ func duplicateInstallDirOptionError(option string) error {
 func writeInstallCompletion(stdout io.Writer, goos string) {
 	if goos == "windows" {
 		clicore.WriteLine(stdout, "The package-owned User PATH entry was configured.")
-		clicore.WriteLine(stdout, "Legacy npm uloop-cli launchers were cleaned up when detected.")
+		clicore.WriteLine(stdout, "Legacy npm tloop-cli launchers were cleaned up when detected.")
 		return
 	}
 	if goos == "darwin" || goos == "linux" {
 		clicore.WriteLine(stdout, "The package-owned shell PATH entry was configured.")
-		clicore.WriteLine(stdout, "Legacy npm uloop-cli launchers were cleaned up when detected.")
+		clicore.WriteLine(stdout, "Legacy npm tloop-cli launchers were cleaned up when detected.")
 		return
 	}
 
@@ -151,13 +151,13 @@ func writeInstallCompletion(stdout io.Writer, goos string) {
 
 func printInstallHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop install [--dir <install-dir>]")
+	clicore.WriteLine(stdout, "  tloop install [--dir <install-dir>]")
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Configures the global uloop dispatcher after the installer places the binary.")
-	clicore.WriteLine(stdout, "Set ULOOP_INSTALL_DIR or pass --dir to choose the install directory.")
-	clicore.WriteLine(stdout, "On Windows, updates User PATH and removes legacy npm uloop-cli launchers.")
-	clicore.WriteLine(stdout, "On macOS, updates shell PATH and removes legacy npm uloop-cli launchers.")
-	clicore.WriteLine(stdout, "On Linux, updates shell PATH and removes legacy npm uloop-cli launchers.")
+	clicore.WriteLine(stdout, "Configures the global tloop dispatcher after the installer places the binary.")
+	clicore.WriteLine(stdout, "Set TLOOP_INSTALL_DIR or pass --dir to choose the install directory.")
+	clicore.WriteLine(stdout, "On Windows, updates User PATH and removes legacy npm tloop-cli launchers.")
+	clicore.WriteLine(stdout, "On macOS, updates shell PATH and removes legacy npm tloop-cli launchers.")
+	clicore.WriteLine(stdout, "On Linux, updates shell PATH and removes legacy npm tloop-cli launchers.")
 }
 
 func resolveNativeInstallDir(goos string, explicitInstallDir string) (string, error) {

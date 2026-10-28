@@ -100,7 +100,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             RecordVideoSchema parameters = new RecordVideoSchema
             {
                 Action = RecordVideoAction.start,
-                WindowName = "NoSuchWindow-uloop-test",
+                WindowName = "NoSuchWindow-tloop-test",
                 FrameRate = 0
             };
 

@@ -40,7 +40,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             (bool isMatch, string parameterName) =
                 ThirdPartyToolMigrationTimingArgumentRules.ReadLegacyPlayerLoopTimingParameter(
-                    "io.github.hatayama.uLoopMCP.PlayerLoopTiming timing",
+                    "io.github.tongguang.tloop.PlayerLoopTiming timing",
                     Array.Empty<string>(),
                     false);
 

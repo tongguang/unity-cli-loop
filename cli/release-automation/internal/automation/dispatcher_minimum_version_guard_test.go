@@ -95,7 +95,7 @@ func TestRunDispatcherMinimumVersionCheck_WhenProjectPinDiffersFromPackagePin_Fa
 	if result.exitCode != 1 {
 		t.Fatalf("expected exit code 1, got %d\nstdout: %s", result.exitCode, result.stdout)
 	}
-	assertDispatcherMinimumVersionLogContains(t, result.stderr, ".uloop/project-runner-pin.json minimumDispatcherVersion")
+	assertDispatcherMinimumVersionLogContains(t, result.stderr, ".tloop/project-runner-pin.json minimumDispatcherVersion")
 }
 
 type dispatcherMinimumVersionCase struct {
@@ -131,7 +131,7 @@ func runDispatcherMinimumVersionCheckCase(t *testing.T, testCase dispatcherMinim
 	prepareDispatcherMinimumVersionFiles(t, workDir, testCase)
 
 	t.Setenv("PATH", mockBin+string(os.PathListSeparator)+os.Getenv("PATH"))
-	t.Setenv("ULOOP_REPOSITORY_ROOT", workDir)
+	t.Setenv("TLOOP_REPOSITORY_ROOT", workDir)
 	t.Setenv("GIT_LOG", gitLogPath)
 	if testCase.releaseContract != "" {
 		releaseContractPath := filepath.Join(workDir, "release-contract.json")
@@ -229,7 +229,7 @@ set -eu
 printf '%s\n' "$*" >> "$GIT_LOG"
 
 if [ "$1" = "rev-parse" ] && [ "$2" = "--show-toplevel" ]; then
-  printf '%s\n' "$ULOOP_REPOSITORY_ROOT"
+  printf '%s\n' "$TLOOP_REPOSITORY_ROOT"
   exit 0
 fi
 

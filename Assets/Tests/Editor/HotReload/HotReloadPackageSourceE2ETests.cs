@@ -26,9 +26,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     public class HotReloadPackageSourceE2ETests
     {
         private const string FixtureAssetPath =
-            "Packages/io.github.hatayama.uloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/io.github.tongguang.tloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const string FixturePhysicalPath =
-            "Packages/uloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/tloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const string FixtureTypeName = "HotReloadPackageFixture";
         private const string FixtureAssemblyQualifiedTypeName =
             "io.github.hatayama.UnityCliLoop.Tests.PackageFixture." + FixtureTypeName

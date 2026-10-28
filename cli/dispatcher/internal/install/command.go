@@ -11,8 +11,8 @@ import (
 
 const (
 	UnsupportedOSMessage = "native install is only supported on macOS, Linux, and Windows"
-	PosixCommandName     = "uloop"
-	WindowsCommandName   = "uloop.exe"
+	PosixCommandName     = "tloop"
+	WindowsCommandName   = "tloop.exe"
 )
 
 type Options struct {
@@ -74,7 +74,7 @@ func windowsInstallArgs(installDir string, targetPath string) []string {
 func windowsInstallScript(installDir string, targetPath string) string {
 	return strings.NewReplacer(
 		"'{{INSTALL_DIR}}'", powerShellSingleQuote(installDir),
-		"'{{EXPECTED_ULOOP_PATH}}'", powerShellSingleQuote(targetPath),
+		"'{{EXPECTED_TLOOP_PATH}}'", powerShellSingleQuote(targetPath),
 	).Replace(installScriptTemplate("scripts/install_windows.ps1"))
 }
 

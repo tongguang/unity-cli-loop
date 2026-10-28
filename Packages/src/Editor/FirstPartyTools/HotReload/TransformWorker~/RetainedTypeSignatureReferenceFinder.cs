@@ -84,7 +84,7 @@ internal static class RetainedTypeSignatureReferenceFinder
             + "' would split it between the retained assembly and this edit. To keep hot reloading, also edit "
             + referrerList
             + " in this same reload (a method body change is enough); passing its file unchanged does not help. "
-            + "Otherwise run 'uloop compile' to apply this edit.";
+            + "Otherwise run 'tloop compile' to apply this edit.";
     }
 
     // A type this run introduces was compiled against the loaded definition before the edit could
@@ -117,7 +117,7 @@ internal static class RetainedTypeSignatureReferenceFinder
             + sameRunList
             + ", then make the change together with an edit of "
             + FormatNameList(allReferrers)
-            + " (a method body change is enough). Otherwise run 'uloop compile' to apply this edit.";
+            + " (a method body change is enough). Otherwise run 'tloop compile' to apply this edit.";
     }
 
     // Why the two steps are not offered here: they begin with a reload without the change, and
@@ -148,7 +148,7 @@ internal static class RetainedTypeSignatureReferenceFinder
             + " is compiled against the '"
             + metadataName
             + "' an earlier reload first loaded, which does not hold those changes, so the two would split. "
-            + "Reloading in steps cannot join them: run 'uloop compile' to apply this edit, or name '"
+            + "Reloading in steps cannot join them: run 'tloop compile' to apply this edit, or name '"
             + metadataName
             + "' only inside method bodies of "
             + sameRunList
@@ -179,8 +179,8 @@ internal static class RetainedTypeSignatureReferenceFinder
             + "and it appears in member signatures of "
             + retainedClause
             + sameRunList
-            + ". A type this reload introduces cannot name such a type in its signatures until 'uloop compile' runs. "
-            + "Run 'uloop compile' to apply this edit, or name '"
+            + ". A type this reload introduces cannot name such a type in its signatures until 'tloop compile' runs. "
+            + "Run 'tloop compile' to apply this edit, or name '"
             + metadataName
             + "' only inside method bodies of "
             + sameRunList

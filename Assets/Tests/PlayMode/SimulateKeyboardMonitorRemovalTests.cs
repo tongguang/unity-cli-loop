@@ -1,4 +1,4 @@
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 #nullable enable
 using System.Collections;
 using System.Threading.Tasks;

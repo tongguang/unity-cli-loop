@@ -35,7 +35,7 @@ func TestSkillStatusMatchesSharedContract(t *testing.T) {
 			writeContractFiles(t, sourceDir, contractCase.Source)
 
 			skill := skillDefinition{
-				name:            "uloop-sample",
+				name:            "tloop-sample",
 				content:         []byte(contractCase.Source[skillscan.SkillFileName]),
 				sourceDirectory: sourceDir,
 			}

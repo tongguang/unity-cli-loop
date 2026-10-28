@@ -25,7 +25,7 @@
         {
             "name": "com.unity.inputsystem",
             "expression": "",
-            "define": "ULOOP_HAS_INPUT_SYSTEM"
+            "define": "TLOOP_HAS_INPUT_SYSTEM"
         }
     ],
     "noEngineReferences": false

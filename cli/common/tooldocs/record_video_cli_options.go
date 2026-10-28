@@ -28,7 +28,7 @@ func RecordVideoCLIOnlyOptions() []PausePointCLIOnlyOption {
 		{
 			FlagName: RecordVideoTriggerFlagName,
 			Type:     "string",
-			Description: "One-shot: a uloop command to run right after recording starts, for example " +
+			Description: "One-shot: a tloop command to run right after recording starts, for example " +
 				"\"simulate-keyboard --action Press --key C\" or " +
 				"\"enable-pause-point --file <path> --line <n> --mode trace --await\". " +
 				"The burst sheet is built around the moment it returns. " +

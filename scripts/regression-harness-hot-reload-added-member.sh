@@ -3,7 +3,7 @@ set -e
 # Regression harness for the HotReloadAddedMember trap:
 # PlayMode logs a baseline marker from Update. The driver adds a field and a
 # method in the same file, rewrites existing ReadAdded/WriteAdded plus Update to
-# use them, applies uloop hot-reload (no domain reload), asserts get-logs shows
+# use them, applies tloop hot-reload (no domain reload), asserts get-logs shows
 # the added-method path, writes 10 through the patched existing method, asserts
 # the store keeps 10 across re-apply, then --revert-all restores baseline.
 # A second pass adds a method that reads a compiled private field and asserts
@@ -18,7 +18,7 @@ set -e
 # Prerequisites:
 #   - Assets/RegressionHarness/HotReloadAddedMember/HotReloadAddedMember.unity
 #     must be open in a running Unity Editor
-#   - dist/<platform>/uloop must be built (this checkout's development binary)
+#   - dist/<platform>/tloop must be built (this checkout's development binary)
 #   - jq must be installed
 
 PROJECT_PATH=""
@@ -39,12 +39,12 @@ REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 case "$(uname -s)" in
     Darwin)
         case "$(uname -m)" in
-            arm64) ULOOP_BIN="$REPO_ROOT/dist/darwin-arm64/uloop" ;;
-            *) ULOOP_BIN="$REPO_ROOT/dist/darwin-amd64/uloop" ;;
+            arm64) TLOOP_BIN="$REPO_ROOT/dist/darwin-arm64/tloop" ;;
+            *) TLOOP_BIN="$REPO_ROOT/dist/darwin-amd64/tloop" ;;
         esac
         ;;
     MINGW*|MSYS*|CYGWIN*)
-        ULOOP_BIN="$REPO_ROOT/dist/windows-amd64/uloop.exe"
+        TLOOP_BIN="$REPO_ROOT/dist/windows-amd64/tloop.exe"
         ;;
     *)
         printf '%s\n' "Unsupported platform: $(uname -s)" >&2
@@ -52,13 +52,13 @@ case "$(uname -s)" in
         ;;
 esac
 
-if [ ! -x "$ULOOP_BIN" ]; then
-    printf '%s\n' "uloop binary not found or not executable: $ULOOP_BIN" >&2
+if [ ! -x "$TLOOP_BIN" ]; then
+    printf '%s\n' "tloop binary not found or not executable: $TLOOP_BIN" >&2
     printf '%s\n' "Build with scripts/build-go-cli.sh first." >&2
     exit 2
 fi
 
-# Why sed and uloop must share one root: --project-path selects the Unity project whose
+# Why sed and tloop must share one root: --project-path selects the Unity project whose
 # Assets file we mutate; resolving SOURCE_ABS from the script checkout alone would edit one
 # tree while hot-reloading another.
 if [ -n "$PROJECT_PATH" ]; then
@@ -100,8 +100,8 @@ CLEANED_UP="0"
 # leave the working tree clean, so the pristine bytes are snapshotted before the first edit.
 cp "$SOURCE_ABS" "$SOURCE_BACKUP"
 
-run_uloop() {
-    "$ULOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
+run_tloop() {
+    "$TLOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
 }
 
 log() {
@@ -119,7 +119,7 @@ restore_source() {
 allow_auto_refresh() {
     if [ "$AUTO_REFRESH_DISALLOWED" = "1" ]; then
         # Why best-effort: cleanup must not fail the harness after assertions already passed.
-        if ! run_uloop execute-dynamic-code --code "
+        if ! run_tloop execute-dynamic-code --code "
 using UnityEditor;
 AssetDatabase.AllowAutoRefresh();
 return \"AllowAutoRefresh\";
@@ -137,9 +137,9 @@ cleanup() {
     fi
     CLEANED_UP="1"
     restore_source
-    run_uloop hot-reload --revert-all > /dev/null 2>&1 || true
+    run_tloop hot-reload --revert-all > /dev/null 2>&1 || true
     allow_auto_refresh
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
     rm -f "$RESULT_FILE" "$LOG_FILE" "$PROBE_FILE" "$SOURCE_BACKUP" "${SOURCE_ABS}.tmp"
 }
 # Why INT/TERM/HUP too: EXIT alone misses Ctrl-C / kill mid-write and would leave Assets dirty.
@@ -152,7 +152,7 @@ trap 'cleanup; exit 129' HUP
 disallow_auto_refresh() {
     # Why: writes under Assets/; without this hold Unity may import + domain-reload mid-run
     # and erase the hot-reload patches (or race the Mvid guard) before get-logs can assert.
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEditor;
 AssetDatabase.DisallowAutoRefresh();
 return \"DisallowAutoRefresh\";
@@ -166,10 +166,10 @@ await_marker_in_logs() {
     # Why 30s: cold PlayMode entry (import / domain reload) can exceed 10s before the first Update.
     max_attempts=30
     while [ "$attempt" -le "$max_attempts" ]; do
-        run_uloop clear-console > /dev/null
+        run_tloop clear-console > /dev/null
         # Why sleep: Update logs once per frame; give PlayMode a beat to emit after clear.
         sleep 1
-        run_uloop get-logs --log-type Log --max-count 50 --search-text "$expected_marker" > "$LOG_FILE"
+        run_tloop get-logs --log-type Log --max-count 50 --search-text "$expected_marker" > "$LOG_FILE"
         displayed="$(jq -r '.DisplayedCount // 0' "$LOG_FILE")"
         if [ "$displayed" -gt 0 ]; then
             return 0
@@ -258,7 +258,7 @@ ENDPATCH
 }
 
 probe_added() {
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEngine;
 using io.github.hatayama.UnityCliLoop.RegressionHarness;
 HotReloadAddedMemberLogger logger = Object.FindObjectOfType<HotReloadAddedMemberLogger>();
@@ -273,7 +273,7 @@ return logger.ReadAdded().ToString();
 
 write_added() {
     written_value="$1"
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEngine;
 using io.github.hatayama.UnityCliLoop.RegressionHarness;
 HotReloadAddedMemberLogger logger = Object.FindObjectOfType<HotReloadAddedMemberLogger>();
@@ -303,10 +303,10 @@ log "Disallowing AssetDatabase auto-refresh for the edit window..."
 disallow_auto_refresh
 
 log "Stopping any existing Play Mode session..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
 log "Starting Play Mode..."
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 
 log "Asserting baseline marker before hot-reload..."
 await_marker_in_logs "$BASELINE_MARKER"
@@ -321,7 +321,7 @@ if grep -Fq "$PRISTINE_NEEDLE" "$SOURCE_ABS"; then
 fi
 
 log "Applying hot-reload to $SOURCE_FILE..."
-run_uloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
+run_tloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
 assert_apply_has_added_and_patched
 
 log "Asserting added=0 from Update via the added method before the store write..."
@@ -339,7 +339,7 @@ log "Asserting ${ADDED_MARKER} after the store write..."
 await_marker_in_logs "$ADDED_MARKER"
 
 log "Checking --status lists Kind Added..."
-run_uloop hot-reload --status > "$RESULT_FILE"
+run_tloop hot-reload --status > "$RESULT_FILE"
 status_added="$(jq '[.Methods[]? | select(.Kind=="Added")] | length' "$RESULT_FILE")"
 if [ "$status_added" -lt 1 ]; then
     log "FAIL: --status did not list Kind=Added"
@@ -348,7 +348,7 @@ if [ "$status_added" -lt 1 ]; then
 fi
 
 log "Re-applying the same patch to prove the store keeps 10..."
-run_uloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
+run_tloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
 # Why AlreadyActive: identical source after a fully applied reload is a no-op by design;
 # the store-keep check below is the trap this step exists for.
 reapply_success="$(jq -r '.Success' "$RESULT_FILE")"
@@ -367,7 +367,7 @@ await_marker_in_logs "$ADDED_MARKER"
 
 log "Restoring source and reverting all hot-reload patches..."
 restore_source
-run_uloop hot-reload --revert-all > "$RESULT_FILE"
+run_tloop hot-reload --revert-all > "$RESULT_FILE"
 revert_success="$(jq -r '.Success' "$RESULT_FILE")"
 if [ "$revert_success" != "true" ]; then
     log "FAIL: --revert-all did not succeed"
@@ -383,7 +383,7 @@ SOURCE_DIRTY="1"
 write_private_field_added_method_source
 
 log "Applying hot-reload to $SOURCE_FILE..."
-run_uloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
+run_tloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
 assert_apply_has_added_and_patched
 
 log "Asserting ${SECRET_MARKER} from Update via the added method..."
@@ -391,7 +391,7 @@ await_marker_in_logs "$SECRET_MARKER"
 
 log "Restoring source and reverting all hot-reload patches..."
 restore_source
-run_uloop hot-reload --revert-all > "$RESULT_FILE"
+run_tloop hot-reload --revert-all > "$RESULT_FILE"
 revert_success="$(jq -r '.Success' "$RESULT_FILE")"
 if [ "$revert_success" != "true" ]; then
     log "FAIL: --revert-all did not succeed after private-field added method"

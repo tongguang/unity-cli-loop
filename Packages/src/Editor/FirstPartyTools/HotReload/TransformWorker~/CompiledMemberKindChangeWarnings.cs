@@ -18,10 +18,10 @@ using Microsoft.CodeAnalysis.Text;
 internal static class CompiledMemberKindChangeWarnings
 {
     internal const string CompiledPropertyKindChangeWarningFormat =
-        "Compiled property '{0}' was removed or redeclared as a different member kind in the edited source; the compiled member stays until 'uloop compile'.";
+        "Compiled property '{0}' was removed or redeclared as a different member kind in the edited source; the compiled member stays until 'tloop compile'.";
 
     internal const string CompiledEventKindChangeWarningFormat =
-        "Compiled event '{0}' was removed or redeclared as a different member kind in the edited source; the compiled member stays until 'uloop compile'.";
+        "Compiled event '{0}' was removed or redeclared as a different member kind in the edited source; the compiled member stays until 'tloop compile'.";
 
     internal sealed class SyntaxKeys
     {

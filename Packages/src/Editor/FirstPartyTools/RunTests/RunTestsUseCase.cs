@@ -22,7 +22,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
         // Format: path of the record that could not be removed, the reason.
         private const string ClearRecordFailedMessageFormat =
-            "Could not clear the last-run record at {0} ({1}), so no tests were run. Remove that path and run uloop run-tests again.";
+            "Could not clear the last-run record at {0} ({1}), so no tests were run. Remove that path and run tloop run-tests again.";
 
         private readonly TestFilterCreationService _filterService;
         private readonly TestExecutionService _executionService;

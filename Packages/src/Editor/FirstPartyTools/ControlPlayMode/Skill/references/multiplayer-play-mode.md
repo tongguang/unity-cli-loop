@@ -5,10 +5,10 @@ to start, stop, inspect, or drive its Virtual Players.
 
 ## Start and stop
 
-- `uloop control-play-mode --action Play` starts the active scenario the same way the Editor's
+- `tloop control-play-mode --action Play` starts the active scenario the same way the Editor's
   Play button does: Virtual Players are launched, then the main Editor enters Play Mode.
-- `uloop control-play-mode --action Stop` stops the scenario, including its Virtual Players.
-- `uloop control-play-mode --action Status` reports `ActiveScenario` with the name of the active
+- `tloop control-play-mode --action Stop` stops the scenario, including its Virtual Players.
+- `tloop control-play-mode --action Status` reports `ActiveScenario` with the name of the active
   Play Mode configuration. The field is absent while the default configuration is active.
 - `Play` waits only until the main Editor is in Play Mode. It does not wait for every Virtual
   Player to finish starting; check each player's own state (below) when that matters.
@@ -32,29 +32,29 @@ Log file location depends on how the main Editor was launched:
 - With `-logFile <path>`: `<path without .txt>-mppm<id>.txt`.
 
 To read a player's Console without depending on either location, run
-`uloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> get-logs`.
+`tloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> get-logs`.
 
 ## Command a Virtual Player
 
-Each Virtual Player is an independent Unity Editor, so pass its project root to any command:
+Each Virtual Player is an independent Tuanjie Editor, so pass its project root to any command:
 
 ```bash
-uloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> control-play-mode --action Status
-uloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> get-logs
-uloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> simulate-keyboard --action Press --key Space
+tloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> control-play-mode --action Status
+tloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> get-logs
+tloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> simulate-keyboard --action Press --key Space
 ```
 
-uloop's one-command-at-a-time rule is per Editor, so commands to different players (or to the
+tloop's one-command-at-a-time rule is per Editor, so commands to different players (or to the
 main Editor) do not block each other.
 
 ## Hot reload
 
 - A hot-reload patch lives in the Editor process it was applied to. To patch a Virtual
   Player, send the command to that player:
-  `uloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> hot-reload --files ...`.
+  `tloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> hot-reload --files ...`.
 - A player reads the main project's `Library/ScriptAssemblies` and keeps its own hot-reload
   state (the `ActivePatchTotal` that `--status` reports, and the source snapshots) under its own
-  `Library/UloopHotReload/`.
+  `Library/TloopHotReload/`.
 - A patch applied to the main Editor does not reach the players, and a patch applied to a player
   does not reach the main Editor or the other players. A compile of the main Editor's project
   reaches every player, and clears the patches a player holds.
@@ -75,21 +75,21 @@ startup (for example a `file:` dependency whose folder is missing), that file is
 player finds no package. Fix the main project's dependencies, restart the main Editor until it
 starts without that dialog and `<PROJECT_ROOT>/Library/PackageManager/ProjectCache` exists,
 then activate the player again. Until then
-`uloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> ...` fails at project resolution: the
-player never loaded uloop's project runner.
+`tloop --project-path <PROJECT_ROOT>/Library/VP/mppm<id> ...` fails at project resolution: the
+player never loaded tloop's project runner.
 
 ## Known limitations
 
 - `Stop` sent while Virtual Players are still starting (the main Editor is not yet in Play Mode)
   does nothing. Wait for `Play` to return, then send `Stop`.
-- A configuration that fails Unity's synchronous check (`IsConfigurationValid`, for example
+- A configuration that fails Tuanjie's synchronous check (`IsConfigurationValid`, for example
   duplicate instance names) is rejected immediately with a tool error:
   `Play Mode configuration '<name>' cannot start: <reason>`.
-- A scenario that fails Unity's pre-start validation (`Scenario.ValidateForRunningAsync`, for
-  example an instance that cannot launch) makes Unity show the modal dialog
+- A scenario that fails Tuanjie's pre-start validation (`Scenario.ValidateForRunningAsync`, for
+  example an instance that cannot launch) makes Tuanjie show the modal dialog
   "Play Mode Scenario - Scenario Setup Error". The CLI cannot see that failure and waits for Play
   Mode until `--timeout-seconds` expires. Close the dialog in the Editor and read the Console
-  errors (`uloop get-logs --log-type Error`).
+  errors (`tloop get-logs --log-type Error`).
 - `--unsaved-changes` applies as with the default configuration: `keep` (the default) starts
   without saving, `save` writes unsaved scenes first (an Untitled scene then fails with
   `CONTROL_PLAY_MODE_UNSAVED_CHANGES`), and `fail` stops if any exist.

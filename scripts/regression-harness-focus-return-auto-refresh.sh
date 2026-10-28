@@ -5,14 +5,14 @@ set -e
 # after focus returns, without a native modal dialog. The Auto Refresh hold
 # removed for issue #2575 used to leave the .cs unimported until an explicit
 # compile. A second pass then edits the open scene while focused and checks
-# that uloop compile imports and reloads it without the native dialog.
+# that tloop compile imports and reloads it without the native dialog.
 # See docs/regression-harness.md.
 #
 # Usage: sh scripts/regression-harness-focus-return-auto-refresh.sh [--project-path <path>]
 #
 # Prerequisites:
 #   - Unity Editor must already be running for this project and unfocused
-#   - uloop CLI must be installed
+#   - tloop CLI must be installed
 #   - jq must be installed
 #   - the harness scene must be clean in git
 
@@ -37,11 +37,11 @@ else
     PROJECT_ROOT="."
 fi
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        uloop "$@" --project-path "$PROJECT_PATH"
+        tloop "$@" --project-path "$PROJECT_PATH"
     else
-        uloop "$@"
+        tloop "$@"
     fi
 }
 
@@ -68,10 +68,10 @@ using UnityEditor.SceneManagement;
 EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 return "closed";
 EOF
-    run_uloop execute-dynamic-code --code-file "$CODE_FILE" > /dev/null 2>&1 || true
+    run_tloop execute-dynamic-code --code-file "$CODE_FILE" > /dev/null 2>&1 || true
     rm -f "$PROJECT_ROOT/$PROBE_REL" "$PROJECT_ROOT/${PROBE_REL}.meta"
     git -C "$PROJECT_ROOT" checkout -- "$SCENE_REL"
-    run_uloop compile > /dev/null 2>&1 || true
+    run_tloop compile > /dev/null 2>&1 || true
     rm -f "$CODE_FILE" "$RESULT_FILE"
 }
 
@@ -94,7 +94,7 @@ fi
 cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorApplication.isFocused.ToString();
 EOF
-if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
     log "FAIL: could not read EditorApplication.isFocused."
     cat "$RESULT_FILE"
     exit 1
@@ -111,12 +111,12 @@ using UnityEditor.SceneManagement;
 UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/RegressionHarness/FocusReturnAutoRefresh/FocusReturnAutoRefresh.unity");
 return "opened";
 EOF
-run_uloop execute-dynamic-code --code-file "$CODE_FILE" > /dev/null
+run_tloop execute-dynamic-code --code-file "$CODE_FILE" > /dev/null
 
 cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorApplication.isFocused.ToString();
 EOF
-if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
     log "FAIL: could not recheck EditorApplication.isFocused before writing external changes."
     cat "$RESULT_FILE"
     exit 1
@@ -140,7 +140,7 @@ sed 's/m_Name: Marker$/m_Name: MarkerExternal/' "$PROJECT_ROOT/$SCENE_REL" > "$S
 mv "$SCENE_TMP" "$PROJECT_ROOT/$SCENE_REL"
 
 log "Returning focus to the Unity Editor..."
-run_uloop focus-window > /dev/null
+run_tloop focus-window > /dev/null
 
 FOCUS_START="$(date +%s)"
 FOCUSED=""
@@ -152,7 +152,7 @@ while :; do
     cat > "$CODE_FILE" <<'EOF'
 return UnityEditor.EditorApplication.isFocused.ToString();
 EOF
-    if run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+    if run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
         FOCUSED="$(jq -r '.Result // empty' "$RESULT_FILE")"
         if [ "$FOCUSED" = "True" ]; then
             break
@@ -187,7 +187,7 @@ while :; do
     if [ $((NOW - WAIT_START)) -ge 180 ]; then
         break
     fi
-    if run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+    if run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
         LAST_STATE="$(jq -r '.Result // empty' "$RESULT_FILE")"
         if [ "$LAST_STATE" = "guidNonEmpty=True typeLoaded=True markerRenamed=True sceneClean=True" ]; then
             log "PASS: external .cs imported and compiled, and the open scene reloaded without a modal dialog."
@@ -195,7 +195,7 @@ while :; do
             SCENE_TMP="$PROJECT_ROOT/${SCENE_REL}.tmp"
             sed 's/m_Name: MarkerExternal$/m_Name: MarkerCompiled/' "$PROJECT_ROOT/$SCENE_REL" > "$SCENE_TMP"
             mv "$SCENE_TMP" "$PROJECT_ROOT/$SCENE_REL"
-            if ! run_uloop compile --timeout-seconds 120 > /dev/null; then
+            if ! run_tloop compile --timeout-seconds 120 > /dev/null; then
                 log "FAIL: compile did not return; Unity may be blocked by a modal dialog"
                 exit 1
             fi
@@ -206,7 +206,7 @@ bool markerRenamed = GameObject.Find("MarkerCompiled") != null;
 bool sceneClean = SceneManager.GetActiveScene().isDirty == false;
 return "markerCompiled=" + markerRenamed.ToString() + " sceneClean=" + sceneClean.ToString();
 EOF
-            if ! run_uloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
+            if ! run_tloop execute-dynamic-code --code-file "$CODE_FILE" > "$RESULT_FILE"; then
                 log "FAIL: could not verify the compile-path scene reload."
                 cat "$RESULT_FILE"
                 exit 1
@@ -216,7 +216,7 @@ EOF
                 log "FAIL: focused compile did not reload the external scene change. State: $COMPILE_STATE"
                 exit 1
             fi
-            log "PASS: external scene change made while focused was imported and reloaded by uloop compile without a modal dialog"
+            log "PASS: external scene change made while focused was imported and reloaded by tloop compile without a modal dialog"
             exit 0
         fi
     fi

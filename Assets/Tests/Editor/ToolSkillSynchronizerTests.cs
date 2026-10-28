@@ -116,7 +116,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             string targetRoot = Path.Combine(temporaryRoot, ".claude");
             string skillsRoot = Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName);
-            string disabledSkillDir = Path.Combine(skillsRoot, "uloop-compile");
+            string disabledSkillDir = Path.Combine(skillsRoot, "tloop-compile");
             WriteSkillFile(disabledSkillDir);
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -144,7 +144,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-fake-skill",
+                "tloop-fake-skill",
                 "FakeTool",
                 "reference.md",
                 "reference");
@@ -172,13 +172,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-fake-skill");
+                "tloop-fake-skill");
             string skillFilePath = Path.Combine(installedSkillDir, SkillInstallLayout.SkillFileName);
             string referencePath = Path.Combine(installedSkillDir, "reference.md");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(File.Exists(skillFilePath), Is.True);
-            Assert.That(File.ReadAllText(skillFilePath), Does.Contain("name: uloop-fake-skill"));
+            Assert.That(File.ReadAllText(skillFilePath), Does.Contain("name: tloop-fake-skill"));
             Assert.That(File.Exists(referencePath), Is.True);
             Assert.That(File.ReadAllText(referencePath), Is.EqualTo("reference"));
         }
@@ -189,7 +189,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-fake-skill",
+                "tloop-fake-skill",
                 "FakeTool",
                 "reference.md",
                 "reference");
@@ -200,7 +200,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-fake-skill"));
+                "tloop-fake-skill"));
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -221,12 +221,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string installedSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
-                "uloop-fake-skill");
+                "tloop-fake-skill");
             string groupedSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-fake-skill");
+                "tloop-fake-skill");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(File.Exists(Path.Combine(installedSkillDir, SkillInstallLayout.SkillFileName)), Is.True);
@@ -240,7 +240,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-fake-skill",
+                "tloop-fake-skill",
                 "FakeTool",
                 "reference.md",
                 "reference");
@@ -253,7 +253,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Directory.CreateDirectory(skillsRoot);
             WriteSkillFile(Path.Combine(
                 managedSkillsRoot,
-                "uloop-fake-skill"));
+                "tloop-fake-skill"));
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -273,7 +273,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             string installedSkillDir = Path.Combine(
                 skillsRoot,
-                "uloop-fake-skill");
+                "tloop-fake-skill");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(File.Exists(Path.Combine(installedSkillDir, SkillInstallLayout.SkillFileName)), Is.True);
@@ -286,7 +286,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-fake-skill",
+                "tloop-fake-skill",
                 "FakeTool",
                 "reference.md",
                 "reference");
@@ -297,8 +297,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 skillsRoot,
                 SkillInstallLayout.ManagedSkillsDirName);
             Directory.CreateDirectory(skillsRoot);
-            WriteSkillFile(Path.Combine(managedSkillsRoot, "uloop-fake-skill"));
-            WriteSkillFile(Path.Combine(managedSkillsRoot, "uloop-capture-window"));
+            WriteSkillFile(Path.Combine(managedSkillsRoot, "tloop-fake-skill"));
+            WriteSkillFile(Path.Combine(managedSkillsRoot, "tloop-capture-window"));
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -318,7 +318,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             string installedSkillDir = Path.Combine(
                 skillsRoot,
-                "uloop-fake-skill");
+                "tloop-fake-skill");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(File.Exists(Path.Combine(installedSkillDir, SkillInstallLayout.SkillFileName)), Is.True);
@@ -332,13 +332,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-enabled-skill",
+                "tloop-enabled-skill",
                 "EnabledTool",
                 "reference.md",
                 "enabled-reference");
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-disabled-skill",
+                "tloop-disabled-skill",
                 "DisabledTool",
                 "reference.md",
                 "disabled-reference");
@@ -348,10 +348,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string managedSkillsRoot = Path.Combine(
                 skillsRoot,
                 SkillInstallLayout.ManagedSkillsDirName);
-            string flatDisabledSkillDir = Path.Combine(skillsRoot, "uloop-disabled-skill");
-            string groupedDisabledSkillDir = Path.Combine(managedSkillsRoot, "uloop-disabled-skill");
-            WriteSkillFile(flatDisabledSkillDir, "---\nname: uloop-disabled-skill\n---\n");
-            WriteSkillFile(groupedDisabledSkillDir, "---\nname: uloop-disabled-skill\n---\n");
+            string flatDisabledSkillDir = Path.Combine(skillsRoot, "tloop-disabled-skill");
+            string groupedDisabledSkillDir = Path.Combine(managedSkillsRoot, "tloop-disabled-skill");
+            WriteSkillFile(flatDisabledSkillDir, "---\nname: tloop-disabled-skill\n---\n");
+            WriteSkillFile(groupedDisabledSkillDir, "---\nname: tloop-disabled-skill\n---\n");
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -369,7 +369,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     disabledTools: new[] { "disabled-skill" },
                     ct: CancellationToken.None);
 
-            string enabledSkillDir = Path.Combine(skillsRoot, "uloop-enabled-skill");
+            string enabledSkillDir = Path.Combine(skillsRoot, "tloop-enabled-skill");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(File.Exists(Path.Combine(enabledSkillDir, SkillInstallLayout.SkillFileName)), Is.True);
@@ -383,7 +383,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             string projectLocalToolDir = CreateFakeProjectLocalSkill(
                 temporaryRoot,
-                "uloop-get-unitask-tracker",
+                "tloop-get-unitask-tracker",
                 "GetUniTaskTracker");
             File.WriteAllText(
                 Path.Combine(projectLocalToolDir, "GetUniTaskTrackerTool.cs"),
@@ -395,7 +395,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 skillsRoot,
                 SkillInstallLayout.ManagedSkillsDirName);
             Directory.CreateDirectory(skillsRoot);
-            WriteSkillFile(Path.Combine(managedSkillsRoot, "uloop-get-unitask-tracker"));
+            WriteSkillFile(Path.Combine(managedSkillsRoot, "tloop-get-unitask-tracker"));
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -415,10 +415,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             string installedSkillDir = Path.Combine(
                 skillsRoot,
-                "uloop-get-unitask-tracker");
+                "tloop-get-unitask-tracker");
             string groupedSkillDir = Path.Combine(
                 managedSkillsRoot,
-                "uloop-get-unitask-tracker");
+                "tloop-get-unitask-tracker");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(File.Exists(Path.Combine(installedSkillDir, SkillInstallLayout.SkillFileName)), Is.True);
@@ -432,13 +432,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-enabled-skill",
+                "tloop-enabled-skill",
                 "EnabledTool",
                 "reference.md",
                 "enabled-reference");
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-unrelated-skill",
+                "tloop-unrelated-skill",
                 "UnrelatedTool",
                 "reference.md",
                 "new-unrelated-reference");
@@ -446,8 +446,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string targetRoot = Path.Combine(temporaryRoot, ".claude");
             string skillsRoot = Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName);
             Directory.CreateDirectory(skillsRoot);
-            string unrelatedSkillDir = Path.Combine(skillsRoot, "uloop-unrelated-skill");
-            WriteSkillFile(unrelatedSkillDir, "---\nname: uloop-unrelated-skill\n---\n");
+            string unrelatedSkillDir = Path.Combine(skillsRoot, "tloop-unrelated-skill");
+            WriteSkillFile(unrelatedSkillDir, "---\nname: tloop-unrelated-skill\n---\n");
             File.WriteAllText(Path.Combine(unrelatedSkillDir, "reference.md"), "old-unrelated-reference");
 
             ToolSkillSynchronizer.SkillInstallResult result =
@@ -459,7 +459,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     disabledTools: Array.Empty<string>(),
                     ct: CancellationToken.None);
 
-            string enabledSkillDir = Path.Combine(skillsRoot, "uloop-enabled-skill");
+            string enabledSkillDir = Path.Combine(skillsRoot, "tloop-enabled-skill");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.AttemptedTargets, Is.EqualTo(1));
@@ -476,7 +476,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-disabled-skill",
+                "tloop-disabled-skill",
                 "DisabledTool",
                 "reference.md",
                 "disabled-reference");
@@ -495,7 +495,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     disabledTools,
                     ct: CancellationToken.None);
 
-            string disabledSkillDir = Path.Combine(skillsRoot, "uloop-disabled-skill");
+            string disabledSkillDir = Path.Combine(skillsRoot, "tloop-disabled-skill");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(result.AttemptedTargets, Is.EqualTo(0));
@@ -507,7 +507,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Tests that explicit tool settings disable run-tests skill installation.
             SkillInstallLayout.SkillSourceInfo skill = new(
-                "uloop-run-tests",
+                "tloop-run-tests",
                 UnityCliLoopConstants.TOOL_NAME_RUN_TESTS,
                 new Dictionary<string, byte[]>());
             string[] disabledTools = { UnityCliLoopConstants.TOOL_NAME_RUN_TESTS };
@@ -524,7 +524,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Tests that run-tests skill installation remains enabled without an explicit setting.
             SkillInstallLayout.SkillSourceInfo skill = new(
-                "uloop-run-tests",
+                "tloop-run-tests",
                 UnityCliLoopConstants.TOOL_NAME_RUN_TESTS,
                 new Dictionary<string, byte[]>());
             string[] disabledTools = Array.Empty<string>();
@@ -542,19 +542,19 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-enabled-skill",
+                "tloop-enabled-skill",
                 "EnabledTool",
                 "reference.md",
                 "enabled-reference");
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-disabled-skill",
+                "tloop-disabled-skill",
                 "DisabledTool",
                 "reference.md",
                 "disabled-reference");
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-unrelated-skill",
+                "tloop-unrelated-skill",
                 "UnrelatedTool",
                 "reference.md",
                 "new-unrelated-reference");
@@ -563,15 +563,15 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string targetRoot = Path.Combine(temporaryRoot, ".claude");
             string skillsRoot = Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName);
             Directory.CreateDirectory(skillsRoot);
-            string disabledSkillDir = Path.Combine(skillsRoot, "uloop-disabled-skill");
-            string deprecatedSkillDir = Path.Combine(skillsRoot, "uloop-capture-window");
-            string retiredRecordInputSkillDir = Path.Combine(skillsRoot, "uloop-record-input");
-            string unrelatedSkillDir = Path.Combine(skillsRoot, "uloop-unrelated-skill");
+            string disabledSkillDir = Path.Combine(skillsRoot, "tloop-disabled-skill");
+            string deprecatedSkillDir = Path.Combine(skillsRoot, "tloop-capture-window");
+            string retiredRecordInputSkillDir = Path.Combine(skillsRoot, "tloop-record-input");
+            string unrelatedSkillDir = Path.Combine(skillsRoot, "tloop-unrelated-skill");
             string thirdPartySkillDir = Path.Combine(skillsRoot, "acme-third-party");
-            WriteSkillFile(disabledSkillDir, "---\nname: uloop-disabled-skill\n---\n");
-            WriteSkillFile(deprecatedSkillDir, "---\nname: uloop-capture-window\n---\n");
-            WriteSkillFile(retiredRecordInputSkillDir, "---\nname: uloop-record-input\n---\n");
-            WriteSkillFile(unrelatedSkillDir, "---\nname: uloop-unrelated-skill\n---\n");
+            WriteSkillFile(disabledSkillDir, "---\nname: tloop-disabled-skill\n---\n");
+            WriteSkillFile(deprecatedSkillDir, "---\nname: tloop-capture-window\n---\n");
+            WriteSkillFile(retiredRecordInputSkillDir, "---\nname: tloop-record-input\n---\n");
+            WriteSkillFile(unrelatedSkillDir, "---\nname: tloop-unrelated-skill\n---\n");
             File.WriteAllText(Path.Combine(unrelatedSkillDir, "reference.md"), "old-unrelated-reference");
             WriteSkillFile(
                 thirdPartySkillDir,
@@ -586,7 +586,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     disabledTools,
                     ct: CancellationToken.None);
 
-            string enabledSkillDir = Path.Combine(skillsRoot, "uloop-enabled-skill");
+            string enabledSkillDir = Path.Combine(skillsRoot, "tloop-enabled-skill");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(File.ReadAllText(Path.Combine(enabledSkillDir, "reference.md")), Is.EqualTo("enabled-reference"));
@@ -605,13 +605,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-enabled-skill",
+                "tloop-enabled-skill",
                 "EnabledTool",
                 "reference.md",
                 "enabled-reference");
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-disabled-skill",
+                "tloop-disabled-skill",
                 "DisabledTool",
                 "reference.md",
                 "disabled-reference");
@@ -620,14 +620,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string targetRoot = Path.Combine(temporaryRoot, ".claude");
             string skillsRoot = Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName);
             string managedSkillsRoot = Path.Combine(skillsRoot, SkillInstallLayout.ManagedSkillsDirName);
-            string flatDisabledSkillDir = Path.Combine(skillsRoot, "uloop-disabled-skill");
-            string flatDeprecatedSkillDir = Path.Combine(skillsRoot, "uloop-capture-window");
-            string groupedDisabledSkillDir = Path.Combine(managedSkillsRoot, "uloop-disabled-skill");
-            string groupedDeprecatedSkillDir = Path.Combine(managedSkillsRoot, "uloop-capture-window");
-            WriteSkillFile(flatDisabledSkillDir, "---\nname: uloop-disabled-skill\n---\n");
-            WriteSkillFile(flatDeprecatedSkillDir, "---\nname: uloop-capture-window\n---\n");
-            WriteSkillFile(groupedDisabledSkillDir, "---\nname: uloop-disabled-skill\n---\n");
-            WriteSkillFile(groupedDeprecatedSkillDir, "---\nname: uloop-capture-window\n---\n");
+            string flatDisabledSkillDir = Path.Combine(skillsRoot, "tloop-disabled-skill");
+            string flatDeprecatedSkillDir = Path.Combine(skillsRoot, "tloop-capture-window");
+            string groupedDisabledSkillDir = Path.Combine(managedSkillsRoot, "tloop-disabled-skill");
+            string groupedDeprecatedSkillDir = Path.Combine(managedSkillsRoot, "tloop-capture-window");
+            WriteSkillFile(flatDisabledSkillDir, "---\nname: tloop-disabled-skill\n---\n");
+            WriteSkillFile(flatDeprecatedSkillDir, "---\nname: tloop-capture-window\n---\n");
+            WriteSkillFile(groupedDisabledSkillDir, "---\nname: tloop-disabled-skill\n---\n");
+            WriteSkillFile(groupedDeprecatedSkillDir, "---\nname: tloop-capture-window\n---\n");
 
             ToolSkillSynchronizer.SkillInstallResult result =
                 await ToolSkillSynchronizer.InstallSkillFilesForToolAtProjectRoot(
@@ -651,7 +651,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-fake-skill",
+                "tloop-fake-skill",
                 "FakeTool",
                 "reference.md",
                 "reference");
@@ -662,7 +662,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 skillsRoot,
                 SkillInstallLayout.ManagedSkillsDirName);
             Directory.CreateDirectory(skillsRoot);
-            WriteSkillFile(Path.Combine(managedSkillsRoot, "uloop-fake-skill"));
+            WriteSkillFile(Path.Combine(managedSkillsRoot, "tloop-fake-skill"));
             WriteSkillFile(
                 Path.Combine(managedSkillsRoot, "acme-third-party"),
                 "---\nname: acme-third-party\ntoolName: acme-third-party\n---\n");
@@ -685,7 +685,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             string installedSkillDir = Path.Combine(
                 skillsRoot,
-                "uloop-fake-skill");
+                "tloop-fake-skill");
             string thirdPartySkillDir = Path.Combine(
                 managedSkillsRoot,
                 "acme-third-party");
@@ -701,7 +701,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-fake-skill",
+                "tloop-fake-skill",
                 "FakeTool",
                 "reference.md",
                 "reference");
@@ -712,7 +712,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 skillsRoot,
                 SkillInstallLayout.ManagedSkillsDirName);
             Directory.CreateDirectory(skillsRoot);
-            WriteSkillFile(Path.Combine(managedSkillsRoot, "uloop-fake-skill"));
+            WriteSkillFile(Path.Combine(managedSkillsRoot, "tloop-fake-skill"));
             File.WriteAllText(Path.Combine(managedSkillsRoot, ".DS_Store"), "ignored");
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
@@ -865,7 +865,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void DetectTargets_WhenManagedSkillsDirectoryContainsSkills_ReportsInstalled()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-compile", "CompileTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-compile", "CompileTool", "reference.md", "reference");
             foreach (string dir in SkillTargetDetector.SkillTargetDirs)
             {
                 string targetRoot = Path.Combine(temporaryRoot, dir);
@@ -873,7 +873,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     targetRoot,
                     SkillInstallLayout.SkillsDirName,
                     SkillInstallLayout.ManagedSkillsDirName,
-                    "uloop-compile"));
+                    "tloop-compile"));
             }
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -900,7 +900,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             foreach (string dir in SkillTargetDetector.SkillTargetDirs)
             {
                 string targetRoot = Path.Combine(temporaryRoot, dir);
-                WriteSkillFile(Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName, "uloop-compile"));
+                WriteSkillFile(Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName, "tloop-compile"));
             }
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -926,7 +926,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
             string targetRoot = Path.Combine(temporaryRoot, ".claude");
-            Directory.CreateDirectory(Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName, "uloop-compile"));
+            Directory.CreateDirectory(Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName, "tloop-compile"));
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
                     temporaryRoot,
@@ -948,7 +948,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void DetectTargets_WhenFlatLayoutRequested_IgnoresGroupedInstalledSkills()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-compile", "CompileTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-compile", "CompileTool", "reference.md", "reference");
             foreach (string dir in SkillTargetDetector.SkillTargetDirs)
             {
                 string targetRoot = Path.Combine(temporaryRoot, dir);
@@ -956,7 +956,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     targetRoot,
                     SkillInstallLayout.SkillsDirName,
                     SkillInstallLayout.ManagedSkillsDirName,
-                    "uloop-compile"));
+                    "tloop-compile"));
             }
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -1087,7 +1087,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Directory.CreateDirectory(skillDir);
             File.WriteAllText(
                 Path.Combine(skillDir, SkillInstallLayout.SkillFileName),
-                "---\nname: uloop-cached-skill\n---\n");
+                "---\nname: tloop-cached-skill\n---\n");
             File.WriteAllText(Path.Combine(skillDir, "reference.md"), "reference");
 
             string installedSkillDir = Path.Combine(
@@ -1095,8 +1095,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-cached-skill");
-            WriteSkillFile(installedSkillDir, "---\nname: uloop-cached-skill\n---\n");
+                "tloop-cached-skill");
+            WriteSkillFile(installedSkillDir, "---\nname: tloop-cached-skill\n---\n");
             File.WriteAllText(Path.Combine(installedSkillDir, "reference.md"), "reference");
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -1116,7 +1116,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void DetectTargets_WhenExpectedLayoutMatchesSourceContent_ReportsInstalled()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-fake-skill", "FakeTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-fake-skill", "FakeTool", "reference.md", "reference");
 
             string targetRoot = Path.Combine(temporaryRoot, ".claude");
             WriteSkillFile(
@@ -1124,13 +1124,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     targetRoot,
                     SkillInstallLayout.SkillsDirName,
                     SkillInstallLayout.ManagedSkillsDirName,
-                    "uloop-fake-skill"),
-                "---\nname: uloop-fake-skill\n---\n");
+                    "tloop-fake-skill"),
+                "---\nname: tloop-fake-skill\n---\n");
             File.WriteAllText(Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-fake-skill",
+                "tloop-fake-skill",
                 "reference.md"), "reference");
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -1151,15 +1151,15 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void DetectTargets_WhenExpectedLayoutDiffersFromSourceContent_ReportsOutdated()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-fake-skill", "FakeTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-fake-skill", "FakeTool", "reference.md", "reference");
 
             string installedSkillDir = Path.Combine(
                 temporaryRoot,
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-fake-skill");
-            WriteSkillFile(installedSkillDir, "---\nname: uloop-fake-skill\n---\nchanged");
+                "tloop-fake-skill");
+            WriteSkillFile(installedSkillDir, "---\nname: tloop-fake-skill\n---\nchanged");
             File.WriteAllText(Path.Combine(installedSkillDir, "reference.md"), "reference");
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -1180,10 +1180,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void DetectTargets_WhenOnlyInternalSkillsAreMissing_IgnoresThem()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-public-skill", "PublicTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-public-skill", "PublicTool", "reference.md", "reference");
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-internal-skill",
+                "tloop-internal-skill",
                 "InternalTool",
                 "reference.md",
                 "internal-reference",
@@ -1194,8 +1194,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-public-skill");
-            WriteSkillFile(installedSkillDir, "---\nname: uloop-public-skill\n---\n");
+                "tloop-public-skill");
+            WriteSkillFile(installedSkillDir, "---\nname: tloop-public-skill\n---\n");
             File.WriteAllText(Path.Combine(installedSkillDir, "reference.md"), "reference");
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -1218,7 +1218,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "PublicTool",
                 "reference.md",
                 "reference",
@@ -1229,8 +1229,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-public-skill");
-            WriteSkillFile(installedSkillDir, "---\nname: uloop-public-skill\n---\n");
+                "tloop-public-skill");
+            WriteSkillFile(installedSkillDir, "---\nname: tloop-public-skill\n---\n");
             File.WriteAllText(Path.Combine(installedSkillDir, "reference.md"), "reference");
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -1253,7 +1253,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "PublicTool",
                 "reference.md",
                 "reference");
@@ -1263,8 +1263,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-public-skill");
-            WriteSkillFile(installedSkillDir, "---\nname: uloop-public-skill\n---\n");
+                "tloop-public-skill");
+            WriteSkillFile(installedSkillDir, "---\nname: tloop-public-skill\n---\n");
             File.WriteAllText(Path.Combine(installedSkillDir, "reference.md"), "reference");
             File.WriteAllText(Path.Combine(installedSkillDir, "stale.md"), "stale");
 
@@ -1290,17 +1290,17 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void DetectTargets_WhenInstalledSkillRootContainsExtraNonMarkdownFile_ReportsInstalled()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-fake-skill", "FakeTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-fake-skill", "FakeTool", "reference.md", "reference");
 
             string installedSkillDir = Path.Combine(
                 temporaryRoot,
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-fake-skill");
-            WriteSkillFile(installedSkillDir, "---\nname: uloop-fake-skill\n---\n");
+                "tloop-fake-skill");
+            WriteSkillFile(installedSkillDir, "---\nname: tloop-fake-skill\n---\n");
             File.WriteAllText(Path.Combine(installedSkillDir, "reference.md"), "reference");
-            File.WriteAllText(Path.Combine(installedSkillDir, "extra.yml"), "name: uloop-fake-skill\n");
+            File.WriteAllText(Path.Combine(installedSkillDir, "extra.yml"), "name: tloop-fake-skill\n");
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
                     temporaryRoot,
@@ -1324,15 +1324,15 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
             string scriptRelativePath = Path.Combine("scripts", "run.sh");
-            CreateFakeSourceSkill(temporaryRoot, "uloop-fake-skill", "FakeTool", scriptRelativePath, "echo source");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-fake-skill", "FakeTool", scriptRelativePath, "echo source");
 
             string installedSkillDir = Path.Combine(
                 temporaryRoot,
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-fake-skill");
-            WriteSkillFile(installedSkillDir, "---\nname: uloop-fake-skill\n---\n");
+                "tloop-fake-skill");
+            WriteSkillFile(installedSkillDir, "---\nname: tloop-fake-skill\n---\n");
             string installedScriptPath = Path.Combine(installedSkillDir, scriptRelativePath);
             Directory.CreateDirectory(Path.GetDirectoryName(installedScriptPath));
             File.WriteAllText(installedScriptPath, "echo installed");
@@ -1357,7 +1357,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "PublicTool",
                 "reference.md",
                 "line1\nline2\n");
@@ -1367,8 +1367,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-public-skill");
-            WriteSkillFile(installedSkillDir, "---\r\nname: uloop-public-skill\r\n---\r\n");
+                "tloop-public-skill");
+            WriteSkillFile(installedSkillDir, "---\r\nname: tloop-public-skill\r\n---\r\n");
             File.WriteAllText(Path.Combine(installedSkillDir, "reference.md"), "line1\r\nline2\r\n");
 
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
@@ -1392,7 +1392,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "PublicTool",
                 "reference.md",
                 "line1\r\nline2\r\n");
@@ -1417,7 +1417,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "reference.md");
             byte[] installedBytes = File.ReadAllBytes(installedReferencePath);
 
@@ -1434,8 +1434,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-public-skill");
-            WriteSkillFile(installedSkillDir, "---\r\nname: uloop-public-skill\r\n---\r\n");
+                "tloop-public-skill");
+            WriteSkillFile(installedSkillDir, "---\r\nname: tloop-public-skill\r\n---\r\n");
             string installedReferencePath = Path.Combine(installedSkillDir, "reference.md");
             File.WriteAllText(installedReferencePath, "line1\r\nline2\r\n");
             byte[] backupBytes = File.ReadAllBytes(installedReferencePath);
@@ -1452,7 +1452,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "PublicTool",
                 "reference.md",
                 "reference");
@@ -1462,22 +1462,22 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-public-skill");
-            WriteSkillFile(installedSkillDir, "---\nname: uloop-public-skill\n---\n");
+                "tloop-public-skill");
+            WriteSkillFile(installedSkillDir, "---\nname: tloop-public-skill\n---\n");
             File.WriteAllText(Path.Combine(installedSkillDir, "reference.md"), "reference");
 
             string deprecatedSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-capture-window");
-            WriteSkillFile(deprecatedSkillDir, "---\nname: uloop-capture-window\n---\n");
+                "tloop-capture-window");
+            WriteSkillFile(deprecatedSkillDir, "---\nname: tloop-capture-window\n---\n");
             string executeMenuItemSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-execute-menu-item");
-            WriteSkillFile(executeMenuItemSkillDir, "---\nname: uloop-execute-menu-item\n---\n");
+                "tloop-execute-menu-item");
+            WriteSkillFile(executeMenuItemSkillDir, "---\nname: tloop-execute-menu-item\n---\n");
             ToolSkillSynchronizer.SkillTargetInfo[] detectedTargets = SkillTargetDetector.DetectTargetsForLayoutStateAtProjectRoot(
                     temporaryRoot,
                     temporaryRoot,
@@ -1498,7 +1498,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "PublicTool",
                 "reference.md",
                 "reference");
@@ -1510,36 +1510,36 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-capture-window");
-            WriteSkillFile(deprecatedSkillDir, "---\nname: uloop-capture-window\n---\n");
+                "tloop-capture-window");
+            WriteSkillFile(deprecatedSkillDir, "---\nname: tloop-capture-window\n---\n");
             string executeMenuItemSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-execute-menu-item");
-            WriteSkillFile(executeMenuItemSkillDir, "---\nname: uloop-execute-menu-item\n---\n");
+                "tloop-execute-menu-item");
+            WriteSkillFile(executeMenuItemSkillDir, "---\nname: tloop-execute-menu-item\n---\n");
             string flatRetiredRecordInputSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
-                "uloop-record-input");
+                "tloop-record-input");
             string groupedRetiredRecordInputSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-record-input");
-            WriteSkillFile(flatRetiredRecordInputSkillDir, "---\nname: uloop-record-input\n---\n");
-            WriteSkillFile(groupedRetiredRecordInputSkillDir, "---\nname: uloop-record-input\n---\n");
+                "tloop-record-input");
+            WriteSkillFile(flatRetiredRecordInputSkillDir, "---\nname: tloop-record-input\n---\n");
+            WriteSkillFile(groupedRetiredRecordInputSkillDir, "---\nname: tloop-record-input\n---\n");
             string flatRetiredCancelSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
-                "uloop-cancel");
+                "tloop-cancel");
             string groupedRetiredCancelSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-cancel");
-            WriteSkillFile(flatRetiredCancelSkillDir, "---\nname: uloop-cancel\n---\n");
-            WriteSkillFile(groupedRetiredCancelSkillDir, "---\nname: uloop-cancel\n---\n");
+                "tloop-cancel");
+            WriteSkillFile(flatRetiredCancelSkillDir, "---\nname: tloop-cancel\n---\n");
+            WriteSkillFile(groupedRetiredCancelSkillDir, "---\nname: tloop-cancel\n---\n");
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -1562,7 +1562,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-public-skill");
+                "tloop-public-skill");
 
             Assert.That(result.IsSuccessful, Is.True);
             Assert.That(Directory.Exists(deprecatedSkillDir), Is.False);
@@ -1581,7 +1581,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "PublicTool",
                 "reference.md",
                 "reference");
@@ -1592,8 +1592,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string executeMenuItemSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
-                "uloop-execute-menu-item");
-            WriteSkillFile(executeMenuItemSkillDir, "---\nname: uloop-execute-menu-item\n---\n");
+                "tloop-execute-menu-item");
+            WriteSkillFile(executeMenuItemSkillDir, "---\nname: tloop-execute-menu-item\n---\n");
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -1621,7 +1621,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "../uloop-stale-skill",
+                "../tloop-stale-skill",
                 "UnsafeTool",
                 "reference.md",
                 "reference");
@@ -1643,9 +1643,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(detectedTargets[0].InstallState, Is.EqualTo(SkillInstallState.Missing));
         }
 
-        [TestCase("C:\\temp\\uloop-bad-skill")]
-        [TestCase("uloop:bad-skill")]
-        [TestCase("uloop*bad-skill")]
+        [TestCase("C:\\temp\\tloop-bad-skill")]
+        [TestCase("tloop:bad-skill")]
+        [TestCase("tloop*bad-skill")]
         public void DetectTargets_WhenSourceSkillNameContainsUnsafePathCharacters_IgnoresIt(string unsafeSkillName)
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
@@ -1690,7 +1690,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 new Dictionary<string, byte[]>
                 {
                     [SkillInstallLayout.SkillFileName] = Encoding.UTF8.GetBytes(
-                        "---\nname: v3-cli-invocation-migration\n---\n"),
+                        "---\nname: tloop-v3-cli-invocation-migration\n---\n"),
                     ["scripts/detect.sh"] = Encoding.UTF8.GetBytes("#!/bin/sh\n")
                 });
 
@@ -1731,12 +1731,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 hasSkillsDirectory: true,
                 hasExistingSkills: false);
             SkillInstallLayout.SkillSourceInfo skill = new(
-                "uloop-cancelled-skill",
+                "tloop-cancelled-skill",
                 string.Empty,
                 new Dictionary<string, byte[]>
                 {
                     [SkillInstallLayout.SkillFileName] = Encoding.UTF8.GetBytes(
-                        "---\nname: uloop-cancelled-skill\n---\n")
+                        "---\nname: tloop-cancelled-skill\n---\n")
                 });
             using CancellationTokenSource cancellation = new();
             cancellation.Cancel();
@@ -1754,7 +1754,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     temporaryRoot,
                     ".codex",
                     SkillInstallLayout.SkillsDirName,
-                    "uloop-cancelled-skill")),
+                    "tloop-cancelled-skill")),
                 Is.False);
         }
 
@@ -1850,9 +1850,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string unrelatedSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
-                "uloop-compile");
-            WriteSkillFile(migrationSkillDir, "---\nname: v3-cli-invocation-migration\n---\n");
-            WriteSkillFile(unrelatedSkillDir, "---\nname: uloop-compile\n---\n");
+                "tloop-compile");
+            WriteSkillFile(migrationSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
+            WriteSkillFile(unrelatedSkillDir, "---\nname: tloop-compile\n---\n");
 
             ToolSkillSynchronizer.SkillInstallResult result =
                 await V3MigrationSkillInstaller.RemoveSpecificSkillFilesAtInstallRoot(
@@ -1894,8 +1894,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 ".claude",
                 SkillInstallLayout.SkillsDirName,
                 CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME);
-            WriteSkillFile(codexSkillDir, "---\nname: v3-cli-invocation-migration\n---\n");
-            WriteSkillFile(claudeSkillDir, "---\nname: v3-cli-invocation-migration\n---\n");
+            WriteSkillFile(codexSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
+            WriteSkillFile(claudeSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
 
             ToolSkillSynchronizer.SkillInstallResult result =
                 await V3MigrationSkillInstaller.RemoveSpecificSkillFilesAtInstallRoot(
@@ -1935,10 +1935,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string unrelatedSkillDir = Path.Combine(
                 targetRoot,
                 SkillInstallLayout.SkillsDirName,
-                "uloop-compile");
-            WriteSkillFile(flatMigrationSkillDir, "---\nname: v3-cli-invocation-migration\n---\n");
-            WriteSkillFile(groupedMigrationSkillDir, "---\nname: v3-cli-invocation-migration\n---\n");
-            WriteSkillFile(unrelatedSkillDir, "---\nname: uloop-compile\n---\n");
+                "tloop-compile");
+            WriteSkillFile(flatMigrationSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
+            WriteSkillFile(groupedMigrationSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
+            WriteSkillFile(unrelatedSkillDir, "---\nname: tloop-compile\n---\n");
 
             ToolSkillSynchronizer.SkillInstallResult result =
                 await V3MigrationSkillInstaller.RemoveV3MigrationSkillFilesAtInstallRoot(
@@ -1964,7 +1964,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             return temporaryRoot;
         }
 
-        private static void WriteSkillFile(string skillDir, string content = "---\nname: uloop-compile\n---\n")
+        private static void WriteSkillFile(string skillDir, string content = "---\nname: tloop-compile\n---\n")
         {
             Directory.CreateDirectory(skillDir);
             File.WriteAllText(Path.Combine(skillDir, SkillInstallLayout.SkillFileName), content);

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	uloopSettingsDir = ".uloop"
+	tloopSettingsDir = ".tloop"
 	toolSettingsFile = "settings.tools.json"
 )
 
@@ -17,7 +17,7 @@ type toolSettingsData struct {
 }
 
 func LoadDisabledTools(projectRoot string) []string {
-	settingsPath := filepath.Join(projectRoot, uloopSettingsDir, toolSettingsFile)
+	settingsPath := filepath.Join(projectRoot, tloopSettingsDir, toolSettingsFile)
 	content, err := os.ReadFile(settingsPath)
 	if err != nil || len(strings.TrimSpace(string(content))) == 0 {
 		return []string{}

@@ -128,8 +128,8 @@ func readInternalSkillToolName(skillDirectory string) (string, bool) {
 	if name == "" {
 		name = FallbackSkillName(skillDirectory)
 	}
-	if strings.HasPrefix(name, "uloop-") {
-		return strings.TrimPrefix(name, "uloop-"), true
+	if strings.HasPrefix(name, "tloop-") {
+		return strings.TrimPrefix(name, "tloop-"), true
 	}
 	return "", false
 }

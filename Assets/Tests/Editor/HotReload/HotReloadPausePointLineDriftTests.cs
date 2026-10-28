@@ -118,7 +118,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(enable.Success, Is.False);
             Assert.That(enable.ErrorCode, Is.EqualTo("PAUSE_POINT_LINE_NOT_COMPILED"));
             Assert.That(enable.Message, Does.Contain("is not in the last compiled source"));
-            Assert.That(enable.RecommendedNextAction, Does.Contain("uloop compile"));
+            Assert.That(enable.RecommendedNextAction, Does.Contain("tloop compile"));
         }
 
         /// <summary>

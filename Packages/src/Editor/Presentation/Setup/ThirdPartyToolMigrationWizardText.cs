@@ -16,19 +16,19 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
         internal const string AiMigrationSkillSectionTitle = "AI Skill and Script Migration";
         internal const string AiMigrationSkillDescriptionText =
             "Install a temporary AI skill for updating SKILL.md, Markdown, shell scripts, and PowerShell scripts " +
-            "that call uloop.\nThe skill teaches your AI agent how to search, inspect context, and update only " +
+            "that call tloop.\nThe skill teaches your AI agent how to search, inspect context, and update only " +
             "real V2 CLI usage. This window only installs or removes it.";
         internal const string AiMigrationSkillUsageFoldoutTitle = "Prompt for your AI agent";
         internal const string AiMigrationSkillTemporaryNoteText =
             "This skill is temporary. Remove it once your docs and scripts are migrated to V3 CLI syntax.";
         internal const string AiMigrationSkillPromptText =
-            "Use the v3-cli-invocation-migration skill in this project to update Unity CLI Loop V2 CLI usage " +
+            "Use the v3-cli-invocation-migration skill in this project to update Tuanjie CLI Loop V2 CLI usage " +
             "for V3.\n\n" +
             "Scope:\n" +
             "- Check SKILL.md, Markdown, POSIX shell scripts, and PowerShell scripts.\n" +
             "- Migrate V2 boolean arguments and renamed first-party options.\n" +
             "- Report removed commands as migration candidates. Do not rewrite or delete them.\n" +
-            "- Read nearby context before editing. Do not change C# snippets, enum/member references, regex match properties, DTO properties, or non-uloop JSON.\n" +
+            "- Read nearby context before editing. Do not change C# snippets, enum/member references, regex match properties, DTO properties, or non-tloop JSON.\n" +
             "- After editing, summarize changed files, remaining candidates, and any commands I should verify manually.";
         internal const string MigrationNotCheckedText = "C# source migration status has not been checked.";
         internal const string NoMigrationTargetsText = "No C# source structure migration is needed.";

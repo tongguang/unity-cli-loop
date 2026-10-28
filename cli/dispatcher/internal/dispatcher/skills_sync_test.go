@@ -13,7 +13,7 @@ func TestSyncSkillDirectorySkipsMetaDirectories(t *testing.T) {
 	writeSkillFile(t, sourceDir, sampleSkillContent)
 	writeDispatcherTestFile(t, filepath.Join(sourceDir, "references.meta", "inner.md"), "meta")
 	writeDispatcherTestFile(t, filepath.Join(sourceDir, "references", "guide.md"), "guide")
-	destinationDir := filepath.Join(t.TempDir(), "skills", "uloop-sample")
+	destinationDir := filepath.Join(t.TempDir(), "skills", "tloop-sample")
 
 	if err := syncSkillDirectory(sourceDir, destinationDir); err != nil {
 		t.Fatalf("syncSkillDirectory failed: %v", err)
@@ -50,7 +50,7 @@ func TestSyncSkillDirectoryReportsFailures(t *testing.T) {
 		},
 		{
 			name:        "parent not writable",
-			wantMessage: string(filepath.Separator) + "uloop-sample" + skillSyncTempSuffix,
+			wantMessage: string(filepath.Separator) + "tloop-sample" + skillSyncTempSuffix,
 			setup: func(t *testing.T, sourceDir string, destinationDir string) {
 				lockSkillsTestDirectory(t, filepath.Dir(destinationDir), 0o555)
 			},
@@ -60,7 +60,7 @@ func TestSyncSkillDirectoryReportsFailures(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			sourceDir := filepath.Join(t.TempDir(), "Skill")
 			writeSkillFile(t, sourceDir, sampleSkillContent)
-			destinationDir := filepath.Join(t.TempDir(), "skills", "uloop-sample")
+			destinationDir := filepath.Join(t.TempDir(), "skills", "tloop-sample")
 			testCase.setup(t, sourceDir, destinationDir)
 
 			err := syncSkillDirectory(sourceDir, destinationDir)
@@ -108,7 +108,7 @@ func TestSyncSkillDirectoryReportsUncreatableParent(t *testing.T) {
 	sourceDir := filepath.Join(t.TempDir(), "Skill")
 	writeSkillFile(t, sourceDir, sampleSkillContent)
 
-	err := syncSkillDirectory(sourceDir, filepath.Join(parentFile, "skills", "uloop-sample"))
+	err := syncSkillDirectory(sourceDir, filepath.Join(parentFile, "skills", "tloop-sample"))
 	if err == nil || !strings.HasPrefix(err.Error(), "mkdir "+parentFile) {
 		t.Fatalf("expected a parent directory failure, got %v", err)
 	}
@@ -116,7 +116,7 @@ func TestSyncSkillDirectoryReportsUncreatableParent(t *testing.T) {
 
 func TestReplaceSkillDirectoryRestoresDestinationWhenReplacementFails(t *testing.T) {
 	// Verifies a failed swap moves the previous install back instead of leaving the skill missing.
-	destinationDir := filepath.Join(t.TempDir(), "uloop-sample")
+	destinationDir := filepath.Join(t.TempDir(), "tloop-sample")
 	writeSkillFile(t, destinationDir, "previous")
 
 	missingSource := filepath.Join(t.TempDir(), "missing")
@@ -126,7 +126,7 @@ func TestReplaceSkillDirectoryRestoresDestinationWhenReplacementFails(t *testing
 		t.Fatalf("expected the replacement to fail, got %v", err)
 	}
 	assertFileContent(t, filepath.Join(destinationDir, "SKILL.md"), "previous")
-	assertNoSkillSyncDebrisExcept(t, filepath.Dir(destinationDir), "uloop-sample")
+	assertNoSkillSyncDebrisExcept(t, filepath.Dir(destinationDir), "tloop-sample")
 }
 
 func assertNoSkillSyncDebrisExcept(t *testing.T, directory string, keep string) {
@@ -147,11 +147,11 @@ func TestReplaceSkillDirectoryReportsBlockedBackup(t *testing.T) {
 	sourceDir := filepath.Join(t.TempDir(), "staged")
 	writeSkillFile(t, sourceDir, "new")
 	parentDir := t.TempDir()
-	destinationDir := filepath.Join(parentDir, "uloop-sample")
+	destinationDir := filepath.Join(parentDir, "tloop-sample")
 	writeSkillFile(t, destinationDir, "previous")
 	lockSkillsTestDirectory(t, parentDir, 0o555)
 
-	if err := replaceSkillDirectory(sourceDir, destinationDir); err == nil || !strings.HasPrefix(err.Error(), "mkdir "+destinationDir+".uloop-backup-") {
+	if err := replaceSkillDirectory(sourceDir, destinationDir); err == nil || !strings.HasPrefix(err.Error(), "mkdir "+destinationDir+".tloop-backup-") {
 		t.Fatalf("expected the backup to fail, got %v", err)
 	}
 	assertFileContent(t, filepath.Join(destinationDir, "SKILL.md"), "previous")
@@ -162,7 +162,7 @@ func TestReplaceSkillDirectoryReportsUninspectableDestination(t *testing.T) {
 	parentFile := filepath.Join(t.TempDir(), "file")
 	blockSkillsDirWithFile(t, filepath.Dir(parentFile), "file")
 
-	if err := replaceSkillDirectory(t.TempDir(), filepath.Join(parentFile, "uloop-sample")); err == nil || !strings.HasPrefix(err.Error(), "stat "+parentFile) {
+	if err := replaceSkillDirectory(t.TempDir(), filepath.Join(parentFile, "tloop-sample")); err == nil || !strings.HasPrefix(err.Error(), "stat "+parentFile) {
 		t.Fatalf("expected a stat failure, got %v", err)
 	}
 }
@@ -175,11 +175,11 @@ func TestGetSkillStatusTreatsUnreadableFilesAsOutdated(t *testing.T) {
 			writeSkillFile(t, sourceDir, sampleSkillContent)
 			writeDispatcherTestFile(t, filepath.Join(sourceDir, "references", "guide.md"), "guide")
 			baseDir := t.TempDir()
-			installedDir := getPreferredSkillDir(baseDir, "uloop-sample", true)
+			installedDir := getPreferredSkillDir(baseDir, "tloop-sample", true)
 			if err := syncSkillDirectory(sourceDir, installedDir); err != nil {
 				t.Fatalf("syncSkillDirectory failed: %v", err)
 			}
-			skill := skillDefinition{name: "uloop-sample", content: []byte(sampleSkillContent), sourceDirectory: sourceDir}
+			skill := skillDefinition{name: "tloop-sample", content: []byte(sampleSkillContent), sourceDirectory: sourceDir}
 			assertSkillStatus(t, baseDir, skill, "installed")
 			lockSkillsTestFile(t, filepath.Join(installedDir, lockedFile))
 

@@ -18,16 +18,16 @@ using Microsoft.CodeAnalysis.Text;
 internal static class ConstDriftCollector
 {
     internal const string NewConstWarningFormat =
-        "const {0} exists only in the edited source, not in the compiled assembly. Method bodies patched in this same run already have its value folded in, so this run needs no compile; only bodies in files outside this reload that reference it fail shim compilation. Run 'uloop compile' when one of those files has to see it.";
+        "const {0} exists only in the edited source, not in the compiled assembly. Method bodies patched in this same run already have its value folded in, so this run needs no compile; only bodies in files outside this reload that reference it fail shim compilation. Run 'tloop compile' when one of those files has to see it.";
 
     // Why a separate wording: patched bodies fold an added const, but an added enum member is
     // bound as a member access on the compiled enum, so it fails shim compilation even in this
     // reload's files and the "needs no compile" sentence would be false.
     internal const string NewEnumMemberWarningFormat =
-        "enum member {0} exists only in the edited source, not in the compiled assembly. Hot reload does not fold an added enum member into patched bodies, so every body that names it fails shim compilation (CS0117), including bodies in this reload's files. Write the underlying value as a cast instead ('({1}){2}'; ToString() then prints the number, not the name), or run 'uloop compile' to add the member.";
+        "enum member {0} exists only in the edited source, not in the compiled assembly. Hot reload does not fold an added enum member into patched bodies, so every body that names it fails shim compilation (CS0117), including bodies in this reload's files. Write the underlying value as a cast instead ('({1}){2}'; ToString() then prints the number, not the name), or run 'tloop compile' to add the member.";
 
     internal const string ChangedConstWarningFormat =
-        "const {0} is {1} in the edited source but {2} in the compiled assembly; edits outside method bodies never take effect through hot reload - a method body patched in the same run still compiles against the compiled assembly and keeps the old value, so nothing runs with {1} yet. This warning repeats on every reload while the two values differ. Run 'uloop compile' to apply this change.";
+        "const {0} is {1} in the edited source but {2} in the compiled assembly; edits outside method bodies never take effect through hot reload - a method body patched in the same run still compiles against the compiled assembly and keeps the old value, so nothing runs with {1} yet. This warning repeats on every reload while the two values differ. Run 'tloop compile' to apply this change.";
 
     /// <summary>
     /// Detects const declarations (including enum members) in the edited source whose values

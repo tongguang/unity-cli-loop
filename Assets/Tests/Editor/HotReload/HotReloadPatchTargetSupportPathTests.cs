@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         private const string EmbeddedPhysicalPath =
             "Packages/src/Editor/FirstPartyTools/HotReload/HotReloadPatchTargetSupport.cs";
         private const string EmbeddedLogicalPath =
-            "Packages/io.github.hatayama.uloopmcp/Editor/FirstPartyTools/HotReload/HotReloadPatchTargetSupport.cs";
+            "Packages/io.github.tongguang.tloop/Editor/FirstPartyTools/HotReload/HotReloadPatchTargetSupport.cs";
         private const string GitPackageLogicalPath =
             "Packages/com.boxqkrtm.ide.cursor/Editor/ProjectGeneration/ProjectGeneration.cs";
         private const string AssetsScriptPath =

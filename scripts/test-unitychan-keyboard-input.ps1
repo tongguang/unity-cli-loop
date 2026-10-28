@@ -3,7 +3,7 @@
 $ErrorActionPreference = "Stop"
 
 function Cleanup {
-    uloop control-play-mode --action Stop 2>$null
+    tloop control-play-mode --action Stop 2>$null
 }
 
 function Press {
@@ -11,7 +11,7 @@ function Press {
         [string]$Key,
         [float]$Duration = 0.5
     )
-    uloop simulate-keyboard --action Press --key $Key --duration $Duration
+    tloop simulate-keyboard --action Press --key $Key --duration $Duration
 }
 
 function HoldFor {
@@ -20,30 +20,30 @@ function HoldFor {
         [string[]]$Keys
     )
     foreach ($k in $Keys) {
-        uloop simulate-keyboard --action KeyDown --key $k
+        tloop simulate-keyboard --action KeyDown --key $k
     }
     Start-Sleep -Seconds $Duration
     foreach ($k in $Keys) {
-        uloop simulate-keyboard --action KeyUp --key $k
+        tloop simulate-keyboard --action KeyUp --key $k
     }
 }
 
 function Hold {
     param([string]$Key)
-    uloop simulate-keyboard --action KeyDown --key $Key
+    tloop simulate-keyboard --action KeyDown --key $Key
 }
 
 function Release {
     param([string]$Key)
-    uloop simulate-keyboard --action KeyUp --key $Key
+    tloop simulate-keyboard --action KeyUp --key $Key
 }
 
 try {
     Write-Host "=== Keyboard Cube Input Test ==="
 
-    uloop control-play-mode --action Play
+    tloop control-play-mode --action Play
     Start-Sleep -Seconds 2
-    # uloop focus-window
+    # tloop focus-window
     # Start-Sleep -Seconds 0.5
 
     # Idle jump

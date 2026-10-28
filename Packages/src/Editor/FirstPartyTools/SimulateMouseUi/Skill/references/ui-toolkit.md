@@ -48,8 +48,8 @@ while held.
 
 - `--bypass-raycast`, `--target-path`, and `--drop-target-path` take GameObject paths only;
   a UI Toolkit `Path` (it contains `#`) is reported as not found.
-- World-space panels (Unity 6), as in the annotation.
-- Two panels with the same `sortingOrder` overlapping at the point: Unity orders them by
+- World-space panels (Tuanjie 6), as in the annotation.
+- Two panels with the same `sortingOrder` overlapping at the point: Tuanjie orders them by
   creation order, which is not exposed, so either one may be chosen.
 
 ## Notes

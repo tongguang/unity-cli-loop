@@ -117,7 +117,7 @@ func TestTryHandleCompileCheckRequestPrintsHelp(t *testing.T) {
 	if !handled || exitCode != 0 {
 		t.Fatalf("expected help to be handled, got handled=%v exitCode=%d", handled, exitCode)
 	}
-	for _, expected := range []string{"uloop compile-check", "--all", "without contacting the Unity Editor"} {
+	for _, expected := range []string{"tloop compile-check", "--all", "without contacting the Unity Editor"} {
 		if !strings.Contains(stdout.String(), expected) {
 			t.Fatalf("expected the help to mention %q, got %q", expected, stdout.String())
 		}
@@ -390,7 +390,7 @@ func TestBuildCompileCheckResponseSaysWhyBlockedAssembliesWereNotCompiled(t *tes
 
 // bogusCompileCheckEditorVersion names an Editor no machine has installed, so
 // editor resolution always fails before any compiler could run.
-const bogusCompileCheckEditorVersion = "0.0.0f0-uloop-test"
+const bogusCompileCheckEditorVersion = "0.0.0f0-tloop-test"
 
 func TestTryHandleCompileCheckRequestReportsInvalidOptions(t *testing.T) {
 	// Verifies an invalid compile-check option exits with code 1 before any project lookup.
@@ -445,14 +445,14 @@ func TestRunCompileCheckReportsResolutionFailures(t *testing.T) {
 				writeDispatcherTestFile(t, filepath.Join(projectRoot, projectVersionFilePath), "m_EditorVersion: "+bogusCompileCheckEditorVersion+"\n")
 				return projectRoot, compileCheckOptions{}
 			},
-			wantMessage: "unity " + bogusCompileCheckEditorVersion + " executable not found",
+			wantMessage: "tuanjie " + bogusCompileCheckEditorVersion + " executable not found",
 		},
 		{
 			name: "explicit editor version not installed",
 			setup: func(t *testing.T) (string, compileCheckOptions) {
 				return createDispatcherUnityProject(t), compileCheckOptions{editorVersion: bogusCompileCheckEditorVersion}
 			},
-			wantMessage: "unity " + bogusCompileCheckEditorVersion + " executable not found",
+			wantMessage: "tuanjie " + bogusCompileCheckEditorVersion + " executable not found",
 		},
 	}
 	for _, testCase := range cases {
@@ -494,7 +494,7 @@ func TestTryHandleCompileCheckRequestRunsWithParsedOptions(t *testing.T) {
 	args := []string{clicore.CompileCheckCommandName, compileCheckEditorFlag, bogusCompileCheckEditorVersion}
 	handled, code := tryHandleCompileCheckRequest(context.Background(), args, projectRoot, "", &stdout, &stderr)
 
-	if !handled || code != 1 || !strings.Contains(stderr.String(), "unity "+bogusCompileCheckEditorVersion+" executable not found") {
+	if !handled || code != 1 || !strings.Contains(stderr.String(), "tuanjie "+bogusCompileCheckEditorVersion+" executable not found") {
 		t.Fatalf("unexpected result: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
 }

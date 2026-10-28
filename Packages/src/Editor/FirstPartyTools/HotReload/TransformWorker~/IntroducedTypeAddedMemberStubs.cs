@@ -102,7 +102,7 @@ internal static class IntroducedTypeAddedMemberStubs
         string memberName = patchedMethod.AssociatedSymbol?.Name ?? patchedMethod.Name;
         return "'" + typeSymbol.ToDisplayString() + "." + memberName
             + "' calls members that a hot reload added, so its body runs only while hot reload patches it in. Reload '"
-            + ownerProjectRelativePath + "' again, or run 'uloop compile'.";
+            + ownerProjectRelativePath + "' again, or run 'tloop compile'.";
     }
 
     // Keeps the form of the body it replaces, so an expression-bodied member keeps the semicolon

@@ -23,12 +23,12 @@ def run_command(
     )
 
 
-def run_uloop(
+def run_tloop(
     args: list[str],
     project_path: str,
     timeout: float,
 ) -> subprocess.CompletedProcess[str]:
-    return run_command(["uloop", *args, "--project-path", project_path], project_path, timeout)
+    return run_command(["tloop", *args, "--project-path", project_path], project_path, timeout)
 
 
 def assert_success(result: subprocess.CompletedProcess[str], label: str) -> None:
@@ -44,13 +44,13 @@ def assert_success(result: subprocess.CompletedProcess[str], label: str) -> None
 
 
 def assert_ready(project_path: str, timeout: float) -> None:
-    result = run_uloop(["get-logs", "--max-count", "1"], project_path, timeout)
+    result = run_tloop(["get-logs", "--max-count", "1"], project_path, timeout)
     assert_success(result, "initial get-logs readiness check")
 
 
 def assert_compile_then_get_logs(project_path: str, timeout: float, round_index: int) -> None:
     compile_started_at = time.time()
-    compile_result = run_uloop(
+    compile_result = run_tloop(
         ["compile"],
         project_path,
         timeout,
@@ -59,7 +59,7 @@ def assert_compile_then_get_logs(project_path: str, timeout: float, round_index:
     assert_success(compile_result, f"round {round_index} compile")
 
     logs_started_at = time.time()
-    logs_result = run_uloop(["get-logs", "--max-count", "1"], project_path, timeout)
+    logs_result = run_tloop(["get-logs", "--max-count", "1"], project_path, timeout)
     logs_elapsed = time.time() - logs_started_at
     assert_success(logs_result, f"round {round_index} immediate get-logs")
 

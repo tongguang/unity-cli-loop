@@ -16,11 +16,11 @@ import (
 )
 
 const (
-	ipcEndpointPrefix = "UnityCliLoop"
+	ipcEndpointPrefix = "TuanjieCliLoop"
 	ipcHashLength     = 16
 	unixSocketParent  = "/tmp"
-	unixSocketPrefix  = "uloop-"
-	windowsPipePrefix = `\\.\pipe\uloop`
+	unixSocketPrefix  = "tloop-"
+	windowsPipePrefix = `\\.\pipe\tloop`
 )
 
 var excludedProjectSearchDirs = map[string]bool{

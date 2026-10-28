@@ -59,7 +59,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 reason,
                 Is.EqualTo(
-                    "Resolved assembly 'Assembly-CSharp' does not exist yet: no script has been compiled into it, so there is no assembly to patch. Hot reload can only introduce types into an assembly that already exists. Run 'uloop compile' once; later scripts in this assembly can then be hot-reloaded."));
+                    "Resolved assembly 'Assembly-CSharp' does not exist yet: no script has been compiled into it, so there is no assembly to patch. Hot reload can only introduce types into an assembly that already exists. Run 'tloop compile' once; later scripts in this assembly can then be hot-reloaded."));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 reason,
                 Is.EqualTo(
-                    "Resolved assembly 'Some.Custom.Assembly' was not found in the compilation pipeline. Unity resolves files under a not-yet-imported .asmdef to a predefined assembly, so a brand-new .asmdef or a brand-new script cannot be hot-reloaded. Run 'uloop compile' first."));
+                    "Resolved assembly 'Some.Custom.Assembly' was not found in the compilation pipeline. Unity resolves files under a not-yet-imported .asmdef to a predefined assembly, so a brand-new .asmdef or a brand-new script cannot be hot-reloaded. Run 'tloop compile' first."));
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 reason,
                 Is.EqualTo(
-                    "'Assets/Tests/Editor/HotReload/UncompiledNewScript.cs' sits under 'Assets/Tests/Editor/HotReload/UnityCLILoop.Tests.Editor.HotReload.asmdef', which Unity has not imported yet, so no compilation assembly exists for it (Unity currently maps the file to the predefined assembly 'Assembly-CSharp'). Run 'uloop compile' first; hot reload can target the file once the .asmdef is imported."));
+                    "'Assets/Tests/Editor/HotReload/UncompiledNewScript.cs' sits under 'Assets/Tests/Editor/HotReload/UnityCLILoop.Tests.Editor.HotReload.asmdef', which Unity has not imported yet, so no compilation assembly exists for it (Unity currently maps the file to the predefined assembly 'Assembly-CSharp'). Run 'tloop compile' first; hot reload can target the file once the .asmdef is imported."));
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ func TestDecodeToolCancelledErrorData_WhenContractFixture_ReadsEveryField(t *tes
 
 	expected := toolCancelledErrorData{
 		Type:            "tool_cancelled",
-		Message:         "'run-tests' was cancelled by uloop cancel.",
+		Message:         "'run-tests' was cancelled by tloop cancel.",
 		RunningToolName: "run-tests",
 	}
 	if decoded != expected {
@@ -33,12 +33,12 @@ func TestDecodeToolCancelledErrorData_WhenContractFixture_ReadsEveryField(t *tes
 }
 
 // Verifies a tool_cancelled RPC error classifies as TOOL_CANCELLED in the execution phase, is
-// not retryable, names the tool, and points at uloop status.
+// not retryable, names the tool, and points at tloop status.
 func TestClassifyToolCancelledRPCError_UsesCancelEnvelope(t *testing.T) {
 	contract := readToolCancelledErrorContract(t)
 	err := &unityipc.RPCError{
 		Code:    -32603,
-		Message: "'run-tests' was cancelled by uloop cancel.",
+		Message: "'run-tests' was cancelled by tloop cancel.",
 		Data:    contract.ErrorData,
 	}
 
@@ -53,10 +53,10 @@ func TestClassifyToolCancelledRPCError_UsesCancelEnvelope(t *testing.T) {
 	if cliErr.Retryable || cliErr.SafeToRetry {
 		t.Fatalf("a cancel must not be retryable: %#v", cliErr)
 	}
-	if cliErr.Message != "'run-tests' was cancelled by uloop cancel." {
+	if cliErr.Message != "'run-tests' was cancelled by tloop cancel." {
 		t.Fatalf("message mismatch: %s", cliErr.Message)
 	}
-	expectedActions := []string{"Run `uloop status` to confirm the Editor is Ready before the next command."}
+	expectedActions := []string{"Run `tloop status` to confirm the Editor is Ready before the next command."}
 	if !reflect.DeepEqual(cliErr.NextActions, expectedActions) {
 		t.Fatalf("next actions mismatch: %#v", cliErr.NextActions)
 	}

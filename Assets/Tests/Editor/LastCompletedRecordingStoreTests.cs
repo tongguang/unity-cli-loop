@@ -19,7 +19,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void SetUp()
         {
             _previousRecording = LastCompletedRecordingTestState.TakeAndClear();
-            _directory = Path.Combine(Path.GetTempPath(), "uloop-last-recording-" + Guid.NewGuid().ToString("N"));
+            _directory = Path.Combine(Path.GetTempPath(), "tloop-last-recording-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_directory);
         }
 

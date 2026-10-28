@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     public sealed class CliInstallationDetectorCacheTests
     {
         private const string DetectedVersion = "3.6.0";
-        private const string DetectedPath = "<PROJECT_ROOT>/bin/uloop";
+        private const string DetectedPath = "<PROJECT_ROOT>/bin/tloop";
 
         /// <summary>
         /// Verifies a refresh stores the detected version, path, and dispatcher flag and marks the check completed.
@@ -157,7 +157,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             SequenceDetection detection = new(
                 new CliInstallationDetection(DetectedVersion, DetectedPath, true),
-                new CliInstallationDetection("3.7.0", "<PROJECT_ROOT>/other/uloop"));
+                new CliInstallationDetection("3.7.0", "<PROJECT_ROOT>/other/tloop"));
             CliInstallationDetector detector = CreateDetector(detection);
             await detector.RefreshCliVersionAsync(CancellationToken.None);
 
@@ -165,7 +165,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             Assert.That(detection.CallCount, Is.EqualTo(2));
             Assert.That(detector.GetCachedCliVersion(), Is.EqualTo("3.7.0"));
-            Assert.That(detector.GetCachedCliExecutablePath(), Is.EqualTo("<PROJECT_ROOT>/other/uloop"));
+            Assert.That(detector.GetCachedCliExecutablePath(), Is.EqualTo("<PROJECT_ROOT>/other/tloop"));
             Assert.That(detector.GetCachedCliIsDispatcher(), Is.False);
             Assert.That(detector.IsCheckCompleted(), Is.True);
         }

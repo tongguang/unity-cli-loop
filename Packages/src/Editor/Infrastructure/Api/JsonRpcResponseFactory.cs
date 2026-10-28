@@ -164,7 +164,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                 id,
                 new JsonRpcError(
                     UnityCliLoopServerConfig.INTERNAL_ERROR_CODE,
-                    "The installed uloop CLI uses an IPC protocol that does not match this Unity package.",
+                    "The installed tloop CLI uses an IPC protocol that does not match this Unity package.",
                     new CliUpdateRequiredErrorData(
                         currentCliVersion,
                         currentProtocolVersion,

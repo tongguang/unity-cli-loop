@@ -66,7 +66,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                         && outcome.Reason != null
                         && outcome.Reason.Contains(RefusedTypeNotePart, StringComparison.Ordinal))
                     {
-                        Assert.That(outcome.Reason, Does.Contain("run 'uloop compile'."));
+                        Assert.That(outcome.Reason, Does.Contain("run 'tloop compile'."));
                         return;
                     }
                 }

@@ -23,7 +23,7 @@ import (
 
 func testPipeConnection(t *testing.T) (Connection, net.Listener) {
 	t.Helper()
-	pipePath := fmt.Sprintf(`\\.\pipe\uloop-test-%d-%s`, os.Getpid(), strings.ReplaceAll(t.Name(), "/", "_"))
+	pipePath := fmt.Sprintf(`\\.\pipe\tloop-test-%d-%s`, os.Getpid(), strings.ReplaceAll(t.Name(), "/", "_"))
 	listener, err := winio.ListenPipe(pipePath, nil)
 	if err != nil {
 		t.Fatalf("failed to listen on named pipe: %v", err)
@@ -134,7 +134,7 @@ func TestPipeDialMissingPipeFailsFast(t *testing.T) {
 	connection := Connection{
 		Endpoint: Endpoint{
 			Network: "pipe",
-			Address: fmt.Sprintf(`\\.\pipe\uloop-test-missing-%d`, os.Getpid()),
+			Address: fmt.Sprintf(`\\.\pipe\tloop-test-missing-%d`, os.Getpid()),
 		},
 		ProjectRoot: t.TempDir(),
 	}

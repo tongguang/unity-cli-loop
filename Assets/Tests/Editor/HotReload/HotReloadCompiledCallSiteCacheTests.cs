@@ -44,7 +44,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             _tempDirectory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-call-site-cache-" + Guid.NewGuid().ToString("N"));
+                "tloop-call-site-cache-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDirectory);
             _cache = new HotReloadCompiledCallSiteCache(BudgetForEntries(2));
         }

@@ -60,7 +60,7 @@ function Invoke-WindowsPowerShellNativeArgumentRoundTrip {
         [string]$Argument
     )
 
-    [string]$childScriptPath = Join-Path ([System.IO.Path]::GetTempPath()) ("uloop-native-argument-round-trip-" + [Guid]::NewGuid().ToString("N") + ".ps1")
+    [string]$childScriptPath = Join-Path ([System.IO.Path]::GetTempPath()) ("tloop-native-argument-round-trip-" + [Guid]::NewGuid().ToString("N") + ".ps1")
     Set-Content -LiteralPath $childScriptPath -Value '[Console]::Out.Write([Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($args[0])))' -Encoding UTF8
     [string[]]$childArguments = @("-NoProfile", "-File", $childScriptPath, $Argument)
     [string[]]$escapedArguments = @($childArguments | ForEach-Object {
@@ -84,7 +84,7 @@ foreach ($definition in @($definitions | Select-Object -Skip 1)) {
     Assert-Equal -Actual $definition -Expected $definitions[0] -Context "All E2E scripts must use the same native argument escaping implementation"
 }
 
-[string]$temporaryFunctionPath = Join-Path ([System.IO.Path]::GetTempPath()) "uloop-native-argument-escaping.ps1"
+[string]$temporaryFunctionPath = Join-Path ([System.IO.Path]::GetTempPath()) "tloop-native-argument-escaping.ps1"
 Set-Content -LiteralPath $temporaryFunctionPath -Value $definitions[0] -Encoding UTF8
 . $temporaryFunctionPath
 Remove-Item -LiteralPath $temporaryFunctionPath

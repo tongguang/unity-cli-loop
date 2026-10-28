@@ -71,14 +71,14 @@ func unityServerNotRespondingCLIError(err UnityServerNotRespondingError, context
 	return CLIError{
 		ErrorCode:   ErrorCodeUnityNotReachable,
 		Phase:       ErrorPhaseConnection,
-		Message:     "Unity is running for this project, but the Unity CLI Loop server is not responding.",
+		Message:     "Unity is running for this project, but the Tuanjie CLI Loop server is not responding.",
 		Retryable:   true,
 		SafeToRetry: true,
 		ProjectRoot: firstNonEmpty(context.ProjectRoot, err.ProjectRoot),
 		Command:     context.Command,
 		NextActions: []string{
 			"Wait and retry; Unity may be starting, importing assets, compiling, or reloading scripts.",
-			"Run `uloop focus-window` if Unity appears stalled in the background.",
+			"Run `tloop focus-window` if Unity appears stalled in the background.",
 			"Confirm that the command targets the intended Unity project and the Editor package is installed.",
 		},
 		Details: map[string]any{
@@ -95,13 +95,13 @@ func connectionAttemptCLIError(err *unityipc.ConnectionAttemptError, context Err
 	return CLIError{
 		ErrorCode:   ErrorCodeUnityNotReachable,
 		Phase:       ErrorPhaseConnection,
-		Message:     "The Unity CLI Loop server is not reachable for this project.",
+		Message:     "The Tuanjie CLI Loop server is not reachable for this project.",
 		Retryable:   true,
 		SafeToRetry: true,
 		ProjectRoot: firstNonEmpty(context.ProjectRoot, err.ProjectRoot),
 		Command:     context.Command,
 		NextActions: []string{
-			"If Unity is closed, run `uloop launch`.",
+			"If Unity is closed, run `tloop launch`.",
 			"If Unity is starting, compiling, or reloading scripts, wait and retry.",
 			"Confirm that the command targets the intended Unity project.",
 		},
@@ -119,7 +119,7 @@ func refusedConnectionAttemptCLIError(err *unityipc.ConnectionAttemptError, cont
 	return CLIError{
 		ErrorCode:   ErrorCodeUnityNotReachable,
 		Phase:       ErrorPhaseConnection,
-		Message:     "The operating system refused the connection to the Unity CLI Loop server for this project.",
+		Message:     "The operating system refused the connection to the Tuanjie CLI Loop server for this project.",
 		Retryable:   false,
 		SafeToRetry: false,
 		ProjectRoot: firstNonEmpty(context.ProjectRoot, err.ProjectRoot),

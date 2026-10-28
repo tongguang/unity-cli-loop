@@ -36,12 +36,12 @@
         {
             "name": "com.unity.inputsystem",
             "expression": "",
-            "define": "ULOOP_HAS_INPUT_SYSTEM"
+            "define": "TLOOP_HAS_INPUT_SYSTEM"
         },
         {
             "name": "com.unity.test-framework",
             "expression": "",
-            "define": "ULOOP_HAS_TEST_FRAMEWORK"
+            "define": "TLOOP_HAS_TEST_FRAMEWORK"
         }
     ],
     "noEngineReferences": false

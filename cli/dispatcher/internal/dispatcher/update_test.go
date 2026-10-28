@@ -43,7 +43,7 @@ func TestUpdateCommandForDarwinUsesDirectInstaller(t *testing.T) {
 	if command.InstallerChecksumURL != expectedScriptURL+".sha256" {
 		t.Fatalf("installer checksum URL mismatch: %s", command.InstallerChecksumURL)
 	}
-	if !stringSliceContains(command.Env, "ULOOP_VERSION="+expectedReleaseTag) {
+	if !stringSliceContains(command.Env, "TLOOP_VERSION="+expectedReleaseTag) {
 		t.Fatalf("installer version missing: %v", command.Env)
 	}
 	if command.InstallerName != update.PosixScriptName {
@@ -71,7 +71,7 @@ func TestUpdateCommandForWindowsUsesPowerShellInstaller(t *testing.T) {
 	if command.InstallerChecksumURL != expectedScriptURL+".sha256" {
 		t.Fatalf("installer checksum URL mismatch: %s", command.InstallerChecksumURL)
 	}
-	if !stringSliceContains(command.Env, "ULOOP_VERSION="+expectedReleaseTag) {
+	if !stringSliceContains(command.Env, "TLOOP_VERSION="+expectedReleaseTag) {
 		t.Fatalf("installer version missing: %v", command.Env)
 	}
 	if command.InstallerName != update.WindowsScriptName {
@@ -95,7 +95,7 @@ func TestUpdateCommandForDarwinUsesRequestedVersion(t *testing.T) {
 	if !strings.Contains(command.InstallerURL, "dispatcher-v3.0.0-beta.6/install.sh") {
 		t.Fatalf("installer URL mismatch: %s", command.InstallerURL)
 	}
-	if !stringSliceContains(command.Env, "ULOOP_VERSION=dispatcher-v3.0.0-beta.6") {
+	if !stringSliceContains(command.Env, "TLOOP_VERSION=dispatcher-v3.0.0-beta.6") {
 		t.Fatalf("installer version missing: %v", command.Env)
 	}
 }
@@ -113,7 +113,7 @@ func TestUpdateCommandForDarwinNormalizesRequestedVersionPrefix(t *testing.T) {
 	if command.Name != "sh" {
 		t.Fatalf("command mismatch: %s", command.Name)
 	}
-	if !stringSliceContains(command.Env, "ULOOP_VERSION=dispatcher-v3.0.0-beta.6") {
+	if !stringSliceContains(command.Env, "TLOOP_VERSION=dispatcher-v3.0.0-beta.6") {
 		t.Fatalf("installer version should not contain a doubled v prefix: %v", command.Env)
 	}
 	if strings.Contains(command.InstallerURL, "dispatcher-vv3.0.0-beta.6") {
@@ -125,7 +125,7 @@ func TestUpdateCommandForDarwinNormalizesProjectRunnerReleaseTag(t *testing.T) {
 	// Verifies project runner release tags resolve to the matching dispatcher release.
 	command, err := update.CommandForOS("darwin", update.Options{
 		CurrentVersion: dispatcherVersion,
-		TargetVersion:  "uloop-project-runner-v3.0.0-beta.6",
+		TargetVersion:  "tloop-project-runner-v3.0.0-beta.6",
 	})
 	if err != nil {
 		t.Fatalf("updateCommandForOSWithOptions failed: %v", err)
@@ -158,7 +158,7 @@ func TestUpdateCommandForWindowsUsesRequestedVersion(t *testing.T) {
 	if !strings.Contains(command.InstallerURL, "dispatcher-v3.0.0/install.ps1") {
 		t.Fatalf("installer URL mismatch: %s", command.InstallerURL)
 	}
-	if !stringSliceContains(command.Env, "ULOOP_VERSION=dispatcher-v3.0.0") {
+	if !stringSliceContains(command.Env, "TLOOP_VERSION=dispatcher-v3.0.0") {
 		t.Fatalf("installer version missing: %v", command.Env)
 	}
 }
@@ -177,7 +177,7 @@ func TestParseUpdateOptionsNormalizesVersionPrefix(t *testing.T) {
 
 func TestParseUpdateOptionsNormalizesProjectRunnerReleaseTag(t *testing.T) {
 	// Verifies parsed project runner release tags are normalized before dispatcher tag selection.
-	options, err := parseUpdateOptions([]string{"--to-version", "uloop-project-runner-v3.0.0-beta.6"})
+	options, err := parseUpdateOptions([]string{"--to-version", "tloop-project-runner-v3.0.0-beta.6"})
 	if err != nil {
 		t.Fatalf("parseUpdateOptions failed: %v", err)
 	}
@@ -341,7 +341,7 @@ func TestTryHandleUpdateRequestReportsVersionChange(t *testing.T) {
 	if !handled || code != 0 {
 		t.Fatalf("update result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	expected := "uloop dispatcher updated from " + dispatcherVersion + " to 9.9.9."
+	expected := "tloop dispatcher updated from " + dispatcherVersion + " to 9.9.9."
 	if !bytes.Contains(stdout.Bytes(), []byte(expected)) {
 		t.Fatalf("update output mismatch: %s", stdout.String())
 	}
@@ -363,7 +363,7 @@ func TestTryHandleUpdateRequestReportsAlreadyCurrentVersion(t *testing.T) {
 	if !handled || code != 0 {
 		t.Fatalf("update result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	expected := "uloop dispatcher is already up to date at " + dispatcherVersion + "."
+	expected := "tloop dispatcher is already up to date at " + dispatcherVersion + "."
 	if !bytes.Contains(stdout.Bytes(), []byte(expected)) {
 		t.Fatalf("update output mismatch: %s", stdout.String())
 	}
@@ -391,7 +391,7 @@ func TestTryHandleUpdateRequestSkipsInstallerWhenResolvedTargetIsCurrent(t *test
 		return options, nil
 	}
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/tmp/uloop", nil
+		return "/tmp/tloop", nil
 	}
 
 	var stdout bytes.Buffer
@@ -401,7 +401,7 @@ func TestTryHandleUpdateRequestSkipsInstallerWhenResolvedTargetIsCurrent(t *test
 	if !handled || code != 0 {
 		t.Fatalf("update result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	expected := "uloop dispatcher is already up to date (" + dispatcherVersion + ")."
+	expected := "tloop dispatcher is already up to date (" + dispatcherVersion + ")."
 	if !strings.Contains(stdout.String(), expected) {
 		t.Fatalf("update output mismatch: %s", stdout.String())
 	}
@@ -426,7 +426,7 @@ func TestTryHandleUpdateRequestExplainsRateLimit(t *testing.T) {
 		return update.Options{}, fmt.Errorf("list releases: %w", githubapi.RateLimitError{ResetAt: resetAt})
 	}
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/tmp/uloop", nil
+		return "/tmp/tloop", nil
 	}
 
 	var stdout bytes.Buffer
@@ -466,7 +466,7 @@ func TestTryHandleUpdateRequestSkipsInstallerWhenRequestedTargetIsCurrent(t *tes
 		return options, nil
 	}
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/tmp/uloop", nil
+		return "/tmp/tloop", nil
 	}
 
 	var stdout bytes.Buffer
@@ -480,7 +480,7 @@ func TestTryHandleUpdateRequestSkipsInstallerWhenRequestedTargetIsCurrent(t *tes
 	if !handled || code != 0 {
 		t.Fatalf("update result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	expected := "uloop dispatcher is already up to date (" + dispatcherVersion + ")."
+	expected := "tloop dispatcher is already up to date (" + dispatcherVersion + ")."
 	if !strings.Contains(stdout.String(), expected) {
 		t.Fatalf("update output mismatch: %s", stdout.String())
 	}
@@ -512,7 +512,7 @@ func TestTryHandleUpdateRequestRunsInstallerWhenResolvedTargetIsNewer(t *testing
 		return options, nil
 	}
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/tmp/uloop", nil
+		return "/tmp/tloop", nil
 	}
 
 	var stdout bytes.Buffer
@@ -546,7 +546,7 @@ func TestTryHandleUpdateRequestRejectsEmptyResolvedTarget(t *testing.T) {
 		return options, nil
 	}
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/tmp/uloop", nil
+		return "/tmp/tloop", nil
 	}
 
 	var stdout bytes.Buffer
@@ -572,7 +572,7 @@ func TestUpdateRefusesHomebrewManagedExecutable(t *testing.T) {
 		resolveUpdateExecutablePathFunc = previousResolver
 		updateRunCommand = previousRunner
 	}()
-	homebrewPath := "/opt/homebrew/Cellar/uloop/3.0.0/bin/uloop"
+	homebrewPath := "/opt/homebrew/Cellar/tloop/3.0.0/bin/tloop"
 	resolveUpdateExecutablePathFunc = func() (string, error) {
 		return homebrewPath, nil
 	}
@@ -588,7 +588,7 @@ func TestUpdateRefusesHomebrewManagedExecutable(t *testing.T) {
 	if !handled || code != 1 {
 		t.Fatalf("update result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "brew upgrade uloop") {
+	if !strings.Contains(stderr.String(), "brew upgrade tloop") {
 		t.Fatalf("expected brew upgrade guidance in stderr, got: %s", stderr.String())
 	}
 }
@@ -602,7 +602,7 @@ func TestUpdateRefusesWingetManagedExecutable(t *testing.T) {
 		updateRunCommand = previousRunner
 	}()
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return `C:\Program Files\WinGet\Links\uloop.exe`, nil
+		return `C:\Program Files\WinGet\Links\tloop.exe`, nil
 	}
 	updateRunCommand = func(context.Context, update.Command, io.Writer, io.Writer) error {
 		t.Fatal("updateRunCommand must not run for winget-managed installs")
@@ -616,7 +616,7 @@ func TestUpdateRefusesWingetManagedExecutable(t *testing.T) {
 	if !handled || code != 1 {
 		t.Fatalf("update result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "winget upgrade --id hatayama.uloop") {
+	if !strings.Contains(stderr.String(), "winget upgrade --id tongguang.tloop") {
 		t.Fatalf("expected winget upgrade guidance in stderr, got: %s", stderr.String())
 	}
 }
@@ -632,7 +632,7 @@ func TestUpdateRefusesCurrentTargetForHomebrewManagedExecutable(t *testing.T) {
 		updateRunCommand = previousRunner
 	}()
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/opt/homebrew/Cellar/uloop/3.0.0/bin/uloop", nil
+		return "/opt/homebrew/Cellar/tloop/3.0.0/bin/tloop", nil
 	}
 	resolveUpdateTargetVersionFunc = func(context.Context, update.Options) (update.Options, error) {
 		t.Fatal("target resolution must not run before the Homebrew guard")
@@ -654,7 +654,7 @@ func TestUpdateRefusesCurrentTargetForHomebrewManagedExecutable(t *testing.T) {
 	if !handled || code != 1 {
 		t.Fatalf("update result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "brew upgrade uloop") {
+	if !strings.Contains(stderr.String(), "brew upgrade tloop") {
 		t.Fatalf("expected brew upgrade guidance in stderr, got: %s", stderr.String())
 	}
 	if stdout.Len() != 0 {
@@ -766,7 +766,7 @@ func stubManualUpdateHooks(t *testing.T, updatedVersion string) func() {
 	// Why: keep existing update tests off os.Executable so a Cellar-hosted test binary
 	// cannot trip the Homebrew guard and change their assertions.
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/Users/someone/.local/bin/uloop", nil
+		return "/Users/someone/.local/bin/tloop", nil
 	}
 	return func() {
 		updateRunCommand = previousRunner
@@ -900,7 +900,7 @@ func TestTryHandleUpdateRequestReportsInstallerFailure(t *testing.T) {
 	if !strings.Contains(stderr.String(), "Update failed: installer exited 1") {
 		t.Fatalf("missing installer failure: %s", stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "Updating global uloop dispatcher...") {
+	if !strings.Contains(stdout.String(), "Updating global tloop dispatcher...") {
 		t.Fatalf("missing progress line: %s", stdout.String())
 	}
 }
@@ -921,7 +921,7 @@ func TestRunUpdateCommandRunsVerifiedInstallerWithManifest(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("POSIX shell installers are not executable on Windows.")
 	}
-	installerContent := []byte("echo \"manifest=$" + updateArchiveManifestEnvName + "\"\necho \"extra=$ULOOP_TEST_EXTRA\"\necho \"args=$*\" >&2\n")
+	installerContent := []byte("echo \"manifest=$" + updateArchiveManifestEnvName + "\"\necho \"extra=$TLOOP_TEST_EXTRA\"\necho \"args=$*\" >&2\n")
 	checksum := sha256.Sum256(installerContent)
 	restoreHTTPClient := stubUpdateInstallerHTTPClient(installerContent, []byte(hex.EncodeToString(checksum[:])+"  install.sh\n"))
 	defer restoreHTTPClient()
@@ -934,7 +934,7 @@ func TestRunUpdateCommandRunsVerifiedInstallerWithManifest(t *testing.T) {
 	var stderr bytes.Buffer
 	err := runUpdateCommand(context.Background(), update.Command{
 		Name:                 "/bin/sh",
-		Env:                  []string{"ULOOP_TEST_EXTRA=from-command"},
+		Env:                  []string{"TLOOP_TEST_EXTRA=from-command"},
 		InstallerName:        update.PosixScriptName,
 		InstallerURL:         "https://example.test/install.sh",
 		InstallerChecksumURL: "https://example.test/install.sh.sha256",

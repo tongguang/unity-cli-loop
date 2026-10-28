@@ -125,7 +125,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     stopWaitTimedOut: false,
                     degradationNote:
                         "Stop/restore failed unexpectedly; Editor state may still be dirty. " +
-                        "Restart with `uloop launch -r` if Unity remains stuck.");
+                        "Restart with `tloop launch -r` if Unity remains stuck.");
             }
         }
 
@@ -270,7 +270,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 note.Append("Stop-wait polling reached its upper bound. ");
             }
 
-            note.Append("Restart with `uloop launch -r` if Unity remains stuck.");
+            note.Append("Restart with `tloop launch -r` if Unity remains stuck.");
             return note.ToString();
         }
     }

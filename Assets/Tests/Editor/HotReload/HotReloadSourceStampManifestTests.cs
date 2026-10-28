@@ -22,7 +22,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _tempRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _tempRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempRoot);
         }
 
@@ -79,7 +79,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [Test]
         public void Load_WhenTheHeaderDiffers_IsEmpty()
         {
-            WriteRawManifest("uloop-source-stamps 99\n" + ValidLine() + "\n");
+            WriteRawManifest("tloop-source-stamps 99\n" + ValidLine() + "\n");
 
             AssertIgnoredAsAWhole();
         }
@@ -224,7 +224,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [Test]
         public void Load_TheFormerHeader_AnswersEmpty()
         {
-            WriteRawManifest("uloop-source-stamps 1\n" + ValidLine() + "\n");
+            WriteRawManifest("tloop-source-stamps 1\n" + ValidLine() + "\n");
 
             AssertIgnoredAsAWhole();
         }

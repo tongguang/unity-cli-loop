@@ -232,7 +232,7 @@ func TestRunEnablePausePointCommandAnnouncesArmedWaitOnStderr(t *testing.T) {
 		fetchMatchingLogs = originalFetch
 	})
 
-	const wantAnnounce = "Pause point armed (Id: jump). Waiting up to 45s for a hit; the JSON response prints only when the wait ends. If this output gets cut off before then, read the outcome with: uloop pause-point-status --id \"jump\"\n"
+	const wantAnnounce = "Pause point armed (Id: jump). Waiting up to 45s for a hit; the JSON response prints only when the wait ends. If this output gets cut off before then, read the outcome with: tloop pause-point-status --id \"jump\"\n"
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
@@ -1148,7 +1148,7 @@ func TestRunEnablePausePointCommandAwaitTimeoutIncludesNonFiringHint(t *testing.
 		t.Fatalf("expected timeout failure, got %d with stdout %s", code, stdout.String())
 	}
 	envelope := parsePausePointErrorEnvelopeAfterAnnounce(t, stderr.Bytes(),
-		"Pause point armed (Id: jump). Waiting up to 1s for a hit; the JSON response prints only when the wait ends. If this output gets cut off before then, read the outcome with: uloop pause-point-status --id \"jump\"")
+		"Pause point armed (Id: jump). Waiting up to 1s for a hit; the JSON response prints only when the wait ends. If this output gets cut off before then, read the outcome with: tloop pause-point-status --id \"jump\"")
 	if envelope.Error.Details["Status"] != pausePointStatusCleared {
 		t.Fatalf("status detail mismatch: %#v", envelope.Error.Details)
 	}
@@ -1293,10 +1293,10 @@ func TestExtractPausePointEnableAwaitFlagsNamesCapturedVariableNamesWithoutAwait
 // sending the enable request.
 func TestRunEnablePausePointCommandRejectsBeforeSending(t *testing.T) {
 	cacheWithoutEnable := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(cacheWithoutEnable, ".uloop"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(cacheWithoutEnable, ".tloop"), 0o755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
-	writeTestFile(t, filepath.Join(cacheWithoutEnable, ".uloop", "tools.json"), `{"tools":[]}`)
+	writeTestFile(t, filepath.Join(cacheWithoutEnable, ".tloop", "tools.json"), `{"tools":[]}`)
 	otherProject := writeFakeUnityProject(t)
 
 	cases := []struct {

@@ -294,7 +294,7 @@ func TestFormatToolListResultKeepsEmbeddedTextWithoutASkill(t *testing.T) {
 	}
 }
 
-// writeSkillFixtureProject builds a Unity project holding a uloop package whose simulate-keyboard
+// writeSkillFixtureProject builds a Unity project holding a tloop package whose simulate-keyboard
 // skill documents --duration with the given text.
 func writeSkillFixtureProject(t *testing.T, durationDescription string) string {
 	t.Helper()
@@ -305,13 +305,13 @@ func writeSkillFixtureProject(t *testing.T, durationDescription string) string {
 	if err := os.MkdirAll(skillDirectory, 0o755); err != nil {
 		t.Fatalf("failed to create the skill directory: %v", err)
 	}
-	manifest := []byte(`{"name":"io.github.hatayama.uloopmcp"}`)
+	manifest := []byte(`{"name":"io.github.tongguang.tloop"}`)
 	if err := os.WriteFile(filepath.Join(packageRoot, "package.json"), manifest, 0o644); err != nil {
 		t.Fatalf("failed to write the package manifest: %v", err)
 	}
 
 	skill := "---\n" +
-		"name: uloop-simulate-keyboard\n" +
+		"name: tloop-simulate-keyboard\n" +
 		"toolName: simulate-keyboard\n" +
 		"description: \"Simulate keyboard input from the fixture skill.\"\n" +
 		"---\n\n" +

@@ -30,7 +30,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 Plain(
                     "Has no body, so there is nothing to patch. It could not be compared with the compiled source, "
                     + "so a change to its default values, attributes or parameter names cannot be detected; "
-                    + "run 'uloop compile' only if you made one.",
+                    + "run 'tloop compile' only if you made one.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.MethodTransformBaseMemberCall,
@@ -58,21 +58,21 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 Plain(
                     "Another part of this partial type changed since the last compile ({0}), so hot reload "
                     + "cannot bind this method against the compiled type. Pass that file with --files too, "
-                    + "or run 'uloop compile'.",
+                    + "or run 'tloop compile'.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.MethodTransformPartialOtherPartsUnverified,
                 Plain(
                     "The other parts of this partial type could not be checked against the last compile "
                     + "(no source snapshot for the assembly, or too many changed files to scan), so hot "
-                    + "reload cannot bind this method against the compiled type. Run 'uloop compile'.",
+                    + "reload cannot bind this method against the compiled type. Run 'tloop compile'.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.MethodTransformPartialBodyUnbound,
                 Plain(
                     "{0}. None of this partial type's source files known to hot reload declares that name: "
                     + "a part generated at compile time is not visible to it, and a file added since the "
-                    + "last compile must be passed with --files. Otherwise run 'uloop compile'.",
+                    + "last compile must be passed with --files. Otherwise run 'tloop compile'.",
                     1));
             // Why the three share every sentence but the last: the member, its type and the rule are
             // the same whatever the use, and only the change that brings the use within reach differs.
@@ -82,17 +82,17 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             templates.Add(
                 HotReloadWorkerReasonCode.MethodTransformUnpassedInternalMemberBareName,
                 Plain(UnpassedInternalMemberSentence, 3).EndingWith(
-                    "Qualify the bare name with 'this.' or the type name, or run 'uloop compile'."));
+                    "Qualify the bare name with 'this.' or the type name, or run 'tloop compile'."));
             templates.Add(
                 HotReloadWorkerReasonCode.MethodTransformUnpassedInternalMemberInsideClosure,
                 Plain(UnpassedInternalMemberSentence, 3).EndingWith(
-                    "Move the use out of the lambda, local function or query, or run 'uloop compile'."));
+                    "Move the use out of the lambda, local function or query, or run 'tloop compile'."));
             templates.Add(
                 HotReloadWorkerReasonCode.MethodTransformStructHost,
                 Plain(
                     "Struct (value type) methods are skipped; byref instance transplant is unverified. "
                     + "Leave the struct's methods as they are and put the new logic at the call site or in a "
-                    + "non-struct helper, or run 'uloop compile' to change the struct.",
+                    + "non-struct helper, or run 'tloop compile' to change the struct.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.MethodTransformGenericMethodOrType,
@@ -110,7 +110,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     "This file was brought back to re-bind its active patches, but this method's body no "
                     + "longer binds here ({0}): it uses a member of {1} that this reload was not given the "
                     + "source of. Any earlier patch of this method stays active. Pass {2} to --files "
-                    + "together with this file, or run 'uloop compile'.",
+                    + "together with this file, or run 'tloop compile'.",
                     3));
             templates.Add(
                 HotReloadWorkerReasonCode.MethodTransformSiblingBodyUnbound,
@@ -118,7 +118,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     "This file was brought back to re-bind its active patches, but this method's body no "
                     + "longer binds here ({0}), so it is skipped rather than failed; any earlier patch of it "
                     + "stays active. Pass the file that declares the missing name to --files together with "
-                    + "this file, or run 'uloop compile'.",
+                    + "this file, or run 'tloop compile'.",
                     1));
         }
     }

@@ -13,7 +13,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal sealed class PausePointSessionStateStore : IPausePointPersistenceStore
     {
-        private const string RecordsKey = "io.github.hatayama.uloopmcp.pausePoint.persistedRecords";
+        private const string RecordsKey = "io.github.tongguang.tloop.pausePoint.persistedRecords";
 
         public IReadOnlyList<PausePointPersistedRecord> Load()
         {

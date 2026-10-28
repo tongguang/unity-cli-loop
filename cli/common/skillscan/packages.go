@@ -11,8 +11,7 @@ import (
 const (
 	manifestFileName = "manifest.json"
 	packageFileName  = "package.json"
-	packageName      = "io.github.hatayama.uloopmcp"
-	packageNameAlias = "io.github.hatayama.uLoopMCP"
+	packageName      = "io.github.tongguang.tloop"
 )
 
 type manifestData struct {
@@ -308,14 +307,12 @@ func resolveLocalDependencyPath(dependencyValue string, projectRoot string) stri
 
 func isTargetPackageCacheDir(dirName string) bool {
 	normalizedName := strings.ToLower(dirName)
-	return strings.HasPrefix(normalizedName, strings.ToLower(packageName)+"@") ||
-		strings.HasPrefix(normalizedName, strings.ToLower(packageNameAlias)+"@")
+	return strings.HasPrefix(normalizedName, strings.ToLower(packageName)+"@")
 }
 
 func isTargetPackageIdentity(identity PackageIdentity) bool {
 	normalizedName := strings.ToLower(identity.Name)
-	return normalizedName == strings.ToLower(packageName) ||
-		normalizedName == strings.ToLower(packageNameAlias)
+	return normalizedName == strings.ToLower(packageName)
 }
 
 func packageIdentityNameFromCacheDir(dirName string) string {
@@ -338,7 +335,6 @@ func unityCliLoopPackagePriority(projectRoot string, packageRoot string) int {
 	priorityCandidates := []string{
 		filepath.Join(projectRoot, "Packages", "src"),
 		filepath.Join(projectRoot, "Packages", packageName),
-		filepath.Join(projectRoot, "Packages", packageNameAlias),
 	}
 	normalizedRoot := normalizedAbsolutePath(packageRoot)
 	for index, candidate := range priorityCandidates {

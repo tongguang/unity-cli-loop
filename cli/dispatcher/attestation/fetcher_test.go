@@ -53,9 +53,9 @@ func serveTagRefs(t *testing.T, responses ...tagRefResponse) *httptest.Server {
 
 // Verifies the bundle URL points at the release asset with the sigstore suffix, path-escaped.
 func TestBundleAssetURLEscapesTheAssetName(t *testing.T) {
-	got := BundleAssetURL("owner/repo", "dispatcher-v3.1.0", "uloop darwin.tar.gz")
+	got := BundleAssetURL("owner/repo", "dispatcher-v3.1.0", "tloop darwin.tar.gz")
 
-	want := "https://github.com/owner/repo/releases/download/dispatcher-v3.1.0/uloop%20darwin.tar.gz.sigstore.json"
+	want := "https://github.com/owner/repo/releases/download/dispatcher-v3.1.0/tloop%20darwin.tar.gz.sigstore.json"
 	if got != want {
 		t.Fatalf("BundleAssetURL = %q, want %q", got, want)
 	}
@@ -167,9 +167,9 @@ func TestFetchTagCommitSHAFailsClosedOnTransportErrors(t *testing.T) {
 // paths, and falls back to the raw value when the URL cannot be parsed.
 func TestAssetNameFromReleaseAsset(t *testing.T) {
 	cases := map[string]string{
-		"https://github.com/owner/repo/releases/download/v1/uloop.tar.gz?token=x": "uloop.tar.gz",
-		"dist/uloop.zip":   "uloop.zip",
-		"%zz/broken/uloop": "uloop",
+		"https://github.com/owner/repo/releases/download/v1/tloop.tar.gz?token=x": "tloop.tar.gz",
+		"dist/tloop.zip":   "tloop.zip",
+		"%zz/broken/tloop": "tloop",
 	}
 	for input, want := range cases {
 		if got := AssetNameFromReleaseAsset(input); got != want {

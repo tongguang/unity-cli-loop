@@ -67,7 +67,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         /// Runs hot reload for each path in <paramref name="files"/>.
         /// <paramref name="contentPathOverride"/> is test-only: when set, the worker reads that
         /// path while assembly resolution still uses <paramref name="files"/> (so edited copies
-        /// can live under <c>Library/UloopHotReload/TestSources/</c> without provoking AssetDatabase).
+        /// can live under <c>Library/TloopHotReload/TestSources/</c> without provoking AssetDatabase).
         /// <paramref name="contentPathOverrideByFile"/> is the per-file form of that hook, keyed by
         /// the entry in <paramref name="files"/>; it wins over the single override.
         /// <paramref name="isDefaultSelection"/> marks every input as chosen from compile snapshots,

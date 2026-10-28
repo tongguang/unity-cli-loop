@@ -11,7 +11,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
     /// </summary>
     internal static class UnityCliLoopEditorSessionStateStorage
     {
-        internal const string KeyPrefix = "io.github.hatayama.uloopmcp.editorSession.";
+        internal const string KeyPrefix = "io.github.tongguang.tloop.editorSession.";
 
         internal static (bool IsValid, long Value) ParseUtcTicks(string utcTicksText)
         {

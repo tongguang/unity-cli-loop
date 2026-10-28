@@ -24,7 +24,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             @"static\s+readonly\s+string\s+OUTPUT_ROOT_DIR\s*=\s*Path\.Combine\(";
         private const string StringLiteralPattern = "\"([^\"\\\\]|\\\\.)*\"";
         private const string SourceDeclarationRequiredMessage =
-            "OUTPUT_ROOT_DIR must be declared as Path.Combine in source. Runtime equality cannot catch a revert to \".uloop/outputs\" on macOS because Path.Combine(\".uloop\", \"outputs\") yields the same string.";
+            "OUTPUT_ROOT_DIR must be declared as Path.Combine in source. Runtime equality cannot catch a revert to \".tloop/outputs\" on macOS because Path.Combine(\".tloop\", \"outputs\") yields the same string.";
         private const string SourceLiteralSeparatorMessage =
             "File output directory string literals must not embed a separator; Path.Combine supplies the platform separator on Windows.";
 
@@ -57,7 +57,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// <summary>
         /// Verifies OUTPUT_ROOT_DIR is declared as Path.Combine in source and that File output
         /// directory string literals embed no separator. Runtime checks cannot distinguish a
-        /// literal ".uloop/outputs" on macOS because Path.Combine(".uloop", "outputs") is identical.
+        /// literal ".tloop/outputs" on macOS because Path.Combine(".tloop", "outputs") is identical.
         /// </summary>
         [Test]
         public void OutputRootDir_IsDeclaredWithPathCombineInSource()

@@ -110,14 +110,14 @@ func TestMergePackageManifestNoChangeWhenAlreadyInstalled(t *testing.T) {
 	input := []byte(`{
   "dependencies": {
     "com.unity.modules.ai": "1.0.0",
-    "io.github.hatayama.uloopmcp": "1.2.3"
+    "io.github.tongguang.tloop": "1.2.3"
   },
   "scopedRegistries": [
     {
       "name": "package.openupm.com",
       "url": "https://package.openupm.com",
       "scopes": [
-        "io.github.hatayama.uloopmcp"
+        "io.github.tongguang.tloop"
       ]
     }
   ]
@@ -141,7 +141,7 @@ func TestMergePackageManifestUpdatesDependencyVersionInPlace(t *testing.T) {
 	input := []byte(`{
   "dependencies": {
     "com.unity.modules.ai": "1.0.0",
-    "io.github.hatayama.uloopmcp": "1.2.2",
+    "io.github.tongguang.tloop": "1.2.2",
     "com.unity.modules.animation": "1.0.0"
   }
 }
@@ -163,7 +163,7 @@ func TestMergePackageManifestUpdatesDependencyVersionInPlace(t *testing.T) {
 
 	deps := decodeOrderedObjectField(t, result.Content, "dependencies")
 	keys := deps.keys
-	expectedKeys := []string{"com.unity.modules.ai", "io.github.hatayama.uloopmcp", "com.unity.modules.animation"}
+	expectedKeys := []string{"com.unity.modules.ai", "io.github.tongguang.tloop", "com.unity.modules.animation"}
 	if len(keys) != len(expectedKeys) {
 		t.Fatalf("dependency key count mismatch: %#v", keys)
 	}

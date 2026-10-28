@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	lockHelperProjectRootEnv = "ULOOP_COMPILE_CHECK_LOCK_HELPER_PROJECT_ROOT"
+	lockHelperProjectRootEnv = "TLOOP_COMPILE_CHECK_LOCK_HELPER_PROJECT_ROOT"
 	lockHelperReadyLine      = "locked"
 	shortLockTimeout         = 150 * time.Millisecond
 )

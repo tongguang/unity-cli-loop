@@ -21,7 +21,7 @@ func parseListOptions(args []string) (listOptions, error) {
 			Message:     "Unknown option for list: " + arg,
 			Option:      arg,
 			Command:     "list",
-			NextActions: []string{"Run `uloop list --help` to inspect supported options."},
+			NextActions: []string{"Run `tloop list --help` to inspect supported options."},
 		}
 	}
 	return options, nil

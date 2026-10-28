@@ -193,7 +193,7 @@ func (v *verifier) addDuplicateGUIDFindings() {
 func metaMissingMessage(path string) string {
 	return path + " has no .meta file. Unity will create one with a new GUID, which breaks every reference " +
 		"to the old one. If the file came from another branch or folder, bring its .meta file along; " +
-		"if you just created it, let Unity import it (for example with uloop compile) and commit the " +
+		"if you just created it, let Unity import it (for example with tloop compile) and commit the " +
 		"generated .meta file."
 }
 

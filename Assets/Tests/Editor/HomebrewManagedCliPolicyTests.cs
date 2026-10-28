@@ -14,9 +14,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// <summary>
         /// Verifies that a Cellar path is classified as Homebrew-managed for every Homebrew prefix.
         /// </summary>
-        [TestCase("/opt/homebrew/Cellar/uloop/3.0.0/bin/uloop")]
-        [TestCase("/usr/local/Cellar/uloop/3.0.0/bin/uloop")]
-        [TestCase("/home/linuxbrew/.linuxbrew/Cellar/uloop/3.0.0/bin/uloop")]
+        [TestCase("/opt/homebrew/Cellar/tloop/3.0.0/bin/tloop")]
+        [TestCase("/usr/local/Cellar/tloop/3.0.0/bin/tloop")]
+        [TestCase("/home/linuxbrew/.linuxbrew/Cellar/tloop/3.0.0/bin/tloop")]
         public void IsHomebrewManagedPath_WithCellarSegment_ReturnsTrue(string executablePath)
         {
             bool result = HomebrewManagedCliPolicy.IsHomebrewManagedPath(
@@ -35,7 +35,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             List<string> probedDirectories = new();
 
             bool result = HomebrewManagedCliPolicy.IsHomebrewManagedPath(
-                "/opt/homebrew/bin/uloop",
+                "/opt/homebrew/bin/tloop",
                 directoryPath =>
                 {
                     probedDirectories.Add(directoryPath);
@@ -43,14 +43,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 });
 
             Assert.That(result, Is.True);
-            Assert.That(probedDirectories, Is.EqualTo(new[] { "/opt/homebrew/Cellar/uloop" }));
+            Assert.That(probedDirectories, Is.EqualTo(new[] { "/opt/homebrew/Cellar/tloop" }));
         }
 
         /// <summary>
         /// Verifies that a linked prefix/bin path without a Cellar formula directory is not Homebrew-managed.
         /// </summary>
-        [TestCase("/usr/local/bin/uloop")]
-        [TestCase("/Users/dev/.local/bin/uloop")]
+        [TestCase("/usr/local/bin/tloop")]
+        [TestCase("/Users/dev/.local/bin/tloop")]
         public void IsHomebrewManagedPath_WithoutCellarFormulaDirectory_ReturnsFalse(string executablePath)
         {
             bool result = HomebrewManagedCliPolicy.IsHomebrewManagedPath(
@@ -69,7 +69,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             List<string> probedDirectories = new();
 
             bool result = HomebrewManagedCliPolicy.IsHomebrewManagedPath(
-                "/opt/homebrew/sbin/uloop",
+                "/opt/homebrew/sbin/tloop",
                 directoryPath =>
                 {
                     probedDirectories.Add(directoryPath);
@@ -89,7 +89,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             List<string> probedDirectories = new();
 
             bool result = HomebrewManagedCliPolicy.IsHomebrewManagedPath(
-                "C:\\Users\\dev\\AppData\\Local\\Programs\\uloop\\bin\\uloop.exe",
+                "C:\\Users\\dev\\AppData\\Local\\Programs\\tloop\\bin\\tloop.exe",
                 directoryPath =>
                 {
                     probedDirectories.Add(directoryPath);
@@ -99,7 +99,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(result, Is.False);
             Assert.That(
                 probedDirectories,
-                Is.EqualTo(new[] { "C:/Users/dev/AppData/Local/Programs/uloop/Cellar/uloop.exe" }));
+                Is.EqualTo(new[] { "C:/Users/dev/AppData/Local/Programs/tloop/Cellar/tloop.exe" }));
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void IsHomebrewManagedPath_WithPartialCellarSegment_ReturnsFalse()
         {
             bool result = HomebrewManagedCliPolicy.IsHomebrewManagedPath(
-                "/Users/dev/CellarTools/uloop",
+                "/Users/dev/CellarTools/tloop",
                 directoryPath => false);
 
             Assert.That(result, Is.False);
@@ -120,7 +120,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// </summary>
         [TestCase(null)]
         [TestCase("")]
-        [TestCase("uloop")]
+        [TestCase("tloop")]
         public void IsHomebrewManagedPath_WithoutUsablePath_ReturnsFalse(string executablePath)
         {
             bool result = HomebrewManagedCliPolicy.IsHomebrewManagedPath(

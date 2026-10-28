@@ -398,7 +398,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string tempDirectory = Path.Combine(
                 projectRoot,
                 "Library",
-                "UloopHotReload",
+                "TloopHotReload",
                 "TestSources",
                 "ArrowLineDirective");
             Directory.CreateDirectory(tempDirectory);
@@ -1269,13 +1269,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 result.Output.siblingConstDriftWarnings,
                 Has.Some.EqualTo(
-                    "const io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingConstDefinitions.SiblingTuning is 7 in the edited source but 6 in the compiled assembly; edits outside method bodies never take effect through hot reload - a method body patched in the same run still compiles against the compiled assembly and keeps the old value, so nothing runs with 7 yet. This warning repeats on every reload while the two values differ. Run 'uloop compile' to apply this change."),
+                    "const io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingConstDefinitions.SiblingTuning is 7 in the edited source but 6 in the compiled assembly; edits outside method bodies never take effect through hot reload - a method body patched in the same run still compiles against the compiled assembly and keeps the old value, so nothing runs with 7 yet. This warning repeats on every reload while the two values differ. Run 'tloop compile' to apply this change."),
                 "Sibling const drift must use the same warning text as an edited-file const drift.\n"
                 + string.Join("\n", result.Output.siblingConstDriftWarnings));
             Assert.That(
                 result.Output.files[0].declarationDriftWarnings,
                 Has.None.EqualTo(
-                    "const io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingConstDefinitions.SiblingTuning is 7 in the edited source but 6 in the compiled assembly; edits outside method bodies never take effect through hot reload - a method body patched in the same run still compiles against the compiled assembly and keeps the old value, so nothing runs with 7 yet. This warning repeats on every reload while the two values differ. Run 'uloop compile' to apply this change."),
+                    "const io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingConstDefinitions.SiblingTuning is 7 in the edited source but 6 in the compiled assembly; edits outside method bodies never take effect through hot reload - a method body patched in the same run still compiles against the compiled assembly and keeps the old value, so nothing runs with 7 yet. This warning repeats on every reload while the two values differ. Run 'tloop compile' to apply this change."),
                 "Sibling const-drift warnings must stay on siblingConstDriftWarnings, not declarationDriftWarnings.");
         }
 
@@ -1421,7 +1421,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 result.Output.files[0].declarationDriftWarnings,
                 Does.Contain(
-                    "Edits outside method bodies in NonConstFieldInitializerDrift.cs (field initializer: _secret) since the last compile are not applied by hot reload; run uloop compile to pick them up."));
+                    "Edits outside method bodies in NonConstFieldInitializerDrift.cs (field initializer: _secret) since the last compile are not applied by hot reload; run tloop compile to pick them up."));
         }
 
         /// <summary>
@@ -1472,11 +1472,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         private const string ExpectedExplicitAccessorSkipReason =
             "Property setter, init, or indexer accessors are skipped; "
-            + "run 'uloop compile' to apply accessor edits.";
+            + "run 'tloop compile' to apply accessor edits.";
 
         private const string ExpectedSetOnlyPropertySkipReason =
             "Added properties with only a setter are skipped; the shim requires a getter identity. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         /// <summary>
         /// What: adding an expression-bodied property plus a method-body edit emits the getter
@@ -1687,7 +1687,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 result.Output.files[0].declarationDriftWarnings,
                 Does.Contain(
-                    "Edits outside method bodies in ExistingPropertyDeclarationOnlyEdit.cs (property: Value) since the last compile are not applied by hot reload; run uloop compile to pick them up."));
+                    "Edits outside method bodies in ExistingPropertyDeclarationOnlyEdit.cs (property: Value) since the last compile are not applied by hot reload; run tloop compile to pick them up."));
             AssertEmittedWithoutSkip(result, "get_Value");
             AssertSkippedDoesNotContain(result, "set_Value");
         }
@@ -2159,7 +2159,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             TransformWorkerClientResult result = await RunWorkerOnSourceAsync(
                 sourcePath,
-                "Library/UloopHotReload/TestSources/AliasShadowEdited.cs",
+                "Library/TloopHotReload/TestSources/AliasShadowEdited.cs",
                 snapshotSource: null,
                 additionalAssemblySourcePaths: new[] { globalPath });
 
@@ -2292,13 +2292,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         private const string ExpectedUnsupportedMemberKindSkipReason =
             "Constructors, operators, and event accessors are skipped; "
-            + "run 'uloop compile' to apply these edits.";
+            + "run 'tloop compile' to apply these edits.";
 
         // Keep in sync with OutsideMethodBodyDriftWarningFormat in
         // Packages/src/Editor/FirstPartyTools/HotReload/TransformWorker~/OutsideMethodBodyDriftChecker.cs.
         // That constant lives in the Unity-ignored worker process and is not visible here.
         private const string OutsideMethodBodyDriftWarningFormat =
-            "Edits outside method bodies in {0} (fields, initializers, or attributes) since the last compile are not applied by hot reload; run uloop compile to pick them up.";
+            "Edits outside method bodies in {0} (fields, initializers, or attributes) since the last compile are not applied by hot reload; run tloop compile to pick them up.";
 
         /// <summary>
         /// What: editing one instance constructor reports that .ctor as Skipped and omits an
@@ -2653,7 +2653,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 result.Output.files[0].declarationDriftWarnings,
                 Does.Contain(
-                    "Edits outside method bodies in UnsupportedKindCtorInitializerDrift.cs (constructor: .ctor) since the last compile are not applied by hot reload; run uloop compile to pick them up."));
+                    "Edits outside method bodies in UnsupportedKindCtorInitializerDrift.cs (constructor: .ctor) since the last compile are not applied by hot reload; run tloop compile to pick them up."));
         }
 
         /// <summary>
@@ -2672,7 +2672,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 result.Output.files[0].declarationDriftWarnings,
                 Does.Contain(
-                    "Edits outside method bodies in UnsupportedKindOperatorAttributeDrift.cs (operator: +) since the last compile are not applied by hot reload; run uloop compile to pick them up."));
+                    "Edits outside method bodies in UnsupportedKindOperatorAttributeDrift.cs (operator: +) since the last compile are not applied by hot reload; run tloop compile to pick them up."));
         }
 
         /// <summary>
@@ -2691,7 +2691,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 result.Output.files[0].declarationDriftWarnings,
                 Does.Contain(
-                    "Edits outside method bodies in UnsupportedKindConversionAttributeDrift.cs (conversion: implicit->int) since the last compile are not applied by hot reload; run uloop compile to pick them up."));
+                    "Edits outside method bodies in UnsupportedKindConversionAttributeDrift.cs (conversion: implicit->int) since the last compile are not applied by hot reload; run tloop compile to pick them up."));
         }
 
         /// <summary>
@@ -2710,7 +2710,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 result.Output.files[0].declarationDriftWarnings,
                 Does.Contain(
-                    "Edits outside method bodies in UnsupportedKindEventAttributeDrift.cs (event: Edited) since the last compile are not applied by hot reload; run uloop compile to pick them up."));
+                    "Edits outside method bodies in UnsupportedKindEventAttributeDrift.cs (event: Edited) since the last compile are not applied by hot reload; run tloop compile to pick them up."));
         }
 
         /// <summary>

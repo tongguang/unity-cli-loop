@@ -16,7 +16,7 @@ import (
 // project pin, so each test runs from an empty working directory where any
 // accidental forwarding would fail with a pin resolution error.
 
-// Verifies the global uloop binary reports dispatcher identity fields in JSON version output.
+// Verifies the global tloop binary reports dispatcher identity fields in JSON version output.
 func TestRunDispatcherVersionJSONReportsDispatcherIdentity(t *testing.T) {
 	t.Chdir(t.TempDir())
 
@@ -54,7 +54,7 @@ func TestRunDispatcherUpdateHelpDoesNotExecuteInstaller(t *testing.T) {
 	if updateExecuted {
 		t.Fatal("update help must not execute the installer")
 	}
-	if !strings.Contains(stdout.String(), "uloop update") {
+	if !strings.Contains(stdout.String(), "tloop update") {
 		t.Fatalf("update help output mismatch: %s", stdout.String())
 	}
 }
@@ -96,7 +96,7 @@ func TestRunDispatcherUpdateRunsInDispatcherProcess(t *testing.T) {
 	// Why: keep this routing test off os.Executable so a Cellar-hosted binary cannot
 	// trip the Homebrew guard and hide a real dispatcher-process regression.
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/Users/someone/.local/bin/uloop", nil
+		return "/Users/someone/.local/bin/tloop", nil
 	}
 
 	var stdout bytes.Buffer
@@ -109,7 +109,7 @@ func TestRunDispatcherUpdateRunsInDispatcherProcess(t *testing.T) {
 	if !updateExecuted {
 		t.Fatal("expected update to run in the dispatcher process")
 	}
-	if !strings.Contains(stdout.String(), "Updating global uloop dispatcher") {
+	if !strings.Contains(stdout.String(), "Updating global tloop dispatcher") {
 		t.Fatalf("update output mismatch: %s", stdout.String())
 	}
 }
@@ -125,7 +125,7 @@ func TestRunDispatcherSkillsHelpDoesNotRequireProjectPin(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("dispatcher skills help failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop skills install") {
+	if !strings.Contains(stdout.String(), "tloop skills install") {
 		t.Fatalf("skills help output mismatch: %s", stdout.String())
 	}
 }

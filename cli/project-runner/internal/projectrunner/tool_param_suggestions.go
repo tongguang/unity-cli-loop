@@ -45,7 +45,7 @@ func unknownToolOptionError(tool clicore.ToolDefinition, flagName string) *clier
 		Command: tool.Name,
 		NextActions: prependSuggestions(
 			unknownOptionSuggestions(tool, flagName),
-			"Run `uloop "+tool.Name+" --help` to inspect supported options.",
+			"Run `tloop "+tool.Name+" --help` to inspect supported options.",
 		),
 	}
 }
@@ -236,7 +236,7 @@ func prependSuggestions(suggestions []string, fallback string) []string {
 }
 
 func didYouMeanOption(toolName string, optionName string) string {
-	return "Did you mean: uloop " + toolName + " --" + optionName
+	return "Did you mean: tloop " + toolName + " --" + optionName
 }
 
 func didYouMeanOptionValue(toolName string, optionName string, value string) string {

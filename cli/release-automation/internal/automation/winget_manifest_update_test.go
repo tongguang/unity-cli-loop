@@ -87,7 +87,7 @@ func TestUpdateWingetManifestSkipsGitHubPrerelease(t *testing.T) {
 func TestRenderWingetManifests(t *testing.T) {
 	manifests, err := renderWingetManifests(wingetManifestData{
 		Version:     "3.1.0",
-		Repository:  "hatayama/unity-cli-loop",
+		Repository:  "tongguang/unity-cli-loop",
 		SHA256Upper: strings.ToUpper(testWingetSHA256),
 		ReleaseDate: "2026-08-31",
 	})
@@ -96,49 +96,49 @@ func TestRenderWingetManifests(t *testing.T) {
 	}
 
 	expected := map[string]string{
-		"hatayama.uloop.yaml": `# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.10.0.schema.json
-PackageIdentifier: hatayama.uloop
+		"tongguang.tloop.yaml": `# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.10.0.schema.json
+PackageIdentifier: tongguang.tloop
 PackageVersion: 3.1.0
 DefaultLocale: en-US
 ManifestType: version
 ManifestVersion: 1.10.0
 `,
-		"hatayama.uloop.installer.yaml": `# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.10.0.schema.json
-PackageIdentifier: hatayama.uloop
+		"tongguang.tloop.installer.yaml": `# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.10.0.schema.json
+PackageIdentifier: tongguang.tloop
 PackageVersion: 3.1.0
 InstallerType: zip
 NestedInstallerType: portable
 NestedInstallerFiles:
-  - RelativeFilePath: uloop.exe
-    PortableCommandAlias: uloop
+  - RelativeFilePath: tloop.exe
+    PortableCommandAlias: tloop
 Commands:
-  - uloop
+  - tloop
 ReleaseDate: 2026-08-31
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/hatayama/unity-cli-loop/releases/download/dispatcher-v3.1.0/uloop-dispatcher-windows-amd64.zip
+    InstallerUrl: https://github.com/tongguang/unity-cli-loop/releases/download/dispatcher-v3.1.0/tloop-dispatcher-windows-amd64.zip
     InstallerSha256: ABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCD
 ManifestType: installer
 ManifestVersion: 1.10.0
 `,
-		"hatayama.uloop.locale.en-US.yaml": `# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json
-PackageIdentifier: hatayama.uloop
+		"tongguang.tloop.locale.en-US.yaml": `# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json
+PackageIdentifier: tongguang.tloop
 PackageVersion: 3.1.0
 PackageLocale: en-US
-Publisher: hatayama
-PublisherUrl: https://github.com/hatayama
-PublisherSupportUrl: https://github.com/hatayama/unity-cli-loop/issues
-PackageName: Unity CLI Loop
-PackageUrl: https://github.com/hatayama/unity-cli-loop
+Publisher: tongguang
+PublisherUrl: https://github.com/tongguang
+PublisherSupportUrl: https://github.com/tongguang/unity-cli-loop/issues
+PackageName: Tuanjie CLI Loop
+PackageUrl: https://github.com/tongguang/unity-cli-loop
 License: MIT
-LicenseUrl: https://github.com/hatayama/unity-cli-loop/blob/main/LICENSE.md
+LicenseUrl: https://github.com/tongguang/unity-cli-loop/blob/main/LICENSE.md
 ShortDescription: Let AI drive Unity, from Editor to Play Mode
-Moniker: uloop
+Moniker: tloop
 Tags:
   - unity
   - cli
   - ai
-ReleaseNotesUrl: https://github.com/hatayama/unity-cli-loop/releases/tag/dispatcher-v3.1.0
+ReleaseNotesUrl: https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.1.0
 ManifestType: defaultLocale
 ManifestVersion: 1.10.0
 `,
@@ -164,7 +164,7 @@ ManifestVersion: 1.10.0
 func TestRenderWingetManifestsIncludesSchemaHeader(t *testing.T) {
 	manifests, err := renderWingetManifests(wingetManifestData{
 		Version:     "3.1.0",
-		Repository:  "hatayama/unity-cli-loop",
+		Repository:  "tongguang/unity-cli-loop",
 		SHA256Upper: strings.ToUpper(testWingetSHA256),
 		ReleaseDate: "2026-08-31",
 	})
@@ -173,14 +173,14 @@ func TestRenderWingetManifestsIncludesSchemaHeader(t *testing.T) {
 	}
 
 	wantHeaderByFilename := map[string]string{
-		"hatayama.uloop.yaml":              "# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.10.0.schema.json",
-		"hatayama.uloop.installer.yaml":    "# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.10.0.schema.json",
-		"hatayama.uloop.locale.en-US.yaml": "# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json",
+		"tongguang.tloop.yaml":              "# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.10.0.schema.json",
+		"tongguang.tloop.installer.yaml":    "# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.10.0.schema.json",
+		"tongguang.tloop.locale.en-US.yaml": "# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json",
 	}
 	wantManifestTypeByFilename := map[string]string{
-		"hatayama.uloop.yaml":              "version",
-		"hatayama.uloop.installer.yaml":    "installer",
-		"hatayama.uloop.locale.en-US.yaml": "defaultLocale",
+		"tongguang.tloop.yaml":              "version",
+		"tongguang.tloop.installer.yaml":    "installer",
+		"tongguang.tloop.locale.en-US.yaml": "defaultLocale",
 	}
 
 	for filename, content := range manifests {
@@ -239,7 +239,7 @@ func TestUpdateWingetManifestSkipsUntilPackageExistsUpstream(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("exit code = %d", code)
 	}
-	if !strings.Contains(stdout, "hatayama.uloop is not in winget-pkgs yet; the initial submission is manual. Skipping.") {
+	if !strings.Contains(stdout, "tongguang.tloop is not in winget-pkgs yet; the initial submission is manual. Skipping.") {
 		t.Fatalf("unexpected stdout: %s", stdout)
 	}
 	if scenario.putCalls != 0 || scenario.pullRequestCreateCalls != 0 {
@@ -260,7 +260,7 @@ func TestUpdateWingetManifestUsesNewVersionTitle(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("exit code = %d", code)
 	}
-	if scenario.pullRequestTitle != "New version: hatayama.uloop version 3.1.0" {
+	if scenario.pullRequestTitle != "New version: tongguang.tloop version 3.1.0" {
 		t.Fatalf("PR title = %q", scenario.pullRequestTitle)
 	}
 }
@@ -309,22 +309,22 @@ func TestWingetQueriesEncodeBuildMetadata(t *testing.T) {
 			return `[]`, nil
 		},
 	}
-	branch := "hatayama-uloop-3.1.0+build"
+	branch := "tongguang-tloop-3.1.0+build"
 
-	_, err := wingetForkContentSHA(context.Background(), deps, "token", "hatayama/winget-pkgs", branch, "manifest.yaml")
+	_, err := wingetForkContentSHA(context.Background(), deps, "token", "tongguang/winget-pkgs", branch, "manifest.yaml")
 	if err != nil {
 		t.Fatalf("wingetForkContentSHA failed: %v", err)
 	}
-	_, err = wingetPullRequestOpen(context.Background(), deps, "token", "hatayama", branch)
+	_, err = wingetPullRequestOpen(context.Background(), deps, "token", "tongguang", branch)
 	if err != nil {
 		t.Fatalf("wingetPullRequestOpen failed: %v", err)
 	}
 
 	joined := strings.Join(endpoints, "\n")
-	if !strings.Contains(joined, "?ref=hatayama-uloop-3.1.0%2Bbuild") {
+	if !strings.Contains(joined, "?ref=tongguang-tloop-3.1.0%2Bbuild") {
 		t.Fatalf("encoded ref query missing from endpoints: %s", joined)
 	}
-	if !strings.Contains(joined, "?head=hatayama%3Ahatayama-uloop-3.1.0%2Bbuild&state=open") {
+	if !strings.Contains(joined, "?head=tongguang%3Atongguang-tloop-3.1.0%2Bbuild&state=open") {
 		t.Fatalf("encoded head query missing from endpoints: %s", joined)
 	}
 }
@@ -352,9 +352,9 @@ func newWingetTestScenario() *wingetTestScenario {
 
 func testWingetConfig(tag string) wingetManifestUpdateConfig {
 	return wingetManifestUpdateConfig{
-		repository: "hatayama/unity-cli-loop",
+		repository: "tongguang/unity-cli-loop",
 		tag:        tag,
-		forkRepo:   "hatayama/winget-pkgs",
+		forkRepo:   "tongguang/winget-pkgs",
 	}
 }
 
@@ -416,20 +416,20 @@ func (s *wingetTestScenario) releaseOutput(_ []string, joined string) (string, b
 }
 
 func (s *wingetTestScenario) upstreamOutput(_ []string, joined string) (string, bool, error) {
-	versionPath := "repos/microsoft/winget-pkgs/contents/manifests/h/hatayama/uloop/" + s.version + "?ref=master"
+	versionPath := "repos/microsoft/winget-pkgs/contents/manifests/t/tongguang/tloop/" + s.version + "?ref=master"
 	if strings.Contains(joined, versionPath) {
 		if s.versionExists {
 			return `{}`, true, nil
 		}
 		return "", true, errors.New("gh api failed: HTTP 404 Not Found")
 	}
-	if strings.Contains(joined, "repos/microsoft/winget-pkgs/contents/manifests/h/hatayama/uloop?ref=master") {
+	if strings.Contains(joined, "repos/microsoft/winget-pkgs/contents/manifests/t/tongguang/tloop?ref=master") {
 		if s.packageExists {
 			return `{}`, true, nil
 		}
 		return "", true, errors.New("gh api failed: HTTP 404 Not Found")
 	}
-	if strings.Contains(joined, "repos/hatayama/winget-pkgs/merge-upstream") {
+	if strings.Contains(joined, "repos/tongguang/winget-pkgs/merge-upstream") {
 		s.mergeUpstreamCalls++
 		return `{}`, true, nil
 	}
@@ -441,7 +441,7 @@ func (s *wingetTestScenario) upstreamOutput(_ []string, joined string) (string, 
 }
 
 func (s *wingetTestScenario) branchOutput(args []string, joined string) (string, bool, error) {
-	if strings.Contains(joined, "repos/hatayama/winget-pkgs/git/refs") {
+	if strings.Contains(joined, "repos/tongguang/winget-pkgs/git/refs") {
 		s.branchCreationCalls++
 		if err := validateWingetBranchCreationArgs(args, s.version); err != nil {
 			return "", true, err
@@ -455,7 +455,7 @@ func (s *wingetTestScenario) branchOutput(args []string, joined string) (string,
 }
 
 func (s *wingetTestScenario) manifestFileOutput(args []string, joined string) (string, bool, error) {
-	versionPath := "repos/hatayama/winget-pkgs/contents/manifests/h/hatayama/uloop/" + s.version + "/"
+	versionPath := "repos/tongguang/winget-pkgs/contents/manifests/t/tongguang/tloop/" + s.version + "/"
 	if strings.Contains(joined, versionPath) {
 		if strings.Contains(joined, "-X PUT") {
 			s.putCalls++
@@ -474,7 +474,7 @@ func (s *wingetTestScenario) manifestFileOutput(args []string, joined string) (s
 }
 
 func (s *wingetTestScenario) pullRequestOutput(args []string, joined string) (string, bool, error) {
-	headQuery := "repos/microsoft/winget-pkgs/pulls?head=" + url.QueryEscape("hatayama:hatayama-uloop-"+s.version) + "&state=open"
+	headQuery := "repos/microsoft/winget-pkgs/pulls?head=" + url.QueryEscape("tongguang:tongguang-tloop-"+s.version) + "&state=open"
 	if strings.Contains(joined, headQuery) {
 		if s.pullRequestOpen {
 			return `[{"html_url":"https://example.invalid/existing"}]`, true, nil
@@ -506,7 +506,7 @@ func validateWingetTestEnvironment(extraEnv []string, joined string) error {
 }
 
 func validateWingetBranchCreationArgs(args []string, version string) error {
-	expectedRef := "refs/heads/hatayama-uloop-" + version
+	expectedRef := "refs/heads/tongguang-tloop-" + version
 	if flagValue(args, "ref") != expectedRef {
 		return fmt.Errorf("branch ref = %q, want %q", flagValue(args, "ref"), expectedRef)
 	}
@@ -531,7 +531,7 @@ func validateWingetManifestPutArgs(args []string, version string) ([]byte, error
 	if len(decodedContent) == 0 {
 		return nil, errors.New("manifest PUT decoded content is empty")
 	}
-	expectedBranch := "hatayama-uloop-" + version
+	expectedBranch := "tongguang-tloop-" + version
 	if flagValue(args, "branch") != expectedBranch {
 		return nil, fmt.Errorf("manifest PUT branch = %q, want %q", flagValue(args, "branch"), expectedBranch)
 	}
@@ -542,7 +542,7 @@ func validateWingetManifestPutArgs(args []string, version string) ([]byte, error
 }
 
 func validateWingetPullRequestArgs(args []string, version string) error {
-	expectedHead := "hatayama:hatayama-uloop-" + version
+	expectedHead := "tongguang:tongguang-tloop-" + version
 	if flagValue(args, "head") != expectedHead {
 		return fmt.Errorf("pull request head = %q, want %q", flagValue(args, "head"), expectedHead)
 	}
@@ -550,7 +550,7 @@ func validateWingetPullRequestArgs(args []string, version string) error {
 		return fmt.Errorf("pull request base = %q, want master", flagValue(args, "base"))
 	}
 	body := flagValue(args, "body")
-	expectedReleaseURL := "https://github.com/hatayama/unity-cli-loop/releases/tag/dispatcher-v" + version
+	expectedReleaseURL := "https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v" + version
 	if body == "" || !strings.Contains(body, expectedReleaseURL) {
 		return fmt.Errorf("pull request body = %q, want release URL %q", body, expectedReleaseURL)
 	}
@@ -657,7 +657,7 @@ func wingetJoinedContains(parts ...string) func(string) bool {
 }
 
 func wingetForkContentRead(joined string) bool {
-	return strings.Contains(joined, "repos/hatayama/winget-pkgs/contents/") && !strings.Contains(joined, "-X PUT")
+	return strings.Contains(joined, "repos/tongguang/winget-pkgs/contents/") && !strings.Contains(joined, "-X PUT")
 }
 
 func runWingetOverrideScenario(t *testing.T, tag string, override wingetOverride) (string, string, int) {
@@ -687,8 +687,8 @@ func TestUpdateWingetManifestReportsEachFailingStep(t *testing.T) {
 		wantErr  string
 	}{
 		{"invalid tag", "v3.1.0", wingetOverride{matches: never}, "must start with dispatcher-v"},
-		{"package lookup", "dispatcher-v3.1.0", wingetOverride{matches: wingetJoinedContains("uloop?ref=master"), err: errors.New("package lookup failed")}, "package lookup failed"},
-		{"version lookup", "dispatcher-v3.1.0", wingetOverride{matches: wingetJoinedContains("uloop/3.1.0?ref=master"), err: errors.New("version lookup failed")}, "version lookup failed"},
+		{"package lookup", "dispatcher-v3.1.0", wingetOverride{matches: wingetJoinedContains("tloop?ref=master"), err: errors.New("package lookup failed")}, "package lookup failed"},
+		{"version lookup", "dispatcher-v3.1.0", wingetOverride{matches: wingetJoinedContains("tloop/3.1.0?ref=master"), err: errors.New("version lookup failed")}, "version lookup failed"},
 		{"release view", "dispatcher-v3.1.0", wingetOverride{matches: wingetJoinedContains("release view"), err: errors.New("release view failed")}, "release view failed"},
 		{"release view JSON", "dispatcher-v3.1.0", wingetOverride{matches: wingetJoinedContains("release view"), output: "{"}, "failed to parse release metadata"},
 		{"release date", "dispatcher-v3.1.0", wingetOverride{matches: wingetJoinedContains("release view"), output: `{"publishedAt":"2026"}`}, `invalid publishedAt value "2026"`},

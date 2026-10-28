@@ -9,9 +9,9 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
     /// </summary>
     internal static class CliUninstallPrompt
     {
-        private const string DialogTitle = "Uninstall uloop CLI?";
+        private const string DialogTitle = "Uninstall tloop CLI?";
         private const string DialogMessage =
-            "This removes the native uloop CLI command from this user account and removes package-owned PATH entries when applicable.";
+            "This removes the native tloop CLI command from this user account and removes package-owned PATH entries when applicable.";
         private const string ConfirmButtonText = "OK";
         private const string CancelButtonText = "Cancel";
 

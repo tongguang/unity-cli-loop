@@ -31,65 +31,65 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         private const string PropertyPatternReason =
             "Property patterns that match an added property are skipped; a pattern member name cannot "
-            + "be replaced by an accessor shim call. Run 'uloop compile' to add the property.";
+            + "be replaced by an accessor shim call. Run 'tloop compile' to add the property.";
 
         private const string GenericHostReason =
             "Added properties on generic types are skipped; one accessor identity and one store entry "
-            + "cannot stand for every closed instantiation. Run 'uloop compile' to add the property.";
+            + "cannot stand for every closed instantiation. Run 'tloop compile' to add the property.";
 
         private const string ExistingCallerOriginal =
             "        public int ExistingCaller(int value)\n        {\n            return value;\n        }";
 
         private const string VirtualOrAbstractReason =
             "Added virtual, override, abstract, or interface properties are skipped; the loaded type has no vtable slot. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         private const string InitAccessorReason =
             "Added properties with init accessors are skipped; the shim cannot preserve initialization-only assignment. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         private const string CompoundAssignmentReason =
             "Compound assignment, increment, and decrement of an added property are skipped; the accessor shim cannot preserve the operation. "
             + "Rewrite it as a plain assignment statement ('X = X + 1;') to keep hot reloading. "
-            + "Run 'uloop compile' to keep the code as written.";
+            + "Run 'tloop compile' to keep the code as written.";
 
         private const string ConsumedWriteReason =
             "The value of an assignment to an added property is consumed; the setter shim returns void. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         private const string NameofReferenceReason =
             "References to added properties inside nameof are skipped; the member does not exist in the compiled assembly. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         private const string ObjectInitializerReason =
             "Object initializers that assign added properties are skipped; the setter shim cannot rewrite the initializer. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         private const string RefOutInReason =
-            "Added properties cannot be passed by ref, out, or in. Run 'uloop compile' to add the property.";
+            "Added properties cannot be passed by ref, out, or in. Run 'tloop compile' to add the property.";
 
         private const string SetOnlyReason =
             "Added properties with only a setter are skipped; the shim requires a getter identity. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         private const string StructHostReason =
             "Added properties on struct types are skipped; the shim requires a reference-type instance. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         private const string CompiledMemberKindChangedReason =
             "Property 'PublicSeed' is declared as a field or an event in the compiled assembly. "
-            + "Run 'uloop compile'.";
+            + "Run 'tloop compile'.";
 
         private const string InitializerNotEmittableReason =
-            "Added property initializer cannot run in the shim lambda. Run 'uloop compile' to add the property.";
+            "Added property initializer cannot run in the shim lambda. Run 'tloop compile' to add the property.";
 
         private const string ConditionalAccessReason =
             "Conditional access to added properties is skipped; there is no rewrite shape. "
-            + "Run 'uloop compile' to add the property.";
+            + "Run 'tloop compile' to add the property.";
 
         private const string DeconstructionTargetReason =
             "Deconstruction assignment to an added property is skipped; the setter shim cannot stand as a "
-            + "deconstruction target. Run 'uloop compile' to add the property.";
+            + "deconstruction target. Run 'tloop compile' to add the property.";
 
         private const string HostStoreKeyPrefix =
             "io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadAddedMemberHost::";
@@ -417,7 +417,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 callerReason,
                 Is.EqualTo(
-                    "Uses an added property that hot reload cannot emit. Run 'uloop compile'. "
+                    "Uses an added property that hot reload cannot emit. Run 'tloop compile'. "
                     + "The property body was refused because: Added property 'Doubled' is left out of "
                     + "this reload because one of its accessors was. The Failed or Skipped row that "
                     + "names that accessor gives the reason; fix it and rerun."));

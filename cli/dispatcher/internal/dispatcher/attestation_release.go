@@ -18,7 +18,7 @@ const (
 	dispatcherReleaseAPIMaxPages      = 10
 	dispatcherReleaseTagPrefix        = "dispatcher-v"
 	betaVersionMarker                 = "-beta."
-	updateArchiveManifestEnvName      = "ULOOP_ARCHIVE_MANIFEST"
+	updateArchiveManifestEnvName      = "TLOOP_ARCHIVE_MANIFEST"
 )
 
 // dispatcherAPIBaseURL is mutable so tests can point it at an httptest server.

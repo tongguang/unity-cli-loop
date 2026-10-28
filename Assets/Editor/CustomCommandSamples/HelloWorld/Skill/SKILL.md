@@ -1,16 +1,16 @@
 ---
-name: uloop-hello-world
-description: "Sample uloop hello-world tool. Use to verify custom tool wiring or inspect a minimal tool implementation example."
+name: tloop-hello-world
+description: "Sample tloop hello-world tool. Use to verify custom tool wiring or inspect a minimal tool implementation example."
 ---
 
-# uloop hello-world
+# tloop hello-world
 
 Personalized hello world tool with multi-language support.
 
 ## Usage
 
 ```bash
-uloop hello-world [options]
+tloop hello-world [options]
 ```
 
 ## Parameters
@@ -25,16 +25,16 @@ uloop hello-world [options]
 
 ```bash
 # Default greeting
-uloop hello-world
+tloop hello-world
 
 # Greet with custom name
-uloop hello-world --name "Alice"
+tloop hello-world --name "Alice"
 
 # Japanese greeting
-uloop hello-world --name "太郎" --language japanese
+tloop hello-world --name "太郎" --language japanese
 
 # Spanish greeting without timestamp
-uloop hello-world --name "Carlos" --language spanish --no-include-timestamp
+tloop hello-world --name "Carlos" --language spanish --no-include-timestamp
 ```
 
 ## Output

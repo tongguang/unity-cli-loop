@@ -17,15 +17,15 @@
       "trimOnlyEquivalentRoots": [
         "/Users/example/MyProject/"
       ],
-      "unixSocketPathTemplate": "/tmp/uloop-<UID>/UnityCliLoop-bebe6bce5923715b.sock",
-      "windowsPipePath": "\\\\.\\pipe\\uloop-UnityCliLoop-bebe6bce5923715b"
+      "unixSocketPathTemplate": "/tmp/tloop-<UID>/TuanjieCliLoop-bebe6bce5923715b.sock",
+      "windowsPipePath": "\\\\.\\pipe\\tloop-TuanjieCliLoop-bebe6bce5923715b"
     },
     {
       "id": "unix-case-sensitive",
       "canonicalProjectRoot": "/Users/example/myproject",
       "trimOnlyEquivalentRoots": [],
-      "unixSocketPathTemplate": "/tmp/uloop-<UID>/UnityCliLoop-6b4ae0bfeab42b19.sock",
-      "windowsPipePath": "\\\\.\\pipe\\uloop-UnityCliLoop-6b4ae0bfeab42b19"
+      "unixSocketPathTemplate": "/tmp/tloop-<UID>/TuanjieCliLoop-6b4ae0bfeab42b19.sock",
+      "windowsPipePath": "\\\\.\\pipe\\tloop-TuanjieCliLoop-6b4ae0bfeab42b19"
     },
     {
       "id": "windows-stable",
@@ -33,8 +33,8 @@
       "trimOnlyEquivalentRoots": [
         "C:\\Users\\example\\MyProject\\"
       ],
-      "unixSocketPathTemplate": "/tmp/uloop-<UID>/UnityCliLoop-4abce6d9d9e51244.sock",
-      "windowsPipePath": "\\\\.\\pipe\\uloop-UnityCliLoop-4abce6d9d9e51244"
+      "unixSocketPathTemplate": "/tmp/tloop-<UID>/TuanjieCliLoop-4abce6d9d9e51244.sock",
+      "windowsPipePath": "\\\\.\\pipe\\tloop-TuanjieCliLoop-4abce6d9d9e51244"
     }
   ]
 }

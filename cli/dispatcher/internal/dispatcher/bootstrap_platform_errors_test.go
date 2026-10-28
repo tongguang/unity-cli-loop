@@ -10,8 +10,8 @@ import (
 func TestUnsupportedPlatformErrorGivesCommandSpecificActions(t *testing.T) {
 	// Verifies each bootstrap command's unsupported-OS message maps to an invalid-argument error with its own manual fallback.
 	cases := map[string]string{
-		updateUnsupportedOSMessage:    "Install the latest uloop dispatcher manually on this platform.",
-		uninstallUnsupportedOSMessage: "Remove the uloop dispatcher binary manually on this platform.",
+		updateUnsupportedOSMessage:    "Install the latest tloop dispatcher manually on this platform.",
+		uninstallUnsupportedOSMessage: "Remove the tloop dispatcher binary manually on this platform.",
 	}
 	for message, wantManualAction := range cases {
 		cliError, ok := unsupportedPlatformError(message, clierrors.ErrorContext{Command: "<COMMAND>"})

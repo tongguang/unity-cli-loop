@@ -18,7 +18,7 @@ import (
 func TestMatchMacUnityProcessKeepsAnEditorWithoutProjectPathUnidentified(t *testing.T) {
 	process, matched := matchMacUnityProcess(
 		123,
-		`/Applications/Unity/Hub/Editor/6000.0.0f1/Unity.app/Contents/MacOS/Unity -useHub -hubIPC`)
+		`/Applications/Tuanjie/Hub/Editor/6000.0.0f1/Tuanjie.app/Contents/MacOS/Tuanjie -useHub -hubIPC`)
 
 	if !matched || process.Pid != 123 || process.projectPath != "" {
 		t.Fatalf("expected an Editor with no project path, got matched = %v, %#v", matched, process)
@@ -140,7 +140,7 @@ func TestParseWindowsUnityProcessesSkipsMalformedLines(t *testing.T) {
 	encode := func(commandLine string) string {
 		return base64.StdEncoding.EncodeToString([]byte(commandLine))
 	}
-	validEditorCommand := encode(`C:\Editor\Unity.exe -projectPath "C:\Projects\Kept"`)
+	validEditorCommand := encode(`C:\Editor\Tuanjie.exe -projectPath "C:\Projects\Kept"`)
 	cases := []struct {
 		name string
 		line string

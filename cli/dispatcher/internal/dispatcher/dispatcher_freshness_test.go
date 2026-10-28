@@ -36,7 +36,7 @@ func TestDetectManagedDispatcherInstallIgnoresExecutablePathFailure(t *testing.T
 	})
 	// The path would be detected as Homebrew-managed if the error were ignored.
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/opt/homebrew/Cellar/uloop/1.0.0/bin/uloop", errors.New("executable path unavailable")
+		return "/opt/homebrew/Cellar/tloop/1.0.0/bin/tloop", errors.New("executable path unavailable")
 	}
 
 	if detectManagedDispatcherInstall().IsManaged() {
@@ -59,7 +59,7 @@ func TestExecuteDispatcherFreshnessPlanRejectsUnknownAction(t *testing.T) {
 }
 
 func TestRunDispatcherFreshnessUpdateTurnsFailedRequiredUpdateIntoManualUpdate(t *testing.T) {
-	// Verifies a failed required update stops the command and tells the user to run `uloop update` with the cause.
+	// Verifies a failed required update stops the command and tells the user to run `tloop update` with the cause.
 	t.Setenv(nativepath.CacheDirEnvName, t.TempDir())
 	deps := defaultDispatcherRunDeps()
 	deps.runUpdate = func(context.Context) (bool, error) {
@@ -76,7 +76,7 @@ func TestRunDispatcherFreshnessUpdateTurnsFailedRequiredUpdateIntoManualUpdate(t
 	if !handled || code != 1 {
 		t.Fatalf("result mismatch: handled=%t code=%d", handled, code)
 	}
-	for _, expected := range []string{"999.0.0", "Automatic update failed: network unavailable", "Run `uloop update` and retry the command."} {
+	for _, expected := range []string{"999.0.0", "Automatic update failed: network unavailable", "Run `tloop update` and retry the command."} {
 		if !strings.Contains(stderr.String(), expected) {
 			t.Fatalf("missing %q in envelope: %s", expected, stderr.String())
 		}

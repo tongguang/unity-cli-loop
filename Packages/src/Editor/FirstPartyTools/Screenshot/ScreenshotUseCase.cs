@@ -95,7 +95,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 {
                     Success = false,
                     Message = "Rendering screenshots require PlayMode, but Unity is currently in EditMode.",
-                    NextActions = new[] { "Start PlayMode with `uloop control-play-mode --action Play`, then retry the rendering screenshot." }
+                    NextActions = new[] { "Start PlayMode with `tloop control-play-mode --action Play`, then retry the rendering screenshot." }
                 };
             }
 

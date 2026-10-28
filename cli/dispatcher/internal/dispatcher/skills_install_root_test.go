@@ -180,9 +180,9 @@ func TestTryHandleSkillsRequestInstallsAtGitRoot(t *testing.T) {
 	if !handled || code != 0 {
 		t.Fatalf("install should succeed: handled=%v code=%d stderr=%s", handled, code, stderr.String())
 	}
-	assertSkillInstalledAt(t, repositoryRoot, "uloop-enabled-skill")
-	assertSkillAbsentAt(t, repositoryRoot, "uloop-disabled-skill")
-	assertSkillAbsentAt(t, projectRoot, "uloop-enabled-skill")
+	assertSkillInstalledAt(t, repositoryRoot, "tloop-enabled-skill")
+	assertSkillAbsentAt(t, repositoryRoot, "tloop-disabled-skill")
+	assertSkillAbsentAt(t, projectRoot, "tloop-enabled-skill")
 	if !strings.Contains(stdout.String(), filepath.Join(repositoryRoot, ".claude", "skills")) {
 		t.Fatalf("output should report the Git root location:\n%s", stdout.String())
 	}
@@ -204,8 +204,8 @@ func TestTryHandleSkillsRequestFollowsSavedInstallRoot(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("install should succeed: code=%d stderr=%s", code, stderr.String())
 	}
-	assertSkillInstalledAt(t, repositoryRoot, "uloop-enabled-skill")
-	assertSkillAbsentAt(t, projectRoot, "uloop-enabled-skill")
+	assertSkillInstalledAt(t, repositoryRoot, "tloop-enabled-skill")
+	assertSkillAbsentAt(t, projectRoot, "tloop-enabled-skill")
 }
 
 // Tests that --root unity overrides a saved Git install root for one invocation.
@@ -224,8 +224,8 @@ func TestTryHandleSkillsRequestRootFlagOverridesSavedInstallRoot(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("install should succeed: code=%d stderr=%s", code, stderr.String())
 	}
-	assertSkillInstalledAt(t, projectRoot, "uloop-enabled-skill")
-	assertSkillAbsentAt(t, repositoryRoot, "uloop-enabled-skill")
+	assertSkillInstalledAt(t, projectRoot, "tloop-enabled-skill")
+	assertSkillAbsentAt(t, repositoryRoot, "tloop-enabled-skill")
 }
 
 // Tests that --root git fails without writing anything when the project is not inside a Git repository.
@@ -247,7 +247,7 @@ func TestTryHandleSkillsRequestRejectsGitRootOutsideRepository(t *testing.T) {
 	if !strings.Contains(stderr.String(), "Git repository") {
 		t.Fatalf("error should explain the missing Git repository:\n%s", stderr.String())
 	}
-	assertSkillAbsentAt(t, projectRoot, "uloop-enabled-skill")
+	assertSkillAbsentAt(t, projectRoot, "tloop-enabled-skill")
 }
 
 // Tests that list with --root git reports skills installed at the Git root.
@@ -282,7 +282,7 @@ func TestTryHandleSkillsRequestListsGitRootInstall(t *testing.T) {
 	if !strings.Contains(output, filepath.Join(repositoryRoot, ".claude", "skills")) {
 		t.Fatalf("list should report the Git root location:\n%s", output)
 	}
-	if !strings.Contains(output, "uloop-enabled-skill (installed)") {
+	if !strings.Contains(output, "tloop-enabled-skill (installed)") {
 		t.Fatalf("list should report the Git root install:\n%s", output)
 	}
 }
@@ -293,7 +293,7 @@ func TestTryHandleSkillsRequestInstallsV3MigrationAtGitRoot(t *testing.T) {
 	mustMkdir(t, filepath.Join(repositoryRoot, ".git"))
 	projectRoot := filepath.Join(repositoryRoot, "unity")
 	writeUnityProjectWithSkills(t, projectRoot)
-	writeV3MigrationSkillFixture(t, projectRoot, "---\nname: v3-cli-invocation-migration\n---\n")
+	writeV3MigrationSkillFixture(t, projectRoot, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
 
 	stderr := &bytes.Buffer{}
 	_, code := tryHandleSkillsRequest(
@@ -325,14 +325,14 @@ func writeUnityProjectWithSkills(t *testing.T, projectRoot string) {
 	t.Helper()
 	mustMkdir(t, filepath.Join(projectRoot, "Assets"))
 	mustMkdir(t, filepath.Join(projectRoot, "ProjectSettings"))
-	writeTestSkill(t, projectRoot, "Assets/Editor/Enabled/Skill", "---\nname: uloop-enabled-skill\n---\n")
-	writeTestSkill(t, projectRoot, "Assets/Editor/Disabled/Skill", "---\nname: uloop-disabled-skill\n---\n")
+	writeTestSkill(t, projectRoot, "Assets/Editor/Enabled/Skill", "---\nname: tloop-enabled-skill\n---\n")
+	writeTestSkill(t, projectRoot, "Assets/Editor/Disabled/Skill", "---\nname: tloop-disabled-skill\n---\n")
 	writeToolSettings(t, projectRoot, `{"disabledTools":["disabled-skill"]}`)
 }
 
 func writeSkillSettings(t *testing.T, projectRoot string, content string) {
 	t.Helper()
-	settingsDir := filepath.Join(projectRoot, ".uloop")
+	settingsDir := filepath.Join(projectRoot, ".tloop")
 	mustMkdir(t, settingsDir)
 	if err := os.WriteFile(filepath.Join(settingsDir, "settings.skills.json"), []byte(content), 0o644); err != nil {
 		t.Fatalf("failed to write skill settings: %v", err)
@@ -380,7 +380,7 @@ func TestTryHandleSkillsRequestOutputDirIgnoresSavedInstallRoot(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("install should succeed: code=%d stderr=%s", code, stderr.String())
 	}
-	if _, err := os.Stat(filepath.Join(storeDir, "uloop-enabled-skill", "SKILL.md")); err != nil {
+	if _, err := os.Stat(filepath.Join(storeDir, "tloop-enabled-skill", "SKILL.md")); err != nil {
 		t.Fatalf("skill should be synced into the store: %v", err)
 	}
 }

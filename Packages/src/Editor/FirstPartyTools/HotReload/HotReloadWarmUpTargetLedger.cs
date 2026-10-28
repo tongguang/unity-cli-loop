@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     {
         internal const int MaxRecordedTargets = 32;
 
-        private const string FormatHeader = "uloop-hot-reload-warm-up-targets 1";
+        private const string FormatHeader = "tloop-hot-reload-warm-up-targets 1";
 
         /// <summary>
         /// The recorded names, most recent first. Empty when there is no ledger or it has another header.

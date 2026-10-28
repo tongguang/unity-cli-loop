@@ -229,7 +229,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             string missingImagePath = System.IO.Path.Combine(
                 System.IO.Path.GetTempPath(),
-                "uloop-missing-" + Guid.NewGuid().ToString("N") + ".dll");
+                "tloop-missing-" + Guid.NewGuid().ToString("N") + ".dll");
 
             HotReloadPatchTargetResolution resolution = ResolveExistingScriptWithItsImageAt(
                 missingImagePath,

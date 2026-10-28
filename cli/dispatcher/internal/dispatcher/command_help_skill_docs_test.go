@@ -128,13 +128,13 @@ func writeNegatedBooleanSkillFixture(t *testing.T, projectRoot string) {
 	if err := os.MkdirAll(skillDirectory, 0o755); err != nil {
 		t.Fatalf("failed to create the skill directory: %v", err)
 	}
-	manifest := []byte(`{"name":"io.github.hatayama.uloopmcp"}`)
+	manifest := []byte(`{"name":"io.github.tongguang.tloop"}`)
 	if err := os.WriteFile(filepath.Join(packageRoot, "package.json"), manifest, 0o644); err != nil {
 		t.Fatalf("failed to write the package manifest: %v", err)
 	}
 
 	skill := "---\n" +
-		"name: uloop-get-hierarchy\n" +
+		"name: tloop-get-hierarchy\n" +
 		"toolName: get-hierarchy\n" +
 		"description: \"Dump the scene hierarchy from the fixture skill.\"\n" +
 		"---\n\n" +
@@ -146,7 +146,7 @@ func writeNegatedBooleanSkillFixture(t *testing.T, projectRoot string) {
 	}
 }
 
-// writeSkillDocsFixturePackage installs a uloop package inside the project whose simulate-keyboard
+// writeSkillDocsFixturePackage installs a tloop package inside the project whose simulate-keyboard
 // skill documents --duration with the given text.
 func writeSkillDocsFixturePackage(t *testing.T, projectRoot string, durationDescription string) {
 	t.Helper()
@@ -156,13 +156,13 @@ func writeSkillDocsFixturePackage(t *testing.T, projectRoot string, durationDesc
 	if err := os.MkdirAll(skillDirectory, 0o755); err != nil {
 		t.Fatalf("failed to create the skill directory: %v", err)
 	}
-	manifest := []byte(`{"name":"io.github.hatayama.uloopmcp"}`)
+	manifest := []byte(`{"name":"io.github.tongguang.tloop"}`)
 	if err := os.WriteFile(filepath.Join(packageRoot, "package.json"), manifest, 0o644); err != nil {
 		t.Fatalf("failed to write the package manifest: %v", err)
 	}
 
 	skill := "---\n" +
-		"name: uloop-simulate-keyboard\n" +
+		"name: tloop-simulate-keyboard\n" +
 		"toolName: simulate-keyboard\n" +
 		"description: \"Simulate keyboard input from the fixture skill.\"\n" +
 		"---\n\n" +

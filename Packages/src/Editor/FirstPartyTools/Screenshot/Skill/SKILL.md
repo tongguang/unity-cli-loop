@@ -1,17 +1,17 @@
 ---
-name: uloop-screenshot
+name: tloop-screenshot
 toolName: screenshot
-description: "Capture Unity Editor windows or Game View rendering as PNG. Use for visual checks, debugging, documentation, or annotated UI element coordinates. A screenshot is one frame; for flicker, stutter, one-frame glitches, or anything that changes between frames, use record-video."
+description: "Capture Tuanjie Editor windows or Game View rendering as PNG. Use for visual checks, debugging, documentation, or annotated UI element coordinates. A screenshot is one frame; for flicker, stutter, one-frame glitches, or anything that changes between frames, use record-video."
 ---
 
-# uloop screenshot
+# tloop screenshot
 
-Take a screenshot of any Unity EditorWindow by name and save as PNG.
+Take a screenshot of any Tuanjie EditorWindow by name and save as PNG.
 
 ## Usage
 
 ```bash
-uloop screenshot [--window-name <name>] [--resolution-scale <scale>] [--match-mode <mode>] [--capture-mode <mode>] [--annotate-elements] [--annotate-raycast-grid] [--raycast-layer-mask <layers>] [--elements-only] [--output-directory <path>] [--prefab-path <path>] [--prefab-background-color <color>]
+tloop screenshot [--window-name <name>] [--resolution-scale <scale>] [--match-mode <mode>] [--capture-mode <mode>] [--annotate-elements] [--annotate-raycast-grid] [--raycast-layer-mask <layers>] [--elements-only] [--output-directory <path>] [--prefab-path <path>] [--prefab-background-color <color>]
 ```
 
 ## Parameters
@@ -22,7 +22,7 @@ uloop screenshot [--window-name <name>] [--resolution-scale <scale>] [--match-mo
 | `--resolution-scale` | number | `1.0` | Resolution scale (0.1 to 1.0) |
 | `--match-mode` | enum | `exact` | Window name matching mode: `exact`, `prefix`, or `contains`. Ignored when the resolved capture mode is rendering (auto during Play Mode resolves to rendering). |
 | `--capture-mode` | enum | `auto` | `auto` - rendering in PlayMode and window otherwise, `window` - capture EditorWindow including toolbar, `rendering` - capture game rendering only (PlayMode required), `GameView` - alias for `rendering`. Rendering screenshots return `ScreenshotToInputFormula` for converting raw image pixels before calling simulate-mouse-input (including `--dry-run`) or simulate-mouse-ui. |
-| `--output-directory` | string | `""` | Output directory path for saving screenshots. When empty, uses default path (.uloop/outputs/Screenshots/). Accepts absolute paths. |
+| `--output-directory` | string | `""` | Output directory path for saving screenshots. When empty, uses default path (.tloop/outputs/Screenshots/). Accepts absolute paths. |
 | `--annotate-elements` | flag | - | Annotate interactive uGUI elements and UI Toolkit controls on screen-space panels with index labels and interaction hints (A / CLICK, B / DRAG, ...). The response includes an `AnnotatedElements` array with element metadata sorted by `SortingOrder` then `SiblingIndex` (an approximation of z-order, not the guaranteed draw order). Only works when the resolved capture mode is rendering (auto during Play Mode resolves to rendering) in PlayMode. |
 | `--annotate-raycast-grid` | flag | - | Annotate clustered 3D physics collider candidates as `PhysicsCollider` entries in `AnnotatedElements`. Uses `Camera.main` visibility and the same top-left Game View coordinates as `simulate-mouse-input`. Only works when the resolved capture mode is rendering (auto during Play Mode resolves to rendering) in PlayMode. |
 | `--raycast-layer-mask` | string | `""` | Comma-separated physics layer names to narrow which layers `--annotate-raycast-grid` clusters. Hits are limited to layers also visible to `Camera.main.cullingMask`. When omitted, clusters against `Physics.DefaultRaycastLayers`. |
@@ -50,7 +50,7 @@ Returns JSON with:
 
 - `ScreenshotCount`: Number of windows captured
 - `ResolvedCaptureMode`: `"window"`, `"rendering"`, or `"prefab"` — the mode actually used after resolving `auto`
-- `Warning`: Appears for window captures taken while Play Mode is running with at least one image, and for any image captured while Play Mode is paused (UGUI/canvas content may show the frame rendered before the pause; run `uloop control-play-mode --action Step` once and capture again to refresh it).
+- `Warning`: Appears for window captures taken while Play Mode is running with at least one image, and for any image captured while Play Mode is paused (UGUI/canvas content may show the frame rendered before the pause; run `tloop control-play-mode --action Step` once and capture again to refresh it).
 - `Screenshots`: Array of screenshot info, each containing:
   - `ImagePath`: Absolute path to the saved PNG file. Empty (`""`) when `--elements-only` is used because no image file is written; `FileSizeBytes`, `Width`, and `Height` are then `0`, while `GameViewWidth`/`GameViewHeight` and `AnnotatedElements` still carry real values. When it is non-empty, always open the file named here — the output directory accumulates every past capture, so guessing the newest file with directory listing (`ls -t` or similar) can silently pick a stale screenshot from an earlier run.
   - `FileSizeBytes`: Size of the saved file in bytes
@@ -70,7 +70,7 @@ When multiple windows match (e.g., multiple Inspector windows or when using `con
 
 ## Notes
 
-- Use `uloop focus-window` first if needed
-- Target window must be open in Unity Editor
+- Use `tloop focus-window` first if needed
+- Target window must be open in Tuanjie Editor
 - Window name matching is always case-insensitive
 - Before using --prefab-path, read [references/prefab-capture.md](references/prefab-capture.md).

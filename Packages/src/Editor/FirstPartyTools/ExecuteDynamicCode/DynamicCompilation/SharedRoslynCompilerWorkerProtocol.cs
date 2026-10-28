@@ -15,8 +15,8 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal static class SharedRoslynCompilerWorkerProtocol
     {
-        internal const string SharedCompilerWorkerResultPrefix = "__ULOOP_RESULT__";
-        internal const string SharedCompilerWorkerEndMarker = "__ULOOP_END__";
+        internal const string SharedCompilerWorkerResultPrefix = "__TLOOP_RESULT__";
+        internal const string SharedCompilerWorkerEndMarker = "__TLOOP_END__";
         internal const string SharedCompilerWorkerQuitCommand = "__QUIT__";
         internal const string CompileRequestPathPrefix = "path-base64:";
         private const string RoslynWorkerProgramTemplateRelativePath =

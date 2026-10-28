@@ -43,12 +43,39 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             }
         }
 
+        // Verifies the Editor installer cannot adopt the original Unity CLI's skill sources.
+        [Test]
+        public void GetSkillSourceInfos_IgnoresOriginalUloopSkills()
+        {
+            string temporaryRoot = CreateTemporaryProjectRoot();
+            CreateFakeSourceSkill(temporaryRoot, "uloop-compile", "UnityTool", "reference.md", "Unity");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-compile", "TuanjieTool", "reference.md", "Tuanjie");
+
+            List<SkillInstallLayout.SkillSourceInfo> skills = SkillInstallLayout.GetSkillSourceInfos(temporaryRoot);
+
+            Assert.That(skills.Select(skill => skill.Name), Is.EqualTo(new[] { "tloop-compile" }));
+        }
+
+        // Verifies existing Unity skills are not reported as a Tuanjie installation or owned directories.
+        [Test]
+        public void HasInstalledSkills_IgnoresOriginalUloopDirectories()
+        {
+            string temporaryRoot = CreateTemporaryProjectRoot();
+            CreateFakeSourceSkill(temporaryRoot, "tloop-compile", "TuanjieTool", "reference.md", "Tuanjie");
+            string targetRoot = Path.Combine(temporaryRoot, ".agents");
+            string originalSkillDirectory = Path.Combine(targetRoot, "skills", "uloop-compile");
+            WriteSkillFile(originalSkillDirectory, "---\r\nname: uloop-compile\r\ntoolName: compile\r\n---\r\nUnity\r\n");
+
+            Assert.That(SkillInstallLayout.HasInstalledSkillsInAnyLayout(temporaryRoot, targetRoot), Is.False);
+            Assert.That(SkillInstallLayout.EnumerateInstalledSkillDirectories(targetRoot), Does.Not.Contain(originalSkillDirectory));
+        }
+
         // Tests that skill installation detection accepts managed legacy and namespaced skills only.
         [Test]
         public void AreSkillsInstalled_ReturnsTrueForManagedLegacyAndNamespacedSkillsOnly()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-compile", "CompileTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-compile", "CompileTool", "reference.md", "reference");
 
             string manualTargetRoot = Path.Combine(temporaryRoot, ".claude");
             WriteSkillFile(
@@ -70,7 +97,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 managedTargetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-compile"));
+                "tloop-compile"));
             Assert.IsTrue(detector.AreSkillsInstalledInAnyLayout(temporaryRoot, ".agents"),
                 "Namespaced managed skills should be detected");
         }
@@ -80,11 +107,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void AreSkillsInstalled_WhenLayoutSpecified_MatchesOnlySelectedLayout()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-compile", "CompileTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-compile", "CompileTool", "reference.md", "reference");
             SkillInstallationDetector detector = new();
 
             string flatTargetRoot = Path.Combine(temporaryRoot, ".claude");
-            WriteSkillFile(Path.Combine(flatTargetRoot, SkillInstallLayout.SkillsDirName, "uloop-compile"));
+            WriteSkillFile(Path.Combine(flatTargetRoot, SkillInstallLayout.SkillsDirName, "tloop-compile"));
             Assert.IsTrue(detector.AreSkillsInstalledForLayout(temporaryRoot, ".claude", false));
             Assert.IsFalse(detector.AreSkillsInstalledForLayout(temporaryRoot, ".claude", true));
 
@@ -93,7 +120,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 groupedTargetRoot,
                 SkillInstallLayout.SkillsDirName,
                 SkillInstallLayout.ManagedSkillsDirName,
-                "uloop-compile"));
+                "tloop-compile"));
             Assert.IsTrue(detector.AreSkillsInstalledForLayout(temporaryRoot, ".codex", true));
             Assert.IsFalse(detector.AreSkillsInstalledForLayout(temporaryRoot, ".codex", false));
         }
@@ -104,7 +131,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
             string targetRoot = Path.Combine(temporaryRoot, ".codex");
-            Directory.CreateDirectory(Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName, "uloop-compile"));
+            Directory.CreateDirectory(Path.Combine(targetRoot, SkillInstallLayout.SkillsDirName, "tloop-compile"));
             SkillInstallationDetector detector = new();
 
             Assert.IsTrue(detector.AreSkillsInstalledForLayout(temporaryRoot, ".codex", false));
@@ -118,7 +145,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             SkillInstallLayout.SkillSourceInfo[] skillSources = SkillInstallLayout.GetSkillSourceInfos(_projectRoot)
                 .ToArray();
 
-            Assert.That(skillSources.Select(skill => skill.Name), Does.Contain("uloop-launch"));
+            Assert.That(skillSources.Select(skill => skill.Name), Does.Contain("tloop-launch"));
         }
 
         // Tests that differently cased paths follow each editor platform's path identity policy.
@@ -182,12 +209,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 "PackageCache",
                 "com.example.cached@1.0.0");
 
-            WriteSourceSkill(assetsRoot, "uloop-assets-priority", "assets-winner", "AssetsWinner");
-            WriteSourceSkill(directPackageRoot, "uloop-assets-priority", "direct-loser", "DirectLoser");
-            WriteSourceSkill(directPackageRoot, "uloop-package-priority", "direct-winner", "DirectWinner");
-            WriteSourceSkill(manifestPackageRoot, "uloop-package-priority", "manifest-loser", "ManifestLoser");
-            WriteSourceSkill(manifestPackageRoot, "uloop-manifest-priority", "manifest-winner", "ManifestWinner");
-            WriteSourceSkill(cachePackageRoot, "uloop-manifest-priority", "cache-loser", "CacheLoser");
+            WriteSourceSkill(assetsRoot, "tloop-assets-priority", "assets-winner", "AssetsWinner");
+            WriteSourceSkill(directPackageRoot, "tloop-assets-priority", "direct-loser", "DirectLoser");
+            WriteSourceSkill(directPackageRoot, "tloop-package-priority", "direct-winner", "DirectWinner");
+            WriteSourceSkill(manifestPackageRoot, "tloop-package-priority", "manifest-loser", "ManifestLoser");
+            WriteSourceSkill(manifestPackageRoot, "tloop-manifest-priority", "manifest-winner", "ManifestWinner");
+            WriteSourceSkill(cachePackageRoot, "tloop-manifest-priority", "cache-loser", "CacheLoser");
 
             string manifestPath = Path.Combine(temporaryRoot, "Packages", "manifest.json");
             Directory.CreateDirectory(Path.GetDirectoryName(manifestPath));
@@ -201,9 +228,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 .GetSkillSourceInfos(temporaryRoot)
                 .ToDictionary(skill => skill.Name, StringComparer.Ordinal);
 
-            Assert.That(skillSources["uloop-assets-priority"].ToolName, Is.EqualTo("assets-winner"));
-            Assert.That(skillSources["uloop-package-priority"].ToolName, Is.EqualTo("direct-winner"));
-            Assert.That(skillSources["uloop-manifest-priority"].ToolName, Is.EqualTo("manifest-winner"));
+            Assert.That(skillSources["tloop-assets-priority"].ToolName, Is.EqualTo("assets-winner"));
+            Assert.That(skillSources["tloop-package-priority"].ToolName, Is.EqualTo("direct-winner"));
+            Assert.That(skillSources["tloop-manifest-priority"].ToolName, Is.EqualTo("manifest-winner"));
         }
 
         // Tests that local manifest dependencies do not also discover stale PackageCache-only skills.
@@ -219,8 +246,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 "Library",
                 "PackageCache",
                 "com.example.local@1.0.0");
-            WriteSourceSkill(localPackageRoot, "uloop-local-skill", "local-tool", "LocalTool");
-            WriteSourceSkill(cachePackageRoot, "uloop-stale-cache-skill", "stale-tool", "StaleTool");
+            WriteSourceSkill(localPackageRoot, "tloop-local-skill", "local-tool", "LocalTool");
+            WriteSourceSkill(cachePackageRoot, "tloop-stale-cache-skill", "stale-tool", "StaleTool");
 
             string manifestPath = Path.Combine(temporaryRoot, "Packages", "manifest.json");
             Directory.CreateDirectory(Path.GetDirectoryName(manifestPath));
@@ -234,8 +261,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 .Select(skill => skill.Name)
                 .ToArray();
 
-            Assert.That(skillNames, Does.Contain("uloop-local-skill"));
-            Assert.That(skillNames, Does.Not.Contain("uloop-stale-cache-skill"));
+            Assert.That(skillNames, Does.Contain("tloop-local-skill"));
+            Assert.That(skillNames, Does.Not.Contain("tloop-stale-cache-skill"));
         }
 
         // Tests that skill discovery follows bundled tools after they move into the first-party plugin assembly.
@@ -246,79 +273,79 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 .ToArray();
 
             SkillInstallLayout.SkillSourceInfo controlPlayModeSkill = skillSources
-                .Single(skill => skill.Name == "uloop-control-play-mode");
+                .Single(skill => skill.Name == "tloop-control-play-mode");
 
             Assert.That(controlPlayModeSkill.ToolName, Is.EqualTo("control-play-mode"));
             Assert.That(controlPlayModeSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo getLogsSkill = skillSources
-                .Single(skill => skill.Name == "uloop-get-logs");
+                .Single(skill => skill.Name == "tloop-get-logs");
 
             Assert.That(getLogsSkill.ToolName, Is.EqualTo("get-logs"));
             Assert.That(getLogsSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo compileSkill = skillSources
-                .Single(skill => skill.Name == "uloop-compile");
+                .Single(skill => skill.Name == "tloop-compile");
 
             Assert.That(compileSkill.ToolName, Is.EqualTo("compile"));
             Assert.That(compileSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo executeDynamicCodeSkill = skillSources
-                .Single(skill => skill.Name == "uloop-execute-dynamic-code");
+                .Single(skill => skill.Name == "tloop-execute-dynamic-code");
 
             Assert.That(executeDynamicCodeSkill.ToolName, Is.EqualTo("execute-dynamic-code"));
             Assert.That(executeDynamicCodeSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo clearConsoleSkill = skillSources
-                .Single(skill => skill.Name == "uloop-clear-console");
+                .Single(skill => skill.Name == "tloop-clear-console");
 
             Assert.That(clearConsoleSkill.ToolName, Is.EqualTo("clear-console"));
             Assert.That(clearConsoleSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo getHierarchySkill = skillSources
-                .Single(skill => skill.Name == "uloop-get-hierarchy");
+                .Single(skill => skill.Name == "tloop-get-hierarchy");
 
             Assert.That(getHierarchySkill.ToolName, Is.EqualTo("get-hierarchy"));
             Assert.That(getHierarchySkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo runTestsSkill = skillSources
-                .Single(skill => skill.Name == "uloop-run-tests");
+                .Single(skill => skill.Name == "tloop-run-tests");
 
             Assert.That(runTestsSkill.ToolName, Is.EqualTo("run-tests"));
             Assert.That(runTestsSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo findGameObjectsSkill = skillSources
-                .Single(skill => skill.Name == "uloop-find-game-objects");
+                .Single(skill => skill.Name == "tloop-find-game-objects");
 
             Assert.That(findGameObjectsSkill.ToolName, Is.EqualTo("find-game-objects"));
             Assert.That(findGameObjectsSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo screenshotSkill = skillSources
-                .Single(skill => skill.Name == "uloop-screenshot");
+                .Single(skill => skill.Name == "tloop-screenshot");
 
             Assert.That(screenshotSkill.ToolName, Is.EqualTo("screenshot"));
             Assert.That(screenshotSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo replayInputSkill = skillSources
-                .Single(skill => skill.Name == "uloop-replay-input");
+                .Single(skill => skill.Name == "tloop-replay-input");
 
             Assert.That(replayInputSkill.ToolName, Is.EqualTo("replay-input"));
             Assert.That(replayInputSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo simulateKeyboardSkill = skillSources
-                .Single(skill => skill.Name == "uloop-simulate-keyboard");
+                .Single(skill => skill.Name == "tloop-simulate-keyboard");
 
             Assert.That(simulateKeyboardSkill.ToolName, Is.EqualTo("simulate-keyboard"));
             Assert.That(simulateKeyboardSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo simulateMouseInputSkill = skillSources
-                .Single(skill => skill.Name == "uloop-simulate-mouse-input");
+                .Single(skill => skill.Name == "tloop-simulate-mouse-input");
 
             Assert.That(simulateMouseInputSkill.ToolName, Is.EqualTo("simulate-mouse-input"));
             Assert.That(simulateMouseInputSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo simulateMouseUiSkill = skillSources
-                .Single(skill => skill.Name == "uloop-simulate-mouse-ui");
+                .Single(skill => skill.Name == "tloop-simulate-mouse-ui");
 
             Assert.That(simulateMouseUiSkill.ToolName, Is.EqualTo("simulate-mouse-ui"));
             Assert.That(simulateMouseUiSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
@@ -331,13 +358,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-public-skill",
+                "tloop-public-skill",
                 "PublicTool",
                 "reference.md",
                 "reference");
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-internal-skill",
+                "tloop-internal-skill",
                 "InternalTool",
                 "reference.md",
                 "internal-reference",
@@ -356,7 +383,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string temporaryRoot = CreateTemporaryProjectRoot();
             CreateFakeSourceSkill(
                 temporaryRoot,
-                "uloop-internal-tool",
+                "tloop-internal-tool",
                 "InternalTool",
                 "reference.md",
                 "internal-reference",
@@ -388,10 +415,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void GetInstalledState_WhenExpectedSkillToolIsDisabled_IgnoresThatSkill()
         {
             string temporaryRoot = CreateTemporaryProjectRoot();
-            CreateFakeSourceSkill(temporaryRoot, "uloop-compile", "CompileTool", "reference.md", "reference");
-            CreateFakeSourceSkill(temporaryRoot, "uloop-replay-input", "ReplayInputTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-compile", "CompileTool", "reference.md", "reference");
+            CreateFakeSourceSkill(temporaryRoot, "tloop-replay-input", "ReplayInputTool", "reference.md", "reference");
             string targetRoot = Path.Combine(temporaryRoot, ".claude");
-            InstallFakeSkill(targetRoot, "uloop-compile", "reference.md", "reference");
+            InstallFakeSkill(targetRoot, "tloop-compile", "reference.md", "reference");
 
             SkillInstallState stateWithDisabledTool = SkillInstallLayout.GetInstalledState(
                 temporaryRoot,
@@ -431,7 +458,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             return temporaryRoot;
         }
 
-        private static void WriteSkillFile(string skillDir, string content = "---\nname: uloop-compile\n---\n")
+        private static void WriteSkillFile(string skillDir, string content = "---\nname: tloop-compile\n---\n")
         {
             Directory.CreateDirectory(skillDir);
             File.WriteAllText(Path.Combine(skillDir, SkillInstallLayout.SkillFileName), content);
@@ -527,8 +554,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string temporaryTargetRoot = CreateTemporaryProjectRoot();
             string skillsRoot = SkillInstallLayout.GetSkillsRoot(temporaryTargetRoot);
-            Directory.CreateDirectory(Path.Combine(SkillInstallLayout.GetManagedSkillsRoot(temporaryTargetRoot), "uloop-compile"));
-            Directory.CreateDirectory(Path.Combine(skillsRoot, "uloop-get-logs"));
+            Directory.CreateDirectory(Path.Combine(SkillInstallLayout.GetManagedSkillsRoot(temporaryTargetRoot), "tloop-compile"));
+            Directory.CreateDirectory(Path.Combine(skillsRoot, "tloop-get-logs"));
             Directory.CreateDirectory(Path.Combine(skillsRoot, "manual-skill"));
 
             string[] skillDirectories = SkillInstallLayout.EnumerateInstalledSkillDirectories(temporaryTargetRoot)
@@ -539,8 +566,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 skillDirectories,
                 Is.EqualTo(new[]
                 {
-                    Path.Combine("skills", "unity-cli-loop", "uloop-compile"),
-                    Path.Combine("skills", "uloop-get-logs")
+                    Path.Combine("skills", "tuanjie-cli-loop", "tloop-compile"),
+                    Path.Combine("skills", "tloop-get-logs")
                 }));
         }
 
@@ -563,10 +590,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void GetInstalledStateForSkillSource_WhenInstalledFileNamesDiffer_ReturnsOutdated()
         {
             string temporaryTargetRoot = CreateTemporaryProjectRoot();
-            byte[] skillContent = Encoding.UTF8.GetBytes("---\nname: uloop-compile\n---\n");
+            byte[] skillContent = Encoding.UTF8.GetBytes("---\nname: tloop-compile\n---\n");
             byte[] guideContent = Encoding.UTF8.GetBytes("guide\n");
             SkillInstallLayout.SkillSourceInfo skill = new(
-                "uloop-compile",
+                "tloop-compile",
                 "compile",
                 new Dictionary<string, byte[]>(StringComparer.Ordinal)
                 {
@@ -575,7 +602,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 });
             string installedSkillDirectory = SkillInstallLayout.GetInstalledSkillDirectoryPathForLayout(
                 temporaryTargetRoot,
-                "uloop-compile",
+                "tloop-compile",
                 groupSkillsUnderUnityCliLoop: false);
             Directory.CreateDirectory(installedSkillDirectory);
             File.WriteAllBytes(Path.Combine(installedSkillDirectory, "SKILL.md"), skillContent);

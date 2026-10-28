@@ -111,7 +111,7 @@ func TestEnumeratePackageSearchResultsCapturesPackageIdentities(t *testing.T) {
 	}
 }
 
-// Tests that local manifest packages from other dependencies cannot replace the Unity CLI Loop package root.
+// Tests that local manifest packages from other dependencies cannot replace the Tuanjie CLI Loop package root.
 func TestResolvePackageRootIgnoresOtherManifestFilePackages(t *testing.T) {
 	projectRoot := t.TempDir()
 	otherPackageRoot := filepath.Join(t.TempDir(), "AOtherPackage")
@@ -125,7 +125,7 @@ func TestResolvePackageRootIgnoresOtherManifestFilePackages(t *testing.T) {
 	writeManifest(
 		t,
 		projectRoot,
-		`{"dependencies":{"com.example.other":"file:`+filepath.ToSlash(otherPackageRoot)+`","io.github.hatayama.uloopmcp":"file:`+filepath.ToSlash(packageRoot)+`"}}`)
+		`{"dependencies":{"com.example.other":"file:`+filepath.ToSlash(otherPackageRoot)+`","io.github.tongguang.tloop":"file:`+filepath.ToSlash(packageRoot)+`"}}`)
 
 	actualRoot := filepath.Clean(ResolvePackageRoot(projectRoot))
 	expectedRoot := filepath.Clean(packageRoot)
@@ -134,7 +134,7 @@ func TestResolvePackageRootIgnoresOtherManifestFilePackages(t *testing.T) {
 	}
 }
 
-// Tests that marker-only project packages are not treated as the Unity CLI Loop package unless they are Packages/src.
+// Tests that marker-only project packages are not treated as the Tuanjie CLI Loop package unless they are Packages/src.
 func TestResolvePackageRootIgnoresMarkerOnlyUnrelatedProjectPackage(t *testing.T) {
 	projectRoot := t.TempDir()
 	unrelatedPackageRoot := filepath.Join(projectRoot, "Packages", "unrelated-package")
@@ -361,7 +361,7 @@ func TestFindEditorFoldersReturnsEmptyForMissingBase(t *testing.T) {
 func TestFindUnityCliLoopPackageFallsBackToPackageCacheDirectoryName(t *testing.T) {
 	projectRoot := t.TempDir()
 	cacheDir := filepath.Join(projectRoot, "Library", "PackageCache")
-	cachedRoot := filepath.Join(cacheDir, packageNameAlias+"@1.0.0", "Packages", "src")
+	cachedRoot := filepath.Join(cacheDir, packageName+"@1.0.0", "Packages", "src")
 	mkdirAll(t, filepath.Join(cachedRoot, "Editor", "FirstPartyTools"))
 	mkdirAll(t, filepath.Join(cacheDir, "com.example.unrelated@1.0.0"))
 	cachedFile := filepath.Join(cacheDir, packageName+"@file")
@@ -379,7 +379,7 @@ func TestFindUnityCliLoopPackageFallsBackToPackageCacheDirectoryName(t *testing.
 	if !ok {
 		t.Fatal("cached package should be found")
 	}
-	if result.Identity.Name != packageNameAlias || filepath.Clean(result.Root) != filepath.Clean(cachedRoot) {
+	if result.Identity.Name != packageName || filepath.Clean(result.Root) != filepath.Clean(cachedRoot) {
 		t.Fatalf("unexpected package result: %#v", result)
 	}
 }
@@ -481,13 +481,12 @@ func TestPackageIdentityNameFromCacheDir(t *testing.T) {
 	}
 }
 
-// Tests the package root priority order: Packages/src, the package name, its alias, other locations, then PackageCache.
+// Tests the package root priority order: Packages/src, the package name, other locations, then PackageCache.
 func TestUnityCliLoopPackagePriority(t *testing.T) {
 	projectRoot := t.TempDir()
 	cases := map[string]int{
 		filepath.Join(projectRoot, "Packages", "src"):                               0,
 		filepath.Join(projectRoot, "Packages", packageName):                         1,
-		filepath.Join(projectRoot, "Packages", packageNameAlias):                    2,
 		filepath.Join(t.TempDir(), "elsewhere"):                                     10,
 		filepath.Join(projectRoot, "Library", "PackageCache", packageName+"@1.0.0"): 20,
 	}

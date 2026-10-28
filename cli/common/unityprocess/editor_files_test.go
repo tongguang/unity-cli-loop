@@ -28,9 +28,9 @@ func TestEditorLogPathForEachPlatform(t *testing.T) {
 		localAppData string
 		want         string
 	}{
-		{name: "macOS", goos: "darwin", homeDir: homeDir, want: filepath.Join(homeDir, "Library", "Logs", "Unity", "Editor.log")},
-		{name: "Windows", goos: "windows", localAppData: localAppData, want: filepath.Join(localAppData, "Unity", "Editor", "Editor.log")},
-		{name: "Linux", goos: "linux", homeDir: homeDir, want: filepath.Join(homeDir, ".config", "unity3d", "Editor.log")},
+		{name: "macOS", goos: "darwin", homeDir: homeDir, want: filepath.Join(homeDir, "Library", "Logs", "Tuanjie", "Editor.log")},
+		{name: "Windows", goos: "windows", localAppData: localAppData, want: filepath.Join(localAppData, "Tuanjie", "Editor", "Editor.log")},
+		{name: "Linux", goos: "linux", homeDir: homeDir, want: filepath.Join(homeDir, ".config", "tuanjie", "Editor.log")},
 		{name: "macOS without a home directory", goos: "darwin", want: ""},
 		{name: "Windows without LOCALAPPDATA", goos: "windows", homeDir: homeDir, want: ""},
 		{name: "Linux without a home directory", goos: "linux", want: ""},
@@ -53,7 +53,7 @@ func writeEditorLogForTest(t *testing.T, logPath string, projectPath string, lin
 	t.Helper()
 	lines := []string{
 		"COMMAND LINE ARGUMENTS:",
-		"Unity",
+		"Tuanjie",
 		"-projectPath",
 		projectPath,
 		"Successfully changed project path to: " + projectPath,

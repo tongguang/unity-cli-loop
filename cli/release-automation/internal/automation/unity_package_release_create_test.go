@@ -60,7 +60,7 @@ func unityPackageReleaseTestCreateOptions(t *testing.T) unityPackageReleaseCreat
 		RepoRoot:   t.TempDir(),
 		Tag:        "v3.14.0",
 		Commit:     unityPackageReleaseTestCommit,
-		Asset:      writeUnityPackageReleaseTestAsset(t, "io.github.hatayama.uloopmcp-3.14.0.tgz", "signed"),
+		Asset:      writeUnityPackageReleaseTestAsset(t, "io.github.tongguang.tloop-3.14.0.tgz", "signed"),
 	}
 }
 
@@ -184,14 +184,14 @@ func TestCreateUnityPackageReleaseWritesInOrder(t *testing.T) {
 // Verifies a pre-release version is created as a pre-release, as the release sync did.
 func TestCreateUnityPackageReleaseMarksPreReleases(t *testing.T) {
 	fake := newFakeUnityPackageReleaseCommands(t, unityPackageReleaseTestCreateResponses(map[string][]fakeUnityPackageReleaseResponse{
-		"release":   {unityPackageReleaseTestNotFound, {output: `{"tag_name": "v3.15.0-beta.1", "draft": false, "assets": [{"name": "io.github.hatayama.uloopmcp-3.15.0-beta.1.tgz", "size": 2048}]}`}},
+		"release":   {unityPackageReleaseTestNotFound, {output: `{"tag_name": "v3.15.0-beta.1", "draft": false, "assets": [{"name": "io.github.tongguang.tloop-3.15.0-beta.1.tgz", "size": 2048}]}`}},
 		"tag":       {{output: `{"ref": "refs/tags/v3.15.0-beta.1", "object": {"sha": "` + unityPackageReleaseTestCommit + `", "type": "commit"}}`}},
 		"changelog": {{output: "## [3.15.0-beta.1](https://example.com) (2026-10-12)\n\n* beta\n"}},
 	}))
 	fake.tag = "v3.15.0-beta.1"
 	options := unityPackageReleaseTestCreateOptions(t)
 	options.Tag = "v3.15.0-beta.1"
-	options.Asset = writeUnityPackageReleaseTestAsset(t, "io.github.hatayama.uloopmcp-3.15.0-beta.1.tgz", "signed")
+	options.Asset = writeUnityPackageReleaseTestAsset(t, "io.github.tongguang.tloop-3.15.0-beta.1.tgz", "signed")
 	code, output := runCreateUnityPackageReleaseForTest(fake, options)
 	if code != 0 {
 		t.Fatalf("exit code = %d, output = %s", code, output)
@@ -452,16 +452,16 @@ func TestCreateUnityPackageReleaseRejectsInvalidInputs(t *testing.T) {
 			options.Commit = "main"
 		}},
 		{name: "missing asset", mutate: func(_ *testing.T, options *unityPackageReleaseCreateOptions) {
-			options.Asset = filepath.Join(filepath.Dir(options.Asset), "missing", "io.github.hatayama.uloopmcp-3.14.0.tgz")
+			options.Asset = filepath.Join(filepath.Dir(options.Asset), "missing", "io.github.tongguang.tloop-3.14.0.tgz")
 		}},
 		{name: "empty asset", mutate: func(t *testing.T, options *unityPackageReleaseCreateOptions) {
-			options.Asset = writeUnityPackageReleaseTestAsset(t, "io.github.hatayama.uloopmcp-3.14.0.tgz", "")
+			options.Asset = writeUnityPackageReleaseTestAsset(t, "io.github.tongguang.tloop-3.14.0.tgz", "")
 		}},
 		{name: "asset of another version", mutate: func(t *testing.T, options *unityPackageReleaseCreateOptions) {
-			options.Asset = writeUnityPackageReleaseTestAsset(t, "io.github.hatayama.uloopmcp-3.13.0.tgz", "signed")
+			options.Asset = writeUnityPackageReleaseTestAsset(t, "io.github.tongguang.tloop-3.13.0.tgz", "signed")
 		}},
 		{name: "directory instead of an asset", mutate: func(t *testing.T, options *unityPackageReleaseCreateOptions) {
-			directory := filepath.Join(t.TempDir(), "io.github.hatayama.uloopmcp-3.14.0.tgz")
+			directory := filepath.Join(t.TempDir(), "io.github.tongguang.tloop-3.14.0.tgz")
 			if err := os.Mkdir(directory, 0o700); err != nil {
 				t.Fatalf("create directory: %v", err)
 			}
@@ -529,7 +529,7 @@ func TestParseUnityPackageReleaseCreateOptions(t *testing.T) {
 func TestRunCreateUnityPackageReleaseRejectsAnInvalidAsset(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	missingAsset := filepath.Join(t.TempDir(), "io.github.hatayama.uloopmcp-3.14.0.tgz")
+	missingAsset := filepath.Join(t.TempDir(), "io.github.tongguang.tloop-3.14.0.tgz")
 	code := RunCreateUnityPackageRelease(context.Background(), &stdout, &stderr, []string{
 		"--repo", unityPackageReleaseTestRepository, "--repo-root", t.TempDir(),
 		"--tag", "v3.14.0", "--commit", unityPackageReleaseTestCommit, "--asset", missingAsset,

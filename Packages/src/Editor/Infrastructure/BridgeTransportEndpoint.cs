@@ -32,10 +32,10 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
             Debug.Assert(!string.IsNullOrWhiteSpace(projectRoot), "projectRoot must not be empty");
 
             string canonicalProjectRoot = CanonicalizeProjectRoot(projectRoot);
-            string endpointName = "UnityCliLoop-" + CreateEndpointHash(canonicalProjectRoot);
+            string endpointName = "TuanjieCliLoop-" + CreateEndpointHash(canonicalProjectRoot);
             if (UnityEngine.Application.platform == RuntimePlatform.WindowsEditor)
             {
-                string pipeName = "uloop-" + endpointName;
+                string pipeName = "tloop-" + endpointName;
                 return new BridgeTransportEndpoint(
                     BridgeTransportKind.WindowsNamedPipe,
                     @"\\.\pipe\" + pipeName,

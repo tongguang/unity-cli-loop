@@ -23,7 +23,7 @@ const (
 )
 
 // writePlainToolVibeLog mirrors writeCompileVibeLog: the entry is built only when the log is on,
-// so a command run without ULOOP_DEBUG pays nothing for it.
+// so a command run without TLOOP_DEBUG pays nothing for it.
 func writePlainToolVibeLog(projectRoot string, buildEntry func() vibelog.CLIVibeLogEntry) {
 	if !vibelog.IsCLIVibeLogEnabled() {
 		return

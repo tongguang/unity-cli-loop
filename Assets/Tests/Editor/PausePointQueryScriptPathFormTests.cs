@@ -19,9 +19,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         // An embedded package whose folder name differs from its package name, so the folder path
         // and the asset path of the same script differ.
         private const string PackageAssetPath =
-            "Packages/io.github.hatayama.uloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/io.github.tongguang.tloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const string PackagePhysicalPath =
-            "Packages/uloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/tloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const string AssetsScriptPath = "Assets/Tests/Editor/PausePointQueryScriptPathFormTests.cs";
         private const string Line = ":16";
         private const string ProjectRootToken = "<root>/";

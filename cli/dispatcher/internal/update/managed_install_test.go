@@ -9,17 +9,17 @@ func TestIsWingetManagedPath(t *testing.T) {
 		path string
 		want bool
 	}{
-		{name: "user package", path: `C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Packages\hatayama.uloop_Microsoft.Winget.Source_8wekyb3d8bbwe\uloop.exe`, want: true},
-		{name: "user link", path: `C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Links\uloop.exe`, want: true},
-		{name: "machine package", path: `C:\Program Files\WinGet\Packages\hatayama.uloop_Microsoft.Winget.Source_8wekyb3d8bbwe\uloop.exe`, want: true},
-		{name: "machine link", path: `C:\Program Files\WinGet\Links\uloop.exe`, want: true},
-		{name: "forward slashes", path: `C:/Users/<USER_NAME>/AppData/Local/Microsoft/WinGet/Packages/hatayama.uloop_Microsoft.Winget.Source_8wekyb3d8bbwe/uloop.exe`, want: true},
-		{name: "case insensitive", path: `C:\Users\<USER_NAME>\AppData\Local\Microsoft\winget\packages\hatayama.uloop\uloop.exe`, want: true},
-		{name: "curl install", path: `C:\Users\<USER_NAME>\AppData\Local\Programs\uloop\bin\uloop.exe`, want: false},
-		{name: "homebrew install", path: `/opt/homebrew/Cellar/uloop/3.1.0/bin/uloop`, want: false},
-		{name: "winget without managed directory", path: `C:\Tools\WinGet\uloop.exe`, want: false},
-		{name: "managed directory is not adjacent", path: `C:\Tools\WinGet\Other\Packages\uloop.exe`, want: false},
-		{name: "reversed segments", path: `D:\Packages\WinGet\uloop.exe`, want: false},
+		{name: "user package", path: `C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Packages\tongguang.tloop_Microsoft.Winget.Source_8wekyb3d8bbwe\tloop.exe`, want: true},
+		{name: "user link", path: `C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Links\tloop.exe`, want: true},
+		{name: "machine package", path: `C:\Program Files\WinGet\Packages\tongguang.tloop_Microsoft.Winget.Source_8wekyb3d8bbwe\tloop.exe`, want: true},
+		{name: "machine link", path: `C:\Program Files\WinGet\Links\tloop.exe`, want: true},
+		{name: "forward slashes", path: `C:/Users/<USER_NAME>/AppData/Local/Microsoft/WinGet/Packages/tongguang.tloop_Microsoft.Winget.Source_8wekyb3d8bbwe/tloop.exe`, want: true},
+		{name: "case insensitive", path: `C:\Users\<USER_NAME>\AppData\Local\Microsoft\winget\packages\tongguang.tloop\tloop.exe`, want: true},
+		{name: "curl install", path: `C:\Users\<USER_NAME>\AppData\Local\Programs\tloop\bin\tloop.exe`, want: false},
+		{name: "homebrew install", path: `/opt/homebrew/Cellar/tloop/3.1.0/bin/tloop`, want: false},
+		{name: "winget without managed directory", path: `C:\Tools\WinGet\tloop.exe`, want: false},
+		{name: "managed directory is not adjacent", path: `C:\Tools\WinGet\Other\Packages\tloop.exe`, want: false},
+		{name: "reversed segments", path: `D:\Packages\WinGet\tloop.exe`, want: false},
 	}
 
 	for _, test := range tests {
@@ -41,10 +41,10 @@ func TestDetectManagedInstall(t *testing.T) {
 		expectedName    string
 		expectedUpgrade string
 	}{
-		{name: "homebrew", path: "/opt/homebrew/Cellar/uloop/3.1.0/bin/uloop", expectedKind: ManagedInstallHomebrew, expectedName: "Homebrew", expectedUpgrade: "brew upgrade uloop"},
-		{name: "winget", path: `C:\Program Files\WinGet\Links\uloop.exe`, expectedKind: ManagedInstallWinget, expectedName: "winget", expectedUpgrade: "winget upgrade --id hatayama.uloop"},
-		{name: "homebrew precedence", path: "/opt/homebrew/Cellar/uloop/3.1.0/WinGet/Links/uloop", expectedKind: ManagedInstallHomebrew, expectedName: "Homebrew", expectedUpgrade: "brew upgrade uloop"},
-		{name: "unmanaged", path: "/home/<USER_NAME>/.local/bin/uloop", expectedKind: ManagedInstallNone},
+		{name: "homebrew", path: "/opt/homebrew/Cellar/tloop/3.1.0/bin/tloop", expectedKind: ManagedInstallHomebrew, expectedName: "Homebrew", expectedUpgrade: "brew upgrade tloop"},
+		{name: "winget", path: `C:\Program Files\WinGet\Links\tloop.exe`, expectedKind: ManagedInstallWinget, expectedName: "winget", expectedUpgrade: "winget upgrade --id tongguang.tloop"},
+		{name: "homebrew precedence", path: "/opt/homebrew/Cellar/tloop/3.1.0/WinGet/Links/tloop", expectedKind: ManagedInstallHomebrew, expectedName: "Homebrew", expectedUpgrade: "brew upgrade tloop"},
+		{name: "unmanaged", path: "/home/<USER_NAME>/.local/bin/tloop", expectedKind: ManagedInstallNone},
 	}
 
 	for _, test := range tests {

@@ -28,7 +28,7 @@ func TestReleasePRCheckUnityPackageSummaryIsClarified(t *testing.T) {
 		"\n" +
 		"* Unity package notes\n" +
 		"</details>\n" +
-		"<details><summary>uloop-project-runner: 3.0.0-beta.44</summary>\n" +
+		"<details><summary>tloop-project-runner: 3.0.0-beta.44</summary>\n" +
 		"\n" +
 		"* Project runner notes\n" +
 		"</details>\n"
@@ -39,7 +39,7 @@ func TestReleasePRCheckUnityPackageSummaryIsClarified(t *testing.T) {
 		t.Fatal("expected plain Unity package summary to change")
 	}
 	assertReleasePRCheckLogContains(t, clarifiedBody, "<details><summary>unity-package: 3.0.0-beta.46</summary>")
-	assertReleasePRCheckLogContains(t, clarifiedBody, "<details><summary>uloop-project-runner: 3.0.0-beta.44</summary>")
+	assertReleasePRCheckLogContains(t, clarifiedBody, "<details><summary>tloop-project-runner: 3.0.0-beta.44</summary>")
 }
 
 // Verifies that already labeled release summaries are left unchanged.
@@ -67,8 +67,8 @@ func TestReleasePRCheckComponentHeadingsAreClarified(t *testing.T) {
 		"<details><summary>dispatcher: 3.0.1-beta.13</summary>\n\n" +
 		"## [3.0.1-beta.13](https://example.test/compare/dispatcher-v3.0.1-beta.12...dispatcher-v3.0.1-beta.13) (2026-07-11)\n" +
 		"</details>\n" +
-		"<details><summary>uloop-project-runner: 3.0.0-beta.45</summary>\n\n" +
-		"## [3.0.0-beta.45](https://example.test/compare/uloop-project-runner-v3.0.0-beta.44...uloop-project-runner-v3.0.0-beta.45) (2026-07-01)\n" +
+		"<details><summary>tloop-project-runner: 3.0.0-beta.45</summary>\n\n" +
+		"## [3.0.0-beta.45](https://example.test/compare/tloop-project-runner-v3.0.0-beta.44...tloop-project-runner-v3.0.0-beta.45) (2026-07-01)\n" +
 		"</details>\n"
 
 	clarifiedBody, changed := clarifyReleasePRCheckComponentLabels(body)
@@ -77,17 +77,17 @@ func TestReleasePRCheckComponentHeadingsAreClarified(t *testing.T) {
 		t.Fatal("expected component release headings to change")
 	}
 	assertReleasePRCheckLogContains(t, clarifiedBody, "## [unity-package: 3.0.0-beta.48](https://example.test/compare/v3.0.0-beta.47...v3.0.0-beta.48) (2026-07-01)")
-	assertReleasePRCheckLogContains(t, clarifiedBody, "## [uloop-dispatcher: 3.0.1-beta.13](https://example.test/compare/dispatcher-v3.0.1-beta.12...dispatcher-v3.0.1-beta.13) (2026-07-11)")
-	assertReleasePRCheckLogContains(t, clarifiedBody, "## [uloop-project-runner: 3.0.0-beta.45](https://example.test/compare/uloop-project-runner-v3.0.0-beta.44...uloop-project-runner-v3.0.0-beta.45) (2026-07-01)")
-	assertReleasePRCheckLogContains(t, clarifiedBody, "<details><summary>uloop-dispatcher: 3.0.1-beta.13</summary>")
+	assertReleasePRCheckLogContains(t, clarifiedBody, "## [tloop-dispatcher: 3.0.1-beta.13](https://example.test/compare/dispatcher-v3.0.1-beta.12...dispatcher-v3.0.1-beta.13) (2026-07-11)")
+	assertReleasePRCheckLogContains(t, clarifiedBody, "## [tloop-project-runner: 3.0.0-beta.45](https://example.test/compare/tloop-project-runner-v3.0.0-beta.44...tloop-project-runner-v3.0.0-beta.45) (2026-07-01)")
+	assertReleasePRCheckLogContains(t, clarifiedBody, "<details><summary>tloop-dispatcher: 3.0.1-beta.13</summary>")
 	assertReleasePRCheckLogContains(t, clarifiedBody, "<details><summary>unity-package: 3.0.0-beta.48</summary>")
-	assertReleasePRCheckLogContains(t, clarifiedBody, "<details><summary>uloop-project-runner: 3.0.0-beta.45</summary>")
+	assertReleasePRCheckLogContains(t, clarifiedBody, "<details><summary>tloop-project-runner: 3.0.0-beta.45</summary>")
 }
 
 // Verifies an already clarified dispatcher block stays unchanged on a second clarification pass.
 func TestReleasePRCheckClarifiedDispatcherBlockIsStable(t *testing.T) {
-	body := "<details><summary>uloop-dispatcher: 3.0.1-beta.13</summary>\n\n" +
-		"## [uloop-dispatcher: 3.0.1-beta.13](https://example.test/compare/dispatcher-v3.0.1-beta.12...dispatcher-v3.0.1-beta.13) (2026-07-11)\n" +
+	body := "<details><summary>tloop-dispatcher: 3.0.1-beta.13</summary>\n\n" +
+		"## [tloop-dispatcher: 3.0.1-beta.13](https://example.test/compare/dispatcher-v3.0.1-beta.12...dispatcher-v3.0.1-beta.13) (2026-07-11)\n" +
 		"</details>\n"
 
 	clarifiedBody, changed := clarifyReleasePRCheckComponentLabels(body)
@@ -252,7 +252,7 @@ func TestReleasePRChecksSkipWhenRunsCheckDifferentHeads(t *testing.T) {
 func TestReleasePRChecksClarifyUnityPackageSummaryBeforeDispatch(t *testing.T) {
 	result := runReleasePRCheckCase(t, releasePRCheckCase{
 		prListJSON:     `[{"number":1043,"headRefName":"release-please--branches--v3-beta","headRefOid":"abc123","title":"chore(v3-beta): release 3.0.0-beta.46","url":"https://example.test/pr/1043"}]`,
-		prViewJSON:     `{"body":"<details><summary>3.0.0-beta.46</summary>\n</details>\n<details><summary>uloop-project-runner: 3.0.0-beta.44</summary>\n</details>\n"}`,
+		prViewJSON:     `{"body":"<details><summary>3.0.0-beta.46</summary>\n</details>\n<details><summary>tloop-project-runner: 3.0.0-beta.44</summary>\n</details>\n"}`,
 		runListJSON:    `[{"databaseId":4242,"headSha":"abc123","createdAt":"2026-05-30T01:00:01Z","status":"queued","conclusion":"","url":"https://example.test/run/4242"}]`,
 		runWatchStatus: "0",
 	})
@@ -453,7 +453,7 @@ func runReleasePRCheckCase(t *testing.T, testCase releasePRCheckCase) releasePRC
 	t.Setenv("PATH", mockBin+string(os.PathListSeparator)+os.Getenv("PATH"))
 	t.Setenv("GITHUB_REPOSITORY", "owner/repository")
 	t.Setenv("TARGET_BRANCH", "v3-beta")
-	t.Setenv("ULOOP_REPOSITORY_ROOT", workDir)
+	t.Setenv("TLOOP_REPOSITORY_ROOT", workDir)
 	t.Setenv("RELEASE_PR_CHECK_LOOKUP_ATTEMPTS", lookupAttempts)
 	t.Setenv("RELEASE_PR_CHECK_LOOKUP_INTERVAL_SECONDS", "1")
 	t.Setenv("RELEASE_PR_CHECK_WATCH_INTERVAL_SECONDS", "1")
@@ -597,7 +597,7 @@ set -eu
 printf '%s\n' "$*" >> "$GIT_LOG"
 
 if [ "$1" = "rev-parse" ] && [ "$2" = "--show-toplevel" ]; then
-  printf '%s\n' "$ULOOP_REPOSITORY_ROOT"
+  printf '%s\n' "$TLOOP_REPOSITORY_ROOT"
   exit 0
 fi
 
@@ -615,7 +615,7 @@ fi
 
 if [ "$1" = "show" ]; then
   case "$2" in
-    uloop-project-runner-v*:cli/common/clicontract/contract.json)
+    tloop-project-runner-v*:cli/common/clicontract/contract.json)
       if [ -n "${GIT_RELEASE_CONTRACT:-}" ]; then
         cat "$GIT_RELEASE_CONTRACT"
       else
@@ -709,7 +709,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 >>"%GIT_LOG%" echo %*
 
 if "%~1"=="rev-parse" if "%~2"=="--show-toplevel" (
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "[Console]::Out.WriteLine($env:ULOOP_REPOSITORY_ROOT)"
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "[Console]::Out.WriteLine($env:TLOOP_REPOSITORY_ROOT)"
   exit /b 0
 )
 
@@ -722,7 +722,7 @@ if "%~1"=="fetch" if "%~2"=="origin" exit /b 0
 if "%~1"=="switch" if "%~2"=="--detach" if "%~3"=="FETCH_HEAD" exit /b 0
 
 if "%~1"=="show" (
-  echo %~2| findstr /r "^uloop-project-runner-v.*:cli/common/clicontract/contract.json$" >nul
+  echo %~2| findstr /r "^tloop-project-runner-v.*:cli/common/clicontract/contract.json$" >nul
   if not errorlevel 1 (
     if not "%GIT_RELEASE_CONTRACT%"=="" (
       type "%GIT_RELEASE_CONTRACT%"

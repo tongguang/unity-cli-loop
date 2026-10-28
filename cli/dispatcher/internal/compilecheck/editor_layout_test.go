@@ -202,9 +202,9 @@ func TestResolveEditorCompilerPathsRejectsUnknownEditorLayout(t *testing.T) {
 
 // Verifies the resolver finds a real bundled compiler when an installed Editor is pointed at.
 func TestResolveEditorCompilerPathsAgainstInstalledEditor(t *testing.T) {
-	editorExecutablePath := os.Getenv("ULOOP_EDITOR_EXE")
+	editorExecutablePath := os.Getenv("TLOOP_EDITOR_EXE")
 	if editorExecutablePath == "" {
-		t.Skip("set ULOOP_EDITOR_EXE to a Unity Editor executable to run this check")
+		t.Skip("set TLOOP_EDITOR_EXE to a Unity Editor executable to run this check")
 	}
 
 	paths, err := ResolveEditorCompilerPaths(editorExecutablePath)

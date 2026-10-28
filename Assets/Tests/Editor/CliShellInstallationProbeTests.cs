@@ -15,7 +15,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     /// </summary>
     public sealed class CliShellInstallationProbeTests
     {
-        private const string InstallDirectory = "/opt/uloop-test/bin";
+        private const string InstallDirectory = "/opt/tloop-test/bin";
 
         /// <summary>
         /// Verifies that the POSIX probe runs the detection script in an interactive login shell with the install directory removed from PATH.
@@ -32,7 +32,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(startInfo.FileName, Is.EqualTo("/bin/zsh"));
             Assert.That(
                 startInfo.Arguments,
-                Is.EqualTo("-l -i -c \"" + CliShellInstallationProbe.BuildShellCliDetectionCommand("uloop") + "\""));
+                Is.EqualTo("-l -i -c \"" + CliShellInstallationProbe.BuildShellCliDetectionCommand("tloop") + "\""));
             Assert.That(startInfo.UseShellExecute, Is.False);
             Assert.That(startInfo.RedirectStandardOutput, Is.True);
             Assert.That(startInfo.EnvironmentVariables["PATH"], Is.EqualTo("/usr/bin:/bin"));
@@ -53,9 +53,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 startInfo.Arguments,
                 Is.EqualTo("-l -i -c \""
-                    + CliShellInstallationProbe.BuildShellCliDetectionCommandForShell("uloop", "/usr/local/bin/fish")
+                    + CliShellInstallationProbe.BuildShellCliDetectionCommandForShell("tloop", "/usr/local/bin/fish")
                     + "\""));
-            Assert.That(startInfo.Arguments, Does.Contain("set uloop_version_status $status"));
+            Assert.That(startInfo.Arguments, Does.Contain("set tloop_version_status $status"));
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void BuildShellCliDetectionStartInfo_OnWindows_DoesNotRewritePath()
         {
-            string markerEntry = "/opt/uloop-test-marker-" + Guid.NewGuid().ToString("N");
+            string markerEntry = "/opt/tloop-test-marker-" + Guid.NewGuid().ToString("N");
 
             ProcessStartInfo startInfo = CliShellInstallationProbe.BuildShellCliDetectionStartInfo(
                 "/bin/zsh",
@@ -81,10 +81,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void BuildShellCliDetectionCommandForShell_WhenShellIsBash_UsesPosixStatusSyntax()
         {
-            string command = CliShellInstallationProbe.BuildShellCliDetectionCommandForShell("uloop", "/bin/bash");
+            string command = CliShellInstallationProbe.BuildShellCliDetectionCommandForShell("tloop", "/bin/bash");
 
-            Assert.That(command, Is.EqualTo(CliShellInstallationProbe.BuildShellCliDetectionCommand("uloop")));
-            Assert.That(command, Does.Contain("uloop_version_status=$?"));
+            Assert.That(command, Is.EqualTo(CliShellInstallationProbe.BuildShellCliDetectionCommand("tloop")));
+            Assert.That(command, Does.Contain("tloop_version_status=$?"));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void IsShellDetectionUsableForPathSetup_WhenPathIsPackageOwned_ReturnsTrue()
         {
-            CliInstallationDetection detection = new CliInstallationDetection("2.0.0", InstallDirectory + "/uloop");
+            CliInstallationDetection detection = new CliInstallationDetection("2.0.0", InstallDirectory + "/tloop");
 
             bool result = CliShellInstallationProbe.IsShellDetectionUsableForPathSetup(
                 detection,
@@ -110,7 +110,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void IsShellDetectionUsableForPathSetup_WhenDispatcherMeetsMinimum_ReturnsTrue()
         {
-            CliInstallationDetection detection = new CliInstallationDetection("3.1.0", "/usr/local/bin/uloop", true);
+            CliInstallationDetection detection = new CliInstallationDetection("3.1.0", "/usr/local/bin/tloop", true);
 
             bool result = CliShellInstallationProbe.IsShellDetectionUsableForPathSetup(
                 detection,
@@ -127,7 +127,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void IsShellDetectionUsableForPathSetup_WhenDispatcherIsBelowMinimum_ReturnsFalse()
         {
-            CliInstallationDetection detection = new CliInstallationDetection("2.9.0", "/usr/local/bin/uloop", true);
+            CliInstallationDetection detection = new CliInstallationDetection("2.9.0", "/usr/local/bin/tloop", true);
 
             bool result = CliShellInstallationProbe.IsShellDetectionUsableForPathSetup(
                 detection,
@@ -144,27 +144,27 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ParseShellCliInstallationOutput_WhenContractHasNoVersion_FallsBackToShortVersion()
         {
-            string output = "__ULOOP_PATH_START__\n"
-                + "/usr/local/bin/uloop\n"
-                + "__ULOOP_PATH_END__\n"
-                + "__ULOOP_CONTRACT_START__\n"
+            string output = "__TLOOP_PATH_START__\n"
+                + "/usr/local/bin/tloop\n"
+                + "__TLOOP_PATH_END__\n"
+                + "__TLOOP_CONTRACT_START__\n"
                 + "{\"Other\":\"value\"}\n"
-                + "__ULOOP_CONTRACT_END__\n"
-                + "__ULOOP_CONTRACT_STATUS_START__\n"
+                + "__TLOOP_CONTRACT_END__\n"
+                + "__TLOOP_CONTRACT_STATUS_START__\n"
                 + "0\n"
-                + "__ULOOP_CONTRACT_STATUS_END__\n"
-                + "__ULOOP_VERSION_START__\n"
+                + "__TLOOP_CONTRACT_STATUS_END__\n"
+                + "__TLOOP_VERSION_START__\n"
                 + "2.4.0\n"
-                + "__ULOOP_VERSION_END__\n"
-                + "__ULOOP_VERSION_STATUS_START__\n"
+                + "__TLOOP_VERSION_END__\n"
+                + "__TLOOP_VERSION_STATUS_START__\n"
                 + "0\n"
-                + "__ULOOP_VERSION_STATUS_END__\n";
+                + "__TLOOP_VERSION_STATUS_END__\n";
 
             CliInstallationDetection detection = CliShellInstallationProbe.ParseShellCliInstallationOutput(output);
 
             Assert.That(detection.Version, Is.EqualTo("2.4.0"));
             Assert.That(detection.IsDispatcher, Is.False);
-            Assert.That(detection.ExecutablePath, Is.EqualTo("/usr/local/bin/uloop"));
+            Assert.That(detection.ExecutablePath, Is.EqualTo("/usr/local/bin/tloop"));
         }
 
         /// <summary>
@@ -175,11 +175,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             CliInstallationDetection detection = CliShellInstallationProbe.ParseCliContractOutput(
                 "\n   \n\t\n",
-                "/usr/local/bin/uloop");
+                "/usr/local/bin/tloop");
 
             Assert.That(detection.Version, Is.Null);
             Assert.That(detection.IsDispatcher, Is.False);
-            Assert.That(detection.ExecutablePath, Is.EqualTo("/usr/local/bin/uloop"));
+            Assert.That(detection.ExecutablePath, Is.EqualTo("/usr/local/bin/tloop"));
         }
 
         /// <summary>
@@ -190,11 +190,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             CliInstallationDetection detection = CliShellInstallationProbe.ParseCliContractOutput(
                 "{\"DispatcherVersion\": ",
-                "/usr/local/bin/uloop");
+                "/usr/local/bin/tloop");
 
             Assert.That(detection.Version, Is.Null);
             Assert.That(detection.IsDispatcher, Is.False);
-            Assert.That(detection.ExecutablePath, Is.EqualTo("/usr/local/bin/uloop"));
+            Assert.That(detection.ExecutablePath, Is.EqualTo("/usr/local/bin/tloop"));
         }
 
         private static CliPathSetupPlan CreatePlan()

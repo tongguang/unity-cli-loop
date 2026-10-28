@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	compileCheckFixErrorsAction    = "Fix the errors, then run `uloop compile-check` again."
-	compileCheckFullRunAction      = "Run `uloop compile-check --full` before finishing to cover the rules listed in FastChecks[].UncheckedCodes."
-	compileCheckUnityCompileAction = "Run `uloop compile` when the result must be live in the Editor."
+	compileCheckFixErrorsAction    = "Fix the errors, then run `tloop compile-check` again."
+	compileCheckFullRunAction      = "Run `tloop compile-check --full` before finishing to cover the rules listed in FastChecks[].UncheckedCodes."
+	compileCheckUnityCompileAction = "Run `tloop compile` when the result must be live in the Editor."
 )
 
 // compileCheckMessage states what the run did in one line.

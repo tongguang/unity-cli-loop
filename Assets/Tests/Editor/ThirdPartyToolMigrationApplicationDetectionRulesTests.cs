@@ -49,7 +49,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ContainsLegacyApplicationReference_WhenTypeIsLegacyQualified_ReturnsTrueWithoutBareMigration()
         {
-            const string source = "io.github.hatayama.uLoopMCP.MainThreadSwitcher switcher;";
+            const string source = "io.github.tongguang.tloop.MainThreadSwitcher switcher;";
 
             bool contains = ThirdPartyToolMigrationApplicationDetectionRules.ContainsLegacyApplicationReference(
                 source,

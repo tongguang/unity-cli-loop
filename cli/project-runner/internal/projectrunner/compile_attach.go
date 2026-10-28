@@ -38,7 +38,7 @@ const (
 type compileReattachPolicy int
 
 const (
-	// The user's own `uloop compile`: retrying after COMPILE_WAIT_TIMEOUT is how it collects the
+	// The user's own `tloop compile`: retrying after COMPILE_WAIT_TIMEOUT is how it collects the
 	// result it timed out on.
 	compileReattachAcceptsEarlierResult compileReattachPolicy = iota
 	// A command that goes on to rely on the current sources: the earlier compile is only waited

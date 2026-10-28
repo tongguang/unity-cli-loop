@@ -10,7 +10,7 @@ namespace io.github.hatayama.UnityCliLoop.Domain
     /// </summary>
     public static class ThirdPartyToolMigrationRuleCatalog
     {
-        public const string LegacyNamespace = "io.github.hatayama.uLoopMCP";
+        public const string LegacyNamespace = "io.github.tongguang.tloop";
         public const string CurrentNamespace = "io.github.hatayama.UnityCliLoop.ToolContracts";
         public const string CurrentApplicationNamespace = "io.github.hatayama.UnityCliLoop.Application";
         public const string CurrentDomainNamespace = "io.github.hatayama.UnityCliLoop.Domain";

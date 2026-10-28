@@ -27,7 +27,7 @@ A stopped recording (from `stop`, a one-shot, or `status`/`stop` after an auto-s
 
 Each entry of `BurstFrames` and `TimelineFrames` is `{CapturedIndex, EncodedFrame, Seconds}`. `Seconds` is the capture clock, the same clock as `MarkSeconds`. `EncodedFrame` is the frame number in the video. The two clocks can drift by a frame or more, so match frames by `EncodedFrame`.
 
-A one-shot (`--seconds`/`--trigger`) adds `OneShot`: `Seconds`, `TriggerCommand`, `TriggerResult` (`Command`, `Completed`, `Response` holding the trigger's own JSON, `Error`, `Explanation`), `MarkAccepted`, `FocusWindowNote` when focusing Unity failed, and `Warning` when the mark was refused or a pause point paused Play Mode. A failed trigger or a cancelled one-shot still stops the recording, but exits 1 with nothing on stdout: the error envelope on stderr (`RECORD_VIDEO_TRIGGER_FAILED` or `RECORD_VIDEO_CANCELLED`) carries the stop response, `OneShot` included, in `Error.Details.Recording`. `RECORD_VIDEO_STOP_FAILED` means the stop itself failed; its `Error.Details.Recording` holds what the stop returned; check `--action status`.
+A one-shot (`--seconds`/`--trigger`) adds `OneShot`: `Seconds`, `TriggerCommand`, `TriggerResult` (`Command`, `Completed`, `Response` holding the trigger's own JSON, `Error`, `Explanation`), `MarkAccepted`, `FocusWindowNote` when focusing Tuanjie failed, and `Warning` when the mark was refused or a pause point paused Play Mode. A failed trigger or a cancelled one-shot still stops the recording, but exits 1 with nothing on stdout: the error envelope on stderr (`RECORD_VIDEO_TRIGGER_FAILED` or `RECORD_VIDEO_CANCELLED`) carries the stop response, `OneShot` included, in `Error.Details.Recording`. `RECORD_VIDEO_STOP_FAILED` means the stop itself failed; its `Error.Details.Recording` holds what the stop returned; check `--action status`.
 
 ## Reading the numbers
 
@@ -51,11 +51,11 @@ These are measurements, not verdicts:
 ## Cutting frames out of a finished recording
 
 ```bash
-uloop record-video --video <OutputPath> --frame-at <seconds>
-uloop record-video --video <OutputPath> --sheet-from <seconds> --sheet-to <seconds>
+tloop record-video --video <OutputPath> --frame-at <seconds>
+tloop record-video --video <OutputPath> --sheet-from <seconds> --sheet-to <seconds>
 ```
 
-- Needs `ffmpeg` on PATH. It never contacts Unity, so it works while the Editor is closed or busy. Without ffmpeg it fails with `FFMPEG_NOT_FOUND`; the sheets and numbers written at stop are still beside the video.
+- Needs `ffmpeg` on PATH. It never contacts Tuanjie, so it works while the Editor is closed or busy. Without ffmpeg it fails with `FFMPEG_NOT_FOUND`; the sheets and numbers written at stop are still beside the video.
 - Seconds are on the capture clock: pass `MarkSeconds` or a tile's `Seconds`. Each maps to the frame showing the last capture at or before it, clamped to the recording.
 - `--frame-at` writes `<stem>_frame_<ms>.png` at full size and returns `FramePath`.
 - `--sheet-from`/`--sheet-to` writes `<stem>_sheet_<fromMs>_<toMs>.png` and returns `SheetPath`, `Columns` (5), and `TileWidth` (320). Every frame of the range up to 40; a longer range keeps every n-th frame.
@@ -65,17 +65,17 @@ uloop record-video --video <OutputPath> --sheet-from <seconds> --sheet-to <secon
 ## Troubleshooting
 
 - `Success: false` with `Message` "A recording is already in progress" → run `stop` first, then `start` again.
-- `Success: false` with "Play Mode view RenderTexture is not available" → open the Game View tab (`uloop focus-window`) and make sure a camera renders.
+- `Success: false` with "Play Mode view RenderTexture is not available" → open the Game View tab (`tloop focus-window`) and make sure a camera renders.
 - `SkippedFrameCount` growing while `EncodedFrameCount` stays flat → the Game View is closed, hidden, or resized. Restore it; recording resumes without restarting.
-- `EncodedFrameCount` far below `ElapsedSeconds × FrameRate` with few skips → the Editor is unfocused and throttling draws; run `uloop focus-window` before the next recording. The one-shot does this for you.
+- `EncodedFrameCount` far below `ElapsedSeconds × FrameRate` with few skips → the Editor is unfocused and throttling draws; run `tloop focus-window` before the next recording. The one-shot does this for you.
 - `Success: false` with "Window '...' not found" → pick the right title from the `Open windows:` list in the message, or use `--match-mode prefix`.
 - `StoppedBy` is not `"cli"` → the recording ended on its own; the file is still valid up to that point.
-- A compile auto-stops and finalizes the recording (when Unity's Script Changes While Playing is `Recompile After Finished Playing`, the compile is refused instead and the recording continues). Exiting Play Mode stops a Game View recording; a `--window-name` recording keeps running.
+- A compile auto-stops and finalizes the recording (when Tuanjie's Script Changes While Playing is `Recompile After Finished Playing`, the compile is refused instead and the recording continues). Exiting Play Mode stops a Game View recording; a `--window-name` recording keeps running.
 
 ## Notes
 
 - Odd Game View sizes are rounded down to even for H.264 (for example 1286×723 → 1286×722; the last pixel row/column is dropped).
 - The recording is wall-clock paced, so Play Mode pause records a still image, not a gap.
-- A window recording survives Play Mode stopping, but entering Play Mode with domain reload enabled (Unity's default) ends it with `StoppedBy: "assembly-reload"`.
+- A window recording survives Play Mode stopping, but entering Play Mode with domain reload enabled (Tuanjie's default) ends it with `StoppedBy: "assembly-reload"`.
 - Default output is H.264 `.mp4` on macOS/Windows and VP8 `.webm` on Linux. An explicit `.webm` path uses VP8 on every host.
-- Default recordings under `.uloop/outputs/Videos/` keep only the newest 20 files per extension; a custom `--output-path` is never pruned. The sheets and `frames.json` of a pruned video are removed with it.
+- Default recordings under `.tloop/outputs/Videos/` keep only the newest 20 files per extension; a custom `--output-path` is never pruned. The sheets and `frames.json` of a pruned video are removed with it.

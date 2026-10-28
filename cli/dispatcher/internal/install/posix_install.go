@@ -12,7 +12,7 @@ func posixInstallArgs(installDir string, targetPath string) []string {
 func posixInstallScript(installDir string, targetPath string) string {
 	return strings.NewReplacer(
 		"'{{INSTALL_DIR}}'", shellQuote(installDir),
-		"'{{EXPECTED_ULOOP_PATH}}'", shellQuote(targetPath),
+		"'{{EXPECTED_TLOOP_PATH}}'", shellQuote(targetPath),
 	).Replace(installScriptTemplate("scripts/install_darwin.sh"))
 }
 

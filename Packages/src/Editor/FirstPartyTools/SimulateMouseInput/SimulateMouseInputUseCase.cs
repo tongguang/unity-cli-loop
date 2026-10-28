@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 
@@ -20,13 +20,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Wire-visible fragment of the paused preflight message; tests pin the composed string.
         public const string PausedActionDescription = "simulating mouse input";
 
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
 #pragma warning disable CS1998
 #endif
         public async Task<SimulateMouseInputResponse> ExecuteAsync(
             SimulateMouseInputSchema parameters,
             CancellationToken ct)
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
 #pragma warning restore CS1998
 #endif
         {
@@ -46,7 +46,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     parameters.LayerMask);
             }
 
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
             return new SimulateMouseInputResponse
             {
                 Success = false,
@@ -158,7 +158,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 #endif
         }
 
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
         private static void EnsureOverlayExists()
         {
             OverlayCanvasFactory.EnsureExists();

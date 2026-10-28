@@ -41,7 +41,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             NativeCliInstallerService service = new NativeCliInstallerService();
 
             ManagedCliKind result = service.ResolveManagedCliKind(
-                @"C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Links\uloop.exe");
+                @"C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Links\tloop.exe");
 
             Assert.That(result, Is.EqualTo(ManagedCliKind.Winget));
         }

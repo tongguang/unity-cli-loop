@@ -88,7 +88,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(response.RejectedBeforeExecution, Is.False);
         }
 
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
         [Test]
         public void KeyboardPreflightFailure_WhenPreflightRejected_ReportsRejectionBeforeExecution()
         {
@@ -144,7 +144,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(response.RejectedBeforeExecution, Is.True);
         }
 
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
         [Test]
         public void KeyboardUseCase_WhenPlayModeIsStopped_ReportsRejectionBeforeExecution()
         {

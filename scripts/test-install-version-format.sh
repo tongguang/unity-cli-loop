@@ -1,5 +1,5 @@
 #!/bin/sh
-# Verifies install.sh's validate_uloop_version helper accepts every version
+# Verifies install.sh's validate_tloop_version helper accepts every version
 # shape the dispatcher self-update flow can emit (latest, latest-beta, bare
 # semver, dispatcher-v prefix, project-runner prefix, prerelease + build
 # metadata) and rejects values that could break out of the release path.
@@ -19,11 +19,11 @@ extract_function() {
 
 LATEST_VERSION="latest"
 LATEST_BETA_VERSION="latest-beta"
-eval "$(extract_function validate_uloop_version)"
+eval "$(extract_function validate_tloop_version)"
 
 expect_pass() {
   value=$1
-  if ! (validate_uloop_version "$value") >/dev/null 2>&1; then
+  if ! (validate_tloop_version "$value") >/dev/null 2>&1; then
     echo "FAIL: expected pass for '$value'" >&2
     exit 1
   fi
@@ -31,7 +31,7 @@ expect_pass() {
 
 expect_fail() {
   value=$1
-  if (validate_uloop_version "$value") >/dev/null 2>&1; then
+  if (validate_tloop_version "$value") >/dev/null 2>&1; then
     echo "FAIL: expected reject for '$value'" >&2
     exit 1
   fi
@@ -51,7 +51,7 @@ expect_pass "1.2.3-rc.1+build.7"
 # ProjectRunnerReleaseTag / bare 'v' prefix.
 expect_pass "dispatcher-v3.0.0"
 expect_pass "dispatcher-v3.0.0-beta.5"
-expect_pass "uloop-project-runner-v3.0.0-beta.43"
+expect_pass "tloop-project-runner-v3.0.0-beta.43"
 expect_pass "v3.0.0"
 
 # Path traversal or URL-injection shapes must not survive.

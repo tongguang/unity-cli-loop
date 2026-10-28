@@ -2,11 +2,11 @@ package dispatcher
 
 // Status classification for --output-dir mode. The rules here decide when a
 // destination entry may be replaced or deleted, so they are deliberately
-// conservative: uloop acts on a skill directory only when it holds evidence of
-// a uloop install (see dirSkillHasInstallEvidence), and every name lookup —
+// conservative: tloop acts on a skill directory only when it holds evidence of
+// a tloop install (see dirSkillHasInstallEvidence), and every name lookup —
 // the skill directory itself included — is exact against ReadDir listings: on
 // a case-insensitive filesystem a path probe would resolve a user's
-// Uloop-Sample/ or skill.md as uloop's own names and claim foreign content.
+// Tloop-Sample/ or skill.md as tloop's own names and claim foreign content.
 
 import (
 	"bytes"
@@ -102,7 +102,7 @@ func storeLevelDirSkillState(baseDir string, skill skillDefinition) (dirSkillSta
 		// A symlink gets its own message: "not a directory" would mislead when
 		// the link points at one — it is the refusal to follow that matters.
 		if skillDirEntry.Type()&os.ModeSymlink != 0 {
-			return conflictDirSkillState(fmt.Sprintf("cannot manage skill %q: %s is a symlink, which uloop never follows", skill.name, skillDir)), true, nil
+			return conflictDirSkillState(fmt.Sprintf("cannot manage skill %q: %s is a symlink, which tloop never follows", skill.name, skillDir)), true, nil
 		}
 		return conflictDirSkillState(fmt.Sprintf("cannot manage skill %q: %s exists but is not a directory", skill.name, skillDir)), true, nil
 	}
@@ -112,8 +112,8 @@ func storeLevelDirSkillState(baseDir string, skill skillDefinition) (dirSkillSta
 // classifyDirSkillWithoutSkillFile classifies a skill directory that has no
 // regular SKILL.md at its exact name. Owned entries backed by install evidence
 // mean a partial install worth repairing (outdated); owned names occupied by
-// content uloop cannot confirm it installed are a conflict — replacing or
-// deleting them could destroy user data in a store uloop may never have
+// content tloop cannot confirm it installed are a conflict — replacing or
+// deleting them could destroy user data in a store tloop may never have
 // installed into. Accepted limitation of the no-manifest design: an orphan of
 // a partial removal whose source has since been updated no longer matches and
 // lands here too, so the message tells the user how to resolve either case.
@@ -130,12 +130,12 @@ func classifyDirSkillWithoutSkillFile(skillDir string, skill skillDefinition, ow
 		return dirSkillState{status: "outdated"}, nil
 	}
 	return conflictDirSkillState(fmt.Sprintf(
-		"cannot manage skill %q: %s holds entries at source-owned names (%s) that uloop cannot confirm it installed; remove or rename them to let uloop manage this skill",
+		"cannot manage skill %q: %s holds entries at source-owned names (%s) that tloop cannot confirm it installed; remove or rename them to let tloop manage this skill",
 		skill.name, skillDir, strings.Join(occupied, ", "))), nil
 }
 
 // dirSkillHasInstallEvidence reports whether the skill directory shows signs
-// of a uloop install: a regular SKILL.md at its exact name, or an owned entry
+// of a tloop install: a regular SKILL.md at its exact name, or an owned entry
 // whose content equals the current source (the orphan a partial removal
 // leaves behind). Name presence alone is never evidence — a hand-authored
 // directory that happens to use a skill's name must stay untouched.
@@ -152,7 +152,7 @@ func dirSkillHasInstallEvidence(skillDir string, skill skillDefinition, ownedEnt
 		if err != nil {
 			return false, err
 		}
-		// Only a full content match proves the entry came from uloop; an
+		// Only a full content match proves the entry came from tloop; an
 		// empty match (ownedEntryEqualEmpty) proves nothing, and unreadable
 		// content is not evidence of anything — the entry stays foreign and
 		// therefore untouched.
@@ -314,7 +314,7 @@ func collectSourceDirFiles(root string) (map[string][]byte, error) {
 }
 
 // collectOwnedDirFiles is the error-surfacing collector for installed content
-// uloop owns: inside an owned directory an unreadable file or a non-regular
+// tloop owns: inside an owned directory an unreadable file or a non-regular
 // entry (dangling symlink, FIFO) is a broken copy the caller must react to,
 // not something to silently treat as matching.
 func collectOwnedDirFiles(root string) (map[string][]byte, error) {

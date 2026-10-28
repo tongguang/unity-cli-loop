@@ -309,7 +309,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                             HotReloadValidationErrorCodes.StatusConflict,
                             new[]
                             {
-                                "Run 'uloop hot-reload --status' with no other flags to inspect active patches.",
+                                "Run 'tloop hot-reload --status' with no other flags to inspect active patches.",
                                 "To apply or revert patches, drop --status and pass --files or --revert-all."
                             }));
                 }

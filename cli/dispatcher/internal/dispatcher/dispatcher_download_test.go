@@ -74,12 +74,12 @@ func TestDispatcherReleaseAssetNameCoversSupportedAndUnsupportedPlatforms(t *tes
 		wantName  string
 		wantError string
 	}{
-		{goos: "darwin", goarch: "amd64", wantName: "uloop-project-runner-darwin-amd64.tar.gz"},
-		{goos: "darwin", goarch: "arm64", wantName: "uloop-project-runner-darwin-arm64.tar.gz"},
+		{goos: "darwin", goarch: "amd64", wantName: "tloop-project-runner-darwin-amd64.tar.gz"},
+		{goos: "darwin", goarch: "arm64", wantName: "tloop-project-runner-darwin-arm64.tar.gz"},
 		{goos: "darwin", goarch: "386", wantError: "unsupported darwin architecture: 386"},
-		{goos: "windows", goarch: "amd64", wantName: "uloop-project-runner-windows-amd64.zip"},
+		{goos: "windows", goarch: "amd64", wantName: "tloop-project-runner-windows-amd64.zip"},
 		{goos: "windows", goarch: "arm64", wantError: "unsupported windows architecture: arm64"},
-		{goos: "linux", goarch: "amd64", wantName: "uloop-project-runner-linux-amd64.tar.gz"},
+		{goos: "linux", goarch: "amd64", wantName: "tloop-project-runner-linux-amd64.tar.gz"},
 		{goos: "linux", goarch: "arm64", wantError: "unsupported platform: linux-arm64"},
 		{goos: "freebsd", goarch: "amd64", wantError: "unsupported platform: freebsd-amd64"},
 	}
@@ -236,11 +236,11 @@ func TestExtractDispatcherRealCLIFromTarGzFailures(t *testing.T) {
 		{name: "missing archive", archivePath: filepath.Join(tempDir, "missing.tar.gz"), wantMessage: "missing.tar.gz", wantNotExist: true},
 		{name: "not gzip", archivePath: notGzipPath, wantMessage: "gzip: invalid header"},
 		{name: "corrupt tar", archivePath: corruptTarPath, wantMessage: "archive/tar"},
-		{name: "runner missing", archivePath: runnerlessArchivePath, wantMessage: "archive does not contain uloop-project-runner"},
+		{name: "runner missing", archivePath: runnerlessArchivePath, wantMessage: "archive does not contain tloop-project-runner"},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			destinationPath := filepath.Join(t.TempDir(), "uloop-project-runner")
+			destinationPath := filepath.Join(t.TempDir(), "tloop-project-runner")
 			err := extractDispatcherRealCLI(testCase.archivePath, "asset.tar.gz", destinationPath, "linux")
 			assertDispatcherTestError(t, err, testCase.wantMessage, testCase.wantNotExist)
 			if fileExists(destinationPath) {
@@ -269,9 +269,9 @@ func TestExtractDispatcherRealCLIFromTarGzSkipsNonRegularEntries(t *testing.T) {
 	// Verifies a directory entry named like the runner is skipped and the regular file in a subdirectory is extracted.
 	tempDir := t.TempDir()
 	archivePath := filepath.Join(tempDir, "runner.tar.gz")
-	writeDispatcherTarGzArchiveWithDirectory(t, archivePath, "uloop-project-runner/", []dispatcherArchiveTestEntry{
+	writeDispatcherTarGzArchiveWithDirectory(t, archivePath, "tloop-project-runner/", []dispatcherArchiveTestEntry{
 		{Name: "docs/README.md", Content: "docs"},
-		{Name: "bin/uloop-project-runner", Content: "runner"},
+		{Name: "bin/tloop-project-runner", Content: "runner"},
 	})
 	destinationPath := filepath.Join(tempDir, "extracted")
 
@@ -286,7 +286,7 @@ func TestExtractDispatcherRealCLIFromZipFailures(t *testing.T) {
 	tempDir := t.TempDir()
 	runnerlessArchivePath := filepath.Join(tempDir, "runnerless.zip")
 	writeDispatcherZipArchive(t, runnerlessArchivePath, []dispatcherArchiveTestEntry{
-		{Name: "uloop-project-runner.exe/", Content: ""},
+		{Name: "tloop-project-runner.exe/", Content: ""},
 		{Name: "README.md", Content: "docs"},
 	})
 	corruptArchivePath := filepath.Join(tempDir, "corrupt.zip")
@@ -298,11 +298,11 @@ func TestExtractDispatcherRealCLIFromZipFailures(t *testing.T) {
 		wantMessage string
 	}{
 		{name: "corrupt zip", archivePath: corruptArchivePath, wantMessage: "zip: not a valid zip file"},
-		{name: "runner missing", archivePath: runnerlessArchivePath, wantMessage: "archive does not contain uloop-project-runner.exe"},
+		{name: "runner missing", archivePath: runnerlessArchivePath, wantMessage: "archive does not contain tloop-project-runner.exe"},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			destinationPath := filepath.Join(t.TempDir(), "uloop-project-runner.exe")
+			destinationPath := filepath.Join(t.TempDir(), "tloop-project-runner.exe")
 			err := extractDispatcherRealCLI(testCase.archivePath, "asset.zip", destinationPath, "windows")
 			assertDispatcherTestError(t, err, testCase.wantMessage, false)
 		})
@@ -313,9 +313,9 @@ func TestExtractDispatcherRealCLIReportsUnwritableDestination(t *testing.T) {
 	// Verifies extraction surfaces a destination write failure for both archive formats.
 	tempDir := t.TempDir()
 	tarPath := filepath.Join(tempDir, "runner.tar.gz")
-	writeDispatcherTarGzArchive(t, tarPath, []dispatcherArchiveTestEntry{{Name: "uloop-project-runner", Content: "runner"}})
+	writeDispatcherTarGzArchive(t, tarPath, []dispatcherArchiveTestEntry{{Name: "tloop-project-runner", Content: "runner"}})
 	zipPath := filepath.Join(tempDir, "runner.zip")
-	writeDispatcherZipArchive(t, zipPath, []dispatcherArchiveTestEntry{{Name: "uloop-project-runner.exe", Content: "runner"}})
+	writeDispatcherZipArchive(t, zipPath, []dispatcherArchiveTestEntry{{Name: "tloop-project-runner.exe", Content: "runner"}})
 	destinationPath := filepath.Join(tempDir, "missing", "runner")
 
 	for _, err := range []error{
@@ -331,7 +331,7 @@ func TestExtractDispatcherRealCLIReportsUnwritableDestination(t *testing.T) {
 func TestInstallDownloadedDispatcherRealCLIRetriesRenameAfterRemovingIncompleteEntry(t *testing.T) {
 	// Verifies a first rename failure over an incomplete cache entry removes that entry and retries the rename.
 	tempDir := t.TempDir()
-	realCLIPath := filepath.Join(tempDir, "uloop-project-runner")
+	realCLIPath := filepath.Join(tempDir, "tloop-project-runner")
 	tempRealCLIPath := filepath.Join(tempDir, "downloaded")
 	writeDispatcherTestFile(t, realCLIPath, "incomplete")
 	writeDispatcherTestFile(t, tempRealCLIPath, "downloaded")
@@ -366,7 +366,7 @@ func TestInstallDownloadedDispatcherRealCLIRetriesRenameAfterRemovingIncompleteE
 func TestInstallDownloadedDispatcherRealCLIReportsSecondRenameFailure(t *testing.T) {
 	// Verifies a rename that keeps failing is reported and no READY marker is written.
 	tempDir := t.TempDir()
-	realCLIPath := filepath.Join(tempDir, "uloop-project-runner")
+	realCLIPath := filepath.Join(tempDir, "tloop-project-runner")
 	tempRealCLIPath := filepath.Join(tempDir, "downloaded")
 	writeDispatcherTestFile(t, tempRealCLIPath, "downloaded")
 
@@ -413,7 +413,7 @@ func TestInstallDownloadedDispatcherRealCLIReportsCleanupFailures(t *testing.T) 
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
 			tempDir := t.TempDir()
-			realCLIPath := filepath.Join(tempDir, "uloop-project-runner")
+			realCLIPath := filepath.Join(tempDir, "tloop-project-runner")
 			tempRealCLIPath := filepath.Join(tempDir, "downloaded")
 			writeDispatcherTestFile(t, tempRealCLIPath, "downloaded")
 			testCase.setup(t, realCLIPath)
@@ -447,7 +447,7 @@ func stubDispatcherRenameFailsOnce(t *testing.T) {
 func TestMarkDispatcherRealCLIReadyReportsWriteFailure(t *testing.T) {
 	// Verifies a READY marker that cannot be written is reported instead of claiming the runner is ready.
 	tempDir := t.TempDir()
-	realCLIPath := filepath.Join(tempDir, "uloop-project-runner")
+	realCLIPath := filepath.Join(tempDir, "tloop-project-runner")
 	if err := os.MkdirAll(dispatcherRealCLIReadyPath(realCLIPath), 0o755); err != nil {
 		t.Fatalf("failed to create READY directory: %v", err)
 	}
@@ -461,14 +461,14 @@ func TestMarkDispatcherRealCLIReadyReportsWriteFailure(t *testing.T) {
 func TestDownloadDispatcherRealCLIForPinFailures(t *testing.T) {
 	// Verifies each download stage failure stops the install before a runner is cached.
 	archiveDir := t.TempDir()
-	archivePath := filepath.Join(archiveDir, "uloop-project-runner-linux-amd64.tar.gz")
+	archivePath := filepath.Join(archiveDir, "tloop-project-runner-linux-amd64.tar.gz")
 	writeDispatcherTarGzArchive(t, archivePath, []dispatcherArchiveTestEntry{{Name: "README.md", Content: "docs"}})
 	archiveContent, err := os.ReadFile(archivePath)
 	if err != nil {
 		t.Fatalf("failed to read archive: %v", err)
 	}
 	validChecksum := dispatcherTestChecksumLine(t, archivePath)
-	assetSuffix := "/uloop-project-runner-linux-amd64.tar.gz"
+	assetSuffix := "/tloop-project-runner-linux-amd64.tar.gz"
 
 	cases := []struct {
 		name        string
@@ -515,7 +515,7 @@ func TestDownloadDispatcherRealCLIForPinReportsUnusableCacheRoot(t *testing.T) {
 }
 
 func TestResolveDispatcherRealCLIDownloadsOnCacheMiss(t *testing.T) {
-	// Verifies a cache miss for the pinned version downloads into ULOOP_CACHE_DIR and returns the cached path.
+	// Verifies a cache miss for the pinned version downloads into TLOOP_CACHE_DIR and returns the cached path.
 	assetName, err := dispatcherReleaseAssetName(runtime.GOOS, runtime.GOARCH)
 	if err != nil {
 		t.Skipf("no published runner asset for %s-%s", runtime.GOOS, runtime.GOARCH)

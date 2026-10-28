@@ -33,12 +33,12 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
 
         public static string PackageResolvedPath => PackageInfo.resolvedPath;
 
-        public const string PROJECT_NAME = "UnityCliLoop";
-        public const string PACKAGE_NAME = "io.github.hatayama.uloopmcp";
+        public const string PROJECT_NAME = "TuanjieCliLoop";
+        public const string PACKAGE_NAME = "io.github.tongguang.tloop";
         
         // Editor settings
-        public const string SETTINGS_FILE_NAME = "UnityCliLoopSettings.json";
-        public const string LEGACY_SETTINGS_FILE_NAME = "UnityMcpSettings.json";
+        public const string SETTINGS_FILE_NAME = "TuanjieCliLoopSettings.json";
+        public const string LEGACY_SETTINGS_FILE_NAME = "TuanjieMcpSettings.json";
         public const string USER_SETTINGS_FOLDER = "UserSettings";
 
         // Project-scoped (git-shared) settings, stored under the Unity convention
@@ -48,16 +48,16 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         public const string PROJECT_SETTINGS_FILE_NAME = "settings.json";
         
         // Scripting define symbols
-        public const string SCRIPTING_DEFINE_ULOOP_DEBUG = "ULOOP_DEBUG";
-        public const string SCRIPTING_DEFINE_HAS_TEST_FRAMEWORK = "ULOOP_HAS_TEST_FRAMEWORK";
+        public const string SCRIPTING_DEFINE_ULOOP_DEBUG = "TLOOP_DEBUG";
+        public const string SCRIPTING_DEFINE_HAS_TEST_FRAMEWORK = "TLOOP_HAS_TEST_FRAMEWORK";
         
         // Environment variable keys for development mode
-        public const string ENV_KEY_ULOOP_DEBUG = "ULOOP_DEBUG";
+        public const string ENV_KEY_ULOOP_DEBUG = "TLOOP_DEBUG";
         // Reconnection settings
         public const int RECONNECTION_TIMEOUT_SECONDS = 10;
 
         // .uloop directory
-        public const string ULOOP_DIR = ".uloop";
+        public const string ULOOP_DIR = ".tloop";
         public const string ULOOP_TOOL_SETTINGS_FILE_NAME = "settings.tools.json";
         public const string ULOOP_TOOLS_CACHE_FILE_NAME = "tools.json";
         public const string ULOOP_PROJECT_RUNNER_PIN_FILE_NAME = "project-runner-pin.json";
@@ -162,8 +162,8 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
         /// </summary>
         public static readonly string[] DYNAMIC_CODE_RUNTIME_RESTARTING_NEXT_ACTIONS =
         {
-            "Retry the same `uloop execute-dynamic-code` shortly — the bridge is restarting after reset or domain reload.",
-            "Unity is still running; `uloop launch -r` is not needed for this error.",
+            "Retry the same `tloop execute-dynamic-code` shortly — the bridge is restarting after reset or domain reload.",
+            "Unity is still running; `tloop launch -r` is not needed for this error.",
         };
 
         public const int COMPILE_START_TIMEOUT_MS = 5000;

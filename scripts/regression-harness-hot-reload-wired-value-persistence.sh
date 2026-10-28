@@ -17,7 +17,7 @@ set -e
 #     (Scene Reload stays enabled; that reload is the trap)
 #   - Assets/RegressionHarness/HotReloadWiredValuePersistence/HotReloadWiredValuePersistence.unity
 #     must be the active scene in a running Unity Editor, in Edit Mode
-#   - dist/<platform>/uloop must be built (this checkout's development binary)
+#   - dist/<platform>/tloop must be built (this checkout's development binary)
 #   - jq must be installed
 
 PROJECT_PATH=""
@@ -38,12 +38,12 @@ REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 case "$(uname -s)" in
     Darwin)
         case "$(uname -m)" in
-            arm64) ULOOP_BIN="$REPO_ROOT/dist/darwin-arm64/uloop" ;;
-            *) ULOOP_BIN="$REPO_ROOT/dist/darwin-amd64/uloop" ;;
+            arm64) TLOOP_BIN="$REPO_ROOT/dist/darwin-arm64/tloop" ;;
+            *) TLOOP_BIN="$REPO_ROOT/dist/darwin-amd64/tloop" ;;
         esac
         ;;
     MINGW*|MSYS*|CYGWIN*)
-        ULOOP_BIN="$REPO_ROOT/dist/windows-amd64/uloop.exe"
+        TLOOP_BIN="$REPO_ROOT/dist/windows-amd64/tloop.exe"
         ;;
     *)
         printf '%s\n' "Unsupported platform: $(uname -s)" >&2
@@ -51,13 +51,13 @@ case "$(uname -s)" in
         ;;
 esac
 
-if [ ! -x "$ULOOP_BIN" ]; then
-    printf '%s\n' "uloop binary not found or not executable: $ULOOP_BIN" >&2
+if [ ! -x "$TLOOP_BIN" ]; then
+    printf '%s\n' "tloop binary not found or not executable: $TLOOP_BIN" >&2
     printf '%s\n' "Build with scripts/build-go-cli.sh first." >&2
     exit 2
 fi
 
-# Why sed and uloop must share one root: --project-path selects the Unity project whose
+# Why sed and tloop must share one root: --project-path selects the Unity project whose
 # Assets file we mutate; resolving SOURCE_ABS from the script checkout alone would edit one
 # tree while hot-reloading another.
 if [ -n "$PROJECT_PATH" ]; then
@@ -111,8 +111,8 @@ CLEANED_UP="0"
 # leave the working tree clean, so the pristine bytes are snapshotted before the first edit.
 cp "$SOURCE_ABS" "$SOURCE_BACKUP"
 
-run_uloop() {
-    "$ULOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
+run_tloop() {
+    "$TLOOP_BIN" "$@" --project-path "$EFFECTIVE_ROOT"
 }
 
 log() {
@@ -130,7 +130,7 @@ restore_source() {
 allow_auto_refresh() {
     if [ "$AUTO_REFRESH_DISALLOWED" = "1" ]; then
         # Why best-effort: cleanup must not fail the harness after assertions already passed.
-        if ! run_uloop execute-dynamic-code --code "
+        if ! run_tloop execute-dynamic-code --code "
 using UnityEditor;
 AssetDatabase.AllowAutoRefresh();
 return \"AllowAutoRefresh\";
@@ -147,8 +147,8 @@ cleanup() {
         return
     fi
     CLEANED_UP="1"
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
-    run_uloop hot-reload --revert-all > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop hot-reload --revert-all > /dev/null 2>&1 || true
     restore_source
     allow_auto_refresh
     rm -f "$RESULT_FILE" "$LOG_FILE" "$PROBE_FILE" "$SOURCE_BACKUP" "${SOURCE_ABS}.tmp"
@@ -163,7 +163,7 @@ trap 'cleanup; exit 129' HUP
 disallow_auto_refresh() {
     # Why: writes under Assets/; without this hold Unity may import + domain-reload mid-run
     # and erase the hot-reload patches before the Play Mode assertions run.
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEditor;
 AssetDatabase.DisallowAutoRefresh();
 return \"DisallowAutoRefresh\";
@@ -172,7 +172,7 @@ return \"DisallowAutoRefresh\";
 }
 
 assert_harness_scene_open() {
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEngine.SceneManagement;
 return SceneManager.GetActiveScene().path;
 " > "$PROBE_FILE"
@@ -194,7 +194,7 @@ await_marker_without_clear() {
     attempt=1
     max_attempts=30
     while [ "$attempt" -le "$max_attempts" ]; do
-        run_uloop get-logs --log-type Log --max-count 50 --search-text "$expected_marker" > "$LOG_FILE"
+        run_tloop get-logs --log-type Log --max-count 50 --search-text "$expected_marker" > "$LOG_FILE"
         displayed="$(jq -r '.DisplayedCount // 0' "$LOG_FILE")"
         if [ "$displayed" -gt 0 ]; then
             log "observed: $(print_matched_log)"
@@ -204,7 +204,7 @@ await_marker_without_clear() {
         attempt=$((attempt + 1))
     done
     log "FAIL: did not observe log marker within ${max_attempts}s: $expected_marker"
-    run_uloop get-logs --log-type Log --max-count 20 --search-text "[HotReloadWiredValueHarness]" || true
+    run_tloop get-logs --log-type Log --max-count 20 --search-text "[HotReloadWiredValueHarness]" || true
     return 1
 }
 
@@ -214,10 +214,10 @@ await_marker_in_logs() {
     # Why 30s: cold PlayMode entry can exceed 10s before the first Update.
     max_attempts=30
     while [ "$attempt" -le "$max_attempts" ]; do
-        run_uloop clear-console > /dev/null
+        run_tloop clear-console > /dev/null
         # Why sleep: Update logs once per frame; give PlayMode a beat to emit after clear.
         sleep 1
-        run_uloop get-logs --log-type Log --max-count 50 --search-text "$expected_marker" > "$LOG_FILE"
+        run_tloop get-logs --log-type Log --max-count 50 --search-text "$expected_marker" > "$LOG_FILE"
         displayed="$(jq -r '.DisplayedCount // 0' "$LOG_FILE")"
         if [ "$displayed" -gt 0 ]; then
             log "observed: $(print_matched_log)"
@@ -226,7 +226,7 @@ await_marker_in_logs() {
         attempt=$((attempt + 1))
     done
     log "FAIL: did not observe log marker within ${max_attempts}s: $expected_marker"
-    run_uloop get-logs --log-type Log --max-count 20 --search-text "[HotReloadWiredValueHarness]" || true
+    run_tloop get-logs --log-type Log --max-count 20 --search-text "[HotReloadWiredValueHarness]" || true
     return 1
 }
 
@@ -258,7 +258,7 @@ ENDPATCH
 }
 
 apply_patched_source() {
-    run_uloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
+    run_tloop hot-reload --files "$SOURCE_FILE" > "$RESULT_FILE"
     success="$(jq -r '.Success' "$RESULT_FILE")"
     added_target="$(jq '[.AddedFields[]? | select(endswith(".target"))] | length' "$RESULT_FILE")"
     if [ "$success" != "true" ] || [ "$added_target" -lt 1 ]; then
@@ -270,7 +270,7 @@ apply_patched_source() {
 }
 
 read_wired_target() {
-    run_uloop execute-dynamic-code --code "
+    run_tloop execute-dynamic-code --code "
 using UnityEngine;
 using io.github.hatayama.UnityCliLoop.RegressionHarness;
 using io.github.hatayama.UnityCliLoop.ToolContracts;
@@ -296,14 +296,14 @@ log "Disallowing AssetDatabase auto-refresh for the edit window..."
 disallow_auto_refresh
 
 log "Step 2: stopping Play Mode, adding the target field and applying hot-reload in Edit Mode..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 # Why before write: a signal between mv and a later flag would skip restore.
 SOURCE_DIRTY="1"
 write_patched_source
 apply_patched_source
 
 log "Step 3: wiring the scene's Target into the Edit Mode host..."
-run_uloop execute-dynamic-code --code "
+run_tloop execute-dynamic-code --code "
 using UnityEngine;
 using io.github.hatayama.UnityCliLoop.RegressionHarness;
 using io.github.hatayama.UnityCliLoop.ToolContracts;
@@ -328,13 +328,13 @@ if [ "$wired_now" != "Target" ]; then
 fi
 
 log "Step 4: entering Play Mode; the scene reload rebuilds the host..."
-run_uloop clear-console > /dev/null
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop clear-console > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 await_marker_without_clear "[HotReloadWiredValueHarness] awake-target=Target"
 await_marker_in_logs "[HotReloadWiredValueHarness] update-target=Target"
 
 log "Step 5: checking --status counts the restore..."
-run_uloop hot-reload --status > "$RESULT_FILE"
+run_tloop hot-reload --status > "$RESULT_FILE"
 restored="$(jq -r '.RestoredWiredValueCount // 0' "$RESULT_FILE")"
 if [ "$restored" -lt 1 ]; then
     log "FAIL: --status RestoredWiredValueCount is ${restored}, expected >= 1"
@@ -344,7 +344,7 @@ fi
 log "--status RestoredWiredValueCount=${restored} UnrestoredWiredValues=$(jq -c '.UnrestoredWiredValues // []' "$RESULT_FILE")"
 
 log "Step 6: stopping Play Mode; the Edit Mode host is rebuilt too..."
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 after_stop="$(read_wired_target)"
 if [ "$after_stop" != "Target" ]; then
     log "FAIL: the Edit Mode host rebuilt after Stop does not read Target (got: ${after_stop})"
@@ -354,7 +354,7 @@ fi
 log "Edit Mode host after Stop reads: ${after_stop}"
 
 log "Step 7: --revert-all, then re-apply the same source without wiring..."
-run_uloop hot-reload --revert-all > "$RESULT_FILE"
+run_tloop hot-reload --revert-all > "$RESULT_FILE"
 revert_success="$(jq -r '.Success' "$RESULT_FILE")"
 if [ "$revert_success" != "true" ]; then
     log "FAIL: --revert-all did not succeed"
@@ -362,9 +362,9 @@ if [ "$revert_success" != "true" ]; then
     exit 1
 fi
 apply_patched_source
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 await_marker_in_logs "[HotReloadWiredValueHarness] update-target=none"
-run_uloop control-play-mode --action Stop > /dev/null
+run_tloop control-play-mode --action Stop > /dev/null
 
 log "PASS: the wired Target came back in Awake and Update after Play entry and in Edit Mode after Stop, and not after --revert-all."
 exit 0

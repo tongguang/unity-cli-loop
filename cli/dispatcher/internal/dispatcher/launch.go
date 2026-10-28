@@ -7,10 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
-	"runtime"
 	"strconv"
-	"strings"
 	"time"
 
 	clierrors "github.com/hatayama/unity-cli-loop/common/errors"
@@ -38,14 +35,13 @@ const (
 	unityLockfileName          = unityprocess.LockfileName
 )
 
-var editorVersionPattern = regexp.MustCompile(`(?m)^m_EditorVersion:\s*(.+)$`)
-
 type launchOptions struct {
 	projectPath    string
 	restart        bool
 	quit           bool
 	deleteRecovery bool
 	editorVersion  string
+	editorPath     string
 	platform       string
 	maxDepth       int
 }
@@ -91,7 +87,7 @@ func parseLaunchOptions(args []string, globalProjectPath string) (launchOptions,
 		index = nextIndex
 	}
 
-	return options, nil
+	return options, validateEditorSelection(options.editorPath, options.editorVersion)
 }
 
 func runLaunchWithDeps(ctx context.Context, options launchOptions, startPath string, stdout io.Writer, stderr io.Writer, deps launchDeps) int {
@@ -189,8 +185,8 @@ func handleExistingLaunchProcess(
 	deps launchDeps,
 ) (launchStopMethod, bool, int) {
 	if !options.restart && !options.quit {
-		if options.editorVersion != "" {
-			clierrors.WriteClassifiedError(stderr, launchEditorVersionRequiresRestartError(options.editorVersion), clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
+		if options.editorVersion != "" || options.editorPath != "" {
+			clierrors.WriteClassifiedError(stderr, launchEditorSelectionRequiresRestartError(options), clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
 			return "", true, 1
 		}
 		if isV2 {
@@ -209,14 +205,20 @@ func handleExistingLaunchProcess(
 	return stopMethod, false, 0
 }
 
-func launchEditorVersionRequiresRestartError(editorVersion string) error {
+func launchEditorSelectionRequiresRestartError(options launchOptions) error {
+	option, value := "--editor-version", options.editorVersion
+	commandValue := value
+	if options.editorPath != "" {
+		option, value = "--editor-path", options.editorPath
+		commandValue = `"` + value + `"`
+	}
 	return &clierrors.ArgumentError{
-		Message:  "--editor-version requires --restart when Unity is already running for this project.",
-		Option:   "--editor-version",
-		Received: editorVersion,
+		Message:  option + " requires --restart when Unity is already running for this project.",
+		Option:   option,
+		Received: value,
 		Command:  clicore.LaunchCommandName,
 		NextActions: []string{
-			fmt.Sprintf("Run `uloop launch --restart --editor-version %s` to relaunch Unity with the requested Editor version.", editorVersion),
+			fmt.Sprintf("Run `tloop launch --restart %s %s` to relaunch with the requested Editor.", option, commandValue),
 		},
 	}
 }
@@ -264,7 +266,7 @@ func startUnityAndWaitForReadiness(
 		return 1
 	}
 
-	unityPath, err := deps.resolveUnityExecutablePath(unityVersion)
+	unityPath, err := resolveLaunchExecutablePath(options, unityVersion, deps)
 	if err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
 		return 1
@@ -273,10 +275,12 @@ func startUnityAndWaitForReadiness(
 	spinner := ui.NewLaunchSpinner(stdout, stderr)
 	defer spinner.Stop()
 
-	clicore.WriteLine(stdout, "Opening Unity...")
+	clicore.WriteLine(stdout, "Opening Editor...")
 	clicore.WriteFormat(stdout, "Project Path: %s\n", projectRoot)
-	clicore.WriteFormat(stdout, "Detected Unity version: %s\n", unityVersion)
-	clicore.WriteLine(stdout, "Unity Hub launch options: none")
+	if unityVersion != "" {
+		clicore.WriteFormat(stdout, "Detected Tuanjie version: %s\n", unityVersion)
+	}
+	clicore.WriteFormat(stdout, "Editor Path: %s\n", unityPath)
 
 	launchStartedAt := deps.now()
 	command := newUnityLaunchCommand(unityPath, buildUnityLaunchArgs(projectRoot, options))
@@ -416,57 +420,18 @@ func resolveLaunchProjectRoot(startPath string, options launchOptions) (string, 
 	return project.FindUnityProjectRootWithin(startPath, options.maxDepth)
 }
 
-func resolveUnityExecutablePath(version string) (string, error) {
-	candidates := unityExecutableCandidates(version)
-	return resolveExistingUnityExecutablePath(version, candidates)
-}
-
-func resolveLaunchEditorVersion(projectRoot string, options launchOptions) (string, error) {
-	if options.editorVersion != "" {
-		return options.editorVersion, nil
-	}
-	return readUnityEditorVersion(projectRoot)
-}
-
-func resolveExistingUnityExecutablePath(version string, candidates []string) (string, error) {
-	for _, candidate := range candidates {
-		if _, err := os.Stat(candidate); err == nil {
-			return candidate, nil
-		}
-	}
-	if len(candidates) == 0 {
-		return "", fmt.Errorf("unity launch is not supported on %s", runtime.GOOS)
-	}
-	return "", fmt.Errorf("unity %s executable not found; searched: %s", version, strings.Join(candidates, ", "))
-}
-
-func unityExecutableCandidates(version string) []string {
-	switch runtime.GOOS {
-	case "darwin":
-		return []string{fmt.Sprintf("/Applications/Unity/Hub/Editor/%s/Unity.app/Contents/MacOS/Unity", version)}
-	case "windows":
-		return windowsUnityExecutableCandidates(version)
-	case "linux":
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return []string{}
-		}
-		return linuxUnityExecutableCandidates(version, homeDir)
-	default:
-		return []string{}
-	}
-}
-
 func printLaunchHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop launch [options] [project-path]")
+	clicore.WriteLine(stdout, "  tloop launch [options] [project-path]")
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Options:")
 	clicore.WriteLine(stdout, "  -r, --restart          Quit an existing Unity process for the project before launching")
 	clicore.WriteLine(stdout, "  -q, --quit             Quit an existing Unity process for the project without launching")
 	clicore.WriteLine(stdout, "  -d, --delete-recovery  Delete Assets/_Recovery before launch")
 	clicore.WriteLine(stdout, "      --editor-version <version>")
-	clicore.WriteLine(stdout, "                          Use this Unity Editor version instead of ProjectVersion.txt")
+	clicore.WriteLine(stdout, "                          Use this Tuanjie Editor version instead of ProjectVersion.txt")
+	clicore.WriteLine(stdout, "      --editor-path <path>")
+	clicore.WriteLine(stdout, "                          Use this Editor executable instead of automatic discovery")
 	clicore.WriteLine(stdout, "  -p, --platform <name>  Pass Unity -buildTarget when launching")
 	clicore.WriteLine(stdout, "      --max-depth <n>    Max directory depth when auto-searching for the project (default: 3, -1 = unlimited)")
 	clicore.WriteLine(stdout, "")

@@ -1,17 +1,17 @@
 ---
-name: uloop-game-view-mode
+name: tloop-game-view-mode
 toolName: game-view-mode
 description: "Show which view the Game tab is showing, switch it between the Game view and the Device Simulator (rotating the simulated device to match the Game view's orientation), or pick the simulated device by name. Use before Play when the UI must be checked in a device frame."
 ---
 
-# uloop game-view-mode
+# tloop game-view-mode
 
 Show which view the Game tab is showing, switch it between the Game view and the Device Simulator (rotating the simulated device to match the Game view's orientation), or pick the simulated device by name.
 
 ## Usage
 
 ```bash
-uloop game-view-mode [--to <GameView|Simulator>] [--device <name>] [--list-devices]
+tloop game-view-mode [--to <GameView|Simulator>] [--device <name>] [--list-devices]
 ```
 
 ## Parameters
@@ -40,20 +40,20 @@ Returns JSON containing:
 
 ```bash
 # Report which view is showing
-uloop game-view-mode
+tloop game-view-mode
 
 # Play in the Device Simulator, rotated like the Game view
-uloop game-view-mode --to Simulator
-uloop control-play-mode --action Play
+tloop game-view-mode --to Simulator
+tloop control-play-mode --action Play
 
 # Show a particular device (implies --to Simulator)
-uloop game-view-mode --device "iPhone 12"
+tloop game-view-mode --device "iPhone 12"
 
 # Which devices can be shown?
-uloop game-view-mode --list-devices
+tloop game-view-mode --list-devices
 
 # Back to the plain Game view
-uloop game-view-mode --to GameView
+tloop game-view-mode --to GameView
 ```
 
 ## Notes
@@ -63,6 +63,6 @@ uloop game-view-mode --to GameView
 - No Play Mode view open: a new window of the requested kind is opened; the Simulator keeps its own rotation because there is no Game view shape to copy.
 - The orientation comes from the Game view's rendering resolution (wider than tall is landscape; square counts as portrait). A Free Aspect tab uses the tab's own shape, so set `set-game-view-size` first when the shape must be exact.
 - When Player Settings allow no orientation on the wanted side (for example a portrait-only project and a landscape Game view), the device is not rotated and `Warning` says so. Fix the Default Orientation or the allowed auto-rotation flags in Player Settings if landscape is really wanted.
-- Device names come from the project. Unity 2022 ships real devices (`Apple iPhone 12`, `Google Pixel 5`, ...); Unity 6 ships generic ones (`iOS Notch Device (1170x2532)`, `Tablet Small (1536x2048)`, ...) and real names need the Device Simulator Devices package. When unsure, run `--list-devices` first.
+- Device names come from the project. Tuanjie 2022 ships real devices (`Apple iPhone 12`, `Google Pixel 5`, ...); Tuanjie 6 ships generic ones (`iOS Notch Device (1170x2532)`, `Tablet Small (1536x2048)`, ...) and real names need the Device Simulator Devices package. When unsure, run `--list-devices` first.
 - Works in Edit Mode, Play Mode, and while paused; the play state is never changed. Start or stop playing with `control-play-mode` separately.
-- Editors without the Device Simulator (Unity 2020 and older without the package) return `Success: false` and leave the view untouched.
+- Editors without the Device Simulator (Tuanjie 2020 and older without the package) return `Success: false` and leave the view untouched.

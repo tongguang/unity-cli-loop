@@ -33,7 +33,7 @@ func tryHandleVersionRequest(args []string, stdout io.Writer, stderr io.Writer) 
 		Message:     "Unknown version option: " + unknownOption,
 		Option:      unknownOption,
 		Command:     clicore.VersionCommandName,
-		NextActions: []string{"Run `uloop version --help` to inspect supported options."},
+		NextActions: []string{"Run `tloop version --help` to inspect supported options."},
 	}, clierrors.ErrorContext{Command: clicore.VersionCommandName})
 	return true, 1
 }

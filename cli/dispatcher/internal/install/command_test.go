@@ -14,7 +14,7 @@ import (
 func TestCommandForWindowsConfiguresUserPathAndLegacyCleanup(t *testing.T) {
 	// Verifies Windows install delegates PATH and legacy npm cleanup to the native setup command.
 	command, err := CommandForOS("windows", Options{
-		InstallDir: `C:\Users\ExampleUser\AppData\Local\Programs\uloop\bin`,
+		InstallDir: `C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin`,
 	})
 	if err != nil {
 		t.Fatalf("CommandForOS failed: %v", err)
@@ -33,10 +33,10 @@ func TestCommandForWindowsConfiguresUserPathAndLegacyCleanup(t *testing.T) {
 		"GetExtension($CommandPath), '.exe'",
 		"$CommandContent = Get-Content -Path $CommandPath -Raw -ErrorAction SilentlyContinue",
 		"if ($null -eq $CommandContent) {\n        return $false\n    }",
-		"foreach ($ShimName in @('uloop', 'uloop.cmd', 'uloop.ps1'))",
+		"foreach ($ShimName in @('tloop', 'tloop.cmd', 'tloop.ps1'))",
 		"Invoke-AllLegacyNpmPackageRemoval -ExpectedUloopPath $ExpectedUloopPath",
-		"$NpmArgs = @('uninstall', '-g', '--prefix', $LegacyPrefix, 'uloop-cli')",
-		"$null = & $NpmCommand.Source @('uninstall', '-g', 'uloop-cli')",
+		"$NpmArgs = @('uninstall', '-g', '--prefix', $LegacyPrefix, 'tloop-cli')",
+		"$null = & $NpmCommand.Source @('uninstall', '-g', 'tloop-cli')",
 		"Report-PathShadowing",
 		"function Get-FirstUloopCommandFromPath",
 		"$NormalizedPathEntry = & $NormalizePath $PathEntry",
@@ -58,10 +58,10 @@ func TestCommandForWindowsConfiguresUserPathAndLegacyCleanup(t *testing.T) {
 	if !command.CleansLegacy {
 		t.Fatal("windows install should clean legacy launchers")
 	}
-	if command.TargetPath != `C:\Users\ExampleUser\AppData\Local\Programs\uloop\bin\uloop.exe` {
+	if command.TargetPath != `C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin\tloop.exe` {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
 	}
-	if strings.Contains(setupScript, "foreach ($ShimName in @('uloop', 'uloop.cmd', 'uloop.ps1', 'uloop.exe'))") {
+	if strings.Contains(setupScript, "foreach ($ShimName in @('tloop', 'tloop.cmd', 'tloop.ps1', 'tloop.exe'))") {
 		t.Fatal("legacy npm shim detection should not content-scan native exe files")
 	}
 	if count := strings.Count(setupScript, "Legacy npm shims can alter multiline PowerShell arguments before the native CLI receives them."); count != 1 {
@@ -70,10 +70,10 @@ func TestCommandForWindowsConfiguresUserPathAndLegacyCleanup(t *testing.T) {
 	if count := strings.Count(setupScript, "Write-LegacyNpmMultilineArgumentWarning"); count != 2 {
 		t.Fatalf("legacy npm multiline warning should be centralized and called from one site, got %d occurrences", count)
 	}
-	if strings.Contains(setupScript, "Failed to remove the legacy npm uloop-cli package.") {
+	if strings.Contains(setupScript, "Failed to remove the legacy npm tloop-cli package.") {
 		t.Fatal("legacy npm cleanup failure should not fail installation")
 	}
-	if strings.Contains(setupScript, "Get-Command uloop -ErrorAction SilentlyContinue") {
+	if strings.Contains(setupScript, "Get-Command tloop -ErrorAction SilentlyContinue") {
 		t.Fatal("Windows path shadowing should inspect persisted PATH instead of the current process PATH")
 	}
 	if strings.Contains(setupScript, "$RemovedAll") {
@@ -99,12 +99,12 @@ func TestCommandForMacConfiguresShellPathAndLegacyCleanup(t *testing.T) {
 	}
 	setupScript := posixInstallScript(command.InstallDir, command.TargetPath)
 	for _, expected := range []string{
-		"# >>> uloop PATH >>>",
-		"# <<< uloop PATH <<<",
+		"# >>> tloop PATH >>>",
+		"# <<< tloop PATH <<<",
 		"fish_add_path --move",
-		`tmp_path=$(mktemp "$profile_dir/.uloop_path.XXXXXX" 2>/dev/null || true)`,
+		`tmp_path=$(mktemp "$profile_dir/.tloop_path.XXXXXX" 2>/dev/null || true)`,
 		"npm uninstall -g --prefix",
-		"npm uninstall -g uloop-cli",
+		"npm uninstall -g tloop-cli",
 		"report_path_shadowing",
 	} {
 		if !strings.Contains(setupScript, expected) {
@@ -117,7 +117,7 @@ func TestCommandForMacConfiguresShellPathAndLegacyCleanup(t *testing.T) {
 	if !command.CleansLegacy {
 		t.Fatal("macOS install should clean legacy launchers")
 	}
-	if command.TargetPath != "/Users/ExampleUser/.local/bin/uloop" {
+	if command.TargetPath != "/Users/ExampleUser/.local/bin/tloop" {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
 	}
 }
@@ -134,7 +134,7 @@ func TestCommandForLinuxConfiguresShellPathAndLegacyCleanup(t *testing.T) {
 	if command.Name != "sh" {
 		t.Fatalf("command name mismatch: %s", command.Name)
 	}
-	if command.TargetPath != "/home/tester/.local/bin/uloop" {
+	if command.TargetPath != "/home/tester/.local/bin/tloop" {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
 	}
 	if !command.UpdatesPath {
@@ -147,34 +147,34 @@ func TestCommandForLinuxConfiguresShellPathAndLegacyCleanup(t *testing.T) {
 
 func TestWindowsInstallScriptReplacesTemplateValues(t *testing.T) {
 	// Verifies Windows setup templates cannot ship with unresolved placeholders.
-	installDir := `C:\Temp\uloop's bin`
-	targetPath := `C:\Temp\uloop's bin\uloop.exe`
+	installDir := `C:\Temp\tloop's bin`
+	targetPath := `C:\Temp\tloop's bin\tloop.exe`
 	setupScript := windowsInstallScript(installDir, targetPath)
 
 	if strings.Contains(setupScript, "{{") {
 		t.Fatalf("setup script contains unresolved template placeholder: %s", setupScript)
 	}
-	if !strings.Contains(setupScript, `$InstallDir = 'C:\Temp\uloop''s bin'`) {
+	if !strings.Contains(setupScript, `$InstallDir = 'C:\Temp\tloop''s bin'`) {
 		t.Fatalf("setup script does not quote install dir correctly: %s", setupScript)
 	}
-	if !strings.Contains(setupScript, `$ExpectedUloopPath = 'C:\Temp\uloop''s bin\uloop.exe'`) {
+	if !strings.Contains(setupScript, `$ExpectedUloopPath = 'C:\Temp\tloop''s bin\tloop.exe'`) {
 		t.Fatalf("setup script does not quote target path correctly: %s", setupScript)
 	}
 }
 
 func TestPosixInstallScriptReplacesTemplateValues(t *testing.T) {
 	// Verifies POSIX setup templates cannot ship with unresolved placeholders.
-	installDir := "/tmp/uloop's bin"
-	targetPath := "/tmp/uloop's bin/uloop"
+	installDir := "/tmp/tloop's bin"
+	targetPath := "/tmp/tloop's bin/tloop"
 	setupScript := posixInstallScript(installDir, targetPath)
 
 	if strings.Contains(setupScript, "{{") {
 		t.Fatalf("setup script contains unresolved template placeholder: %s", setupScript)
 	}
-	if !strings.Contains(setupScript, `InstallDir='/tmp/uloop'"'"'s bin'`) {
+	if !strings.Contains(setupScript, `InstallDir='/tmp/tloop'"'"'s bin'`) {
 		t.Fatalf("setup script does not quote install dir correctly: %s", setupScript)
 	}
-	if !strings.Contains(setupScript, `ExpectedUloopPath='/tmp/uloop'"'"'s bin/uloop'`) {
+	if !strings.Contains(setupScript, `ExpectedUloopPath='/tmp/tloop'"'"'s bin/tloop'`) {
 		t.Fatalf("setup script does not quote target path correctly: %s", setupScript)
 	}
 }
@@ -191,7 +191,7 @@ func TestCommandForMacPreservesRootInstallDir(t *testing.T) {
 	if command.InstallDir != "/" {
 		t.Fatalf("install dir mismatch: %s", command.InstallDir)
 	}
-	if command.TargetPath != "/uloop" {
+	if command.TargetPath != "/tloop" {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
 	}
 }
@@ -233,9 +233,9 @@ func TestPosixInstallScriptWritesZshPathBlock(t *testing.T) {
 	}
 	content := string(profileContent)
 	for _, expected := range []string{
-		"# >>> uloop PATH >>>",
+		"# >>> tloop PATH >>>",
 		"export PATH=" + shellProfileQuoteForTest(installDir) + ":$PATH",
-		"# <<< uloop PATH <<<",
+		"# <<< tloop PATH <<<",
 	} {
 		if !strings.Contains(content, expected) {
 			t.Fatalf("profile content missing %q:\n%s", expected, content)
@@ -281,7 +281,7 @@ func TestPosixInstallScriptWritesBashrcOnLinux(t *testing.T) {
 		t.Fatalf("failed to read bashrc: %v\n%s", err, output)
 	}
 	if !strings.Contains(string(bashrcContent), "export PATH="+shellProfileQuoteForTest(installDir)+":$PATH") {
-		t.Fatalf("bashrc missing uloop PATH block:\n%s", bashrcContent)
+		t.Fatalf("bashrc missing tloop PATH block:\n%s", bashrcContent)
 	}
 }
 
@@ -318,9 +318,9 @@ func TestPosixInstallScriptCreatesNestedFishProfile(t *testing.T) {
 	}
 	content := string(profileContent)
 	for _, expected := range []string{
-		"# >>> uloop PATH >>>",
+		"# >>> tloop PATH >>>",
 		"fish_add_path --move " + shellProfileQuoteForTest(installDir),
-		"# <<< uloop PATH <<<",
+		"# <<< tloop PATH <<<",
 	} {
 		if !strings.Contains(content, expected) {
 			t.Fatalf("profile content missing %q:\n%s", expected, content)
@@ -509,7 +509,7 @@ func TestPosixInstallScriptFailsWhenSymlinkProfileTargetCannotBeWritten(t *testi
 
 	home := t.TempDir()
 	profilePath := filepath.Join(home, ".zshrc")
-	if err := os.Symlink(filepath.Join(string(os.PathSeparator), "dev", "null", "uloop"), profilePath); err != nil {
+	if err := os.Symlink(filepath.Join(string(os.PathSeparator), "dev", "null", "tloop"), profilePath); err != nil {
 		t.Fatalf("failed to create profile symlink: %v", err)
 	}
 
@@ -587,11 +587,11 @@ func TestPosixInstallScriptRemovesAbsoluteLegacyNpmShimBeforePrependingPath(t *t
 			t.Fatalf("failed to create test directory: %v", err)
 		}
 	}
-	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native uloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write native uloop: %v", err)
+	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native tloop\n"), 0o755); err != nil {
+		t.Fatalf("failed to write native tloop: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(legacyBin, PosixCommandName), []byte("#!/bin/sh\n# node_modules/uloop-cli legacy shim\necho legacy uloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write legacy uloop: %v", err)
+	if err := os.WriteFile(filepath.Join(legacyBin, PosixCommandName), []byte("#!/bin/sh\n# node_modules/tloop-cli legacy shim\necho legacy tloop\n"), 0o755); err != nil {
+		t.Fatalf("failed to write legacy tloop: %v", err)
 	}
 	if err := os.WriteFile(filepath.Join(mockBin, "npm"), []byte("#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$NPM_LOG\"\n"), 0o755); err != nil {
 		t.Fatalf("failed to write mock npm: %v", err)
@@ -621,7 +621,7 @@ func TestPosixInstallScriptRemovesAbsoluteLegacyNpmShimBeforePrependingPath(t *t
 	if err != nil {
 		t.Fatalf("failed to read npm log: %v\n%s", err, output)
 	}
-	expected := "uninstall -g --prefix " + legacyPrefix + " uloop-cli"
+	expected := "uninstall -g --prefix " + legacyPrefix + " tloop-cli"
 	if !strings.Contains(string(npmLogContent), expected) {
 		t.Fatalf("npm log missing %q:\n%s", expected, npmLogContent)
 	}
@@ -643,12 +643,12 @@ func TestPosixInstallScriptSilencesLegacyFailureWhenLegacyShimRemains(t *testing
 			t.Fatalf("failed to create test directory: %v", err)
 		}
 	}
-	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native uloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write native uloop: %v", err)
+	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native tloop\n"), 0o755); err != nil {
+		t.Fatalf("failed to write native tloop: %v", err)
 	}
 	legacyUloop := filepath.Join(legacyBin, PosixCommandName)
-	if err := os.WriteFile(legacyUloop, []byte("#!/bin/sh\n# node_modules/uloop-cli legacy shim\necho legacy uloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write legacy uloop: %v", err)
+	if err := os.WriteFile(legacyUloop, []byte("#!/bin/sh\n# node_modules/tloop-cli legacy shim\necho legacy tloop\n"), 0o755); err != nil {
+		t.Fatalf("failed to write legacy tloop: %v", err)
 	}
 	if err := os.WriteFile(filepath.Join(mockBin, "npm"), []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
 		t.Fatalf("failed to write mock npm: %v", err)
@@ -674,17 +674,17 @@ func TestPosixInstallScriptSilencesLegacyFailureWhenLegacyShimRemains(t *testing
 	}
 
 	outputText := string(output)
-	if strings.Contains(outputText, "Removed legacy npm package: uloop-cli") {
+	if strings.Contains(outputText, "Removed legacy npm package: tloop-cli") {
 		t.Fatalf("cleanup should not report success while the legacy shim remains:\n%s", outputText)
 	}
 	if strings.Contains(outputText, "Could not remove the legacy npm package automatically.") {
 		t.Fatalf("cleanup should not report legacy npm removal failure:\n%s", outputText)
 	}
-	if strings.Contains(outputText, "npm uninstall -g --prefix \""+legacyPrefix+"\" uloop-cli") {
+	if strings.Contains(outputText, "npm uninstall -g --prefix \""+legacyPrefix+"\" tloop-cli") {
 		t.Fatalf("cleanup should not print manual removal guidance:\n%s", outputText)
 	}
 	if _, err := os.Stat(legacyUloop); err != nil {
-		t.Fatalf("legacy uloop should remain for this scenario: %v", err)
+		t.Fatalf("legacy tloop should remain for this scenario: %v", err)
 	}
 }
 
@@ -704,8 +704,8 @@ func TestPosixInstallScriptSkipsDefaultNpmCleanupForInstallPrefix(t *testing.T) 
 			t.Fatalf("failed to create test directory: %v", err)
 		}
 	}
-	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native uloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write native uloop: %v", err)
+	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native tloop\n"), 0o755); err != nil {
+		t.Fatalf("failed to write native tloop: %v", err)
 	}
 	npmScript := "#!/bin/sh\n" +
 		"if [ \"$1\" = \"prefix\" ] && [ \"$2\" = \"-g\" ]; then\n" +
@@ -742,11 +742,11 @@ func TestPosixInstallScriptSkipsDefaultNpmCleanupForInstallPrefix(t *testing.T) 
 	if err != nil && !os.IsNotExist(err) {
 		t.Fatalf("failed to read npm log: %v\n%s", err, output)
 	}
-	if strings.Contains(string(npmLogContent), "uninstall -g uloop-cli") {
+	if strings.Contains(string(npmLogContent), "uninstall -g tloop-cli") {
 		t.Fatalf("default npm cleanup should be skipped:\n%s", npmLogContent)
 	}
 	if _, err := os.Stat(filepath.Join(installDir, PosixCommandName)); err != nil {
-		t.Fatalf("native uloop should remain installed: %v", err)
+		t.Fatalf("native tloop should remain installed: %v", err)
 	}
 }
 
@@ -770,8 +770,8 @@ func TestWindowsInstallScriptParsesOnWindows(t *testing.T) {
 	}
 
 	setupScript := windowsInstallScript(
-		`C:\Users\ExampleUser\AppData\Local\Programs\uloop\bin`,
-		`C:\Users\ExampleUser\AppData\Local\Programs\uloop\bin\uloop.exe`)
+		`C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin`,
+		`C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin\tloop.exe`)
 	scriptPath := t.TempDir() + `\install-setup.ps1`
 	if err := os.WriteFile(scriptPath, []byte(setupScript), 0o600); err != nil {
 		t.Fatalf("failed to write setup script: %v", err)

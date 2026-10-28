@@ -62,7 +62,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Does.Contain("public int Uses() { " + StubThrow + "\"'Example.Stubs.Caller.Uses' calls members that a hot reload added"));
             Assert.That(introducedType.source, Does.Not.Contain("AddedValue"));
             Assert.That(introducedType.source, Does.Contain("public int Plain() { return 7; }"));
-            Assert.That(introducedType.source, Does.Contain("Reload 'Assets/First.cs' again, or run 'uloop compile'."));
+            Assert.That(introducedType.source, Does.Contain("Reload 'Assets/First.cs' again, or run 'tloop compile'."));
             Assert.That(ReadStubbedBodyCount(introducedType), Is.EqualTo(1));
         }
 

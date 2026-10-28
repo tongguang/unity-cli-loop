@@ -44,7 +44,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         private const string PausePointsRuntimeAssemblyName = "UnityCLILoop.PausePoints.Runtime";
         // A file of this repository's embedded package, whose folder differs from its package name.
         private const string PackageSourceAssetPath =
-            "Packages/io.github.hatayama.uloopmcp/Runtime/PausePoints/UloopPausePoint.cs";
+            "Packages/io.github.tongguang.tloop/Runtime/PausePoints/UloopPausePoint.cs";
         private const string PackageSourcePhysicalPath = "Packages/src/Runtime/PausePoints/UloopPausePoint.cs";
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         public void TryFindDocument_ReturnsTheSameDocumentAsTheWalk()
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string persistenceDirectory = Path.Combine(Path.GetTempPath(), "uloop-pdb-documents-" + Guid.NewGuid().ToString("N"));
+            string persistenceDirectory = Path.Combine(Path.GetTempPath(), "tloop-pdb-documents-" + Guid.NewGuid().ToString("N"));
             HotReloadPdbDocumentIndex index = new HotReloadPdbDocumentIndex(persistenceDirectory);
             try
             {
@@ -242,7 +242,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             string virtualPlayersDirectory = Path.Combine(mainRoot, "Library", "VP");
             bool createdVirtualPlayersDirectory = !Directory.Exists(virtualPlayersDirectory);
-            string playerRoot = Path.Combine(virtualPlayersDirectory, "uloop-test-" + Guid.NewGuid().ToString("N"));
+            string playerRoot = Path.Combine(virtualPlayersDirectory, "tloop-test-" + Guid.NewGuid().ToString("N"));
             try
             {
                 // The player's snapshot is planted by hand: a root under Library is not a project the
@@ -321,7 +321,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 FixtureProjectRelativePath);
             Assert.That(File.Exists(realSnapshotPath), Is.True);
 
-            string fakeRoot = Path.Combine(Path.GetTempPath(), "uloop-hot-reload-snapshot-tamper-" + Guid.NewGuid().ToString("N"));
+            string fakeRoot = Path.Combine(Path.GetTempPath(), "tloop-hot-reload-snapshot-tamper-" + Guid.NewGuid().ToString("N"));
             string fakeSnapshotDir = HotReloadSourceSnapshotLayout.AssemblyDirectory(fakeRoot, TestAssemblyName, mvid);
             Directory.CreateDirectory(fakeSnapshotDir);
             string fakeSnapshotPath = HotReloadSourceSnapshotLayout.SourcePath(fakeSnapshotDir, FixtureProjectRelativePath);
@@ -373,7 +373,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         public void DescribeSnapshotMiss_WithoutASnapshotFile_ReportsNoSnapshotFile()
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string emptyRoot = Path.Combine(Path.GetTempPath(), "uloop-hot-reload-snapshot-empty-" + Guid.NewGuid().ToString("N"));
+            string emptyRoot = Path.Combine(Path.GetTempPath(), "tloop-hot-reload-snapshot-empty-" + Guid.NewGuid().ToString("N"));
 
             HotReloadSnapshotMissReason reason = HotReloadSourceBaseline.DescribeSnapshotMissAt(
                 emptyRoot,
@@ -395,7 +395,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         public void DescribeSnapshotMiss_ListedFileWithoutASnapshotInAPdbThatDroppedNothing_ReportsNoSnapshotFile()
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string emptyRoot = Path.Combine(Path.GetTempPath(), "uloop-hot-reload-snapshot-empty-" + Guid.NewGuid().ToString("N"));
+            string emptyRoot = Path.Combine(Path.GetTempPath(), "tloop-hot-reload-snapshot-empty-" + Guid.NewGuid().ToString("N"));
             string dllPath = TestAssemblyDllPath(projectRoot);
             HotReloadPdbCompilationInfo compiled = HotReloadPdbCompilationInfo.Read(Path.ChangeExtension(dllPath, ".pdb"));
             Assert.That(compiled.SourceFileCount, Is.Not.Null, "Precondition: the compiler's PDB must record its source count.");
@@ -503,7 +503,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
             string realDllPath = TestAssemblyDllPath(projectRoot);
-            string fakeRoot = Path.Combine(Path.GetTempPath(), "uloop-hot-reload-snapshot-other-build-" + Guid.NewGuid().ToString("N"));
+            string fakeRoot = Path.Combine(Path.GetTempPath(), "tloop-hot-reload-snapshot-other-build-" + Guid.NewGuid().ToString("N"));
             string dllPath = TestAssemblyDllPath(fakeRoot);
             Directory.CreateDirectory(Path.GetDirectoryName(dllPath));
             File.Copy(realDllPath, dllPath);
@@ -582,7 +582,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         public void LoadVerifiedSnapshotSourceAt_TwoFilesOfOneAssembly_ReadsThePdbOnce()
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string persistenceDirectory = Path.Combine(Path.GetTempPath(), "uloop-pdb-documents-" + Guid.NewGuid().ToString("N"));
+            string persistenceDirectory = Path.Combine(Path.GetTempPath(), "tloop-pdb-documents-" + Guid.NewGuid().ToString("N"));
             HotReloadPdbDocumentIndex index = new HotReloadPdbDocumentIndex(persistenceDirectory);
             try
             {
@@ -617,7 +617,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         public void DescribeSnapshotMissAt_AfterALoadThatFoundNoDocument_DoesNotReadThePdbAgain()
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string persistenceDirectory = Path.Combine(Path.GetTempPath(), "uloop-pdb-documents-" + Guid.NewGuid().ToString("N"));
+            string persistenceDirectory = Path.Combine(Path.GetTempPath(), "tloop-pdb-documents-" + Guid.NewGuid().ToString("N"));
             HotReloadPdbDocumentIndex index = new HotReloadPdbDocumentIndex(persistenceDirectory);
             try
             {
@@ -704,7 +704,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 FixtureProjectRelativePath);
             Assert.That(File.Exists(realSnapshotPath), Is.True, "Precondition: the real snapshot must exist.");
 
-            string fakeRoot = Path.Combine(Path.GetTempPath(), "uloop-hot-reload-snapshot-miss-" + Guid.NewGuid().ToString("N"));
+            string fakeRoot = Path.Combine(Path.GetTempPath(), "tloop-hot-reload-snapshot-miss-" + Guid.NewGuid().ToString("N"));
             string fakeSnapshotDir = HotReloadSourceSnapshotLayout.AssemblyDirectory(fakeRoot, TestAssemblyName, mvid);
             Directory.CreateDirectory(fakeSnapshotDir);
             byte[] tampered = File.ReadAllBytes(realSnapshotPath);
@@ -786,7 +786,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             string root = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-hot-reload-long-path-" + Guid.NewGuid().ToString("N"));
+                "tloop-hot-reload-long-path-" + Guid.NewGuid().ToString("N"));
             string sourceRelativePath = Path.Combine(
                 "Sources",
                 new string('a', 80),
@@ -850,7 +850,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             string root = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-hot-reload-snapshot-skip-" + Guid.NewGuid().ToString("N"));
+                "tloop-hot-reload-snapshot-skip-" + Guid.NewGuid().ToString("N"));
             string sourceDirectory = Path.Combine(root, "Sources");
             string snapshotDirectory = Path.Combine(root, "snapshot");
             string[] sourceRelativePaths =

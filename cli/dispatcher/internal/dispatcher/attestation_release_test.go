@@ -24,7 +24,7 @@ func TestResolveDispatcherLatestReleaseTagBetaChannelSkipsUnmatchedEntries(t *te
 	entriesPage := []githubReleaseListEntry{
 		{TagName: "dispatcher-v3.0.1-beta.12", Prerelease: true, Draft: false},
 		{TagName: "dispatcher-v3.0.0", Prerelease: false, Draft: false},
-		{TagName: "uloop-project-runner-v0.9.0-beta.4", Prerelease: true, Draft: false},
+		{TagName: "tloop-project-runner-v0.9.0-beta.4", Prerelease: true, Draft: false},
 		{TagName: "dispatcher-v3.0.2-beta.1", Prerelease: true, Draft: true},
 		{TagName: "dispatcher-v3.0.0-rc.1", Prerelease: true, Draft: false},
 	}
@@ -47,7 +47,7 @@ func TestResolveDispatcherLatestReleaseTagStableChannelSkipsPrereleases(t *testi
 	entriesPage := []githubReleaseListEntry{
 		{TagName: "dispatcher-v3.0.1-beta.12", Prerelease: true},
 		{TagName: "dispatcher-v3.0.0", Prerelease: false},
-		{TagName: "uloop-project-runner-v0.9.0", Prerelease: false},
+		{TagName: "tloop-project-runner-v0.9.0", Prerelease: false},
 	}
 	server, restoreBase := installReleaseListServer(t, entriesPage)
 	defer server.Close()
@@ -255,7 +255,7 @@ func TestResolveDispatcherLatestReleaseTagFollowsFullPages(t *testing.T) {
 func TestResolveDispatcherLatestReleaseTagStopsAtEmptyPage(t *testing.T) {
 	// Verifies an empty page ends the search with a channel-specific error instead of requesting more pages.
 	var requested []string
-	installPagedReleaseServer(t, [][]githubReleaseListEntry{fullReleasePage("uloop-project-runner-v1.0.0", false)}, &requested)
+	installPagedReleaseServer(t, [][]githubReleaseListEntry{fullReleasePage("tloop-project-runner-v1.0.0", false)}, &requested)
 
 	_, err := resolveDispatcherLatestReleaseTag(context.Background(), false)
 

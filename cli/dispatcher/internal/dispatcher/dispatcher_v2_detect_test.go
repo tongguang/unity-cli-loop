@@ -494,7 +494,7 @@ func TestRunDispatcherReportsVersionResolutionGuidanceForAmbiguousV2Cache(t *tes
 	if envelope.Error.ErrorCode != clierrors.ErrorCodeV2ProjectDetected {
 		t.Fatalf("error code = %q, want %q", envelope.Error.ErrorCode, clierrors.ErrorCodeV2ProjectDetected)
 	}
-	for _, expected := range []string{"Packages/packages-lock.json", "npx uloop-cli@2", "2.1.0", "2.2.0"} {
+	for _, expected := range []string{"Packages/packages-lock.json", "npx tloop-cli@2", "2.1.0", "2.2.0"} {
 		if !bytes.Contains(stderr.Bytes(), []byte(expected)) {
 			t.Fatalf("V2 recovery guidance missing %q: %s", expected, stderr.String())
 		}

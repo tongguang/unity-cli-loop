@@ -12,8 +12,8 @@ import (
 
 const (
 	UnsupportedOSMessage = "native uninstall is only supported on macOS, Linux, and Windows"
-	PosixCommandName     = "uloop"
-	WindowsCommandName   = "uloop.exe"
+	PosixCommandName     = "tloop"
+	WindowsCommandName   = "tloop.exe"
 )
 
 type Options struct {

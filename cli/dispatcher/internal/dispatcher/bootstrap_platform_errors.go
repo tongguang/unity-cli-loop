@@ -13,15 +13,15 @@ func unsupportedPlatformError(message string, context clierrors.ErrorContext) (c
 			message,
 			context,
 			[]string{
-				"Run `uloop update` on macOS, Linux, or Windows.",
-				"Install the latest uloop dispatcher manually on this platform.",
+				"Run `tloop update` on macOS, Linux, or Windows.",
+				"Install the latest tloop dispatcher manually on this platform.",
 			}), true
 	case installUnsupportedOSMessage:
 		return invalidArgumentExecutionError(
 			message,
 			context,
 			[]string{
-				"Run `uloop install` on macOS, Linux, or Windows.",
+				"Run `tloop install` on macOS, Linux, or Windows.",
 				"Use the platform-specific installer for this system.",
 			}), true
 	case uninstallUnsupportedOSMessage:
@@ -29,8 +29,8 @@ func unsupportedPlatformError(message string, context clierrors.ErrorContext) (c
 			message,
 			context,
 			[]string{
-				"Run `uloop uninstall` on macOS, Linux, or Windows.",
-				"Remove the uloop dispatcher binary manually on this platform.",
+				"Run `tloop uninstall` on macOS, Linux, or Windows.",
+				"Remove the tloop dispatcher binary manually on this platform.",
 			}), true
 	default:
 		return clierrors.CLIError{}, false

@@ -1,45 +1,45 @@
 package tooldocs
 
 // commandSkillNames maps a command to the agent skill that documents it. A static table rather than
-// a name derived from the command: `enable-pause-point` is documented by `uloop-pause-point`, not by
-// a `uloop-enable-pause-point` skill that does not exist, and four commands share that one skill.
+// a name derived from the command: `enable-pause-point` is documented by `tloop-pause-point`, not by
+// a `tloop-enable-pause-point` skill that does not exist, and four commands share that one skill.
 // A command absent from this table gets no guidance line at all, so custom commands are never
 // pointed at a skill nobody installed.
 var commandSkillNames = map[string]string{
-	"clear-console":        "uloop-clear-console",
-	"compile":              "uloop-compile",
-	"control-play-mode":    "uloop-control-play-mode",
-	"execute-dynamic-code": "uloop-execute-dynamic-code",
-	"find-game-objects":    "uloop-find-game-objects",
-	"focus-window":         "uloop-focus-window",
-	"get-hierarchy":        "uloop-get-hierarchy",
-	"get-logs":             "uloop-get-logs",
-	"record-video":         "uloop-record-video",
-	"replay-input":         "uloop-replay-input",
-	"run-tests":            "uloop-run-tests",
-	"screenshot":           "uloop-screenshot",
-	"set-game-view-size":   "uloop-set-game-view-size",
-	"game-view-mode":       "uloop-game-view-mode",
-	"simulate-keyboard":    "uloop-simulate-keyboard",
-	"simulate-mouse-input": "uloop-simulate-mouse-input",
-	"simulate-mouse-ui":    "uloop-simulate-mouse-ui",
-	"hot-reload":           "uloop-hot-reload",
+	"clear-console":        "tloop-clear-console",
+	"compile":              "tloop-compile",
+	"control-play-mode":    "tloop-control-play-mode",
+	"execute-dynamic-code": "tloop-execute-dynamic-code",
+	"find-game-objects":    "tloop-find-game-objects",
+	"focus-window":         "tloop-focus-window",
+	"get-hierarchy":        "tloop-get-hierarchy",
+	"get-logs":             "tloop-get-logs",
+	"record-video":         "tloop-record-video",
+	"replay-input":         "tloop-replay-input",
+	"run-tests":            "tloop-run-tests",
+	"screenshot":           "tloop-screenshot",
+	"set-game-view-size":   "tloop-set-game-view-size",
+	"game-view-mode":       "tloop-game-view-mode",
+	"simulate-keyboard":    "tloop-simulate-keyboard",
+	"simulate-mouse-input": "tloop-simulate-mouse-input",
+	"simulate-mouse-ui":    "tloop-simulate-mouse-ui",
+	"hot-reload":           "tloop-hot-reload",
 
-	"launch": "uloop-launch",
-	"status": "uloop-status",
+	"launch": "tloop-launch",
+	"status": "tloop-status",
 	// The status skill documents cancel in references/cancel.md: cancel is the way out of a Busy
 	// that status reports, and a skill of its own would sit in every session for a rare recovery.
-	"cancel": "uloop-status",
+	"cancel": "tloop-status",
 
 	// One skill covers the four pause-point commands and the three watch commands: watch
 	// expressions are documented by the pause-point skill's references/watch-expressions.md.
-	"enable-pause-point": "uloop-pause-point",
-	"clear-pause-point":  "uloop-pause-point",
-	"await-pause-point":  "uloop-pause-point",
-	"pause-point-status": "uloop-pause-point",
-	"enable-watch":       "uloop-pause-point",
-	"clear-watch":        "uloop-pause-point",
-	"get-watch-values":   "uloop-pause-point",
+	"enable-pause-point": "tloop-pause-point",
+	"clear-pause-point":  "tloop-pause-point",
+	"await-pause-point":  "tloop-pause-point",
+	"pause-point-status": "tloop-pause-point",
+	"enable-watch":       "tloop-pause-point",
+	"clear-watch":        "tloop-pause-point",
+	"get-watch-values":   "tloop-pause-point",
 }
 
 // SkillGuidanceLine returns the closing line of a command's --help output: an instruction to load

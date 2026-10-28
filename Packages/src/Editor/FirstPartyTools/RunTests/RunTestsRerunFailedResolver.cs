@@ -13,15 +13,15 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
         // Format: TestMode.
         internal const string NoRecordMessageFormat =
-            "No completed {0} run is recorded for this project. Run uloop run-tests without --rerun-failed first.";
+            "No completed {0} run is recorded for this project. Run tloop run-tests without --rerun-failed first.";
 
         // Format: TestMode, the reason the record was rejected.
         internal const string UnreadableRecordMessageFormat =
-            "The recorded {0} run could not be read ({1}). Run uloop run-tests without --rerun-failed.";
+            "The recorded {0} run could not be read ({1}). Run tloop run-tests without --rerun-failed.";
 
         // Format: number of recorded targets, TestMode, CompletedAt of the recorded run.
         internal const string RerunTargetsMissingMessageFormat =
-            "None of the {0} tests recorded as failed in the {1} run completed at {2} exist any more; they were renamed or removed. Run uloop run-tests without --rerun-failed.";
+            "None of the {0} tests recorded as failed in the {1} run completed at {2} exist any more; they were renamed or removed. Run tloop run-tests without --rerun-failed.";
 
         /// <summary>
         /// Resolves a --rerun-failed request: the recorded failures as a TestNames filter, or the

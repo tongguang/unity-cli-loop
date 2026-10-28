@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 
@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 return Array.Empty<string>();
             }
 
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
             return Array.Empty<string>();
 #else
             string trimmed = invalidKeyName.Trim();
@@ -54,7 +54,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 #endif
         }
 
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
         private static void AddUnique(List<string> suggestions, string candidate)
         {
             for (int index = 0; index < suggestions.Count; index++)

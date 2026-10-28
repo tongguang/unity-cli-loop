@@ -62,7 +62,7 @@ func Run(ctx context.Context, options Options) (Result, error) {
 	}
 
 	// Why the lock is taken only after the dag resolved: a directory Unity never built has nothing
-	// to protect, and taking the lock would create Library/uloop inside it.
+	// to protect, and taking the lock would create Library/tloop inside it.
 	releaseLock, err := acquireProjectLock(ctx, options.ProjectRoot, projectLockTimeout(options))
 	if err != nil {
 		return Result{}, err

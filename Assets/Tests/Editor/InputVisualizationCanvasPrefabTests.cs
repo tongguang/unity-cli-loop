@@ -17,7 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     public sealed class InputVisualizationCanvasPrefabTests
     {
         private const string PrefabPath =
-            "Packages/io.github.hatayama.uloopmcp/Runtime/Common/InputVisualizationCanvas.prefab";
+            "Packages/io.github.tongguang.tloop/Runtime/Common/InputVisualizationCanvas.prefab";
         private const string RuntimeAssemblyDefinitionPath =
             "Packages/src/Runtime/UnityCLILoop.Runtime.asmdef";
         private const string RuntimeSourceDirectoryPath =
@@ -28,12 +28,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         };
         private static readonly string[] OverlayPrefabPaths =
         {
-            "Packages/io.github.hatayama.uloopmcp/Runtime/Common/InputVisualizationCanvas.prefab",
-            "Packages/io.github.hatayama.uloopmcp/Runtime/SimulateMouseInput/SimulateMouseInputOverlay.prefab",
-            "Packages/io.github.hatayama.uloopmcp/Runtime/SimulateKeyboard/SimulateKeyboardOverlay.prefab",
-            "Packages/io.github.hatayama.uloopmcp/Runtime/SimulateMouseUi/SimulateMouseUiOverlay.prefab",
-            "Packages/io.github.hatayama.uloopmcp/Runtime/RecordInput/RecordInputOverlay.prefab",
-            "Packages/io.github.hatayama.uloopmcp/Runtime/ReplayInput/ReplayInputOverlay.prefab"
+            "Packages/io.github.tongguang.tloop/Runtime/Common/InputVisualizationCanvas.prefab",
+            "Packages/io.github.tongguang.tloop/Runtime/SimulateMouseInput/SimulateMouseInputOverlay.prefab",
+            "Packages/io.github.tongguang.tloop/Runtime/SimulateKeyboard/SimulateKeyboardOverlay.prefab",
+            "Packages/io.github.tongguang.tloop/Runtime/SimulateMouseUi/SimulateMouseUiOverlay.prefab",
+            "Packages/io.github.tongguang.tloop/Runtime/RecordInput/RecordInputOverlay.prefab",
+            "Packages/io.github.tongguang.tloop/Runtime/ReplayInput/ReplayInputOverlay.prefab"
         };
 
         private static readonly string[] OverlayPrefabFilePaths =

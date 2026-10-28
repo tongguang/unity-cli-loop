@@ -22,7 +22,7 @@ func TestStampDispatcherPinWritesOnlyVerifiedReleaseSubjects(t *testing.T) {
 			return []dispatcherReleaseAsset{
 				{Name: "install.sh", URL: "https://example.test/install.sh"},
 				{Name: "install.ps1", URL: "https://example.test/install.ps1"},
-				{Name: "uloop-dispatcher-darwin-arm64.zip", URL: "https://example.test/uloop-dispatcher-darwin-arm64.zip"},
+				{Name: "tloop-dispatcher-darwin-arm64.zip", URL: "https://example.test/tloop-dispatcher-darwin-arm64.zip"},
 				{Name: "install.sh.sigstore.json", URL: "https://example.test/install.sh.sigstore.json"},
 			}, nil
 		},
@@ -36,7 +36,7 @@ func TestStampDispatcherPinWritesOnlyVerifiedReleaseSubjects(t *testing.T) {
 			return map[string]string{
 				"install.sh":                        "1111111111111111111111111111111111111111111111111111111111111111",
 				"install.ps1":                       "2222222222222222222222222222222222222222222222222222222222222222",
-				"uloop-dispatcher-darwin-arm64.zip": "3333333333333333333333333333333333333333333333333333333333333333",
+				"tloop-dispatcher-darwin-arm64.zip": "3333333333333333333333333333333333333333333333333333333333333333",
 			}, nil
 		},
 	}
@@ -57,7 +57,7 @@ func TestStampDispatcherPinWritesOnlyVerifiedReleaseSubjects(t *testing.T) {
 	}
 	wantManifest := "1111111111111111111111111111111111111111111111111111111111111111  install.sh\n"
 	wantManifest += "2222222222222222222222222222222222222222222222222222222222222222  install.ps1\n"
-	wantManifest += "3333333333333333333333333333333333333333333333333333333333333333  uloop-dispatcher-darwin-arm64.zip"
+	wantManifest += "3333333333333333333333333333333333333333333333333333333333333333  tloop-dispatcher-darwin-arm64.zip"
 	if stamped["dispatcherArchiveManifest"] != wantManifest {
 		t.Fatalf("dispatcherArchiveManifest mismatch: %v", stamped["dispatcherArchiveManifest"])
 	}

@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-// Verifies CLI Vibe logs are skipped unless ULOOP_DEBUG is enabled.
+// Verifies CLI Vibe logs are skipped unless TLOOP_DEBUG is enabled.
 func TestWriteCLIVibeLogSkipsWhenDebugDisabled(t *testing.T) {
 	t.Setenv(CLIVibeLogEnvName, "")
 	projectRoot := t.TempDir()
@@ -153,7 +153,7 @@ func assertDefaultedCLIVibeEntry(t *testing.T, entry CLIVibeLogEntry) {
 func TestWriteCLIVibeLogReportsDirectoryCreationFailure(t *testing.T) {
 	t.Setenv(CLIVibeLogEnvName, "1")
 	projectRoot := t.TempDir()
-	blocker := filepath.Join(projectRoot, ".uloop")
+	blocker := filepath.Join(projectRoot, ".tloop")
 	if err := os.WriteFile(blocker, []byte("not a directory"), 0o600); err != nil {
 		t.Fatalf("failed to create blocking file: %v", err)
 	}
@@ -190,7 +190,7 @@ func TestWriteCLIVibeLogReportsMarshalFailure(t *testing.T) {
 	}
 }
 
-// Verifies ULOOP_DEBUG disables logging for empty, zero, and any-case "false" values
+// Verifies TLOOP_DEBUG disables logging for empty, zero, and any-case "false" values
 // and enables it for anything else.
 func TestIsCLIVibeLogEnabled(t *testing.T) {
 	cases := []struct {

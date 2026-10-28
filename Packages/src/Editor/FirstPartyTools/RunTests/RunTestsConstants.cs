@@ -31,12 +31,12 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // the notice would not appear. The claim is scoped to this run, not a
         // universal "never discovers".
         internal const string PredefinedAssemblyTestNoticeFormat =
-            " Additionally, {0} NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: {1}. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'uloop compile' and rerun the tests.";
+            " Additionally, {0} NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: {1}. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'tloop compile' and rerun the tests.";
 
         // Format: proposed asset path. Appended after the asmdef hints and the predefined-assembly
         // notice, so it inherits their leading-space convention.
         internal const string TestAsmdefProposalNoticeFormat =
-            " No test assembly exists for this TestMode, so no test script can be discovered until one is added. ProposedTestAsmdef holds a ready-to-write .asmdef for {0}: save it there, move the test scripts under that folder, then run 'uloop compile' and rerun the tests.";
+            " No test assembly exists for this TestMode, so no test script can be discovered until one is added. ProposedTestAsmdef holds a ready-to-write .asmdef for {0}: save it there, move the test scripts under that folder, then run 'tloop compile' and rerun the tests.";
 
         // Why a listing timeout instead of --timeout-seconds: RetrieveTestList is a catalog
         // callback, not a test run. Waiting the full run timeout would stall a no-tests
@@ -58,6 +58,6 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Format: active hot-reload change count at test-run start. Policy-form because
         // response construction was measured to run before any deferred domain reload.
         public const string HotReloadDiscardWarningFormat =
-            "{0} active hot-reload change(s) were live during this test run. If script changes were imported during the run, the deferred domain reload that follows it discards every active hot-reload change, including introduced types - check 'uloop hot-reload --status' and re-apply, or run 'uloop compile' to bake them in.";
+            "{0} active hot-reload change(s) were live during this test run. If script changes were imported during the run, the deferred domain reload that follows it discards every active hot-reload change, including introduced types - check 'tloop hot-reload --status' and re-apply, or run 'tloop compile' to bake them in.";
     }
 }

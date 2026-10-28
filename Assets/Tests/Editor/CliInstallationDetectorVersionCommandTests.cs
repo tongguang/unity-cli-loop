@@ -18,7 +18,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     /// </summary>
     public sealed class CliInstallationDetectorVersionCommandTests
     {
-        private const string ExecutablePath = "<PROJECT_ROOT>/bin/uloop";
+        private const string ExecutablePath = "<PROJECT_ROOT>/bin/tloop";
         private const string ContractArguments = CliConstants.VERSION_FLAG + " " + CliConstants.JSON_FLAG;
 
         private int _warningCount;

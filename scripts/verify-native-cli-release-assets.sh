@@ -3,14 +3,14 @@ set -eu
 
 ROOT_DIR=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
 EXPECTED_ASSETS="
-uloop-project-runner-darwin-amd64.tar.gz
-uloop-project-runner-darwin-amd64.tar.gz.sha256
-uloop-project-runner-darwin-arm64.tar.gz
-uloop-project-runner-darwin-arm64.tar.gz.sha256
-uloop-project-runner-linux-amd64.tar.gz
-uloop-project-runner-linux-amd64.tar.gz.sha256
-uloop-project-runner-windows-amd64.zip
-uloop-project-runner-windows-amd64.zip.sha256
+tloop-project-runner-darwin-amd64.tar.gz
+tloop-project-runner-darwin-amd64.tar.gz.sha256
+tloop-project-runner-darwin-arm64.tar.gz
+tloop-project-runner-darwin-arm64.tar.gz.sha256
+tloop-project-runner-linux-amd64.tar.gz
+tloop-project-runner-linux-amd64.tar.gz.sha256
+tloop-project-runner-windows-amd64.zip
+tloop-project-runner-windows-amd64.zip.sha256
 "
 
 if [ "${1:-}" = "--list" ]; then
@@ -100,14 +100,14 @@ for asset_name in $EXPECTED_ASSETS; do
   require_file "$asset_name"
 done
 
-verify_checksum "uloop-project-runner-darwin-amd64.tar.gz"
-verify_checksum "uloop-project-runner-darwin-arm64.tar.gz"
-verify_checksum "uloop-project-runner-linux-amd64.tar.gz"
-verify_checksum "uloop-project-runner-windows-amd64.zip"
+verify_checksum "tloop-project-runner-darwin-amd64.tar.gz"
+verify_checksum "tloop-project-runner-darwin-arm64.tar.gz"
+verify_checksum "tloop-project-runner-linux-amd64.tar.gz"
+verify_checksum "tloop-project-runner-windows-amd64.zip"
 
-require_tar_entry "uloop-project-runner-darwin-amd64.tar.gz" "uloop-project-runner"
-require_tar_entry "uloop-project-runner-darwin-arm64.tar.gz" "uloop-project-runner"
-require_tar_entry "uloop-project-runner-linux-amd64.tar.gz" "uloop-project-runner"
-require_zip_entry "uloop-project-runner-windows-amd64.zip" "uloop-project-runner.exe"
+require_tar_entry "tloop-project-runner-darwin-amd64.tar.gz" "tloop-project-runner"
+require_tar_entry "tloop-project-runner-darwin-arm64.tar.gz" "tloop-project-runner"
+require_tar_entry "tloop-project-runner-linux-amd64.tar.gz" "tloop-project-runner"
+require_zip_entry "tloop-project-runner-windows-amd64.zip" "tloop-project-runner.exe"
 
 echo "Native CLI release assets are complete."

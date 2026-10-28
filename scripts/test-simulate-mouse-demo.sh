@@ -1,5 +1,5 @@
 #!/bin/sh
-# E2E verification for SimulateMouseDemoScene using the uloop CLI.
+# E2E verification for SimulateMouseDemoScene using the tloop CLI.
 
 set -eu
 
@@ -9,7 +9,7 @@ ELEMENTS_JSON="$TMP_DIR/simulate-mouse-elements.json"
 ORIGINAL_GAME_VIEW_WIDTH=""
 ORIGINAL_GAME_VIEW_HEIGHT=""
 PROJECT_PATH=""
-ULOOP_PATH="${ULOOP_BIN:-uloop}"
+TLOOP_PATH="${TLOOP_BIN:-tloop}"
 
 fail() {
     printf 'ERROR: %s\n' "$1" >&2
@@ -17,7 +17,7 @@ fail() {
 }
 
 cleanup() {
-    run_uloop control-play-mode --action Stop >/dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop >/dev/null 2>&1 || true
     if [ -n "${ORIGINAL_GAME_VIEW_WIDTH:-}" ] && [ -n "${ORIGINAL_GAME_VIEW_HEIGHT:-}" ]; then
         restore_game_view_size "$ORIGINAL_GAME_VIEW_WIDTH" "$ORIGINAL_GAME_VIEW_HEIGHT" >/dev/null 2>&1 || true
     fi
@@ -31,13 +31,13 @@ while [ "$#" -gt 0 ]; do
             PROJECT_PATH=$2
             shift 2
             ;;
-        --uloop-path)
-            [ "$#" -ge 2 ] || fail "--uloop-path requires a value"
-            ULOOP_PATH=$2
+        --tloop-path)
+            [ "$#" -ge 2 ] || fail "--tloop-path requires a value"
+            TLOOP_PATH=$2
             shift 2
             ;;
         -h|--help)
-            printf 'Usage: sh scripts/test-simulate-mouse-demo.sh [--project-path <path>] [--uloop-path <path>]\n'
+            printf 'Usage: sh scripts/test-simulate-mouse-demo.sh [--project-path <path>] [--tloop-path <path>]\n'
             exit 0
             ;;
         *)
@@ -47,22 +47,22 @@ while [ "$#" -gt 0 ]; do
 done
 
 require_jq() {
-    command -v jq >/dev/null 2>&1 || fail "jq is required to parse uloop JSON responses"
+    command -v jq >/dev/null 2>&1 || fail "jq is required to parse tloop JSON responses"
 }
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        "$ULOOP_PATH" --project-path "$PROJECT_PATH" "$@"
+        "$TLOOP_PATH" --project-path "$PROJECT_PATH" "$@"
         return
     fi
 
-    "$ULOOP_PATH" "$@"
+    "$TLOOP_PATH" "$@"
 }
 
-run_uloop_json() {
-    if ! output=$(run_uloop "$@" 2>&1); then
+run_tloop_json() {
+    if ! output=$(run_tloop "$@" 2>&1); then
         printf '%s\n' "$output" >&2
-        fail "uloop $* failed"
+        fail "tloop $* failed"
     fi
 
     printf '%s\n' "$output"
@@ -87,7 +87,7 @@ assert_text_equals() {
 wait_unity_ready() {
     attempt=0
     while [ "$attempt" -lt 15 ]; do
-        if run_uloop get-logs --max-count 1 >/dev/null 2>&1; then
+        if run_tloop get-logs --max-count 1 >/dev/null 2>&1; then
             return
         fi
 
@@ -95,13 +95,13 @@ wait_unity_ready() {
         sleep 2
     done
 
-    fail "Unity did not respond to uloop"
+    fail "Unity did not respond to tloop"
 }
 
 wait_play_mode() {
     attempt=0
     while [ "$attempt" -lt 20 ]; do
-        json=$(run_uloop_json execute-dynamic-code --code 'using UnityEngine; return Application.isPlaying;')
+        json=$(run_tloop_json execute-dynamic-code --code 'using UnityEngine; return Application.isPlaying;')
         if printf '%s\n' "$json" | jq -e '.Success == true and .Result == "True"' >/dev/null; then
             return
         fi
@@ -114,7 +114,7 @@ wait_play_mode() {
 }
 
 initialize_demo_scene() {
-    run_uloop control-play-mode --action Stop >/dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop >/dev/null 2>&1 || true
 
     code="
 using UnityEditor.SceneManagement;
@@ -127,14 +127,14 @@ if (SceneManager.GetActiveScene().path != scenePath)
 return SceneManager.GetActiveScene().path;
 "
 
-    json=$(run_uloop_json execute-dynamic-code --code "$code")
+    json=$(run_tloop_json execute-dynamic-code --code "$code")
     assert_json_success "$json" "Load demo scene"
     scene=$(printf '%s\n' "$json" | jq -r '.Result')
     assert_text_equals "$scene" "$SCENE_PATH" "Active scene"
 }
 
 select_full_hd_game_view() {
-    json=$(run_uloop_json set-game-view-size --width 1920 --height 1080)
+    json=$(run_tloop_json set-game-view-size --width 1920 --height 1080)
     assert_json_success "$json" "Set Full HD Game View"
     ORIGINAL_GAME_VIEW_WIDTH=$(printf '%s\n' "$json" | jq -r '.PreviousWidth')
     ORIGINAL_GAME_VIEW_HEIGHT=$(printf '%s\n' "$json" | jq -r '.PreviousHeight')
@@ -151,12 +151,12 @@ select_full_hd_game_view() {
 restore_game_view_size() {
     original_width=$1
     original_height=$2
-    json=$(run_uloop_json set-game-view-size --width "$original_width" --height "$original_height")
+    json=$(run_tloop_json set-game-view-size --width "$original_width" --height "$original_height")
     assert_json_success "$json" "Restore Game View resolution"
 }
 
 capture_annotated_elements() {
-    run_uloop_json screenshot \
+    run_tloop_json screenshot \
         --capture-mode rendering \
         --annotate-elements \
         --elements-only >"$ELEMENTS_JSON"
@@ -201,7 +201,7 @@ invoke_click() {
     y=$(element_field "$element" "SimY")
     path=$(element_field "$element" "Path")
 
-    json=$(run_uloop_json simulate-mouse-ui \
+    json=$(run_tloop_json simulate-mouse-ui \
         --action Click \
         --x "$x" \
         --y "$y" \
@@ -218,7 +218,7 @@ invoke_long_press() {
     y=$(element_field "$element" "SimY")
     path=$(element_field "$element" "Path")
 
-    json=$(run_uloop_json simulate-mouse-ui \
+    json=$(run_tloop_json simulate-mouse-ui \
         --action LongPress \
         --x "$x" \
         --y "$y" \
@@ -240,7 +240,7 @@ invoke_drag_to_drop_zone() {
     target_path=$(element_field "$element" "Path")
     drop_path=$(element_field "$drop_zone" "Path")
 
-    json=$(run_uloop_json simulate-mouse-ui \
+    json=$(run_tloop_json simulate-mouse-ui \
         --action Drag \
         --from-x "$from_x" \
         --from-y "$from_y" \
@@ -260,7 +260,7 @@ invoke_drag_start() {
     y=$(element_field "$element" "SimY")
     path=$(element_field "$element" "Path")
 
-    json=$(run_uloop_json simulate-mouse-ui \
+    json=$(run_tloop_json simulate-mouse-ui \
         --action DragStart \
         --x "$x" \
         --y "$y" \
@@ -276,7 +276,7 @@ invoke_drag_move() {
     speed=$3
     expected_hit=$4
 
-    json=$(run_uloop_json simulate-mouse-ui \
+    json=$(run_tloop_json simulate-mouse-ui \
         --action DragMove \
         --x "$x" \
         --y "$y" \
@@ -291,7 +291,7 @@ invoke_drag_end() {
     drop_path=$4
     expected_hit=$5
 
-    json=$(run_uloop_json simulate-mouse-ui \
+    json=$(run_tloop_json simulate-mouse-ui \
         --action DragEnd \
         --x "$x" \
         --y "$y" \
@@ -312,7 +312,7 @@ if (text == null) { return \"ERROR: $object_name has no Text component\"; }
 return text.text;
 "
 
-    json=$(run_uloop_json execute-dynamic-code --code "$code")
+    json=$(run_tloop_json execute-dynamic-code --code "$code")
     assert_json_success "$json" "Read text from $object_name"
     printf '%s\n' "$json" | jq -r '.Result'
 }
@@ -328,7 +328,7 @@ if (text == null) { return "ERROR: LongPressButton label not found"; }
 return text.text;
 '
 
-    json=$(run_uloop_json execute-dynamic-code --code "$code")
+    json=$(run_tloop_json execute-dynamic-code --code "$code")
     assert_json_success "$json" "Read LongPressButton text"
     printf '%s\n' "$json" | jq -r '.Result'
 }
@@ -343,7 +343,7 @@ if (dropZone == null) { return "ERROR: DropZone component not found"; }
 return dropZone.StatusMessage;
 '
 
-    json=$(run_uloop_json execute-dynamic-code --code "$code")
+    json=$(run_tloop_json execute-dynamic-code --code "$code")
     assert_json_success "$json" "Read DropZone status"
     printf '%s\n' "$json" | jq -r '.Result'
 }
@@ -359,7 +359,7 @@ if (Mathf.Abs(pad.Direction.x) < 0.001f && Mathf.Abs(pad.Direction.y) < 0.001f) 
 return pad.Direction.ToString("F3");
 '
 
-    json=$(run_uloop_json execute-dynamic-code --code "$code")
+    json=$(run_tloop_json execute-dynamic-code --code "$code")
     assert_json_success "$json" "Read VirtualPad state"
     printf '%s\n' "$json" | jq -r '.Result'
 }
@@ -373,7 +373,7 @@ exercise_virtual_pad() {
     pad_offset=$(jq -nr --argjson width "$pad_width" --argjson height "$pad_height" '([$width, $height] | min) * 0.28')
     target_path=$(element_field "$virtual_pad" "Path")
 
-    json=$(run_uloop_json simulate-mouse-ui \
+    json=$(run_tloop_json simulate-mouse-ui \
         --action DragStart \
         --x "$pad_x" \
         --y "$pad_y" \
@@ -414,7 +414,7 @@ printf '[1/8] Loading SimulateMouse demo scene...\n'
 initialize_demo_scene
 
 printf '[2/8] Starting PlayMode...\n'
-run_uloop_json control-play-mode --action Play >/dev/null
+run_tloop_json control-play-mode --action Play >/dev/null
 wait_play_mode
 sleep 1
 

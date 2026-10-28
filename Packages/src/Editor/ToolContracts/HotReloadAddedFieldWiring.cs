@@ -188,7 +188,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
             {
                 return "'" + fieldName + "' is not an added field of " + type.FullName
                     + ", which has no active added fields at all. Run a hot reload that adds the "
-                    + "field first; a compile, a domain reload, or 'uloop hot-reload --revert-all' "
+                    + "field first; a compile, a domain reload, or 'tloop hot-reload --revert-all' "
                     + "drops the added fields.";
             }
 

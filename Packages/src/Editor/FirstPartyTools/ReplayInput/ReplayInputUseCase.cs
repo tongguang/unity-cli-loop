@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 using Newtonsoft.Json;
@@ -22,19 +22,19 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Wire-visible fragment of the paused preflight message; tests pin the composed string.
         public const string PausedActionDescription = "replaying input";
 
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
 #pragma warning disable CS1998
 #endif
         public async Task<ReplayInputResponse> ReplayInputAsync(
             ReplayInputSchema request,
             CancellationToken ct)
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
 #pragma warning restore CS1998
 #endif
         {
             ct.ThrowIfCancellationRequested();
 
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
             return new ReplayInputResponse
             {
                 Success = false,
@@ -91,7 +91,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 #endif
         }
 
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
         private static ReplayInputResponse ExecuteStart(ReplayInputSchema request)
         {
             PlayModeToolPreflightResult preflight = PlayModeToolPreflightService.RequireActiveAndNotPaused(PausedActionDescription);

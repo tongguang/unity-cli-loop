@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
     internal static class SkillInstallLayout
     {
         internal const string SkillsDirName = "skills";
-        internal const string ManagedSkillsDirName = "unity-cli-loop";
+        internal const string ManagedSkillsDirName = "tuanjie-cli-loop";
         internal const string SkillFileName = "SKILL.md";
         private const string MarkdownFileExtension = ".md";
 
@@ -273,6 +273,11 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
         private static bool IsLegacyManagedSkillDirectory(string skillDir)
         {
             string dirName = Path.GetFileName(skillDir);
+            if (dirName.StartsWith("uloop-", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
             if (dirName.StartsWith(CliConstants.SKILL_DIR_PREFIX, StringComparison.Ordinal))
             {
                 return true;

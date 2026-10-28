@@ -41,7 +41,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         /// The note for a message the engine dispatches but this feature leaves to the compiler.
         /// </summary>
         internal const string NotForwarded =
-            "Unity message: not invoked by the engine until 'uloop compile'; "
+            "Unity message: not invoked by the engine until 'tloop compile'; "
             + "Awake/OnEnable/OnDisable/OnDestroy, editor-only messages, and non-void messages are "
             + "not forwarded by hot reload.";
 
@@ -50,7 +50,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         /// caller reading Warnings alone still learns a compile is needed.
         /// </summary>
         internal const string NotForwardedWarningFormat =
-            "Added Unity messages not invoked until 'uloop compile': {0}";
+            "Added Unity messages not invoked until 'tloop compile': {0}";
 
         /// <summary>Whether a row's note says a proxy delivers the message.</summary>
         internal static bool IsForwarded(string lifecycleNote)

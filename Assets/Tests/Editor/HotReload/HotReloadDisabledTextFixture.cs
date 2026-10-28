@@ -6,7 +6,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     public sealed class HotReloadDisabledTextFixture
     {
         private bool _plainField;
-#if ULOOP_TEST_NEVER_DEFINED_SYMBOL
+#if TLOOP_TEST_NEVER_DEFINED_SYMBOL
         private bool _uloopDisabledGuardedField;
 
         private void UloopDisabledGuardedMethod()

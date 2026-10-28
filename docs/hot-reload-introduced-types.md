@@ -3,7 +3,7 @@
 A hot reload can introduce a type the running domain has never compiled. The type is compiled
 into an artifact assembly the Editor domain loads and keeps, and the bodies of the same reload
 bind against it. This document states exactly which declarations qualify, how the response
-reports the rest, and what still requires `uloop compile`.
+reports the rest, and what still requires `tloop compile`.
 
 Response field reference: `Packages/src/Editor/FirstPartyTools/HotReload/Skill/references/output.md`.
 General hot-reload rules: `docs/hot-reload.md`.
@@ -83,7 +83,7 @@ assembly. Two mechanisms make this possible, and both apply only to the artifact
 - The artifact compiles against copies of its target assembly and of that assembly's active
   artifacts in which only the assembly part of accessibility is removed. `private` members stay
   private, and `private protected` members stay `protected`. The copies are cached under
-  `Library/UloopHotReload/InternalsExposedRefs/`, are never loaded, and do not change what the
+  `Library/TloopHotReload/InternalsExposedRefs/`, are never loaded, and do not change what the
   rest of the reload compiles against.
 - After loading the artifact, and before any of its types becomes active, every method it
   declares is allowed to reach those internals at run time and is marked to never be inlined —
@@ -110,7 +110,7 @@ Limits:
   retained base member is still refused (see the table above).
 - Because the target assembly's internals look public to the artifact compilation, a declaration
   can compile here that a regular compile rejects — a `public` member exposing an `internal`
-  type, for example. Run `uloop compile` to validate the project.
+  type, for example. Run `tloop compile` to validate the project.
 
 ## Type identity is fixed until the next domain reload
 
@@ -121,7 +121,7 @@ This is why a changed declaration of an already-introduced type is a `Failed` ro
 replacement: the domain cannot unload the artifact assembly, so accepting the edit would leave
 callers bound to a definition the source no longer declares. Deleting the declaration does not
 unload it either — the type stays loaded, and the active state of the domain is unchanged.
-`uloop compile` is the only way to get a changed or removed declaration into the running Editor.
+`tloop compile` is the only way to get a changed or removed declaration into the running Editor.
 
 What is fixed is the declaration, not the code behind it. Editing only the bodies of the type's
 ordinary methods leaves the declaration identical, so the reload patches those bodies on the
@@ -157,7 +157,7 @@ recovery: the types stay loaded whatever the methods did, so a re-apply is not a
 
 ## Use from execute-dynamic-code
 
-A snippet run by `uloop execute-dynamic-code` can name an active introduced type directly: every
+A snippet run by `tloop execute-dynamic-code` can name an active introduced type directly: every
 active artifact on disk is added to that compilation's references, so the type is nameable for as
 long as it stays active. Write its full name, as the snippet has no using for its namespace, and
 spell a nested type in C# form (`Outer.Inner`), which a using cannot shorten. An `internal` or
@@ -194,7 +194,7 @@ recompiled rather than reused once that generation is gone.
 
 ## Lifecycle
 
-- `uloop hot-reload --revert-all` reverts patched methods and added members. It does **not**
+- `tloop hot-reload --revert-all` reverts patched methods and added members. It does **not**
   unload an introduced type: the response says how many stayed
   (`N introduced type(s) stay loaded until the next Domain Reload; a revert cannot unload the
   assembly that carries them.`). A body the reload patched over a stub runs the stub again,
@@ -202,7 +202,7 @@ recompiled rather than reused once that generation is gone.
   reloaded.
 - Auto Refresh stays held while any introduced type is active, so returning focus to the Editor
   does not recompile. `--revert-all` releases the hold only when no introduced type remains;
-  `uloop compile` always releases it.
+  `tloop compile` always releases it.
 - When Domain Reload is enabled on Play entry (the default for projects created before Unity 6.6), entering Play Mode reloads the
   domain, which discards the introduced types along with the patches. They are counted in
   `DroppedByPlayModeEntryCount` on the next `--status`, and re-applying the same declaration
@@ -228,18 +228,18 @@ recompiled rather than reused once that generation is gone.
 
 ## File selection and new files
 
-The default selection of `uloop hot-reload` (no `--files`) reads the compile snapshots, so it
+The default selection of `tloop hot-reload` (no `--files`) reads the compile snapshots, so it
 only sees sources Unity has already compiled. A file that has never been compiled is not
 selected automatically; pass it (and any other path) with `--files`.
 
-- No snapshot at all: `No compile snapshots exist yet. Run 'uloop compile' first or pass
+- No snapshot at all: `No compile snapshots exist yet. Run 'tloop compile' first or pass
   project-relative .cs paths with --files. Files that have never been compiled are not selected
   automatically; pass them (and any other path) with --files.`
 - A snapshot exists but nothing compiled has changed: `No .cs files changed since the last
   compile were found. Files that have never been compiled are not selected automatically; pass
   them (and any other path) with --files.`
 
-A brand-new script under a brand-new `.asmdef` still needs `uloop compile` first — Unity has to
+A brand-new script under a brand-new `.asmdef` still needs `tloop compile` first — Unity has to
 create the assembly before any reload can target it.
 
 One exception covers the files hot reload had already introduced types from. When entering Play
@@ -247,12 +247,12 @@ Mode reloads the domain and discards those types, the files that declare them ar
 the rest of the Editor session. `--revert-all` remembers them too: the introduced types stay
 loaded, but what later reloads added to them (a new method, a new field) is dropped, and callers
 that use those members would otherwise fail to compile on the next reload. The next
-`uloop hot-reload` without `--files` selects each remembered file again, after the changed files,
+`tloop hot-reload` without `--files` selects each remembered file again, after the changed files,
 if it is still on disk and is not already a changed file. The selection message then names them:
 
 - `--files was omitted; N changed file(s) since the last compile were selected: <paths>. M new
   file(s) declaring a type hot reload introduced were selected again, because entering Play Mode
-  or 'uloop hot-reload --revert-all' dropped what earlier reloads had applied from them: <paths>.
+  or 'tloop hot-reload --revert-all' dropped what earlier reloads had applied from them: <paths>.
   Other new files that have never been compiled are not selected
   automatically.`
 - With no changed file, the first sentence reads `--files was omitted; no file changed since the

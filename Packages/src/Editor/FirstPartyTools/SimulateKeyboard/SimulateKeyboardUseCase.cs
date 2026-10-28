@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 
@@ -25,13 +25,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             _editorFocusStateProvider = editorFocusStateProvider ?? new EditorFocusStateProvider();
         }
 
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
 #pragma warning disable CS1998
 #endif
         public async Task<SimulateKeyboardResponse> ExecuteAsync(
             SimulateKeyboardSchema parameters,
             CancellationToken ct)
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
 #pragma warning restore CS1998
 #endif
         {
@@ -42,7 +42,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
             ct.ThrowIfCancellationRequested();
 
-#if !ULOOP_HAS_INPUT_SYSTEM
+#if !TLOOP_HAS_INPUT_SYSTEM
             return new SimulateKeyboardResponse
             {
                 Success = false,
@@ -189,7 +189,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 #endif
         }
 
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
         private static async Task<SimulateKeyboardResponse> ExecuteReleaseAllAsync(
             string correlationId,
             CancellationToken ct)

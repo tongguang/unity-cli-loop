@@ -6,7 +6,7 @@ func TestDispatcherPinPathNeedsNetworkVerificationRecognizesEveryWatchedPath(t *
 	// Verifies changes to the pin, installers, verifier, guard, or its workflow revalidate published subjects.
 	paths := []string{
 		"Packages/src/project-runner-pin.json",
-		".uloop/project-runner-pin.json",
+		".tloop/project-runner-pin.json",
 		"scripts/install.sh",
 		"scripts/install.ps1",
 		"cli/dispatcher/attestation/verifier.go",

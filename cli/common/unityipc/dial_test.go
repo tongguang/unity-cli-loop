@@ -13,7 +13,7 @@ func TestDialEndpointWithValidatorAndDialerSkipsDialWhenValidationFails(t *testi
 	dialAttempts := 0
 	_, err := dialEndpointWithValidatorAndDialer(
 		context.Background(),
-		Endpoint{Network: "unix", Address: "/tmp/uloop-501/test.sock"},
+		Endpoint{Network: "unix", Address: "/tmp/tloop-501/test.sock"},
 		func(Endpoint) error { return validationErr },
 		func(context.Context, Endpoint) (net.Conn, error) {
 			dialAttempts++

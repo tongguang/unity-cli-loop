@@ -22,7 +22,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     /// </summary>
     public sealed class UnityCliLoopSettingsSkillsPresenterStateTests
     {
-        private const string CliNotFoundMessage = "uloop CLI is not installed. Please install the CLI first.";
+        private const string CliNotFoundMessage = "tloop CLI is not installed. Please install the CLI first.";
         private const string InstallFailureMessage = "install failed in this test";
 
         private RecordingSkillSetupPort _skillPort;

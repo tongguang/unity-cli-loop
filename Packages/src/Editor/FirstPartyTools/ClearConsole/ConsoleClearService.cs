@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
             if (addConfirmationMessage)
             {
-                Debug.Log("=== Console cleared via Unity CLI Loop ===");
+                Debug.Log("=== Console cleared via Tuanjie CLI Loop ===");
             }
 
             string message = totalLogCount > 0

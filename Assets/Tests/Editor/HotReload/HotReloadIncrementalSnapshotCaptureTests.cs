@@ -44,7 +44,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _root = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _root = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(Path.Combine(_root, "Assets"));
             Directory.CreateDirectory(Path.Combine(_root, HotReloadConstants.ScriptAssembliesRelativeDirectory));
             Directory.CreateDirectory(HotReloadSourceSnapshotLayout.Root(_root));
@@ -355,7 +355,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     WriteStampNamingPrevious();
                     break;
                 case "old_header":
-                    File.WriteAllText(manifestPath, "uloop-source-stamps 1\n" + line + "\n");
+                    File.WriteAllText(manifestPath, "tloop-source-stamps 1\n" + line + "\n");
                     WriteStampNamingPrevious();
                     break;
                 default:

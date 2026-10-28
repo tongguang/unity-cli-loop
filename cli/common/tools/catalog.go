@@ -11,7 +11,7 @@ import (
 var embeddedTools embed.FS
 
 const (
-	CacheDirectoryName = ".uloop"
+	CacheDirectoryName = ".tloop"
 	CacheFileName      = "tools.json"
 	defaultToolsFile   = "default-tools.json"
 )

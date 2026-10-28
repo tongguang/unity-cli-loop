@@ -15,14 +15,14 @@ import (
 // all proves foreign bytes are not opened.
 func TestRunSkillsDirListIgnoresForeignFifo(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	fifoPath := filepath.Join(destinationDir, "uloop-sample", "queue.pipe")
+	fifoPath := filepath.Join(destinationDir, "tloop-sample", "queue.pipe")
 	if err := syscall.Mkfifo(fifoPath, 0o644); err != nil {
 		t.Fatalf("failed to create fifo: %v", err)
 	}
@@ -33,7 +33,7 @@ func TestRunSkillsDirListIgnoresForeignFifo(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("dir list failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop-sample (installed)") {
+	if !strings.Contains(stdout.String(), "tloop-sample (installed)") {
 		t.Fatalf("a foreign FIFO should not change the skill status:\n%s", stdout.String())
 	}
 }

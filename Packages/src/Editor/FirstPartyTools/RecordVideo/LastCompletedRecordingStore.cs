@@ -8,7 +8,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal static class LastCompletedRecordingStore
     {
-        private const string KeyPrefix = "io.github.hatayama.uloopmcp.recordVideo.lastCompleted.";
+        private const string KeyPrefix = "io.github.tongguang.tloop.recordVideo.lastCompleted.";
         private const string OutputPathKey = KeyPrefix + "outputPath";
         private const string WidthKey = KeyPrefix + "width";
         private const string HeightKey = KeyPrefix + "height";

@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	InstallDirEnvName        = "ULOOP_INSTALL_DIR"
-	CacheDirEnvName          = "ULOOP_CACHE_DIR"
-	ProjectRunnerPathEnvName = "ULOOP_PROJECT_RUNNER_PATH"
+	InstallDirEnvName        = "TLOOP_INSTALL_DIR"
+	CacheDirEnvName          = "TLOOP_CACHE_DIR"
+	ProjectRunnerPathEnvName = "TLOOP_PROJECT_RUNNER_PATH"
 	LocalAppDataEnvName      = "LOCALAPPDATA"
 	WindowsProgramsDirName   = "Programs"
-	ProductDirectoryName     = "uloop"
+	ProductDirectoryName     = "tloop"
 	InstallBinDirectoryName  = "bin"
 )
 
@@ -57,7 +57,7 @@ func DefaultInstallDir(goos string, environment Environment) (string, error) {
 	case "windows":
 		localAppData := getEnvironmentValue(environment, LocalAppDataEnvName)
 		if localAppData == "" {
-			return "", errors.New("LOCALAPPDATA is required to resolve the uloop install directory")
+			return "", errors.New("LOCALAPPDATA is required to resolve the tloop install directory")
 		}
 		return Join(goos, localAppData, WindowsProgramsDirName, ProductDirectoryName, InstallBinDirectoryName), nil
 	default:
@@ -81,7 +81,7 @@ func CacheRoot(goos string, environment Environment) (string, error) {
 	case "windows":
 		localAppData := getEnvironmentValue(environment, LocalAppDataEnvName)
 		if localAppData == "" {
-			return "", errors.New("LOCALAPPDATA is required to resolve the uloop cache directory")
+			return "", errors.New("LOCALAPPDATA is required to resolve the tloop cache directory")
 		}
 		return Join(goos, localAppData, ProductDirectoryName), nil
 	default:

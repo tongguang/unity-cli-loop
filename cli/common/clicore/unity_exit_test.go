@@ -29,7 +29,7 @@ func newUnityExitWatchFixture(t *testing.T) *unityExitWatchFixture {
 	fixture := &unityExitWatchFixture{now: time.Unix(1_700_000_000, 0), running: true}
 	fixture.watch = NewUnityExitWatch(
 		t.TempDir(),
-		"/tmp/uloop/sample.sock",
+		"/tmp/tloop/sample.sock",
 		func(context.Context, string) (*unityprocess.UnityProcess, error) {
 			fixture.lookups++
 			if fixture.lookErr != nil {
@@ -208,7 +208,7 @@ func TestNewUnityNotRunningErrorRecordsALockfileLeftBehind(t *testing.T) {
 
 	editorLogPath := writeProjectEditorLogForTest(t, projectRoot)
 
-	err := NewUnityNotRunningError(projectRoot, "/tmp/uloop/sample.sock", io.EOF, true)
+	err := NewUnityNotRunningError(projectRoot, "/tmp/tloop/sample.sock", io.EOF, true)
 
 	if !err.LockfileLeftBehind {
 		t.Fatal("expected the lockfile left behind to be recorded")
@@ -216,7 +216,7 @@ func TestNewUnityNotRunningErrorRecordsALockfileLeftBehind(t *testing.T) {
 	if err.EditorLogPath != editorLogPath {
 		t.Fatalf("EditorLogPath = %q, want the project's Editor log %q", err.EditorLogPath, editorLogPath)
 	}
-	if err.ProjectRoot != projectRoot || err.Endpoint != "/tmp/uloop/sample.sock" || err.Cause != io.EOF ||
+	if err.ProjectRoot != projectRoot || err.Endpoint != "/tmp/tloop/sample.sock" || err.Cause != io.EOF ||
 		!err.ExitedDuringCommand {
 		t.Fatalf("the arguments were not carried over: %#v", err)
 	}

@@ -62,10 +62,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 result.Warnings,
                 Has.Member(
                     "Added field(s) with a serialization attribute will not appear in the Inspector "
-                    + "or serialize until 'uloop compile': "
+                    + "or serialize until 'tloop compile': "
                     + typeof(HotReloadAddedFieldApplyFixture).FullName + ".AddedCount. "
                     + "To put a value in one now, follow references/added-field-wiring.md in the "
-                    + "uloop-hot-reload skill."));
+                    + "tloop-hot-reload skill."));
         }
 
         /// <summary>

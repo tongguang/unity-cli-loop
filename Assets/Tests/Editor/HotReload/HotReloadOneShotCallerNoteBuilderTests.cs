@@ -263,7 +263,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     "Type.SetUp is called only from one-shot lifecycle method(s) (Awake) in the compiled "
                     + "assemblies; objects that already ran them will not run the patched body. It takes "
-                    + "effect only for newly created objects, or run `uloop compile` and re-enter Play Mode."
+                    + "effect only for newly created objects, or run `tloop compile` and re-enter Play Mode."
                     + " Callers hot reload added or patched are not counted; if one of "
                     + "them calls it, the patched body already runs."));
         }
@@ -314,7 +314,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     "OneShotCallerScannerFixture.AwakeOnlyTarget() is called only from one-shot lifecycle "
                     + "method(s) (Awake) in the compiled assemblies; objects that already ran them will not run "
-                    + "the patched body. It takes effect only for newly created objects, or run `uloop compile` "
+                    + "the patched body. It takes effect only for newly created objects, or run `tloop compile` "
                     + "and re-enter Play Mode."
                     + " Callers hot reload added or patched are not counted; if one of "
                     + "them calls it, the patched body already runs."));
@@ -363,7 +363,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     "OneShotCallerScannerFixture.ChainedAwakeOnlyTarget() is called only from one-shot "
                     + "lifecycle method(s) (Awake) in the compiled assemblies; objects that already ran them "
                     + "will not run the patched body. It takes effect only for newly created objects, or run "
-                    + "`uloop compile` and re-enter Play Mode."
+                    + "`tloop compile` and re-enter Play Mode."
                     + " Callers hot reload added or patched are not counted; if one of "
                     + "them calls it, the patched body already runs."));
         }
@@ -390,7 +390,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     "OneShotCallerChainHelper.ConfigureTarget() is called only from one-shot lifecycle "
                     + "method(s) (Awake) in the compiled assemblies; objects that already ran them will not run "
-                    + "the patched body. It takes effect only for newly created objects, or run `uloop compile` "
+                    + "the patched body. It takes effect only for newly created objects, or run `tloop compile` "
                     + "and re-enter Play Mode."
                     + " Callers hot reload added or patched are not counted; if one of "
                     + "them calls it, the patched body already runs."));
@@ -537,7 +537,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     "Type.SetUp is called only from one-shot lifecycle method(s) (Awake) in the compiled "
                     + "assemblies; objects that already ran them will not run the patched body. It takes "
-                    + "effect only for newly created objects, or run `uloop compile` and re-enter Play Mode."
+                    + "effect only for newly created objects, or run `tloop compile` and re-enter Play Mode."
                     + " Callers hot reload added or patched are not counted; if one of "
                     + "them calls it, the patched body already runs."));
         }
@@ -724,7 +724,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 note,
                 Does.EndWith(
                     " To run it on live objects from OnEnable or OnDisable, set the component's "
-                    + "`enabled` to false and back to true (for example with `uloop execute-dynamic-code`); "
+                    + "`enabled` to false and back to true (for example with `tloop execute-dynamic-code`); "
                     + "Awake and Start do not run again that way."));
         }
 
@@ -766,7 +766,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     "SetUp is called only from one-shot lifecycle method(s) (Awake) in the compiled "
                     + "assemblies; objects that already ran them will not run the patched body. It takes "
-                    + "effect only for newly created objects, or run `uloop compile` and re-enter Play Mode."
+                    + "effect only for newly created objects, or run `tloop compile` and re-enter Play Mode."
                     + " Callers hot reload added or patched are not counted; if one of "
                     + "them calls it, the patched body already runs."));
         }
@@ -792,7 +792,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     "SetUp is called only from one-shot lifecycle method(s) (Awake, Start) in the compiled "
                     + "assemblies; objects that already ran them will not run the patched body. It takes "
-                    + "effect only for newly created objects, or run `uloop compile` and re-enter Play Mode."
+                    + "effect only for newly created objects, or run `tloop compile` and re-enter Play Mode."
                     + " Callers hot reload added or patched are not counted; if one of "
                     + "them calls it, the patched body already runs."));
         }

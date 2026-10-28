@@ -1,10 +1,10 @@
 ---
-name: uloop-find-game-objects
+name: tloop-find-game-objects
 toolName: find-game-objects
-description: "Find or inspect Unity GameObjects, especially objects the user currently selected in the Hierarchy. Use for details, components, tags, layers, or name/path searches."
+description: "Find or inspect Tuanjie GameObjects, especially objects the user currently selected in the Hierarchy. Use for details, components, tags, layers, or name/path searches."
 ---
 
-# uloop find-game-objects
+# tloop find-game-objects
 
 Find GameObjects with search criteria or get details for currently selected Hierarchy objects.
 
@@ -13,7 +13,7 @@ Use this before `execute-dynamic-code` when identifying or inspecting selected G
 ## Usage
 
 ```bash
-uloop find-game-objects [options]
+tloop find-game-objects [options]
 ```
 
 ## Parameters
@@ -37,7 +37,7 @@ uloop find-game-objects [options]
 | `path` | Hierarchy path search (e.g., `Canvas/Button`) |
 | `regex` | Regular expression pattern |
 | `contains` | Partial name match |
-| `selected` | Get currently selected GameObjects in Unity Editor |
+| `selected` | Get currently selected GameObjects in Tuanjie Editor |
 
 ## Output
 
@@ -58,7 +58,7 @@ Returns JSON with:
 
 For `selected` mode with **multiple** successfully serialized GameObjects, inline `Results` is not populated and the data is written to a file instead. Two extra fields appear:
 
-- `ResultsFilePath` (string): Relative path under `.uloop/outputs/FindGameObjectsResults/`
+- `ResultsFilePath` (string): Relative path under `.tloop/outputs/FindGameObjectsResults/`
 - `Message` (string): Human-readable summary (e.g., "5 GameObjects exported")
 
 Single-selection and search-mode calls (`exact`, `path`, `regex`, `contains`) always return inline. No selection (`selected` mode with empty selection) returns empty `Results` plus a `Message`.

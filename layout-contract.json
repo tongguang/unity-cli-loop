@@ -11,12 +11,12 @@
   },
   "binaries": {
     "dispatcher": {
-      "unix": "uloop",
-      "windows": "uloop.exe"
+      "unix": "tloop",
+      "windows": "tloop.exe"
     },
     "projectRunner": {
-      "unix": "uloop-project-runner",
-      "windows": "uloop-project-runner.exe"
+      "unix": "tloop-project-runner",
+      "windows": "tloop-project-runner.exe"
     }
   }
 }

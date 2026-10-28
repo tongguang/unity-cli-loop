@@ -41,7 +41,7 @@ func newCachedSchedulerProject(
 	}
 	project.plan = BuildPlan{
 		DagDir:    planDagDirectory,
-		OutputDir: filepath.Join("Library", "uloop", "compile-check", "aaaa.dag"),
+		OutputDir: filepath.Join("Library", "tloop", "compile-check", "aaaa.dag"),
 		Units:     units,
 	}
 

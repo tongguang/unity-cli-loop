@@ -1,17 +1,17 @@
 ---
-name: uloop-get-logs
+name: tloop-get-logs
 toolName: get-logs
-description: "Read current Unity Console entries from a running Editor. Use during bug investigation after compile, tests, PlayMode, dynamic code, or immediately after `uloop-pause-point`."
+description: "Read current Tuanjie Console entries from a running Editor. Use during bug investigation after compile, tests, PlayMode, dynamic code, or immediately after `tloop-pause-point`."
 ---
 
-# uloop get-logs
+# tloop get-logs
 
-Retrieve logs from Unity Console.
+Retrieve logs from Tuanjie Console.
 
 ## Usage
 
 ```bash
-uloop get-logs [options]
+tloop get-logs [options]
 ```
 
 ## Parameters

@@ -3,14 +3,14 @@
 [English](migration-v2-to-v3.md) | 日本語
 
 > [!NOTE]
-> **ほとんどのユーザーには、このガイドは不要です。** C#カスタムツールも、`uloop` を呼び出す自作のスキル／スクリプトも持っていないなら、アップグレードは3ステップで終わります。Unityパッケージのバージョンを上げ、`Window > Unity CLI Loop > Settings` で **Install CLI**（または **Update CLI**）を押し、同じウィンドウで **Install Skills**（または **Update Skills**）を押すだけです。これで移行は完了なので、ここで読み終えて構いません。V3で何が変わったかは [V3の新機能](whats-new-v3_ja.md) を参照してください。
+> **ほとんどのユーザーには、このガイドは不要です。** C#カスタムツールも、`tloop` を呼び出す自作のスキル／スクリプトも持っていないなら、アップグレードは3ステップで終わります。Unityパッケージのバージョンを上げ、`Window > Tuanjie CLI Loop > Settings` で **Install CLI**（または **Update CLI**）を押し、同じウィンドウで **Install Skills**（または **Update Skills**）を押すだけです。これで移行は完了なので、ここで読み終えて構いません。V3で何が変わったかは [V3の新機能](whats-new-v3_ja.md) を参照してください。
 
 ## このガイドが必要な人
 
 次のどちらかに当てはまる場合は、続きを読んでください。
 
-- **V2 APIで書いたC#カスタムツールがある** — V2のツール基底型を継承したクラスや、`io.github.hatayama.uLoopMCP` 名前空間をimportしているコードがある場合です。Step 1〜Step 2に従ってください。移行ウィザードが自動で書き換えます。
-- **`uloop` を呼び出す `SKILL.md`・Markdownドキュメント・POSIXシェルスクリプト・PowerShellスクリプトがある** — V3ではbooleanオプションの書式が変わり、いくつかのコマンドが削除されたため、既存の呼び出しが気づかないうちに壊れる可能性があります。Step 3以降に従ってください。
+- **V2 APIで書いたC#カスタムツールがある** — V2のツール基底型を継承したクラスや、`io.github.tongguang.tloop` 名前空間をimportしているコードがある場合です。Step 1〜Step 2に従ってください。移行ウィザードが自動で書き換えます。
+- **`tloop` を呼び出す `SKILL.md`・Markdownドキュメント・POSIXシェルスクリプト・PowerShellスクリプトがある** — V3ではbooleanオプションの書式が変わり、いくつかのコマンドが削除されたため、既存の呼び出しが気づかないうちに壊れる可能性があります。Step 3以降に従ってください。
 
 両方に当てはまる場合は、このガイドを上から順に進めてください。
 
@@ -29,7 +29,7 @@
 
 起動時、UnityはV2ソースのコンパイルエラーを検出し、Safe Modeに入るかどうかを尋ねてきます。**`Ignore` を押して、Safe Modeに入らずに起動させてください。**
 
-**なぜ重要なのか:** Safe Modeでは、ホワイトリストに登録されたアセンブリだけが読み込まれます。Unity CLI Loopのエディタ拡張はこのホワイトリストに含まれないため、Safe Modeではパッケージのコードが動かず、**移行ウィンドウが開きません**。Safe Modeを拒否することが、この先の手順の前提になります。
+**なぜ重要なのか:** Safe Modeでは、ホワイトリストに登録されたアセンブリだけが読み込まれます。Tuanjie CLI Loopのエディタ拡張はこのホワイトリストに含まれないため、Safe Modeではパッケージのコードが動かず、**移行ウィンドウが開きません**。Safe Modeを拒否することが、この先の手順の前提になります。
 
 ![起動時に表示されるSafe Mode確認ダイアログ。Ignoreを押す](images/migration-safe-mode-dialog.png)
 
@@ -38,13 +38,13 @@
 
 誤ってSafe Modeに入ってしまっても、やり直せます。Safe Modeではパッケージのコードが動かないため、移行状態は何も記録されていません。Unityを再起動して `Ignore` を選べば、以下のとおりウィザードが開きます。
 
-CLIから起動してもこのダイアログは回避できません。`uloop launch` でも同じダイアログが出ます。Unityの仕様上、`-ignorecompilererrors` はGUIモードではこのダイアログを抑止しないためです。
+CLIから起動してもこのダイアログは回避できません。`tloop launch` でも同じダイアログが出ます。Unityの仕様上、`-ignorecompilererrors` はGUIモードではこのダイアログを抑止しないためです。
 
 ## Step 2: Migrateを押す
 
-Editorが起動すると、`Unity CLI Loop Migration` ウィンドウが**自動的に開きます**。この自動オープンは、パッケージのメジャーバージョンがV2からV3になった最初の起動時に発火します。つまり一度きりのイベントで、再起動すればまた出せるというものではありません。**自動で開かなかった場合**は、`Window > Unity CLI Loop > Custom Tool Migration` から手動で開いてください。
+Editorが起動すると、`Tuanjie CLI Loop Migration` ウィンドウが**自動的に開きます**。この自動オープンは、パッケージのメジャーバージョンがV2からV3になった最初の起動時に発火します。つまり一度きりのイベントで、再起動すればまた出せるというものではありません。**自動で開かなかった場合**は、`Window > Tuanjie CLI Loop > Custom Tool Migration` から手動で開いてください。
 
-![Unity CLI Loop Migrationウィンドウ。C# Source Structure MigrationとAI Skill and Script Migrationの2セクションが表示され、検出結果とMigrateボタンが見える](images/migration-wizard-detected.png)
+![Tuanjie CLI Loop Migrationウィンドウ。C# Source Structure MigrationとAI Skill and Script Migrationの2セクションが表示され、検出結果とMigrateボタンが見える](images/migration-wizard-detected.png)
 
 `C# Source Structure Migration` セクションには、コンパイルエラー起点の検出結果が次のように表示されます（`{N}` は対象ファイル数。特定できなかった場合は件数なしの文言になります）。
 
@@ -79,14 +79,14 @@ Editorが起動すると、`Unity CLI Loop Migration` ウィンドウが**自動
 
 ### ウィザードが書き換える内容
 
-- **名前空間** — ツールの契約型について、`io.github.hatayama.uLoopMCP` が `io.github.hatayama.UnityCliLoop.ToolContracts` になります。
+- **名前空間** — ツールの契約型について、`io.github.tongguang.tloop` が `io.github.hatayama.UnityCliLoop.ToolContracts` になります。
 - **基底型** — `AbstractUnityTool` が `UnityCliLoopTool<TSchema, TResponse>` に、`BaseToolSchema` が `UnityCliLoopToolSchema` に、`BaseToolResponse` が `UnityCliLoopToolResponse` になります。
 - **属性** — `[McpTool]` が `[UnityCliLoopTool]` になります。`Description` 引数は削除され、`DisplayDevelopmentOnly` と `RequiredSecuritySetting` は引き継がれます。
 - **asmdefの参照** — `.asmdef` ファイル内の `uLoopMCP.Editor` と `uLoopMCP.Runtime` への参照が、V3のアセンブリに張り替えられます。
 
-## Step 3: uloopを呼び出すスキル・スクリプトを移行する
+## Step 3: tloopを呼び出すスキル・スクリプトを移行する
 
-2つ目のセクション `AI Skill and Script Migration` は、残り半分の作業を担当します。対象は、`uloop` を呼び出している `SKILL.md`・Markdownドキュメント・シェルスクリプト・PowerShellスクリプトです。
+2つ目のセクション `AI Skill and Script Migration` は、残り半分の作業を担当します。対象は、`tloop` を呼び出している `SKILL.md`・Markdownドキュメント・シェルスクリプト・PowerShellスクリプトです。
 
 ![AI Skill and Script Migrationセクション。Install Migration SkillボタンとPrompt for your AI agentの内容が表示されている](images/migration-wizard-ai-skill.png)
 
@@ -94,12 +94,12 @@ Editorが起動すると、`Unity CLI Loop Migration` ウィンドウが**自動
 
 1. **`Install Migration Skill`** を押します。`v3-cli-invocation-migration` という名前の一時スキルがプロジェクトにインストールされます。
 2. **`Prompt for your AI agent`** の折りたたみを開き、**`Copy AI Prompt`** を押します。
-3. コピーしたプロンプトをAIエージェントに貼り付けて実行させます。このスキルは、`uloop` の呼び出しを検索し、前後の文脈を確認したうえで、本物のV2 CLI使用箇所だけを更新する手順をエージェントに教えます。C#のスニペット、enum参照、無関係なJSONは書き換えません。
+3. コピーしたプロンプトをAIエージェントに貼り付けて実行させます。このスキルは、`tloop` の呼び出しを検索し、前後の文脈を確認したうえで、本物のV2 CLI使用箇所だけを更新する手順をエージェントに教えます。C#のスニペット、enum参照、無関係なJSONは書き換えません。
 4. エージェントの変更内容をレビューします。編集したファイル、移行候補として見つかった削除済みコマンド、手動で確認すべき箇所がレポートされます。
 
 ## CLIオプションの変更点
 
-これらの変更はAIエージェントが自動で適用します。以下の表は、その結果を人間がレビューするための参照用です。正典は `Packages/src/TemporarySkills~/v3-cli-invocation-migration/Skill/references/first-party-v2-to-v3.md` です。
+これらの変更はAIエージェントが自動で適用します。以下の表は、その結果を人間がレビューするための参照用です。正典は `Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill/references/first-party-v2-to-v3.md` です。
 
 ### booleanオプションの変換ルール
 
@@ -112,31 +112,31 @@ V3のbooleanオプションは値を取りません。V2の呼び出しをどう
 | `--flag true` / `--flag=true` | V3のデフォルトが既にtrueならオプションごと削除 |
 | `--flag false` / `--flag=false` | V3のデフォルトがtrueならV3の否定形オプションを使う |
 
-以下の表にないbooleanオプションは、`uloop <command> --help` で確認してください。V3の各フラグはデフォルト値が `default: enabled`（true）または `default: disabled`（false）として表示されます。
+以下の表にないbooleanオプションは、`tloop <command> --help` で確認してください。V3の各フラグはデフォルト値が `default: enabled`（true）または `default: disabled`（false）として表示されます。
 
 ### 名前が変わったfirst-partyオプション
 
 | V2コマンド | V2オプション | V3での置き換え |
 |---|---|---|
-| `uloop compile` | `--force-recompile true` | `--force-recompile` |
-| `uloop compile` | `--force-recompile false` | 削除 |
-| `uloop compile` | `--wait-for-domain-reload true` またはフラグのみ | 削除 |
-| `uloop compile` | `--wait-for-domain-reload false` | `--no-wait-for-domain-reload` |
-| `uloop compile` | `--reload-external-scene-changes true` | 削除 |
-| `uloop compile` | `--reload-external-scene-changes false` | `--stop-on-external-scene-changes` |
-| `uloop run-tests` | `--save-before-run true` またはフラグのみ | 削除 |
-| `uloop run-tests` | `--save-before-run false` | `--unsaved-changes fail` |
-| `uloop replay-input` | `--show-overlay true` | 削除 |
-| `uloop replay-input` | `--show-overlay false` | `--no-show-overlay` |
-| `uloop get-hierarchy` | `--include-components true` | 削除 |
-| `uloop get-hierarchy` | `--include-components false` | `--no-include-components` |
-| `uloop get-hierarchy` | `--include-inactive true` | 削除 |
-| `uloop get-hierarchy` | `--include-inactive false` | `--no-include-inactive` |
-| `uloop execute-dynamic-code` | `--compile-only true` | `--compile-only` |
-| `uloop execute-dynamic-code` | `--compile-only false` | 削除 |
+| `tloop compile` | `--force-recompile true` | `--force-recompile` |
+| `tloop compile` | `--force-recompile false` | 削除 |
+| `tloop compile` | `--wait-for-domain-reload true` またはフラグのみ | 削除 |
+| `tloop compile` | `--wait-for-domain-reload false` | `--no-wait-for-domain-reload` |
+| `tloop compile` | `--reload-external-scene-changes true` | 削除 |
+| `tloop compile` | `--reload-external-scene-changes false` | `--stop-on-external-scene-changes` |
+| `tloop run-tests` | `--save-before-run true` またはフラグのみ | 削除 |
+| `tloop run-tests` | `--save-before-run false` | `--unsaved-changes fail` |
+| `tloop replay-input` | `--show-overlay true` | 削除 |
+| `tloop replay-input` | `--show-overlay false` | `--no-show-overlay` |
+| `tloop get-hierarchy` | `--include-components true` | 削除 |
+| `tloop get-hierarchy` | `--include-components false` | `--no-include-components` |
+| `tloop get-hierarchy` | `--include-inactive true` | 削除 |
+| `tloop get-hierarchy` | `--include-inactive false` | `--no-include-inactive` |
+| `tloop execute-dynamic-code` | `--compile-only true` | `--compile-only` |
+| `tloop execute-dynamic-code` | `--compile-only false` | 削除 |
 
 > [!WARNING]
-> このうち2つのオプション名は、**別のコマンドではV3として正しい書式**なので、名前だけを見て一括置換してはいけません。`uloop execute-dynamic-code` ではフラグのみの `--wait-for-domain-reload` がデフォルトfalseの正しいV3フラグであり、`uloop find-game-objects` ではフラグのみの `--include-inactive` が同じくデフォルトfalseの正しいV3フラグです。編集する前に、その呼び出しがどのコマンドのものかを必ず確認してください。
+> このうち2つのオプション名は、**別のコマンドではV3として正しい書式**なので、名前だけを見て一括置換してはいけません。`tloop execute-dynamic-code` ではフラグのみの `--wait-for-domain-reload` がデフォルトfalseの正しいV3フラグであり、`tloop find-game-objects` ではフラグのみの `--include-inactive` が同じくデフォルトfalseの正しいV3フラグです。編集する前に、その呼び出しがどのコマンドのものかを必ず確認してください。
 
 ### 削除・改名されたコマンド
 
@@ -144,15 +144,15 @@ V3のbooleanオプションは値を取りません。V2の呼び出しをどう
 
 | V2コマンド | V3での扱い |
 |---|---|
-| `uloop capture-window` | `uloop screenshot` に改名。 |
-| `uloop unity-search` | 削除。`uloop execute-dynamic-code` を使うか、通常のシーン内検索なら `uloop find-game-objects` を使う。 |
-| `uloop get-unity-search-providers` | 削除。`uloop execute-dynamic-code` を使う。 |
-| `uloop get-provider-details` | 削除。`uloop execute-dynamic-code` を使う。 |
-| `uloop execute-menu-item` | 削除。`uloop execute-dynamic-code` から `EditorApplication.ExecuteMenuItem(...)` を呼ぶ。 |
-| `uloop get-menu-items` | 削除。`uloop execute-dynamic-code` を使う。 |
-| `uloop get-version` | ユーザー向けコマンドとしては削除。CLIのバージョンは `uloop --version`、Unity Editorのバージョンは `uloop execute-dynamic-code` で取得する。 |
-| `uloop get-project-info` | 削除。必要なプロジェクト情報は `uloop execute-dynamic-code` で取得する。 |
-| `uloop record-input` | V3で削除。入力記録は Unity Editor の **Window > Unity CLI Loop > Recordings** で行う。 |
+| `tloop capture-window` | `tloop screenshot` に改名。 |
+| `tloop unity-search` | 削除。`tloop execute-dynamic-code` を使うか、通常のシーン内検索なら `tloop find-game-objects` を使う。 |
+| `tloop get-unity-search-providers` | 削除。`tloop execute-dynamic-code` を使う。 |
+| `tloop get-provider-details` | 削除。`tloop execute-dynamic-code` を使う。 |
+| `tloop execute-menu-item` | 削除。`tloop execute-dynamic-code` から `EditorApplication.ExecuteMenuItem(...)` を呼ぶ。 |
+| `tloop get-menu-items` | 削除。`tloop execute-dynamic-code` を使う。 |
+| `tloop get-version` | ユーザー向けコマンドとしては削除。CLIのバージョンは `tloop --version`、Unity Editorのバージョンは `tloop execute-dynamic-code` で取得する。 |
+| `tloop get-project-info` | 削除。必要なプロジェクト情報は `tloop execute-dynamic-code` で取得する。 |
+| `tloop record-input` | V3で削除。入力記録は Unity Editor の **Window > Tuanjie CLI Loop > Recordings** で行う。 |
 
 移行スキルはこれらを自動で書き換えず、移行候補として報告するだけです。スクリプトが何をしていたかによって適切な代替手段が変わるためです。
 
@@ -165,8 +165,8 @@ V3のbooleanオプションは値を取りません。V2の呼び出しをどう
 ウィザードの **`Remove Migration Skill`** を押すか、インストールした対象ごとにCLIから削除します。
 
 ```bash
-uloop skills uninstall-v3-migration --claude
-uloop skills uninstall-v3-migration --codex
+tloop skills uninstall-v3-migration --claude
+tloop skills uninstall-v3-migration --codex
 ```
 
 ## 動作確認
@@ -175,19 +175,19 @@ uloop skills uninstall-v3-migration --codex
 
 ```bash
 # 1. プロジェクトがエラーなしでコンパイルできる
-uloop compile
+tloop compile
 
 # 2. カスタムツールが登録され、呼び出せる
-uloop list
+tloop list
 ```
 
-- `uloop compile` はエラー0件になるはずです。移行と無関係な警告は問題ありません。
-- `uloop list` には、アップグレード前に持っていたカスタムツールがすべて、同じツール名で表示されるはずです。移行で変わるのは名前空間と基底型であり、`ToolName` の値ではありません。
-- 最後に、自作のスキルやスクリプトを実際に一通り実行し、中の `uloop` 呼び出しが期待どおり動くことを確認してください。オプションの書式エラーは、無言で無視されるのではなくコマンドの失敗として即座に現れます。
+- `tloop compile` はエラー0件になるはずです。移行と無関係な警告は問題ありません。
+- `tloop list` には、アップグレード前に持っていたカスタムツールがすべて、同じツール名で表示されるはずです。移行で変わるのは名前空間と基底型であり、`ToolName` の値ではありません。
+- 最後に、自作のスキルやスクリプトを実際に一通り実行し、中の `tloop` 呼び出しが期待どおり動くことを確認してください。オプションの書式エラーは、無言で無視されるのではなくコマンドの失敗として即座に現れます。
 
 ## 手動移行のリファレンス
 
-手作業で移行したい場合のために、ウィザードが行う具体的な置き換えを示します。旧名前空間は `io.github.hatayama.uLoopMCP`、V3のツール契約名前空間は `io.github.hatayama.UnityCliLoop.ToolContracts` です。
+手作業で移行したい場合のために、ウィザードが行う具体的な置き換えを示します。旧名前空間は `io.github.tongguang.tloop`、V3のツール契約名前空間は `io.github.hatayama.UnityCliLoop.ToolContracts` です。
 
 | V2の型 | V3の型 |
 |---|---|
@@ -211,8 +211,8 @@ uloop list
 
 **Safe Modeに入ってしまった。** Safe Modeではパッケージのコードが動かないため、何も記録されておらず、失われたものもありません。Editorを再起動し、ダイアログで `Ignore` を押してください。そもそもダイアログが出なかった場合は、`Preferences > Asset Pipeline > Show Enter Safe Mode Dialog` をONに戻してから再起動してください。
 
-**ウィザードが自動で開かない。** まず、EditorがV3のパッケージで起動し直されたかを確認してください。自動オープンは起動時、しかもメジャーバージョンがV2からV3になった最初の起動時に発火します。Unityを起動したままPackage Managerで更新したセッションは対象外なので、Editorを再起動してください。開かない場合は `Window > Unity CLI Loop > Custom Tool Migration` から手動で開いてください。手動で開いても、Step 2以降の手順はまったく同じです。
+**ウィザードが自動で開かない。** まず、EditorがV3のパッケージで起動し直されたかを確認してください。自動オープンは起動時、しかもメジャーバージョンがV2からV3になった最初の起動時に発火します。Unityを起動したままPackage Managerで更新したセッションは対象外なので、Editorを再起動してください。開かない場合は `Window > Tuanjie CLI Loop > Custom Tool Migration` から手動で開いてください。手動で開いても、Step 2以降の手順はまったく同じです。
 
 **`Migrate` 実行後もコンパイルエラーが残る。** まず残っているエラーの内容を読んでください。カスタムロジックとV2 API呼び出しが混在しているソースは、置換ルールでカバーできず手直しが必要な場合があります。VCSのdiffでウィザードが何を変更したかを確認し、やり直したい場合はcommitやバックアップから戻したうえで、上記の「手動移行のリファレンス」を使って残りを対処してください。
 
-**AIエージェントから一時スキルが見えない。** このスキルは対象ごとにインストールされるため、実際に使っているエージェント向けにインストールしたか（`--claude`、`--codex` など）を確認してください。正しい対象を指定して `uloop skills install` を実行し直すと、インストール済みのコピーが更新されます。
+**AIエージェントから一時スキルが見えない。** このスキルは対象ごとにインストールされるため、実際に使っているエージェント向けにインストールしたか（`--claude`、`--codex` など）を確認してください。正しい対象を指定して `tloop skills install` を実行し直すと、インストール済みのコピーが更新されます。

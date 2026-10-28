@@ -36,7 +36,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             _tempDirectory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-method-matcher-" + Guid.NewGuid().ToString("N"));
+                "tloop-method-matcher-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDirectory);
         }
 

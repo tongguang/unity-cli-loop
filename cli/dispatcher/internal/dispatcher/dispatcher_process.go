@@ -51,7 +51,7 @@ func tryHandlePreConnectionRequestWithDeps(
 		clierrors.WriteClassifiedError(stderr, &clierrors.ArgumentError{
 			Message:     "Unknown global option: " + command,
 			Option:      command,
-			NextActions: []string{"Run `uloop --help` to inspect supported global options."},
+			NextActions: []string{"Run `tloop --help` to inspect supported global options."},
 		}, clierrors.ErrorContext{})
 		return true, 1
 	}

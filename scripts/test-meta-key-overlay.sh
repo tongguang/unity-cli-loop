@@ -8,34 +8,34 @@
 set -e
 
 cleanup() {
-    uloop simulate-keyboard --action KeyUp --key LeftMeta 2>/dev/null
-    uloop simulate-keyboard --action KeyUp --key RightMeta 2>/dev/null
-    uloop simulate-keyboard --action KeyUp --key LeftShift 2>/dev/null
-    uloop simulate-keyboard --action KeyUp --key LeftCtrl 2>/dev/null
-    uloop simulate-keyboard --action KeyUp --key LeftAlt 2>/dev/null
-    uloop control-play-mode --action Stop 2>/dev/null
+    tloop simulate-keyboard --action KeyUp --key LeftMeta 2>/dev/null
+    tloop simulate-keyboard --action KeyUp --key RightMeta 2>/dev/null
+    tloop simulate-keyboard --action KeyUp --key LeftShift 2>/dev/null
+    tloop simulate-keyboard --action KeyUp --key LeftCtrl 2>/dev/null
+    tloop simulate-keyboard --action KeyUp --key LeftAlt 2>/dev/null
+    tloop control-play-mode --action Stop 2>/dev/null
 }
 trap cleanup EXIT INT TERM
 
 hold() {
-    uloop simulate-keyboard --action KeyDown --key "$1"
+    tloop simulate-keyboard --action KeyDown --key "$1"
 }
 
 release() {
-    uloop simulate-keyboard --action KeyUp --key "$1"
+    tloop simulate-keyboard --action KeyUp --key "$1"
 }
 
 press() {
-    uloop simulate-keyboard --action Press --key "$1" --duration "${2:-0.5}"
+    tloop simulate-keyboard --action Press --key "$1" --duration "${2:-0.5}"
 }
 
 screenshot() {
-    uloop screenshot --capture-mode rendering
+    tloop screenshot --capture-mode rendering
 }
 
 echo "=== Meta Key & Modifier Overlay Test ==="
 
-uloop control-play-mode --action Play
+tloop control-play-mode --action Play
 sleep 2
 
 # --- Single modifier keys ---

@@ -34,7 +34,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                         domain.DescribeAddedMembersOfFile(file.ProjectRelativePath))
                     : new HashSet<string>(StringComparer.Ordinal);
                 // Why projectRelativePath (not workerSourcePath): contentPathOverride E2E copies
-                // live under Library/UloopHotReload/TestSources/ and are absent from the PDB
+                // live under Library/TloopHotReload/TestSources/ and are absent from the PDB
                 // document list. Assembly resolution already computed the on-disk path.
                 file.SnapshotSource = HotReloadSourceBaseline.LoadVerifiedSnapshotSource(
                     file.ProjectRelativePath,

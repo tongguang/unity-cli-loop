@@ -24,7 +24,7 @@ func TestRunDispatcherInstallHelpDoesNotRequireUnityProject(t *testing.T) {
 		t.Fatalf("install help failed: code=%d stderr=%s", code, stderr.String())
 	}
 	output := stdout.String()
-	for _, expected := range []string{"Usage:", "uloop install", "--dir <install-dir>", "shell PATH", "legacy npm"} {
+	for _, expected := range []string{"Usage:", "tloop install", "--dir <install-dir>", "shell PATH", "legacy npm"} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("install help missing %q:\n%s", expected, output)
 		}
@@ -33,12 +33,12 @@ func TestRunDispatcherInstallHelpDoesNotRequireUnityProject(t *testing.T) {
 
 func TestParseInstallOptionsAcceptsDirAlias(t *testing.T) {
 	// Verifies installer scripts can use the Antigravity-style short directory flag.
-	options, err := parseInstallOptions([]string{"-d", `C:\Tools\uloop`})
+	options, err := parseInstallOptions([]string{"-d", `C:\Tools\tloop`})
 	if err != nil {
 		t.Fatalf("parseInstallOptions failed: %v", err)
 	}
 
-	if options.installDir != `C:\Tools\uloop` {
+	if options.installDir != `C:\Tools\tloop` {
 		t.Fatalf("install dir mismatch: %s", options.installDir)
 	}
 }
@@ -53,7 +53,7 @@ func TestResolveNativeInstallDirForWindowsUsesLocalAppData(t *testing.T) {
 		t.Fatalf("resolveNativeInstallDir failed: %v", err)
 	}
 
-	expected := `C:\Users\<USER_NAME>\AppData\Local\Programs\uloop\bin`
+	expected := `C:\Users\<USER_NAME>\AppData\Local\Programs\tloop\bin`
 	if installDir != expected {
 		t.Fatalf("install dir mismatch: %s", installDir)
 	}
@@ -66,7 +66,7 @@ func TestWriteInstallCompletionForWindowsMentionsPathAndLegacyCleanup(t *testing
 	writeInstallCompletion(&stdout, "windows")
 
 	output := stdout.String()
-	for _, expected := range []string{"User PATH", "Legacy npm uloop-cli"} {
+	for _, expected := range []string{"User PATH", "Legacy npm tloop-cli"} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("install completion missing %q:\n%s", expected, output)
 		}
@@ -80,7 +80,7 @@ func TestWriteInstallCompletionForMacMentionsPathAndLegacyCleanup(t *testing.T) 
 	writeInstallCompletion(&stdout, "darwin")
 
 	output := stdout.String()
-	for _, expected := range []string{"shell PATH", "Legacy npm uloop-cli"} {
+	for _, expected := range []string{"shell PATH", "Legacy npm tloop-cli"} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("install completion missing %q:\n%s", expected, output)
 		}
@@ -94,7 +94,7 @@ func TestWriteInstallCompletionForLinuxMentionsPathAndLegacyCleanup(t *testing.T
 	writeInstallCompletion(&stdout, "linux")
 
 	output := stdout.String()
-	for _, expected := range []string{"shell PATH", "Legacy npm uloop-cli"} {
+	for _, expected := range []string{"shell PATH", "Legacy npm tloop-cli"} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("install completion missing %q:\n%s", expected, output)
 		}
@@ -129,12 +129,12 @@ func TestInstallSetupFailureErrorIncludesInstallerStderr(t *testing.T) {
 
 func TestParseInstallOptionsReadsDirFlagForms(t *testing.T) {
 	// Verifies --dir accepts both the separate-value and equals forms.
-	for _, args := range [][]string{{"--dir", "/opt/uloop"}, {"--dir=/opt/uloop"}} {
+	for _, args := range [][]string{{"--dir", "/opt/tloop"}, {"--dir=/opt/tloop"}} {
 		options, err := parseInstallOptions(args)
 		if err != nil {
 			t.Fatalf("args %v: parseInstallOptions failed: %v", args, err)
 		}
-		if options.installDir != "/opt/uloop" {
+		if options.installDir != "/opt/tloop" {
 			t.Fatalf("args %v: install dir mismatch: %s", args, options.installDir)
 		}
 	}
@@ -153,7 +153,7 @@ func TestParseInstallOptionsRejectsInvalidArguments(t *testing.T) {
 		{name: "long flag after short flag", args: []string{"-d", "/a", "--dir=/b"}, wantMessage: "Duplicate install option: --dir"},
 		{name: "short flag without value", args: []string{"-d"}, wantMessage: "-d requires a value"},
 		{name: "short flag followed by option", args: []string{"-d", "--dir"}, wantMessage: "-d requires a value"},
-		{name: "positional argument", args: []string{"/opt/uloop"}, wantMessage: "/opt/uloop"},
+		{name: "positional argument", args: []string{"/opt/tloop"}, wantMessage: "/opt/tloop"},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {

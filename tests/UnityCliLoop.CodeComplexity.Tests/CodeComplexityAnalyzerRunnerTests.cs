@@ -333,7 +333,7 @@ namespace UnityCliLoop.CodeComplexity.Tests
                             return 0;
                         }
 
-                    #if ULOOP_HAS_TEST_FRAMEWORK
+                    #if TLOOP_HAS_TEST_FRAMEWORK
                         public int ConditionalTestFrameworkBranch(bool condition)
                         {
                             if (condition)

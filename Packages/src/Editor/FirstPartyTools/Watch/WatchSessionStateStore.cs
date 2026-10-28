@@ -13,7 +13,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal sealed class WatchSessionStateStore : IWatchPersistenceStore
     {
-        private const string RecordsKey = "io.github.hatayama.uloopmcp.watch.persistedRecords";
+        private const string RecordsKey = "io.github.tongguang.tloop.watch.persistedRecords";
 
         public IReadOnlyList<WatchPersistedRecord> Load()
         {

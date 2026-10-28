@@ -20,9 +20,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private const string TestStableReleaseTag = "dispatcher-v3.0.0";
         private const string TestArchiveManifest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  install.sh\n"
             + "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  install.ps1\n"
-            + "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  uloop-dispatcher-darwin-amd64.tar.gz\n"
-            + "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd  uloop-dispatcher-darwin-arm64.tar.gz\n"
-            + "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee  uloop-dispatcher-windows-amd64.zip";
+            + "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  tloop-dispatcher-darwin-amd64.tar.gz\n"
+            + "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd  tloop-dispatcher-darwin-arm64.tar.gz\n"
+            + "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee  tloop-dispatcher-windows-amd64.zip";
 
         [Test]
         public void GetInstallCommand_OnMacKeepsDispatcherCurlInstallerAvailable()
@@ -37,13 +37,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             Assert.That(command.FileName, Is.EqualTo("/bin/zsh"));
             Assert.That(command.Arguments, Does.Contain("-l -i -c"));
-            Assert.That(command.Arguments, Does.Contain($"https://github.com/hatayama/unity-cli-loop/releases/download/{TestBetaReleaseTag}/install.sh"));
+            Assert.That(command.Arguments, Does.Contain($"https://github.com/tongguang/unity-cli-loop/releases/download/{TestBetaReleaseTag}/install.sh"));
             Assert.That(command.Arguments, Does.Not.Contain(".sha256"));
             Assert.That(command.Arguments, Does.Contain($"{CliConstants.POSIX_SHELL_EXECUTABLE_PATH} -c"));
-            Assert.That(command.Arguments, Does.Contain("ULOOP_VERSION"));
+            Assert.That(command.Arguments, Does.Contain("TLOOP_VERSION"));
             Assert.That(command.Arguments, Does.Contain(TestBetaReleaseTag));
-            Assert.That(command.Arguments, Does.Contain("ULOOP_ARCHIVE_MANIFEST"));
-            Assert.That(command.Arguments, Does.Not.Contain("ULOOP_REMOVE_LEGACY"));
+            Assert.That(command.Arguments, Does.Contain("TLOOP_ARCHIVE_MANIFEST"));
+            Assert.That(command.Arguments, Does.Not.Contain("TLOOP_REMOVE_LEGACY"));
             Assert.That(command.ManualCommand, Does.Contain("curl -fsSL"));
             Assert.That(command.ManualCommand, Does.Not.Contain("npm"));
             Assert.That(command.ManualCommand, Does.Not.Contain("raw.githubusercontent.com"));
@@ -99,13 +99,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 "/bin/zsh");
 
             Assert.That(command.FileName, Is.EqualTo("powershell"));
-            Assert.That(command.Arguments, Does.Contain($"https://github.com/hatayama/unity-cli-loop/releases/download/{TestBetaReleaseTag}/install.ps1"));
+            Assert.That(command.Arguments, Does.Contain($"https://github.com/tongguang/unity-cli-loop/releases/download/{TestBetaReleaseTag}/install.ps1"));
             Assert.That(command.Arguments, Does.Not.Contain(".sha256"));
-            Assert.That(command.Arguments, Does.Contain($"$env:ULOOP_VERSION = '{TestBetaReleaseTag}'"));
-            Assert.That(command.Arguments, Does.Contain("$env:ULOOP_ARCHIVE_MANIFEST"));
+            Assert.That(command.Arguments, Does.Contain($"$env:TLOOP_VERSION = '{TestBetaReleaseTag}'"));
+            Assert.That(command.Arguments, Does.Contain("$env:TLOOP_ARCHIVE_MANIFEST"));
             Assert.That(command.Arguments, Does.Contain("[char]10"));
             Assert.That(command.Arguments, Does.Not.Contain("install.sh\n"));
-            Assert.That(command.Arguments, Does.Not.Contain("ULOOP_REMOVE_LEGACY"));
+            Assert.That(command.Arguments, Does.Not.Contain("TLOOP_REMOVE_LEGACY"));
             Assert.That(command.ManualCommand, Does.StartWith("[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; "));
             Assert.That(command.ManualCommand, Does.Contain("$ErrorActionPreference = 'Stop'"));
             Assert.That(command.ManualCommand, Does.Contain("Invoke-WebRequest"));
@@ -185,8 +185,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 true,
                 "/bin/zsh");
 
-            Assert.That(command.Arguments, Does.Not.Contain("ULOOP_REMOVE_LEGACY"));
-            Assert.That(command.ManualCommand, Does.Not.Contain("ULOOP_REMOVE_LEGACY"));
+            Assert.That(command.Arguments, Does.Not.Contain("TLOOP_REMOVE_LEGACY"));
+            Assert.That(command.ManualCommand, Does.Not.Contain("TLOOP_REMOVE_LEGACY"));
         }
 
         [Test]
@@ -200,8 +200,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 true,
                 "/bin/zsh");
 
-            Assert.That(command.Arguments, Does.Not.Contain("ULOOP_REMOVE_LEGACY"));
-            Assert.That(command.ManualCommand, Does.Not.Contain("ULOOP_REMOVE_LEGACY"));
+            Assert.That(command.Arguments, Does.Not.Contain("TLOOP_REMOVE_LEGACY"));
+            Assert.That(command.ManualCommand, Does.Not.Contain("TLOOP_REMOVE_LEGACY"));
         }
 
         [Test]
@@ -218,7 +218,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(command.Arguments, Does.Contain("dispatcher-v3.0.0"));
             Assert.That(
                 command.Arguments,
-                Does.Contain("https://github.com/hatayama/unity-cli-loop/releases/download/dispatcher-v3.0.0/install.sh"));
+                Does.Contain("https://github.com/tongguang/unity-cli-loop/releases/download/dispatcher-v3.0.0/install.sh"));
         }
 
         [Test]
@@ -227,7 +227,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that local package development tests exercise the checked-out installer script.
             string tempRoot = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-native-local-installer-tests",
+                "tloop-native-local-installer-tests",
                 System.Guid.NewGuid().ToString("N"));
             string packageResolvedPath = Path.Combine(
                 tempRoot,
@@ -254,9 +254,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Assert.That(command.Arguments, Does.Contain("-l -i -c"));
                 Assert.That(command.ManualCommand, Does.Contain($"{CliConstants.POSIX_SHELL_EXECUTABLE_PATH} -c"));
                 Assert.That(command.ManualCommand, Does.Contain(scriptPath));
-                Assert.That(command.ManualCommand, Does.Contain("ULOOP_VERSION"));
+                Assert.That(command.ManualCommand, Does.Contain("TLOOP_VERSION"));
                 Assert.That(command.ManualCommand, Does.Contain(TestBetaReleaseTag));
-                Assert.That(command.ManualCommand, Does.Contain("ULOOP_ARCHIVE_MANIFEST"));
+                Assert.That(command.ManualCommand, Does.Contain("TLOOP_ARCHIVE_MANIFEST"));
                 Assert.That(command.ManualCommand, Does.Not.Contain("curl -fsSL"));
                 Assert.That(command.ManualCommand, Does.Not.Contain("npm"));
             }
@@ -275,7 +275,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that local package development tests use the checked-out PowerShell installer.
             string tempRoot = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-native-local-installer-tests",
+                "tloop-native-local-installer-tests",
                 System.Guid.NewGuid().ToString("N"));
             string packageResolvedPath = Path.Combine(
                 tempRoot,
@@ -301,8 +301,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Assert.That(command.FileName, Is.EqualTo("powershell"));
                 Assert.That(command.ManualCommand, Does.StartWith("[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; "));
                 Assert.That(command.ManualCommand, Does.Contain($"& '{scriptPath}'"));
-                Assert.That(command.ManualCommand, Does.Contain($"$env:ULOOP_VERSION='{TestBetaReleaseTag}'"));
-                Assert.That(command.ManualCommand, Does.Contain("$env:ULOOP_ARCHIVE_MANIFEST"));
+                Assert.That(command.ManualCommand, Does.Contain($"$env:TLOOP_VERSION='{TestBetaReleaseTag}'"));
+                Assert.That(command.ManualCommand, Does.Contain("$env:TLOOP_ARCHIVE_MANIFEST"));
                 Assert.That(command.ManualCommand, Does.Not.Contain("irm"));
                 Assert.That(command.ManualCommand, Does.Not.Contain("npm"));
             }
@@ -323,7 +323,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 TestBetaReleaseTag,
                 CliConstants.POSIX_INSTALL_SCRIPT_NAME);
 
-            Assert.That(url, Is.EqualTo($"https://github.com/hatayama/unity-cli-loop/releases/download/{TestBetaReleaseTag}/install.sh"));
+            Assert.That(url, Is.EqualTo($"https://github.com/tongguang/unity-cli-loop/releases/download/{TestBetaReleaseTag}/install.sh"));
         }
 
         [Test]
@@ -334,7 +334,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 TestStableReleaseTag,
                 CliConstants.WINDOWS_INSTALL_SCRIPT_NAME);
 
-            Assert.That(url, Is.EqualTo($"https://github.com/hatayama/unity-cli-loop/releases/download/{TestStableReleaseTag}/install.ps1"));
+            Assert.That(url, Is.EqualTo($"https://github.com/tongguang/unity-cli-loop/releases/download/{TestStableReleaseTag}/install.ps1"));
         }
 
         [Test]
@@ -354,9 +354,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that release installer startup failure stays inside the install result contract.
             NativeCliInstallCommand command = new(
-                "missing-uloop-release-installer",
+                "missing-tloop-release-installer",
                 "--version",
-                "missing-uloop-release-installer --version");
+                "missing-tloop-release-installer --version");
 
             CliInstallResult result = NativeCliSetupCommandRunner.RunInstallCommand(
                 command,
@@ -460,7 +460,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public async Task WaitForUninstallCompletionAsync_WhenTargetRemainsReportsTimeout()
         {
             // Verifies uninstall completion reports the dispatcher path when deferred self-removal times out.
-            string targetPath = "C:\\Users\\ExampleUser\\Programs\\uloop\\bin\\uloop.exe";
+            string targetPath = "C:\\Users\\ExampleUser\\Programs\\tloop\\bin\\tloop.exe";
             int delayCount = 0;
 
             CliInstallResult result = await NativeCliUninstallCompletionWaiter.WaitForUninstallCompletionAsync(
@@ -486,7 +486,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies uninstall completion succeeds as soon as deferred dispatcher self-removal finishes.
 
             CliInstallResult result = await NativeCliUninstallCompletionWaiter.WaitForUninstallCompletionAsync(
-                "C:\\Users\\ExampleUser\\Programs\\uloop\\bin\\uloop.exe",
+                "C:\\Users\\ExampleUser\\Programs\\tloop\\bin\\tloop.exe",
                 CancellationToken.None,
                 250,
                 100,
@@ -513,9 +513,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 "/Users/ExampleUser/.local/bin",
                 RuntimePlatform.OSXEditor);
 
-            Assert.That(command.FileName, Is.EqualTo("/Users/ExampleUser/.local/bin/uloop"));
+            Assert.That(command.FileName, Is.EqualTo("/Users/ExampleUser/.local/bin/tloop"));
             Assert.That(command.Arguments, Is.EqualTo("uninstall"));
-            Assert.That(command.ManualCommand, Is.EqualTo("\"/Users/ExampleUser/.local/bin/uloop\" uninstall"));
+            Assert.That(command.ManualCommand, Is.EqualTo("\"/Users/ExampleUser/.local/bin/tloop\" uninstall"));
         }
 
         [Test]
@@ -523,14 +523,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that Windows editor uninstall delegates removal to the installed uloop command.
             NativeCliInstallCommand command = NativeCliCommandBuilder.BuildUninstallCommand(
-                "C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\uloop\\bin",
+                "C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor);
 
-            Assert.That(command.FileName, Does.Contain("C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\uloop\\bin"));
-            Assert.That(command.FileName, Does.EndWith("uloop.exe"));
+            Assert.That(command.FileName, Does.Contain("C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\tloop\\bin"));
+            Assert.That(command.FileName, Does.EndWith("tloop.exe"));
             Assert.That(command.Arguments, Is.EqualTo("uninstall"));
-            Assert.That(command.ManualCommand, Does.Contain("C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\uloop\\bin"));
-            Assert.That(command.ManualCommand, Does.EndWith("uloop.exe\" uninstall"));
+            Assert.That(command.ManualCommand, Does.Contain("C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\tloop\\bin"));
+            Assert.That(command.ManualCommand, Does.EndWith("tloop.exe\" uninstall"));
         }
 
         [Test]
@@ -539,10 +539,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that Unity's current Windows PATH prefers the freshly installed native CLI.
             string result = NativeCliInstallPathResolver.BuildPathWithInstallDirectory(
                 "C:\\npm",
-                "C:\\Users\\ExampleUser\\Programs\\uloop\\bin",
+                "C:\\Users\\ExampleUser\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor);
 
-            Assert.That(result, Is.EqualTo("C:\\Users\\ExampleUser\\Programs\\uloop\\bin;C:\\npm"));
+            Assert.That(result, Is.EqualTo("C:\\Users\\ExampleUser\\Programs\\tloop\\bin;C:\\npm"));
         }
 
         private static NativeCliInstallCommand BuildLongRunningInstallCommand()
@@ -582,11 +582,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that a later Windows native install dir does not leave an earlier npm shim first.
             string result = NativeCliInstallPathResolver.BuildPathWithInstallDirectory(
-                "C:\\npm;C:\\USERS\\EXAMPLEUSER\\PROGRAMS\\ULOOP\\BIN",
-                "C:\\Users\\ExampleUser\\Programs\\uloop\\bin",
+                "C:\\npm;C:\\USERS\\EXAMPLEUSER\\PROGRAMS\\TLOOP\\BIN",
+                "C:\\Users\\ExampleUser\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor);
 
-            Assert.That(result, Is.EqualTo("C:\\Users\\ExampleUser\\Programs\\uloop\\bin;C:\\npm"));
+            Assert.That(result, Is.EqualTo("C:\\Users\\ExampleUser\\Programs\\tloop\\bin;C:\\npm"));
         }
 
         [Test]
@@ -594,13 +594,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that a trailing separator does not preserve a duplicate native install directory.
             string result = NativeCliInstallPathResolver.BuildPathWithInstallDirectory(
-                "C:\\npm;C:\\Users\\ExampleUser\\Programs\\uloop\\bin\\;C:\\Tools",
-                "C:\\Users\\ExampleUser\\Programs\\uloop\\bin",
+                "C:\\npm;C:\\Users\\ExampleUser\\Programs\\tloop\\bin\\;C:\\Tools",
+                "C:\\Users\\ExampleUser\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor);
 
             Assert.That(
                 result,
-                Is.EqualTo("C:\\Users\\ExampleUser\\Programs\\uloop\\bin;C:\\npm;C:\\Tools"));
+                Is.EqualTo("C:\\Users\\ExampleUser\\Programs\\tloop\\bin;C:\\npm;C:\\Tools"));
         }
 
         [Test]
@@ -620,8 +620,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that Windows uninstall removes the native CLI directory from PATH without removing npm.
             string result = NativeCliInstallPathResolver.BuildPathWithoutInstallDirectory(
-                "C:\\npm;C:\\USERS\\EXAMPLEUSER\\PROGRAMS\\ULOOP\\BIN\\;C:\\Tools",
-                "C:\\Users\\ExampleUser\\Programs\\uloop\\bin",
+                "C:\\npm;C:\\USERS\\EXAMPLEUSER\\PROGRAMS\\TLOOP\\BIN\\;C:\\Tools",
+                "C:\\Users\\ExampleUser\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor);
 
             Assert.That(result, Is.EqualTo("C:\\npm;C:\\Tools"));
@@ -635,7 +635,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             CliInstallResult result = NativeCliInstaller.FinishSuccessfulInstall(
                 new CliInstallResult(true, ""),
-                "C:\\Users\\ExampleUser\\Programs\\uloop\\bin",
+                "C:\\Users\\ExampleUser\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor,
                 platform => { appliedCurrentPath = true; });
 
@@ -667,7 +667,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(result, Is.EqualTo(System.IO.Path.Combine(
                 "C:\\Users\\ExampleUser\\AppData\\Local",
                 "Programs",
-                "uloop",
+                "tloop",
                 "bin")));
         }
 
@@ -676,8 +676,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that uninstall is available only for the package-owned command path.
             bool result = NativeCliInstallPathResolver.IsPackageOwnedInstallPath(
-                "C:/Users/ExampleUser/AppData/Local/Programs/uloop/bin/uloop.exe",
-                "C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\uloop\\bin",
+                "C:/Users/ExampleUser/AppData/Local/Programs/tloop/bin/tloop.exe",
+                "C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor);
 
             Assert.That(result, Is.True);
@@ -688,8 +688,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that same-version shared commands do not route the settings button to uninstall.
             bool result = NativeCliInstallPathResolver.IsPackageOwnedInstallPath(
-                "C:\\Tools\\uloop.exe",
-                "C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\uloop\\bin",
+                "C:\\Tools\\tloop.exe",
+                "C:\\Users\\ExampleUser\\AppData\\Local\\Programs\\tloop\\bin",
                 RuntimePlatform.WindowsEditor);
 
             Assert.That(result, Is.False);

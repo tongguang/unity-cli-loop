@@ -107,7 +107,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     Is.EqualTo(
                         "No active hot-reload changes to revert. 2 introduced type(s) stay loaded "
                         + "until the next Domain Reload; a revert cannot unload the assembly that "
-                        + "carries them. Auto Refresh stays held for them; run 'uloop compile' to "
+                        + "carries them. Auto Refresh stays held for them; run 'tloop compile' to "
                         + "release it."));
                 Assert.That(response.ActiveIntroducedTypeTotal, Is.EqualTo(2));
                 Assert.That(

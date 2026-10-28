@@ -14,7 +14,7 @@ func newReferenceSurfaceProject(t *testing.T, refOutputPath string) (string, Bui
 	projectRoot := t.TempDir()
 	plan := BuildPlan{
 		DagDir:    planDagDirectory,
-		OutputDir: filepath.Join("Library", "uloop", "compile-check", "aaaa.dag"),
+		OutputDir: filepath.Join("Library", "tloop", "compile-check", "aaaa.dag"),
 	}
 	unit := CompileUnit{Assembly: ResponseFile{AssemblyName: "A", RefOutputPath: refOutputPath}}
 	plan.Units = []CompileUnit{unit}

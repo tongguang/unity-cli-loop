@@ -541,7 +541,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ApplyToFileSystem_WhenProfileIsMissing_CreatesProfileWithSetupLine()
         {
-            string root = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            string root = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             string profilePath = Path.Combine(root, "config", ".zshrc");
             CliPathSetupPlan plan = new CliPathSetupPlan(
                 CliPathSetupShellKind.Zsh,

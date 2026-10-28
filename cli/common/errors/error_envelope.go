@@ -62,7 +62,7 @@ const (
 
 	// Why this wording: --skip-compile only skips the CLI-side compile, so agents read a
 	// disconnect here as an IPC fault instead of the domain reload that discarded their patches.
-	runTestsDisconnectHotReloadNextAction = "If scripts were edited since the last compile, Unity imported them when the test run released its assembly lock and the domain reload discarded every active hot-reload patch; re-run 'uloop hot-reload' after the reload, or run 'uloop compile' first (--skip-compile only skips the CLI-side compile)."
+	runTestsDisconnectHotReloadNextAction = "If scripts were edited since the last compile, Unity imported them when the test run released its assembly lock and the domain reload discarded every active hot-reload patch; re-run 'tloop hot-reload' after the reload, or run 'tloop compile' first (--skip-compile only skips the CLI-side compile)."
 )
 
 type CLIError struct {
@@ -200,7 +200,7 @@ func cliUpdateRequiredNextActions(data cliUpdateRequiredErrorData) []string {
 	} else if cliProtocolMismatchIsNewer(data) {
 		actions = append(actions, "Update the Unity package to a version that supports this CLI protocol, or install the CLI from the same release as the package.")
 	} else {
-		actions = append(actions, "Install matching uloop CLI and Unity package versions.")
+		actions = append(actions, "Install matching tloop CLI and Unity package versions.")
 	}
 	actions = append(actions, "Retry the original command after the versions match.")
 	return actions
@@ -260,7 +260,7 @@ func unityServerNotRespondingAfterDispatchError(err UnityServerNotRespondingErro
 	return CLIError{
 		ErrorCode:   ErrorCodeUnityNotReachable,
 		Phase:       ErrorPhaseResponseWaiting,
-		Message:     "Unity is running for this project, but the Unity CLI Loop server did not acknowledge the dispatched request.",
+		Message:     "Unity is running for this project, but the Tuanjie CLI Loop server did not acknowledge the dispatched request.",
 		Retryable:   true,
 		SafeToRetry: false,
 		ProjectRoot: firstNonEmpty(context.ProjectRoot, err.ProjectRoot),
@@ -268,7 +268,7 @@ func unityServerNotRespondingAfterDispatchError(err UnityServerNotRespondingErro
 		NextActions: []string{
 			"Check Unity Console logs and project state because Unity may have received the request.",
 			"Retry only after confirming the previous command did not run or has finished.",
-			"Run `uloop focus-window` if Unity appears stalled in the background.",
+			"Run `tloop focus-window` if Unity appears stalled in the background.",
 		},
 		Details: map[string]any{
 			"Endpoint": err.Endpoint,
@@ -287,8 +287,8 @@ func UnknownCommandError(command string, availableCommands []string, context Err
 		ProjectRoot: context.ProjectRoot,
 		Command:     command,
 		NextActions: []string{
-			"Run `uloop list` to inspect available commands.",
-			"Run `uloop sync` if the local tool cache may be stale.",
+			"Run `tloop list` to inspect available commands.",
+			"Run `tloop sync` if the local tool cache may be stale.",
 		},
 		Details: map[string]any{
 			"SuggestedCommands": suggestCommands(command, availableCommands),

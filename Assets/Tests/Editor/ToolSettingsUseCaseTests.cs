@@ -185,7 +185,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies disabledTools pause-point key matches the pause-point skill tool name.
             SkillInstallLayout.SkillSourceInfo skill = new(
-                "uloop-pause-point",
+                "tloop-pause-point",
                 UnityCliLoopConstants.SETTINGS_TOOL_NAME_PAUSE_POINT,
                 new Dictionary<string, byte[]>());
             string[] disabledTools = { UnityCliLoopConstants.SETTINGS_TOOL_NAME_PAUSE_POINT };

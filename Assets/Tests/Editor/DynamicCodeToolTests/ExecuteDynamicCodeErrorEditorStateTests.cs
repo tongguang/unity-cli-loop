@@ -224,7 +224,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
                 new ExecuteDynamicCodeSchema { Code = "return 1;" },
                 CancellationToken.None);
 
-            Assert.That(response.Warning, Is.EqualTo("The Unity Editor is unfocused while Play Mode is running, so Play Mode progress may be throttled. Run `uloop focus-window`, or use the `pause-point --await`/`--trigger` flow instead of polling for progress."));
+            Assert.That(response.Warning, Is.EqualTo("The Unity Editor is unfocused while Play Mode is running, so Play Mode progress may be throttled. Run `tloop focus-window`, or use the `pause-point --await`/`--trigger` flow instead of polling for progress."));
         }
 
         private static ExecuteDynamicCodeUseCase CreateUseCase(IDynamicCodeExecutionRuntime runtime)

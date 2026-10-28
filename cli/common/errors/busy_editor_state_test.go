@@ -25,7 +25,7 @@ func TestUnityServerBusyNextActions_WhenRunningCompileTool_IncludesReattachGuida
 	data := serverBusyErrorData{RunningToolName: "compile"}
 
 	actions := unityServerBusyNextActions(data)
-	expected := "A compile can take several minutes on large projects. Wait for it to finish, then retry. If your own `uloop compile` previously failed with COMPILE_WAIT_TIMEOUT, re-running `uloop compile` reattaches to that compile instead of starting a new one."
+	expected := "A compile can take several minutes on large projects. Wait for it to finish, then retry. If your own `tloop compile` previously failed with COMPILE_WAIT_TIMEOUT, re-running `tloop compile` reattaches to that compile instead of starting a new one."
 	found := false
 	for _, action := range actions {
 		if action == expected {
@@ -38,7 +38,7 @@ func TestUnityServerBusyNextActions_WhenRunningCompileTool_IncludesReattachGuida
 	}
 }
 
-// Verifies editor-state unity-compile busy does not promise uloop compile reattach.
+// Verifies editor-state unity-compile busy does not promise tloop compile reattach.
 func TestUnityServerBusyNextActions_WhenRunningUnityCompile_OmitsReattachGuidance(t *testing.T) {
 	isCompiling := true
 	data := serverBusyErrorData{
@@ -48,7 +48,7 @@ func TestUnityServerBusyNextActions_WhenRunningUnityCompile_OmitsReattachGuidanc
 
 	actions := unityServerBusyNextActions(data)
 	for _, action := range actions {
-		if action == "A compile can take several minutes on large projects. Wait for it to finish, then retry. If your own `uloop compile` previously failed with COMPILE_WAIT_TIMEOUT, re-running `uloop compile` reattaches to that compile instead of starting a new one." {
+		if action == "A compile can take several minutes on large projects. Wait for it to finish, then retry. If your own `tloop compile` previously failed with COMPILE_WAIT_TIMEOUT, re-running `tloop compile` reattaches to that compile instead of starting a new one." {
 			t.Fatalf("unity-compile busy must not promise reattach: %#v", actions)
 		}
 	}
@@ -62,7 +62,7 @@ func TestUnityServerBusyNextActions_WhenMainThreadStalled_IncludesResponsiveness
 	actions := unityServerBusyNextActions(data)
 	found := false
 	for _, action := range actions {
-		if action == "Run a light command such as `uloop get-logs --max-count 1` to check whether Unity is still responsive before treating this as a freeze." {
+		if action == "Run a light command such as `tloop get-logs --max-count 1` to check whether Unity is still responsive before treating this as a freeze." {
 			found = true
 			break
 		}
@@ -91,8 +91,8 @@ func TestUnityServerBusyEditorActivitySummary_CopiesKnownFields(t *testing.T) {
 
 const (
 	expectedPausedBusyStalledAction = "Unity is paused in Play Mode. A running command that waits for a frame or a physics step cannot finish until play resumes, so this busy state does not clear on its own."
-	expectedPausedBusyStatusAction  = "Run `uloop pause-point-status` (it answers while Unity is busy) to see whether a pause-point hit is holding the pause."
-	expectedPausedBusyStopAction    = "Run `uloop cancel` (it answers while Unity is busy): the running command is cancelled and the Editor pause is released."
+	expectedPausedBusyStatusAction  = "Run `tloop pause-point-status` (it answers while Unity is busy) to see whether a pause-point hit is holding the pause."
+	expectedPausedBusyStopAction    = "Run `tloop cancel` (it answers while Unity is busy): the running command is cancelled and the Editor pause is released."
 	expectedPausedBusyResumeAction  = "Release the pause in the Editor (Edit > Play Mode > Pause). Frames resume, so the running command finishes and returns its result."
 )
 
@@ -138,7 +138,7 @@ func TestUnityServerBusyNextActions_WhenPausedOutsidePlayMode_OmitsPauseRecovery
 	}
 }
 
-// Verifies a running tool the Editor keeps alive across a client disconnect and uloop cancel
+// Verifies a running tool the Editor keeps alive across a client disconnect and tloop cancel
 // drops the cancel step, because cancelling would neither stop it nor release the Editor pause.
 func TestUnityServerBusyNextActions_WhenPausedWhileRunningDisconnectSurvivingTool_OmitsStopStep(t *testing.T) {
 	isPlaying := true
@@ -149,7 +149,7 @@ func TestUnityServerBusyNextActions_WhenPausedWhileRunningDisconnectSurvivingToo
 		actions := unityServerBusyNextActions(data)
 		for _, action := range actions {
 			if action == expectedPausedBusyStopAction {
-				t.Fatalf("%s must not promise recovery through uloop cancel: %#v", runningToolName, actions)
+				t.Fatalf("%s must not promise recovery through tloop cancel: %#v", runningToolName, actions)
 			}
 		}
 		if actions[2] != expectedPausedBusyResumeAction {

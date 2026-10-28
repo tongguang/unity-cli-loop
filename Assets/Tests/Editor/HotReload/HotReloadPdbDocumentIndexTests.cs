@@ -37,7 +37,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         // A file of this repository's embedded package, whose folder differs from its package name.
         private const string PackageSourcePhysicalPath = "Packages/src/Runtime/PausePoints/UloopPausePoint.cs";
         private const string PackageSourceAssetPath =
-            "Packages/io.github.hatayama.uloopmcp/Runtime/PausePoints/UloopPausePoint.cs";
+            "Packages/io.github.tongguang.tloop/Runtime/PausePoints/UloopPausePoint.cs";
 
         private string _persistenceDirectory;
         private HotReloadPdbDocumentIndex _index;
@@ -47,7 +47,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             // Why a directory per test: a list persisted by an earlier test or domain would let a
             // new index answer without reading the PDB and break every LoadCount expectation.
-            _persistenceDirectory = Path.Combine(Path.GetTempPath(), "uloop-pdb-documents-" + Guid.NewGuid().ToString("N"));
+            _persistenceDirectory = Path.Combine(Path.GetTempPath(), "tloop-pdb-documents-" + Guid.NewGuid().ToString("N"));
             _index = new HotReloadPdbDocumentIndex(_persistenceDirectory);
         }
 
@@ -638,7 +638,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             string directory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-pdb-document-index-" + Guid.NewGuid().ToString("N"));
+                "tloop-pdb-document-index-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);
             try
             {
@@ -777,7 +777,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             string directory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-pdb-document-index-" + Guid.NewGuid().ToString("N"));
+                "tloop-pdb-document-index-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);
             string dllPath = Path.Combine(directory, Path.GetFileName(sourceDllPath));
             File.Copy(sourceDllPath, dllPath);

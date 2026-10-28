@@ -84,7 +84,7 @@ type EditorUnresponsiveError struct {
 
 func (err *EditorUnresponsiveError) Error() string {
 	return fmt.Sprintf(
-		"unity editor main thread has been unresponsive for %.0f seconds; the editor is likely frozen. Restart it with 'uloop launch -r'",
+		"unity editor main thread has been unresponsive for %.0f seconds; the editor is likely frozen. Restart it with 'tloop launch -r'",
 		err.StallSeconds)
 }
 
@@ -101,7 +101,7 @@ type ConnectionAttemptError struct {
 }
 
 func (err *ConnectionAttemptError) Error() string {
-	return fmt.Sprintf("the Unity CLI Loop server is not reachable for this project: %s", err.Cause)
+	return fmt.Sprintf("the Tuanjie CLI Loop server is not reachable for this project: %s", err.Cause)
 }
 
 func (err *ConnectionAttemptError) Unwrap() error {

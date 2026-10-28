@@ -22,9 +22,9 @@ release_tag_from_body() {
     def release_tag($component; $version):
       if $component == "" or $component == "unity-package" then
         "v" + $version
-      elif $component == "uloop-project-runner" then
-        "uloop-project-runner-v" + $version
-      elif $component == "dispatcher" or $component == "uloop-dispatcher" then
+      elif $component == "tloop-project-runner" then
+        "tloop-project-runner-v" + $version
+      elif $component == "dispatcher" or $component == "tloop-dispatcher" then
         "dispatcher-v" + $version
       else
         ""
@@ -80,9 +80,9 @@ release_tag_for_component() {
       ""
     elif $component == "" or $component == "unity-package" then
       "v" + $version
-    elif $component == "uloop-project-runner" then
-      "uloop-project-runner-v" + $version
-    elif $component == "dispatcher" or $component == "uloop-dispatcher" then
+    elif $component == "tloop-project-runner" then
+      "tloop-project-runner-v" + $version
+    elif $component == "dispatcher" or $component == "tloop-dispatcher" then
       "dispatcher-v" + $version
     else
       ""

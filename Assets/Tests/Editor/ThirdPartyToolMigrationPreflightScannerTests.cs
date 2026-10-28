@@ -15,14 +15,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     public sealed class ThirdPartyToolMigrationPreflightScannerTests
     {
         private const string LegacyToolSource =
-            "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class HelloTool {}";
+            "using io.github.tongguang.tloop; [McpTool] public sealed class HelloTool {}";
 
         private string _projectRoot;
 
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_projectRoot);
         }
 

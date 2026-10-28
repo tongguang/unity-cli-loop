@@ -11,7 +11,7 @@ import (
 
 const noToolSkill = `---
 name: some-unrelated-skill
-description: "Not a uloop tool skill."
+description: "Not a tloop tool skill."
 ---
 `
 
@@ -45,7 +45,7 @@ func TestLoadWithoutAProjectRootReturnsNil(t *testing.T) {
 	}
 }
 
-// Verifies that a project without the uloop package loads nothing and, with debug logging on, records
+// Verifies that a project without the tloop package loads nothing and, with debug logging on, records
 // why the embedded descriptions were kept.
 func TestLoadWithoutAPackageLogsTheFallback(t *testing.T) {
 	t.Setenv(vibelog.CLIVibeLogEnvName, "1")
@@ -56,7 +56,7 @@ func TestLoadWithoutAPackageLogsTheFallback(t *testing.T) {
 	}
 
 	logs := readCLIVibeLogs(t, projectRoot)
-	if !strings.Contains(logs, skillDocsLogOperation) || !strings.Contains(logs, "uloop package root not found") {
+	if !strings.Contains(logs, skillDocsLogOperation) || !strings.Contains(logs, "tloop package root not found") {
 		t.Fatalf("fallback was not logged: %q", logs)
 	}
 }

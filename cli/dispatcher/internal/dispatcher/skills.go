@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	managedSkillsDir     = "unity-cli-loop"
-	v3MigrationSkillName = "v3-cli-invocation-migration"
+	managedSkillsDir     = "tuanjie-cli-loop"
+	v3MigrationSkillName = "tloop-v3-cli-invocation-migration"
 	groupSkillsByDefault = false
 
 	utf16LittleEndianBOMFirstByte  = 0xff
@@ -30,18 +30,18 @@ const (
 // deprecatedSkillNames lists previously installed skill directory names that
 // skills install/uninstall runs clean up. Keep cleanup names here and in the
 // Unity-side SkillTargetInstaller; agent-facing V2-to-V3 CLI migration
-// guidance lives in Packages/src/TemporarySkills~/v3-cli-invocation-migration.
+// guidance lives in Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration.
 var deprecatedSkillNames = []string{
-	"uloop-wait-for-pause-point",
-	"uloop-capture-window",
-	"uloop-get-provider-details",
-	"uloop-unity-search",
-	"uloop-get-menu-items",
-	"uloop-get-unity-search-providers",
-	"uloop-execute-menu-item",
-	"uloop-raycast",
-	"uloop-record-input",
-	"uloop-cancel",
+	"tloop-wait-for-pause-point",
+	"tloop-capture-window",
+	"tloop-get-provider-details",
+	"tloop-unity-search",
+	"tloop-get-menu-items",
+	"tloop-get-unity-search-providers",
+	"tloop-execute-menu-item",
+	"tloop-raycast",
+	"tloop-record-input",
+	"tloop-cancel",
 }
 
 type skillTarget struct {
@@ -170,7 +170,7 @@ func unknownSkillsSubcommandError(subcommand string, context clierrors.ErrorCont
 		Message:     "Unknown skills command: " + subcommand,
 		Received:    subcommand,
 		Command:     clicore.SkillsCommandName,
-		NextActions: []string{"Use `uloop skills list`, `uloop skills install`, or `uloop skills uninstall`."},
+		NextActions: []string{"Use `tloop skills list`, `tloop skills install`, or `tloop skills uninstall`."},
 	}).ToCLIError(context)
 }
 
@@ -199,7 +199,7 @@ func runSkillsList(projectRoot string, skills []skillDefinition, options skillCo
 	disabledTools := loadDisabledToolsForSkills(projectRoot, options.global)
 
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "uloop Skills Status:")
+	clicore.WriteLine(stdout, "tloop Skills Status:")
 	clicore.WriteLine(stdout, "")
 	for _, target := range targets {
 		baseDir, err := getSkillsBaseDir(skillsInstallRootFor(projectRoot, options), target, options.global)
@@ -230,7 +230,7 @@ func runSkillsList(projectRoot string, skills []skillDefinition, options skillCo
 
 func runSkillsInstall(projectRoot string, skills []skillDefinition, options skillCommandOptions, stdout io.Writer, stderr io.Writer) int {
 	clicore.WriteLine(stdout, "")
-	clicore.WriteFormat(stdout, "Installing uloop skills (%s)...\n", skillLocationName(options))
+	clicore.WriteFormat(stdout, "Installing tloop skills (%s)...\n", skillLocationName(options))
 	clicore.WriteLine(stdout, "")
 	// Targets installed earlier but omitted from this invocation would keep stale
 	// skill copies that contradict the CLI, so refresh every detected install.
@@ -240,7 +240,7 @@ func runSkillsInstall(projectRoot string, skills []skillDefinition, options skil
 		return 1
 	}
 	for _, autoTarget := range autoRefreshTargets {
-		clicore.WriteFormat(stdout, "Auto-refreshing %s: an existing uloop skill install was detected there.\n\n", autoTarget.displayName)
+		clicore.WriteFormat(stdout, "Auto-refreshing %s: an existing tloop skill install was detected there.\n\n", autoTarget.displayName)
 	}
 	for _, target := range append(append([]skillTarget{}, options.targets...), autoRefreshTargets...) {
 		result, err := installSkillsForTarget(projectRoot, skillsInstallRootFor(projectRoot, options), target, skills, options.global, groupManagedSkillsForOptions(options))
@@ -267,7 +267,7 @@ func runSkillsInstall(projectRoot string, skills []skillDefinition, options skil
 
 func runSkillsUninstall(projectRoot string, skills []skillDefinition, options skillCommandOptions, stdout io.Writer, stderr io.Writer) int {
 	clicore.WriteLine(stdout, "")
-	clicore.WriteFormat(stdout, "Uninstalling uloop skills (%s)...\n", skillLocationName(options))
+	clicore.WriteFormat(stdout, "Uninstalling tloop skills (%s)...\n", skillLocationName(options))
 	clicore.WriteLine(stdout, "")
 	for _, target := range options.targets {
 		grouped := groupManagedSkillsForOptions(options)
@@ -290,7 +290,7 @@ func runSkillsUninstall(projectRoot string, skills []skillDefinition, options sk
 }
 
 // detectInstalledSkillTargets returns known targets that already contain at least one
-// of the current uloop skills but were not requested in this invocation.
+// of the current tloop skills but were not requested in this invocation.
 func detectInstalledSkillTargets(projectRoot string, skills []skillDefinition, options skillCommandOptions) ([]skillTarget, error) {
 	requestedDirs := map[string]bool{}
 	for _, target := range options.targets {

@@ -12,8 +12,8 @@ import (
 // while still installing the enabled ones.
 func TestRunSkillsDirInstallSkipsDisabledToolSkill(t *testing.T) {
 	root := t.TempDir()
-	enabledSkill := writeDirModeSkillSource(t, root, "uloop-enabled")
-	disabledSkill := writeDirModeSkillSource(t, root, "uloop-disabled")
+	enabledSkill := writeDirModeSkillSource(t, root, "tloop-enabled")
+	disabledSkill := writeDirModeSkillSource(t, root, "tloop-disabled")
 	writeToolSettings(t, root, `{"disabledTools":["disabled"]}`)
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
@@ -31,10 +31,10 @@ func TestRunSkillsDirInstallSkipsDisabledToolSkill(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("dir install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if _, err := os.Stat(filepath.Join(destinationDir, "uloop-enabled", "SKILL.md")); err != nil {
+	if _, err := os.Stat(filepath.Join(destinationDir, "tloop-enabled", "SKILL.md")); err != nil {
 		t.Fatalf("enabled skill should be installed: %v", err)
 	}
-	if _, err := os.Stat(filepath.Join(destinationDir, "uloop-disabled")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(destinationDir, "tloop-disabled")); !os.IsNotExist(err) {
 		t.Fatalf("disabled skill should not be installed: err=%v", err)
 	}
 	if !strings.Contains(stdout.String(), "Installed: 1\n") {
@@ -46,9 +46,9 @@ func TestRunSkillsDirInstallSkipsDisabledToolSkill(t *testing.T) {
 // is now disabled, while foreign files next to it survive.
 func TestRunSkillsDirInstallRemovesInstalledDisabledToolSkill(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-disabled")
+	skill := writeDirModeSkillSource(t, root, "tloop-disabled")
 	destinationDir := filepath.Join(root, "apm-skills")
-	installedDir := filepath.Join(destinationDir, "uloop-disabled")
+	installedDir := filepath.Join(destinationDir, "tloop-disabled")
 	installOptions := skillCommandOptions{outputDir: destinationDir}
 	if code := runSkillsSubcommand("install", root, []skillDefinition{skill}, installOptions, &bytes.Buffer{}, &bytes.Buffer{}); code != 0 {
 		t.Fatalf("initial dir install failed: code=%d", code)
@@ -84,10 +84,10 @@ func TestRunSkillsDirInstallRemovesInstalledDisabledToolSkill(t *testing.T) {
 // disabled tool's skill untouched, because it carries no install evidence.
 func TestRunSkillsDirInstallPreservesUnownedDirOfDisabledToolSkill(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-disabled")
+	skill := writeDirModeSkillSource(t, root, "tloop-disabled")
 	writeToolSettings(t, root, `{"disabledTools":["disabled"]}`)
 	destinationDir := filepath.Join(root, "apm-skills")
-	handAuthoredFile := filepath.Join(destinationDir, "uloop-disabled", "notes.md")
+	handAuthoredFile := filepath.Join(destinationDir, "tloop-disabled", "notes.md")
 	if err := os.MkdirAll(filepath.Dir(handAuthoredFile), 0o755); err != nil {
 		t.Fatalf("failed to create hand-authored dir: %v", err)
 	}
@@ -113,7 +113,7 @@ func TestRunSkillsDirInstallPreservesUnownedDirOfDisabledToolSkill(t *testing.T)
 		t.Fatalf("hand-authored file should survive: %v", err)
 	}
 	if strings.Contains(stdout.String(), "Disabled removed:") {
-		t.Fatalf("nothing uloop-owned was removed, so no removal should be reported:\n%s", stdout.String())
+		t.Fatalf("nothing tloop-owned was removed, so no removal should be reported:\n%s", stdout.String())
 	}
 }
 
@@ -121,7 +121,7 @@ func TestRunSkillsDirInstallPreservesUnownedDirOfDisabledToolSkill(t *testing.T)
 // than as missing.
 func TestRunSkillsDirListReportsDisabledToolSkill(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-disabled")
+	skill := writeDirModeSkillSource(t, root, "tloop-disabled")
 	writeToolSettings(t, root, `{"disabledTools":["disabled"]}`)
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
@@ -139,7 +139,7 @@ func TestRunSkillsDirListReportsDisabledToolSkill(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("dir list failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop-disabled (disabled)") {
+	if !strings.Contains(stdout.String(), "tloop-disabled (disabled)") {
 		t.Fatalf("list should report the skill as disabled:\n%s", stdout.String())
 	}
 }

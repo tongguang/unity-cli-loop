@@ -197,7 +197,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
             Assert.That(response.Diagnostics[0].PointerColumn, Is.EqualTo(8));
             Assert.That(response.Diagnostics[0].Context, Does.Contain("L5:int e= ;"));
             Assert.That(response.Diagnostics[0].Context, Does.Contain("int b=2;"));
-            Assert.That(response.Diagnostics[0].Context, Does.Not.Contain("__uloop_literal"));
+            Assert.That(response.Diagnostics[0].Context, Does.Not.Contain("__tloop_literal"));
             Assert.That(response.Diagnostics[0].Context, Does.Not.Contain("using System.Collections.Generic"));
             Assert.That(response.Diagnostics[0].Context, Does.Not.Contain("L7:"));
             string[] contextLines = response.Diagnostics[0].Context
@@ -319,7 +319,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
                 {
                     "Execution exception: Object reference not set to an instance of an object",
                     "Stack trace:   at UnityCliLoop.Dynamic.DynamicCommand.ExecuteAsync () "
-                    + "[0x00017] in /tmp/UnityCliLoopCompilation/user-snippet.cs:3 "
+                    + "[0x00017] in /tmp/TuanjieCliLoopCompilation/user-snippet.cs:3 "
                 }
             };
 
@@ -367,7 +367,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             bool extracted = DynamicCodeExecutionResponseFactory.TryExtractUserSnippetLineNumber(
                 "  at UnityCliLoop.Dynamic.DynamicCommand.ExecuteAsync () "
-                + "[0x00017] in /tmp/UnityCliLoopCompilation/user-snippet.cs:3 ",
+                + "[0x00017] in /tmp/TuanjieCliLoopCompilation/user-snippet.cs:3 ",
                 out int lineNumber);
 
             Assert.That(extracted, Is.True);
@@ -495,14 +495,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
                 Assert.That(
                     response.Diagnostics[0].Hint,
                     Is.EqualTo(
-                        "'Widget' is a hot-reload introduced type (Example.Widget), and the assembly holding it is referenced by this compilation while it stays active, so the name is what did not resolve. Write it as Example.Widget, or add a using for its namespace. Members that hot reload added to it are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'uloop compile' to make it a compiled type."));
+                        "'Widget' is a hot-reload introduced type (Example.Widget), and the assembly holding it is referenced by this compilation while it stays active, so the name is what did not resolve. Write it as Example.Widget, or add a using for its namespace. Members that hot reload added to it are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'tloop compile' to make it a compiled type."));
                 Assert.That(
                     response.Diagnostics[0].Suggestions,
                     Is.EqualTo(new[]
                     {
                         "Write it as Example.Widget, or add a using for its namespace",
                         "Locate the type with AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).First(t => t.FullName == \"Example.Widget\") and drive it through reflection",
-                        "Run 'uloop compile' when the type is final, then reference it as an ordinary compiled type",
+                        "Run 'tloop compile' when the type is final, then reference it as an ordinary compiled type",
                         "Use Namespace.One.Widget",
                         "Use Namespace.Two.Widget"
                     }));
@@ -551,12 +551,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
                 Assert.That(
                     response.Diagnostics[0].Hint,
                     Is.EqualTo(
-                        "'ComputeScore' matches a member hot reload added, which is active now. An added member is not visible to the compilation of a dynamic-code snippet, which compiles against the compiled assemblies only, and it is not visible through reflection either. Run 'uloop compile' to make the added member compiled, then rerun, or read the state through a member that was already compiled."));
+                        "'ComputeScore' matches a member hot reload added, which is active now. An added member is not visible to the compilation of a dynamic-code snippet, which compiles against the compiled assemblies only, and it is not visible through reflection either. Run 'tloop compile' to make the added member compiled, then rerun, or read the state through a member that was already compiled."));
                 Assert.That(
                     response.Diagnostics[0].Suggestions,
                     Is.EqualTo(new[]
                     {
-                        "Run 'uloop compile' to make the added member compiled, then rerun",
+                        "Run 'tloop compile' to make the added member compiled, then rerun",
                         "Read the state through a member that was already compiled instead of the added one"
                     }));
             }

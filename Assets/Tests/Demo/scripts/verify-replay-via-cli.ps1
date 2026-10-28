@@ -7,7 +7,7 @@ Usage:
 Prerequisites:
   - Unity Editor running with InputReplayVerificationScene loaded
   - PlayMode is not running because this script starts it
-  - Record input with Window > Unity CLI Loop > Recordings when prompted
+  - Record input with Window > Tuanjie CLI Loop > Recordings when prompted
 #>
 
 [CmdletBinding()]
@@ -20,8 +20,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$RecordingLogRelativePath = ".uloop/outputs/InputRecordings/recording-event-log.txt"
-$ReplayLogRelativePath = ".uloop/outputs/InputRecordings/replay-event-log.txt"
+$RecordingLogRelativePath = ".tloop/outputs/InputRecordings/recording-event-log.txt"
+$ReplayLogRelativePath = ".tloop/outputs/InputRecordings/replay-event-log.txt"
 $ScenePath = "Assets/Scenes/InputReplayVerificationScene.unity"
 
 function Get-ResolvedProjectPath {
@@ -100,7 +100,7 @@ function Invoke-UloopCapture {
     [string]$previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     try {
-        [object[]]$output = & uloop @arguments 2>&1
+        [object[]]$output = & tloop @arguments 2>&1
         [int]$exitCode = $LASTEXITCODE
     }
     finally {
@@ -130,7 +130,7 @@ function Invoke-Uloop {
         Write-Host $result.Text
     }
 
-    [string]$commandText = "uloop " + ($result.Arguments -join " ")
+    [string]$commandText = "tloop " + ($result.Arguments -join " ")
     throw "$commandText failed with exit code $($result.ExitCode)"
 }
 
@@ -142,7 +142,7 @@ function Invoke-UloopJsonChecked {
     [string]$text = Invoke-Uloop -CommandArguments $CommandArguments
     [pscustomobject]$json = $text | ConvertFrom-Json
     if ($json.PSObject.Properties.Name -contains "success" -and $json.success -ne $true) {
-        throw "uloop $($CommandArguments -join " ") returned success=false: $text"
+        throw "tloop $($CommandArguments -join " ") returned success=false: $text"
     }
 
     return $json
@@ -452,7 +452,7 @@ Invoke-ActivateForRecord
 Write-Host "[3/8] Recording input with the Recordings window..."
 Write-Host ""
 Write-Host "========================================="
-Write-Host "  Open Window > Unity CLI Loop > Recordings."
+Write-Host "  Open Window > Tuanjie CLI Loop > Recordings."
 Write-Host "  Click Start Recording, play in the Game View, then click Stop Recording."
 Write-Host ""
 Write-Host "  WASD: move | Mouse: rotate"

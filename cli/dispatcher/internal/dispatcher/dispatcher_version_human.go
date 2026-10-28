@@ -11,7 +11,7 @@ import (
 // tryHandleDispatcherHumanVersionRequest answers a plain `-v` / `--version` locally when stdout is a
 // terminal, printing the dispatcher version plus one sentence naming the CLI generation that serves
 // this directory.
-// Why only on a terminal: the shipped V2 Unity package runs `uloop --version` with redirected stdout
+// Why only on a terminal: the shipped V2 Unity package runs `tloop --version` with redirected stdout
 // and parses the whole stdout as strict SemVer, so the non-terminal contract must stay byte-identical.
 func tryHandleDispatcherHumanVersionRequest(
 	remainingArgs []string,
@@ -63,15 +63,15 @@ func dispatcherVersionContextSentence(projectPath string, remainingArgs []string
 		return "This Unity project has no readable project runner pin yet; " +
 			"open it in Unity once to create " + dispatcherProjectPinRelativePath + "."
 	}
-	return "This Unity project pins uloop project runner " + pin.ProjectRunnerVersion + "."
+	return "This Unity project pins tloop project runner " + pin.ProjectRunnerVersion + "."
 }
 
 func dispatcherV2VersionContextSentence(v2Project dispatcherV2Project) string {
 	if v2Project.PackageVersion == "" {
-		return "This Unity project uses the uloop V2 package, but its package version could not be resolved; " +
-			"see the error from any other uloop command here."
+		return "This Unity project uses the tloop V2 package, but its package version could not be resolved; " +
+			"see the error from any other tloop command here."
 	}
-	return "This Unity project uses the uloop V2 package " + v2Project.PackageVersion +
+	return "This Unity project uses the tloop V2 package " + v2Project.PackageVersion +
 		", so its commands run through the V2 CLI (" +
 		dispatcherV2CLIPackageName + "@" + v2Project.PackageVersion + ")."
 }

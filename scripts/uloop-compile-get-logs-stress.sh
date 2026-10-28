@@ -1,14 +1,14 @@
 #!/bin/sh
-# Stress test: repeatedly run uloop compile and uloop get-logs in sequence.
+# Stress test: repeatedly run tloop compile and tloop get-logs in sequence.
 # Designed for long-running Unity server restart/recovery verification.
 
 set -eu
 
-PROJECT_PATH="${ULOOP_PROJECT_PATH:-}"
-INTERVAL_SECONDS="${ULOOP_STRESS_INTERVAL_SECONDS:-2}"
-LOG_DIR="${ULOOP_STRESS_LOG_DIR:-.uloop/stress-tests}"
-MAX_ROUNDS="${ULOOP_STRESS_MAX_ROUNDS:-0}"
-WAIT_FOR_READY_SECONDS="${ULOOP_STRESS_WAIT_FOR_READY_SECONDS:-15}"
+PROJECT_PATH="${TLOOP_PROJECT_PATH:-}"
+INTERVAL_SECONDS="${TLOOP_STRESS_INTERVAL_SECONDS:-2}"
+LOG_DIR="${TLOOP_STRESS_LOG_DIR:-.tloop/stress-tests}"
+MAX_ROUNDS="${TLOOP_STRESS_MAX_ROUNDS:-0}"
+WAIT_FOR_READY_SECONDS="${TLOOP_STRESS_WAIT_FOR_READY_SECONDS:-15}"
 CURRENT_CHILD_PID=''
 CURRENT_TIMEOUT_PID=''
 mkdir -p "$LOG_DIR"
@@ -17,11 +17,11 @@ timestamp() {
     date +"%Y-%m-%dT%H:%M:%S%z"
 }
 
-uloop_cmd() {
+tloop_cmd() {
     if [ -n "$PROJECT_PATH" ]; then
-        uloop "$@" --project-path "$PROJECT_PATH"
+        tloop "$@" --project-path "$PROJECT_PATH"
     else
-        uloop "$@"
+        tloop "$@"
     fi
 }
 
@@ -35,7 +35,7 @@ wait_for_ready() {
             return 1
         fi
 
-        if run_quiet_with_timeout "$remaining_seconds" uloop_cmd get-logs --max-count 1; then
+        if run_quiet_with_timeout "$remaining_seconds" tloop_cmd get-logs --max-count 1; then
             printf '%s [%s] ready\n' "$(timestamp)" "$round"
             return 0
         fi
@@ -149,7 +149,7 @@ handle_interrupt() {
 
 trap handle_interrupt INT TERM
 
-echo "=== uloop compile/get-logs stress test ==="
+echo "=== tloop compile/get-logs stress test ==="
 echo "log_dir=$LOG_DIR"
 echo "interval_seconds=$INTERVAL_SECONDS"
 echo "max_rounds=$MAX_ROUNDS"
@@ -168,7 +168,7 @@ while :; do
     fi
 
     if ! run_with_logs "$LOG_DIR/${round}_compile.out" "$LOG_DIR/${round}_compile.err" \
-        uloop_cmd compile; then
+        tloop_cmd compile; then
         echo "compile failed at round $round"
         exit 1
     fi
@@ -179,7 +179,7 @@ while :; do
     fi
 
     if ! run_with_logs "$LOG_DIR/${round}_get-logs.out" "$LOG_DIR/${round}_get-logs.err" \
-        uloop_cmd get-logs --max-count 1; then
+        tloop_cmd get-logs --max-count 1; then
         echo "get-logs failed at round $round"
         exit 1
     fi

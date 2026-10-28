@@ -1,7 +1,7 @@
 <#
-Development helper for refreshing generated uloop skill files in sibling Unity projects.
+Development helper for refreshing generated tloop skill files in sibling Unity projects.
 This is not an installed agent skill or a runtime command. It exists to support local
-uloop development by resetting each target Git repository, quitting each target
+tloop development by resetting each target Git repository, quitting each target
 Unity Editor, regenerating Claude/Codex/Agents skill copies, committing those generated
 files locally, removing Library after Unity has stopped, relaunching each project,
 and opening the sample scene.
@@ -16,7 +16,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $DryRun = $false
-$UloopRoot = $env:ULOOP_ROOT
+$UloopRoot = $env:TLOOP_ROOT
 $Project = @()
 $Help = $false
 $ExpectedProjectCount = 3
@@ -30,15 +30,15 @@ function Show-Usage {
     Write-Host @"
 Usage:
   powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\refresh-neighbor-game-skills-windows.ps1 [-DryRun] [-UloopRoot PATH] [-Project PATH]...
-  powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\refresh-neighbor-game-skills-windows.ps1 [--dry-run] [--uloop-root PATH] [--project PATH]...
+  powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\refresh-neighbor-game-skills-windows.ps1 [--dry-run] [--tloop-root PATH] [--project PATH]...
 
 Workflow for each target Unity project:
   0. Reset Git state to HEAD and remove untracked files
   1. Quit Unity if running
-  2. Install uloop skills for Claude, Codex, and Agents
+  2. Install tloop skills for Claude, Codex, and Agents
   3. Commit generated skill changes without pushing
   4. Remove Library
-  5. Launch Unity with the local uloop launch command
+  5. Launch Unity with the local tloop launch command
   6. Open Assets/Scenes/SampleScene.unity
 "@
 }
@@ -72,9 +72,9 @@ function Read-Arguments {
                 $index++
                 continue
             }
-            { $_ -in @("-UloopRoot", "-uloop-root", "--uloop-root") } {
+            { $_ -in @("-UloopRoot", "-tloop-root", "--tloop-root") } {
                 if ($index + 1 -ge $RawArguments.Count) {
-                    Fail "--uloop-root requires a path"
+                    Fail "--tloop-root requires a path"
                 }
 
                 $script:UloopRoot = $RawArguments[$index + 1]
@@ -246,7 +246,7 @@ function Get-UloopBinaryForRoot {
         [string]$Candidate
     )
 
-    return Join-Path $Candidate "cli\dist\windows-amd64\uloop.exe"
+    return Join-Path $Candidate "cli\dist\windows-amd64\tloop.exe"
 }
 
 function Test-LocalUloop {
@@ -260,12 +260,12 @@ function Test-LocalUloop {
 function Resolve-UloopRoot {
     if (-not [string]::IsNullOrWhiteSpace($UloopRoot)) {
         if (-not (Test-Path -LiteralPath $UloopRoot -PathType Container)) {
-            Fail "--uloop-root does not exist: $UloopRoot"
+            Fail "--tloop-root does not exist: $UloopRoot"
         }
 
         $script:UloopRoot = (Resolve-Path -LiteralPath $UloopRoot).Path
         if (-not (Test-LocalUloop -Candidate $script:UloopRoot)) {
-            Fail "local uloop binary not found under --uloop-root"
+            Fail "local tloop binary not found under --tloop-root"
         }
         return
     }
@@ -279,7 +279,7 @@ function Resolve-UloopRoot {
         }
     }
 
-    Fail "run from the uloop checkout or pass --uloop-root"
+    Fail "run from the tloop checkout or pass --tloop-root"
 }
 
 function Find-Projects {
@@ -441,7 +441,7 @@ function Quit-Unity {
         return
     }
 
-    Write-Host "Quitting Unity with local uloop: $ProjectRoot"
+    Write-Host "Quitting Unity with local tloop: $ProjectRoot"
     Invoke-UloopProjectChecked -ProjectRoot $ProjectRoot -CommandArguments @("launch", "--quit") | Out-Null
 }
 
@@ -497,7 +497,7 @@ function Commit-GeneratedSkillChanges {
         $commitName = "uLoop Automation"
     }
     if ([string]::IsNullOrWhiteSpace($commitEmail)) {
-        $commitEmail = "uloop@example.invalid"
+        $commitEmail = "tloop@example.invalid"
     }
 
     Invoke-NativeChecked -FilePath "git" -Arguments @(
@@ -509,7 +509,7 @@ function Commit-GeneratedSkillChanges {
         "user.email=$commitEmail",
         "commit",
         "-m",
-        "Update generated uloop skills"
+        "Update generated tloop skills"
     ) | Out-Null
 }
 
@@ -521,7 +521,7 @@ function Commit-GeneratedSkills {
     if ($DryRun) {
         Invoke-NativeChecked -FilePath "git" -Arguments (@("-C", $ProjectRoot, "add", "-A", "--") + $GeneratedSkillDirectories) | Out-Null
         Invoke-NativeChecked -FilePath "git" -Arguments (@("-C", $ProjectRoot, "diff", "--cached", "--quiet", "--") + $GeneratedSkillDirectories) | Out-Null
-        Write-Host "[dry-run] git -C $ProjectRoot commit -m 'Update generated uloop skills'"
+        Write-Host "[dry-run] git -C $ProjectRoot commit -m 'Update generated tloop skills'"
         return
     }
 
@@ -584,10 +584,10 @@ Assert-ProjectCount
 
 $UloopBin = Get-UloopBinaryForRoot -Candidate $UloopRoot
 if (-not (Test-Path -LiteralPath $UloopBin -PathType Leaf)) {
-    Fail "local uloop binary not found: $UloopBin"
+    Fail "local tloop binary not found: $UloopBin"
 }
 
-Write-Host "Using uloop: $UloopBin"
+Write-Host "Using tloop: $UloopBin"
 Write-Host "Host OS: windows"
 Write-Host "Target projects:"
 foreach ($projectRoot in $Projects) {
@@ -690,7 +690,7 @@ Invoke-ForProjectsParallel -WorkerName "open_sample_scene" -Worker {
     }
 
     if ($DryRun) {
-        Write-Output "[dry-run] wait until Unity responds to uloop for $ProjectRoot"
+        Write-Output "[dry-run] wait until Unity responds to tloop for $ProjectRoot"
         Write-Output "[dry-run] $UloopBin --project-path $ProjectRoot control-play-mode --action Stop"
         Write-Output "[dry-run] $UloopBin --project-path $ProjectRoot execute-dynamic-code --code-file <sample-scene-open-code-file>"
         return

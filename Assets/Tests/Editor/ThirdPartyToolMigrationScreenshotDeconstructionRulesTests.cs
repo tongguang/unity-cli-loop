@@ -13,7 +13,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     /// </summary>
     public sealed class ThirdPartyToolMigrationScreenshotDeconstructionRulesTests
     {
-        private const string LegacyCaptureUtility = "io.github.hatayama.uLoopMCP.EditorWindowCaptureUtility";
+        private const string LegacyCaptureUtility = "io.github.tongguang.tloop.EditorWindowCaptureUtility";
         private const string CurrentCaptureUtility = "io.github.hatayama.UnityCliLoop.FirstPartyTools.EditorWindowCaptureUtility";
         private const string MigratedCaptureUtility = "io.github.hatayama.UnityCliLoop.ToolContracts.EditorWindowCaptureUtility";
         private const string MigratedTimeout =

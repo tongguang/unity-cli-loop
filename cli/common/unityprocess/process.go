@@ -21,8 +21,8 @@ import (
 const windowsPowerShellCommand = "powershell"
 
 var (
-	macUnityExecutablePattern     = regexp.MustCompile(`(?i)Unity\.app/Contents/MacOS/Unity`)
-	windowsUnityExecutablePattern = regexp.MustCompile(`(?i)Unity\.exe`)
+	macUnityExecutablePattern     = regexp.MustCompile(`(?i)Tuanjie\.app/Contents/MacOS/Tuanjie(?:["'\s]|$)`)
+	windowsUnityExecutablePattern = regexp.MustCompile(`(?i)(?:^|[\\/"\s])Tuanjie\.exe(?:["\s]|$)`)
 	// Why -createProject too: the Editor that creates a project opens it in the same session, and that
 	// session's command line may name the project only through -createProject.
 	projectPathFlagPattern = regexp.MustCompile(`(?i)-(?:projectpath|createproject)(?:=|\s+)(.+)$`)
@@ -183,7 +183,7 @@ func runProcessListCommandWithin(ctx context.Context, timeout time.Duration, nam
 func windowsUnityProcessListScript() string {
 	scriptLines := []string{
 		"$ErrorActionPreference = 'Stop'",
-		"$processes = Get-CimInstance Win32_Process -Filter \"Name = 'Unity.exe'\" | Where-Object { $_.CommandLine }",
+		"$processes = Get-CimInstance Win32_Process -Filter \"Name = 'Tuanjie.exe'\" | Where-Object { $_.CommandLine }",
 		"foreach ($process in $processes) {",
 		"  $commandLine = $process.CommandLine -replace \"`r\", ' ' -replace \"`n\", ' '",
 		"  $encodedCommandLine = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($commandLine))",
@@ -262,24 +262,13 @@ func matchLinuxUnityProcess(pid int, args []string) (UnityProcess, bool) {
 	if len(args) == 0 {
 		return UnityProcess{}, false
 	}
-	if !isLinuxUnityEditorExecutable(path.Base(args[0])) {
+	if path.Base(args[0]) != "Tuanjie" {
 		return UnityProcess{}, false
 	}
 	if hasNonEditorLinuxArg(args) {
 		return UnityProcess{}, false
 	}
 	return UnityProcess{Pid: pid, projectPath: linuxProjectPathFromArgs(args)}, true
-}
-
-// isLinuxUnityEditorExecutable reports whether argv[0]'s basename is a Unity Editor
-// binary. Unity Hub launches the Editor through a hardlink named
-// unityhub-unity-editor-<version> that sits beside Editor/Unity, so the basename
-// is not always "Unity".
-func isLinuxUnityEditorExecutable(executableName string) bool {
-	if executableName == "Unity" {
-		return true
-	}
-	return strings.HasPrefix(executableName, "unityhub-unity-editor-")
 }
 
 // hasNonEditorLinuxArg reports whether argv marks a batchmode run or an asset

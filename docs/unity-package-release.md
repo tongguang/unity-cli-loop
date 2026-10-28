@@ -25,7 +25,7 @@ after the tarball is signed. The decision and the alternatives it replaced are r
    `autorelease: pending`, release-please opens no next release pull request, so the manifest
    there still names the release that is not out yet.
    - A published `v<version>` release is never changed. One that carries
-     `io.github.hatayama.uloopmcp-<version>.tgz` needs nothing; one without it gets a warning,
+     `io.github.tongguang.tloop-<version>.tgz` needs nothing; one without it gets a warning,
      because no run can attach the tarball any more. Most runs end here.
    - Otherwise the plan runs its readiness check. It finds the release-please release commit
      of the package version, requires the project runner release of that commit's manifest and
@@ -70,7 +70,7 @@ cannot write to the repository.
 | `UPM_SERVICE_ACCOUNT_KEY_ID`, `UPM_SERVICE_ACCOUNT_KEY_SECRET` environment secrets | Key pair of a Unity Cloud service account with the organization role **Package Manager Package Signer**. The role must be an organization role; a project role does not allow signing, and `upm pack` then fails with "User does not have permission to sign package". Read only by the `Sign the package` step. |
 | `UPM_ORG_ID` environment secret | ID of the Unity organization that signs the package (Unity Cloud Dashboard → Administration → Settings). The Package Manager window shows the organization's name as "Signed for <name>". |
 | `UPM_CLI_VERSION`, `UPM_CLI_LINUX_X64_SHA256` in `unity-package-release.yml` | The pinned UPM CLI and the checksum recorded for its `upm-linux-x64.zip`. |
-| `openupm/openupm` `data/packages/io.github.hatayama.uloopmcp.yml` | OpenUPM metadata. Needs `trackingMode: githubRelease` and `githubReleaseAssetName: 'io.github.hatayama.uloopmcp-'`; the asset name keeps OpenUPM away from the CLI archives on the dispatcher and project runner releases. |
+| `openupm/openupm` `data/packages/io.github.tongguang.tloop.yml` | OpenUPM metadata. Needs `trackingMode: githubRelease` and `githubReleaseAssetName: 'io.github.tongguang.tloop-'`; the asset name keeps OpenUPM away from the CLI archives on the dispatcher and project runner releases. |
 
 ## Updating the UPM CLI pin
 
@@ -112,7 +112,7 @@ because both come from the same CDN and a replaced zip would come with a matchin
 - **Never create or publish the package release by hand.** A release published without the
   tarball is immutable without it, and that version can then never be signed. The plan reports
   such a release with a warning on every run until the next version is released.
-- **Check a release.** `curl -s https://api.openupm.com/packages/io.github.hatayama.uloopmcp`
+- **Check a release.** `curl -s https://api.openupm.com/packages/io.github.tongguang.tloop`
   reports `"source": "githubRelease"` and `"signed": true` for a version OpenUPM published from
   the signed tarball. In the Unity Package Manager window, the warning only reports correctly on
   Unity 6000.3.5f2 and later; earlier 6.3 builds can call a valid signature invalid.

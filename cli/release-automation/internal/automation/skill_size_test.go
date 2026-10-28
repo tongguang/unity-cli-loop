@@ -48,8 +48,8 @@ func TestScanSkillFileSizesCoversAllSkillRoots(t *testing.T) {
 	root := t.TempDir()
 	// Kept in path-sorted order because findings are reported path-sorted.
 	oversized := []string{
-		".agents/skills/uloop-pause-point/SKILL.md",
-		".claude/skills/uloop-pause-point/SKILL.md",
+		".agents/skills/tloop-pause-point/SKILL.md",
+		".claude/skills/tloop-pause-point/SKILL.md",
 		"Packages/src/Editor/CliOnlyTools~/PausePoint/Skill/SKILL.md",
 	}
 	for _, relativePath := range oversized {

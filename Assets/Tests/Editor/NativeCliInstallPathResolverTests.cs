@@ -16,10 +16,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// Verifies the real resolver wiring returns winget, Homebrew, and unmanaged kinds.
         /// </summary>
         [TestCase(
-            @"C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Links\uloop.exe",
+            @"C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Links\tloop.exe",
             ManagedCliKind.Winget)]
-        [TestCase("/opt/homebrew/Cellar/uloop/3.1.0/bin/uloop", ManagedCliKind.Homebrew)]
-        [TestCase(@"C:\Tools\uloop.exe", ManagedCliKind.None)]
+        [TestCase("/opt/homebrew/Cellar/tloop/3.1.0/bin/tloop", ManagedCliKind.Homebrew)]
+        [TestCase(@"C:\Tools\tloop.exe", ManagedCliKind.None)]
         public void ResolveManagedCliKind_ReturnsExpectedKind(string executablePath, ManagedCliKind expectedKind)
         {
             ManagedCliKind result = NativeCliInstallPathResolver.ResolveManagedCliKind(executablePath);
@@ -35,10 +35,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string result = NativeCliInstallPathResolver.BuildPathWithInstallDirectory(
                 null,
-                "/opt/uloop-test/bin",
+                "/opt/tloop-test/bin",
                 RuntimePlatform.OSXEditor);
 
-            Assert.That(result, Is.EqualTo("/opt/uloop-test/bin"));
+            Assert.That(result, Is.EqualTo("/opt/tloop-test/bin"));
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void BuildPathWithoutInstallDirectory_WhenPathHasWhitespaceEntry_DropsItWithInstallDirectory()
         {
             string result = NativeCliInstallPathResolver.BuildPathWithoutInstallDirectory(
-                "/usr/bin: :/opt/uloop-test/bin:/bin",
-                "/opt/uloop-test/bin",
+                "/usr/bin: :/opt/tloop-test/bin:/bin",
+                "/opt/tloop-test/bin",
                 RuntimePlatform.OSXEditor);
 
             Assert.That(result, Is.EqualTo("/usr/bin:/bin"));
@@ -91,7 +91,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             bool result = NativeCliInstallPathResolver.IsPackageOwnedInstallPath(
                 null,
-                "/opt/uloop-test/bin",
+                "/opt/tloop-test/bin",
                 RuntimePlatform.OSXEditor);
 
             Assert.That(result, Is.False);

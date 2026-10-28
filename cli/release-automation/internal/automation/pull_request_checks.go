@@ -37,7 +37,7 @@ func dispatchPullRequestCheckWorkflows(
 // writePullRequestBodyFile stages a pull request body on disk because gh only
 // accepts multi-line bodies through --body-file.
 func writePullRequestBodyFile(body string) (string, func(), error) {
-	bodyFile, err := os.CreateTemp("", "uloop-pull-request-body-*.md")
+	bodyFile, err := os.CreateTemp("", "tloop-pull-request-body-*.md")
 	if err != nil {
 		return "", func() {}, fmt.Errorf("failed to create pull request body file: %w", err)
 	}

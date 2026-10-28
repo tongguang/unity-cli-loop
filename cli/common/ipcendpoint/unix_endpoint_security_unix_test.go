@@ -14,7 +14,7 @@ import (
 
 // Verifies the live filesystem adapter reads the current user and exact private mode.
 func TestOSUnixMetadataReaderReportsRealOwnerAndMode(t *testing.T) {
-	directory, err := os.MkdirTemp(unixSocketParent, "uloop-security-test-")
+	directory, err := os.MkdirTemp(unixSocketParent, "tloop-security-test-")
 	if err != nil {
 		t.Fatalf("create directory: %v", err)
 	}
@@ -70,7 +70,7 @@ func TestValidateChecksTheLiveEndpointDirectory(t *testing.T) {
 		t.Skipf("%s is not a root-owned sticky directory on this host: %#v (err=%v)", unixSocketParent, parent, err)
 	}
 	// The endpoint directory sits directly under the inspected parent, the way real endpoints do.
-	endpointDirectory, err := os.MkdirTemp(unixSocketParent, "uloop-test-")
+	endpointDirectory, err := os.MkdirTemp(unixSocketParent, "tloop-test-")
 	if err != nil {
 		t.Skipf("cannot create a directory under %s on this host: %v", unixSocketParent, err)
 	}

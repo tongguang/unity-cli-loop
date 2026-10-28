@@ -402,7 +402,7 @@ func TestV2ServerReadyTimeoutErrorNamesProject(t *testing.T) {
 	// Verifies the readiness timeout message names the project it waited on.
 	err := v2ServerReadyTimeoutError{projectRoot: "<PROJECT_ROOT>", timeout: time.Second}
 
-	if err.Error() != "timed out waiting for V2 uloop server readiness in <PROJECT_ROOT>" {
+	if err.Error() != "timed out waiting for V2 tloop server readiness in <PROJECT_ROOT>" {
 		t.Fatalf("unexpected message: %s", err.Error())
 	}
 }

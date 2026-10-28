@@ -182,7 +182,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     internal static class DomainReloadDisableScopeRecoveryConstants
     {
         internal const string DirectoryPath = "UserSettings";
-        internal const string MarkerFileName = "uloop-domain-reload-recovery.json";
+        internal const string MarkerFileName = "tloop-domain-reload-recovery.json";
         internal const string TempFileName = MarkerFileName + ".tmp";
         internal static readonly string MarkerFilePath = Path.Combine(DirectoryPath, MarkerFileName);
         internal static readonly string TempFilePath = Path.Combine(DirectoryPath, TempFileName);

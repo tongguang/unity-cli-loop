@@ -17,16 +17,16 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
     /// </summary>
     internal static class CliShellInstallationProbe
     {
-        private const string SHELL_PATH_START_MARKER = "__ULOOP_PATH_START__";
-        private const string SHELL_PATH_END_MARKER = "__ULOOP_PATH_END__";
-        private const string SHELL_VERSION_START_MARKER = "__ULOOP_VERSION_START__";
-        private const string SHELL_VERSION_END_MARKER = "__ULOOP_VERSION_END__";
-        private const string SHELL_VERSION_STATUS_START_MARKER = "__ULOOP_VERSION_STATUS_START__";
-        private const string SHELL_VERSION_STATUS_END_MARKER = "__ULOOP_VERSION_STATUS_END__";
-        private const string SHELL_CONTRACT_START_MARKER = "__ULOOP_CONTRACT_START__";
-        private const string SHELL_CONTRACT_END_MARKER = "__ULOOP_CONTRACT_END__";
-        private const string SHELL_CONTRACT_STATUS_START_MARKER = "__ULOOP_CONTRACT_STATUS_START__";
-        private const string SHELL_CONTRACT_STATUS_END_MARKER = "__ULOOP_CONTRACT_STATUS_END__";
+        private const string SHELL_PATH_START_MARKER = "__TLOOP_PATH_START__";
+        private const string SHELL_PATH_END_MARKER = "__TLOOP_PATH_END__";
+        private const string SHELL_VERSION_START_MARKER = "__TLOOP_VERSION_START__";
+        private const string SHELL_VERSION_END_MARKER = "__TLOOP_VERSION_END__";
+        private const string SHELL_VERSION_STATUS_START_MARKER = "__TLOOP_VERSION_STATUS_START__";
+        private const string SHELL_VERSION_STATUS_END_MARKER = "__TLOOP_VERSION_STATUS_END__";
+        private const string SHELL_CONTRACT_START_MARKER = "__TLOOP_CONTRACT_START__";
+        private const string SHELL_CONTRACT_END_MARKER = "__TLOOP_CONTRACT_END__";
+        private const string SHELL_CONTRACT_STATUS_START_MARKER = "__TLOOP_CONTRACT_STATUS_START__";
+        private const string SHELL_CONTRACT_STATUS_END_MARKER = "__TLOOP_CONTRACT_STATUS_END__";
         private const string SHELL_SUCCESS_EXIT_CODE = "0";
         private const string VERSION_JSON_PROJECT_RUNNER_VERSION_PROPERTY = "ProjectRunnerVersion";
         private const string VERSION_JSON_LEGACY_CLI_VERSION_PROPERTY = "CliVersion";
@@ -111,17 +111,17 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                 + "echo " + SHELL_PATH_END_MARKER + "\n"
                 + "echo " + SHELL_CONTRACT_START_MARKER + "\n"
                 + executableName + " " + CliConstants.VERSION_FLAG + " " + CliConstants.JSON_FLAG + "\n"
-                + "uloop_contract_status=$?\n"
+                + "tloop_contract_status=$?\n"
                 + "echo " + SHELL_CONTRACT_END_MARKER + "\n"
                 + "echo " + SHELL_CONTRACT_STATUS_START_MARKER + "\n"
-                + "echo $uloop_contract_status\n"
+                + "echo $tloop_contract_status\n"
                 + "echo " + SHELL_CONTRACT_STATUS_END_MARKER + "\n"
                 + "echo " + SHELL_VERSION_START_MARKER + "\n"
                 + executableName + " " + CliConstants.SHORT_VERSION_FLAG + "\n"
-                + "uloop_version_status=$?\n"
+                + "tloop_version_status=$?\n"
                 + "echo " + SHELL_VERSION_END_MARKER + "\n"
                 + "echo " + SHELL_VERSION_STATUS_START_MARKER + "\n"
-                + "echo $uloop_version_status\n"
+                + "echo $tloop_version_status\n"
                 + "echo " + SHELL_VERSION_STATUS_END_MARKER;
         }
 
@@ -134,17 +134,17 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                 + "echo " + SHELL_PATH_END_MARKER + "\n"
                 + "echo " + SHELL_CONTRACT_START_MARKER + "\n"
                 + executableName + " " + CliConstants.VERSION_FLAG + " " + CliConstants.JSON_FLAG + "\n"
-                + "set uloop_contract_status $status\n"
+                + "set tloop_contract_status $status\n"
                 + "echo " + SHELL_CONTRACT_END_MARKER + "\n"
                 + "echo " + SHELL_CONTRACT_STATUS_START_MARKER + "\n"
-                + "echo $uloop_contract_status\n"
+                + "echo $tloop_contract_status\n"
                 + "echo " + SHELL_CONTRACT_STATUS_END_MARKER + "\n"
                 + "echo " + SHELL_VERSION_START_MARKER + "\n"
                 + executableName + " " + CliConstants.SHORT_VERSION_FLAG + "\n"
-                + "set uloop_version_status $status\n"
+                + "set tloop_version_status $status\n"
                 + "echo " + SHELL_VERSION_END_MARKER + "\n"
                 + "echo " + SHELL_VERSION_STATUS_START_MARKER + "\n"
-                + "echo $uloop_version_status\n"
+                + "echo $tloop_version_status\n"
                 + "echo " + SHELL_VERSION_STATUS_END_MARKER;
         }
 

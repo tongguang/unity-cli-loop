@@ -28,7 +28,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         // A file of this repository's embedded package, whose folder differs from its package name,
         // so its asset path and the path its PDB records differ.
         private const string PackageSourceAssetPath =
-            "Packages/io.github.hatayama.uloopmcp/Runtime/PausePoints/UloopPausePoint.cs";
+            "Packages/io.github.tongguang.tloop/Runtime/PausePoints/UloopPausePoint.cs";
         private const string PackageSourcePhysicalPath = "Packages/src/Runtime/PausePoints/UloopPausePoint.cs";
 
         private static readonly long CompileStartUtcTicks = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks;
@@ -43,7 +43,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         public void SetUp()
         {
             _realProjectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            _tempRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _tempRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             _snapshotDirectory = Path.Combine(_tempRoot, "Snapshot");
             Directory.CreateDirectory(_tempRoot);
         }

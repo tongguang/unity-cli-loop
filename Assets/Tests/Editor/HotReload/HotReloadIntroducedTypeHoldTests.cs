@@ -90,7 +90,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     Is.EqualTo(
                         "No active hot-reload changes to revert. 1 introduced type(s) stay loaded "
                         + "until the next Domain Reload; a revert cannot unload the assembly that "
-                        + "carries them. Auto Refresh stays held for them; run 'uloop compile' to "
+                        + "carries them. Auto Refresh stays held for them; run 'tloop compile' to "
                         + "release it."),
                     "A revert that leaves the hold armed must say so, name what stayed, and name "
                     + "the command that releases it.");

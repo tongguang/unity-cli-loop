@@ -74,7 +74,7 @@ namespace io.github.hatayama.UnityCliLoop.Dev
             }
             
             Debug.Log($"[VibeLoggerTest] All log levels tested with correlation ID: {correlationId}");
-            Debug.Log("[VibeLoggerTest] Check .uloop/outputs/VibeLogs/ folder for output files");
+            Debug.Log("[VibeLoggerTest] Check .tloop/outputs/VibeLogs/ folder for output files");
         }
 
         [MenuItem("UnityCliLoop/Debug/VibeLogger Tests/Test Explicit StackTrace Control")]
@@ -105,7 +105,7 @@ namespace io.github.hatayama.UnityCliLoop.Dev
             );
             
             Debug.Log($"[VibeLoggerTest] Explicit control tested with correlation ID: {correlationId}");
-            Debug.Log("[VibeLoggerTest] Check .uloop/outputs/VibeLogs/ folder for output files");
+            Debug.Log("[VibeLoggerTest] Check .tloop/outputs/VibeLogs/ folder for output files");
         }
     }
 }

@@ -8,9 +8,9 @@ const (
 	LatestStable      = "latest"
 	LatestBeta        = "latest-beta"
 
-	repositoryRawBaseURL          = "https://raw.githubusercontent.com/hatayama/unity-cli-loop"
-	repositoryReleaseBaseURL      = "https://github.com/hatayama/unity-cli-loop/releases/download"
-	projectRunnerReleaseTagPrefix = "uloop-project-runner-v"
+	repositoryRawBaseURL          = "https://raw.githubusercontent.com/tongguang/unity-cli-loop"
+	repositoryReleaseBaseURL      = "https://github.com/tongguang/unity-cli-loop/releases/download"
+	projectRunnerReleaseTagPrefix = "tloop-project-runner-v"
 	dispatcherTagPrefix           = "dispatcher-v"
 	betaVersionMarker             = "-beta."
 )

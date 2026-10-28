@@ -18,8 +18,8 @@ const unityNotRunningTestEditorLog = "/home/user/Library/Logs/Unity/Editor.log"
 func TestUnityNotRunningErrorBeforeTheCommandReachedUnity(t *testing.T) {
 	err := UnityNotRunningError{
 		ProjectRoot: "/projects/sample",
-		Endpoint:    "/tmp/uloop/sample.sock",
-		Cause:       errors.New("dial unix /tmp/uloop/sample.sock: connect: no such file or directory"),
+		Endpoint:    "/tmp/tloop/sample.sock",
+		Cause:       errors.New("dial unix /tmp/tloop/sample.sock: connect: no such file or directory"),
 	}
 
 	cliErr := ClassifyError(err, ErrorContext{Command: "get-logs"})
@@ -36,7 +36,7 @@ func TestUnityNotRunningErrorBeforeTheCommandReachedUnity(t *testing.T) {
 	if cliErr.Message != "No Unity Editor is running for this project." {
 		t.Fatalf("unexpected message: %q", cliErr.Message)
 	}
-	if len(cliErr.NextActions) != 1 || !strings.Contains(cliErr.NextActions[0], "`uloop launch`") {
+	if len(cliErr.NextActions) != 1 || !strings.Contains(cliErr.NextActions[0], "`tloop launch`") {
 		t.Fatalf("expected launch as the only next action, got %#v", cliErr.NextActions)
 	}
 	if cliErr.ProjectRoot != "/projects/sample" {
@@ -72,7 +72,7 @@ func TestUnityNotRunningErrorPointsAtTheEditorLogWhenTheLockfileWasLeftBehind(t 
 		!strings.Contains(cliErr.NextActions[0], "next Editor start") {
 		t.Fatalf("expected the Editor log step first, got %q", cliErr.NextActions[0])
 	}
-	if !strings.Contains(cliErr.NextActions[1], "`uloop launch`") {
+	if !strings.Contains(cliErr.NextActions[1], "`tloop launch`") {
 		t.Fatalf("expected launch after the log step, got %q", cliErr.NextActions[1])
 	}
 	if cliErr.Details["EditorLog"] != unityNotRunningTestEditorLog {
@@ -87,7 +87,7 @@ func TestUnityNotRunningErrorOmitsTheEditorLogStepWithoutTheEditorsLog(t *testin
 
 	cliErr := err.ToCLIError(ErrorContext{Command: "get-logs"})
 
-	if len(cliErr.NextActions) != 1 || !strings.Contains(cliErr.NextActions[0], "`uloop launch`") {
+	if len(cliErr.NextActions) != 1 || !strings.Contains(cliErr.NextActions[0], "`tloop launch`") {
 		t.Fatalf("expected the launch step only, got %#v", cliErr.NextActions)
 	}
 	if _, ok := cliErr.Details["EditorLog"]; ok {
@@ -186,7 +186,7 @@ func TestUnityNotRunningErrorAfterUnityExitedDuringLaunch(t *testing.T) {
 	if !strings.Contains(cliErr.NextActions[0], unityNotRunningTestEditorLog) {
 		t.Fatalf("expected the Editor log step first, got %q", cliErr.NextActions[0])
 	}
-	if cliErr.NextActions[1] != "Run `uloop launch` again." {
+	if cliErr.NextActions[1] != "Run `tloop launch` again." {
 		t.Fatalf("expected launch to be run again, got %q", cliErr.NextActions[1])
 	}
 }

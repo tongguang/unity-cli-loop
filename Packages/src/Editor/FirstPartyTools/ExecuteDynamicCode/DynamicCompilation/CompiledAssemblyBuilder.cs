@@ -82,7 +82,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             ct.ThrowIfCancellationRequested();
 
             ExternalCompilerPaths externalCompilerPaths = _externalCompilerPathResolver.Resolve();
-            string tempDirectoryPath = Path.Combine("Temp", "UnityCliLoopCompilation");
+            string tempDirectoryPath = Path.Combine("Temp", "TuanjieCliLoopCompilation");
             int compileCounter = Interlocked.Increment(ref _compileCounter);
             string uniqueName = CreateUniqueCompilationName(plan.ClassName, compileCounter);
             string sourcePath = Path.Combine(tempDirectoryPath, $"{uniqueName}.cs");

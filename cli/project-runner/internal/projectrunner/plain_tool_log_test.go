@@ -186,7 +186,7 @@ func TestClassifyPlainToolErrorNamesTheKindWithoutTheMessage(t *testing.T) {
 
 // Verifies a plain tool command with the log off leaves no log directory behind.
 func TestRunPlainToolWritesNothingWhenDebugIsOff(t *testing.T) {
-	// Explicitly off, so the test also holds when it runs from a shell that exported ULOOP_DEBUG.
+	// Explicitly off, so the test also holds when it runs from a shell that exported TLOOP_DEBUG.
 	t.Setenv(vibelog.CLIVibeLogEnvName, "")
 	projectRoot := t.TempDir()
 

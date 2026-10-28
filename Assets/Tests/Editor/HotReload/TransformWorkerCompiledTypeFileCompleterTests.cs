@@ -30,11 +30,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         private const string PackageFixtureAssemblyName = "UnityCLILoop.Tests.HotReloadPackageFixture";
         private const string PackageFixtureTypeMetadataName =
             "io.github.hatayama.UnityCliLoop.Tests.PackageFixture.HotReloadPackageFixture";
-        private const string PackageFixtureRootAssetPath = "Packages/io.github.hatayama.uloop.hotreload-package-fixture";
+        private const string PackageFixtureRootAssetPath = "Packages/io.github.tongguang.tloop.hotreload-package-fixture";
         private const string PackageFixtureAssetPath =
-            "Packages/io.github.hatayama.uloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/io.github.tongguang.tloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const string PackageFixturePhysicalPath =
-            "Packages/uloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/tloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
 
         /// <summary>
         /// What: a split reason carried as the detail of another reason, as when a member reads an

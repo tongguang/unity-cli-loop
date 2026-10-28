@@ -86,9 +86,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void FormatDetailLine_WhenPadded_TrimsWhitespace()
         {
             // Verifies surrounding whitespace is stripped from streamed installer output.
-            string result = CliInstallProgressFormatting.FormatDetailLine("  Downloading uloop  ");
+            string result = CliInstallProgressFormatting.FormatDetailLine("  Downloading tloop  ");
 
-            Assert.That(result, Is.EqualTo("Downloading uloop"));
+            Assert.That(result, Is.EqualTo("Downloading tloop"));
         }
 
         [Test]

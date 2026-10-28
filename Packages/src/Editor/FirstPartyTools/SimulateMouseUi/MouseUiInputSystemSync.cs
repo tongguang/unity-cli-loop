@@ -1,6 +1,6 @@
 #nullable enable
 using UnityEngine;
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 
@@ -14,7 +14,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // UI handlers can read Mouse.current alongside PointerEventData, so both paths must observe one position.
         internal static void SyncMousePosition(Vector2 screenPos)
         {
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
             Mouse? mouse = Mouse.current;
             if (mouse == null)
             {

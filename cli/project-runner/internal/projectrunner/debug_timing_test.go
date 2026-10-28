@@ -44,7 +44,7 @@ func TestWriteDebugTiming_WhenEnvironmentIsEnabled_ShouldWriteTimingLine(t *test
 
 	output := stderr.String()
 	for _, expected := range []string{
-		"[uloop timing]",
+		"[tloop timing]",
 		"command=execute-dynamic-code",
 		"total=10ms",
 		"rpc_total=9ms",
@@ -95,8 +95,8 @@ func TestWriteDebugTiming_WhenUnityTimingsExist_ShouldWriteUnityTimingLines(t *t
 
 	output := stderr.String()
 	for _, expected := range []string{
-		"[uloop timing] unity [Perf] Build: 12.3ms",
-		"[uloop timing] unity [Perf] Execution: 4.5ms",
+		"[tloop timing] unity [Perf] Build: 12.3ms",
+		"[tloop timing] unity [Perf] Execution: 4.5ms",
 	} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("debug timing output missing %q: %s", expected, output)

@@ -10,7 +10,7 @@ import (
 
 const (
 	testUnixParentPath   = "/tmp"
-	testUnixEndpointPath = "/tmp/uloop-501"
+	testUnixEndpointPath = "/tmp/tloop-501"
 	testEffectiveUserID  = uint32(501)
 )
 
@@ -142,13 +142,13 @@ func TestValidateUnixEndpointPathsReportsEachFailingStep(t *testing.T) {
 		}, "inspect Unix endpoint directory: inspect failed"},
 		{"endpoint symlink", func(r *erroringUnixMetadataReader) {
 			r.noFollow[testUnixEndpointPath] = unixFileMetadata{Kind: unixFileKindSymbolicLink, OwnerUserID: testEffectiveUserID, Permissions: 0o700}
-		}, "unix endpoint directory /tmp/uloop-501 must be a real directory"},
+		}, "unix endpoint directory /tmp/tloop-501 must be a real directory"},
 		{"endpoint owner", func(r *erroringUnixMetadataReader) {
 			r.noFollow[testUnixEndpointPath] = unixFileMetadata{Kind: unixFileKindDirectory, OwnerUserID: testEffectiveUserID + 1, Permissions: 0o700}
-		}, "unix endpoint directory /tmp/uloop-501 is not owned by the current user"},
+		}, "unix endpoint directory /tmp/tloop-501 is not owned by the current user"},
 		{"endpoint mode", func(r *erroringUnixMetadataReader) {
 			r.noFollow[testUnixEndpointPath] = unixFileMetadata{Kind: unixFileKindDirectory, OwnerUserID: testEffectiveUserID, Permissions: 0o770}
-		}, "unix endpoint directory /tmp/uloop-501 must have mode 0700"},
+		}, "unix endpoint directory /tmp/tloop-501 must have mode 0700"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

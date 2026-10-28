@@ -21,8 +21,8 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     {
         public const string ServeArgument = "--serve";
         public const string RunCommand = "run";
-        public const string QuitCommand = "__ULOOP_TRANSFORM_QUIT__";
-        public const string ResultPrefix = "__ULOOP_TRANSFORM_RESULT__";
+        public const string QuitCommand = "__TLOOP_TRANSFORM_QUIT__";
+        public const string ResultPrefix = "__TLOOP_TRANSFORM_RESULT__";
         public const int MalformedRequestExitCode = 2;
 
         // Why bounded: diagnostics travel as a single line through a pipe the host reads with a

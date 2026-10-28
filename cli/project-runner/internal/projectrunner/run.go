@@ -41,7 +41,7 @@ func RunProjectLocal(ctx context.Context, args []string, stdout io.Writer, stder
 		clierrors.WriteClassifiedError(stderr, &clierrors.ArgumentError{
 			Message:     "Unknown global option: " + command,
 			Option:      command,
-			NextActions: []string{"Run `uloop --help` to inspect supported global options."},
+			NextActions: []string{"Run `tloop --help` to inspect supported global options."},
 		}, clierrors.ErrorContext{})
 		return 1
 	}

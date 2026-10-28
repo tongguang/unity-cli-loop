@@ -1,6 +1,6 @@
 # VibeLogs: Tool-Side Logs for Investigations
 
-Read this before concluding that a BUSY error, a hang, or an unexplained `uloop` result "cannot
+Read this before concluding that a BUSY error, a hang, or an unexplained `tloop` result "cannot
 be diagnosed because no logs were collected". The tool writes its own structured logs into the
 Unity project, and they are easy to forget because they live outside the Editor console and are
 not part of any command response. One investigation (2026-09-23) reported a BUSY freeze as
@@ -13,7 +13,7 @@ Both sides of the tool write JSON-lines files into the same directory of the Uni
 command ran against:
 
 ```
-<PROJECT_ROOT>/.uloop/outputs/VibeLogs/
+<PROJECT_ROOT>/.tloop/outputs/VibeLogs/
   unity_vibe_YYYYMMDD.json   # Unity Editor side (server, tools, domain reloads)
   cli_vibe_YYYYMMDD.json     # native CLI side
 ```
@@ -21,15 +21,15 @@ command ran against:
 - The date in the file name is the **UTC** date, while each entry's `timestamp` is local time with
   its offset. An evening event in a zone ahead of UTC lands in the previous day's file, so search
   the neighboring day's file before deciding an event was not logged.
-- `.uloop/*` is gitignored, so `git reset --hard` and `git clean` without `-x` leave the logs in
+- `.tloop/*` is gitignored, so `git reset --hard` and `git clean` without `-x` leave the logs in
   place. A project reset between verification rounds does not erase earlier evidence.
 - The Unity side rotates a file past 10 MB and keeps the newest 20 `unity_vibe_*` files
   (`VibeLoggerService` in `Packages/src/Editor/ToolContracts/VibeLogger.cs`).
 
 ## When they exist
 
-- Unity side: only when the `ULOOP_DEBUG` scripting define symbol is set in the project. Every
-  log method is `[Conditional("ULOOP_DEBUG")]`, so without it nothing is written — not even
+- Unity side: only when the `TLOOP_DEBUG` scripting define symbol is set in the project. Every
+  log method is `[Conditional("TLOOP_DEBUG")]`, so without it nothing is written — not even
   errors. This repository's development project defines it for the Standalone build target.
   Hot reload also writes one `hot_reload_timing_detail` per apply run, with the milliseconds of
   each step outside the response's `Timing` phases (`steps`), the phases themselves, and
@@ -78,7 +78,7 @@ command ran against:
   assembly check and process spawn; `ready` is false when the start failed (no worker
   assembly, or the process did not start). `workerAssemblySource` says where the worker
   assembly came from: `existing` (already in this Editor's worker directory), `cache` (copied
-  from `<OS temp>/UnityCliLoopCompilation/RoslynWorkerCache/<key>/`, keyed by the worker source
+  from `<OS temp>/TuanjieCliLoopCompilation/RoslynWorkerCache/<key>/`, keyed by the worker source
   and the compiler paths), or `built` (csc ran); `cachePublish` and `cachePublishError` say
   whether a built assembly was added to that cache.
   After each server reset, the shared-worker warm-up writes one
@@ -110,7 +110,7 @@ command ran against:
   - `hot_reload_source_snapshot_capture_cancelled` when a domain reload or a compile start
     stopped it.
   After any of the last three, the next reader or the first update tick starts a new capture.
-  While a capture runs, `get-compile-status` reports not ready, so `uloop compile` returns only
+  While a capture runs, `get-compile-status` reports not ready, so `tloop compile` returns only
   after it. That hold gives up after 30 seconds and writes one
   `hot_reload_source_snapshot_capture_hold_cap_exceeded` (a warning). Readers keep waiting for
   the capture. `compile_status_query_received` carries `is_snapshot_capture_holding`. When both
@@ -217,7 +217,7 @@ command ran against:
   `hot_reload_warm_up_complete` are the warm-up's.
   A run's `steps` have `warm_up_yield`, the time it waited for the unit in flight, and `warm_up_targets`, the time it took to record its
   assemblies for the next warm-up.
-- CLI side: only when the `ULOOP_DEBUG` environment variable is set to a value other than empty,
+- CLI side: only when the `TLOOP_DEBUG` environment variable is set to a value other than empty,
   `0`, or `false` (`cli/common/vibelog/cli_vibe.go`).
 - A missing line is evidence only when the define was set and the code path logs at all.
   Coverage is per call site, not per command: for example, `execute-dynamic-code`,
@@ -255,7 +255,7 @@ or `control-play-mode` that waits for a domain reload or a Play Mode change, and
 | `cli_tool_request_sent` | before the request is sent | `command`, `correlation_id`, `project_identity`, `cli_version`, `param_keys` (sorted), `array_lengths` (element count of each array parameter) |
 | `cli_tool_response_received` | when Unity answered | `command`, `correlation_id`, `elapsed_ms`, `request_accepted`, `result_bytes`, `exit_code` |
 | `cli_tool_request_failed` (`ERROR`) | when no answer came, or Unity answered with an error | `command`, `correlation_id`, `elapsed_ms`, `request_accepted`, `error_kind` (`rpc:<error data type>`, `final_response_timeout`, or `other`), `running_tool_name` (only when `error_kind` is `rpc:server_busy` and Unity named the tool that held the Editor) |
-| `cli_hot_reload_busy_wait_decided` | when the first `hot-reload` answer is `server_busy` (another uloop command holds the Editor; the preceding `cli_tool_request_failed` has `error_kind` `rpc:server_busy`) | `correlation_id` (the first request's), `running_tool_name`, `running_tool_phase`, `running_tool_elapsed_seconds`, `budget_ms`, `resend_interval_ms` |
+| `cli_hot_reload_busy_wait_decided` | when the first `hot-reload` answer is `server_busy` (another tloop command holds the Editor; the preceding `cli_tool_request_failed` has `error_kind` `rpc:server_busy`) | `correlation_id` (the first request's), `running_tool_name`, `running_tool_phase`, `running_tool_elapsed_seconds`, `budget_ms`, `resend_interval_ms` |
 | `cli_hot_reload_busy_wait_complete` (`WARN` unless the Editor became ready and the request sent after the wait answered) | after the wait and the one request sent after it, on every way out of a wait that started (a cancel, a failed send, and a bad answer included) | `correlation_id` (the first request's), `second_correlation_id` (the request sent after the wait, or empty when none was sent), `waited_ms`, `ready`, `resends` (requests sent again during the wait while a cancelled `execute-dynamic-code` held the Editor; each also has its own `cli_tool_request_sent`), `resend_correlation_ids` (the `correlation_id` of every request sent again during the wait, in order; its length is `resends`, and its last entry equals `second_correlation_id` when a resent request got in), `second_result`, and that answer's `second_success` and `second_outcome` |
 | `cli_hot_reload_editor_ready_retry_decided` | after every `hot-reload` answer (the one after a busy wait, when one ran), before the fallback decision | `correlation_id` (the request's), `requested`, `parse_error` |
 | `cli_hot_reload_editor_ready_retry_complete` (`WARN` unless the Editor settled and the second apply answered) | after the wait and the second apply, when a retry was requested | `correlation_id` (the first request's), `second_correlation_id` (the second request's, or empty when none was sent), `waited_ms`, `ready`, `second_result`, and the second answer's `second_success` and `second_outcome` |

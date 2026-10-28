@@ -1,13 +1,13 @@
 #!/bin/sh
 set -eu
 
-REPOSITORY="hatayama/unity-cli-loop"
-INSTALL_DIR="${ULOOP_INSTALL_DIR:-$HOME/.local/bin}"
-VERSION="${ULOOP_VERSION:-latest}"
+REPOSITORY="tongguang/unity-cli-loop"
+INSTALL_DIR="${TLOOP_INSTALL_DIR:-$HOME/.local/bin}"
+VERSION="${TLOOP_VERSION:-latest}"
 LATEST_VERSION="latest"
 LATEST_BETA_VERSION="latest-beta"
 DEFAULT_PIN_REF="main"
-PIN_REF="${ULOOP_REF:-$DEFAULT_PIN_REF}"
+PIN_REF="${TLOOP_REF:-$DEFAULT_PIN_REF}"
 
 # Why: install.sh interpolates $VERSION into
 # "https://github.com/$REPOSITORY/releases/download/$VERSION/..." without
@@ -16,9 +16,9 @@ PIN_REF="${ULOOP_REF:-$DEFAULT_PIN_REF}"
 # release path even though the ambient attacker who can already set env
 # usually has bigger wins. Fail-close early on any value that is neither
 # the two well-known channel selectors nor a semantic-version-shaped tag,
-# so downstream users of $VERSION (asset URL, ULOOP_VERSION passthrough,
+# so downstream users of $VERSION (asset URL, TLOOP_VERSION passthrough,
 # release tag prefixing) never see a value they weren't designed for.
-validate_uloop_version() {
+validate_tloop_version() {
   candidate=$1
   if [ "$candidate" = "$LATEST_VERSION" ] || [ "$candidate" = "$LATEST_BETA_VERSION" ]; then
     return
@@ -31,34 +31,34 @@ validate_uloop_version() {
   # smuggled past with embedded newlines or NULs.
   case $candidate in
     ''|*[!0-9A-Za-z.+-]*)
-      echo "Invalid ULOOP_VERSION: $candidate" >&2
+      echo "Invalid TLOOP_VERSION: $candidate" >&2
       echo "Expected 'latest', 'latest-beta', or a semver tag such as '3.0.0-beta.5' / 'dispatcher-v3.0.0-beta.5'." >&2
       exit 1
       ;;
   esac
-  # POSIX ERE: optional dispatcher-v / uloop-project-runner-v / v prefix,
+  # POSIX ERE: optional dispatcher-v / tloop-project-runner-v / v prefix,
   # then MAJOR.MINOR.PATCH, then optional -prerelease.identifiers or
   # +build.metadata.
-  if printf '%s' "$candidate" | grep -Eq '^(dispatcher-v|uloop-project-runner-v|v)?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
+  if printf '%s' "$candidate" | grep -Eq '^(dispatcher-v|tloop-project-runner-v|v)?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
     return
   fi
-  echo "Invalid ULOOP_VERSION: $candidate" >&2
+  echo "Invalid TLOOP_VERSION: $candidate" >&2
   echo "Expected 'latest', 'latest-beta', or a semver tag such as '3.0.0-beta.5' / 'dispatcher-v3.0.0-beta.5'." >&2
   exit 1
 }
 
-validate_uloop_version "$VERSION"
+validate_tloop_version "$VERSION"
 
 report_path_shadowing() {
-  resolved_uloop=$(command -v uloop 2>/dev/null || true)
-  expected_uloop="$INSTALL_DIR/$installed_command_name"
+  resolved_tloop=$(command -v tloop 2>/dev/null || true)
+  expected_tloop="$INSTALL_DIR/$installed_command_name"
 
-  if [ -z "$resolved_uloop" ] || [ "$resolved_uloop" = "$expected_uloop" ] || [ "$resolved_uloop.exe" = "$expected_uloop" ]; then
+  if [ -z "$resolved_tloop" ] || [ "$resolved_tloop" = "$expected_tloop" ] || [ "$resolved_tloop.exe" = "$expected_tloop" ]; then
     return
   fi
 
-  echo "Installed uloop to $expected_uloop, but PATH resolves uloop to:"
-  echo "  $resolved_uloop"
+  echo "Installed tloop to $expected_tloop, but PATH resolves tloop to:"
+  echo "  $resolved_tloop"
   echo "Move $INSTALL_DIR earlier in PATH, or remove the legacy installation if it owns that command."
 }
 
@@ -90,7 +90,7 @@ detect_asset_name() {
       echo "Unsupported Windows architecture: $arch" >&2
       exit 1
     fi
-    echo "uloop-dispatcher-windows-amd64.zip"
+    echo "tloop-dispatcher-windows-amd64.zip"
     return
   fi
 
@@ -102,21 +102,21 @@ detect_asset_name() {
     exit 1
   fi
 
-  echo "uloop-dispatcher-$os_name-$arch_name.tar.gz"
+  echo "tloop-dispatcher-$os_name-$arch_name.tar.gz"
 }
 
 detect_installed_command_name() {
   case "$asset_name" in
-    *.zip) echo "uloop.exe" ;;
-    *) echo "uloop" ;;
+    *.zip) echo "tloop.exe" ;;
+    *) echo "tloop" ;;
   esac
 }
 
-infer_npm_prefix_from_uloop_path() {
+infer_npm_prefix_from_tloop_path() {
   command_path=$1
 
   case "$command_path" in
-    */bin/uloop|*/bin/uloop.exe)
+    */bin/tloop|*/bin/tloop.exe)
       bin_dir=${command_path%/*}
       echo "${bin_dir%/bin}"
       ;;
@@ -126,7 +126,7 @@ infer_npm_prefix_from_uloop_path() {
   esac
 }
 
-is_legacy_npm_uloop_path() {
+is_legacy_npm_tloop_path() {
   command_path=$1
 
   if [ -z "$command_path" ]; then
@@ -136,11 +136,11 @@ is_legacy_npm_uloop_path() {
   if [ -L "$command_path" ]; then
     link_target=$(readlink "$command_path" 2>/dev/null || true)
     case "$link_target" in
-      *node_modules/uloop-cli*|*node_modules\\uloop-cli*) return 0 ;;
+      *node_modules/tloop-cli*|*node_modules\\tloop-cli*) return 0 ;;
     esac
   fi
 
-  if [ -f "$command_path" ] && grep -F "node_modules/uloop-cli" "$command_path" >/dev/null 2>&1; then
+  if [ -f "$command_path" ] && grep -F "node_modules/tloop-cli" "$command_path" >/dev/null 2>&1; then
     return 0
   fi
 
@@ -228,7 +228,7 @@ print_fish_append_command() {
 print_path_setup_guidance() {
   shell_name=$(detect_user_shell_name)
 
-  echo "Installed uloop to $INSTALL_DIR, but that directory is not in PATH."
+  echo "Installed tloop to $INSTALL_DIR, but that directory is not in PATH."
   case "$shell_name" in
     zsh)
       profile_path=$(detect_zsh_profile_path)
@@ -264,16 +264,16 @@ print_path_setup_guidance() {
 }
 
 try_remove_legacy_npm_package() {
-  legacy_uloop=$1
-  expected_uloop=$2
+  legacy_tloop=$1
+  expected_tloop=$2
 
-  if [ -n "$expected_uloop" ] && { [ "$legacy_uloop" = "$expected_uloop" ] || [ "$legacy_uloop.exe" = "$expected_uloop" ]; }; then
+  if [ -n "$expected_tloop" ] && { [ "$legacy_tloop" = "$expected_tloop" ] || [ "$legacy_tloop.exe" = "$expected_tloop" ]; }; then
     return
   fi
 
   legacy_prefix=""
-  if [ -n "$legacy_uloop" ] && is_legacy_npm_uloop_path "$legacy_uloop"; then
-    legacy_prefix=$(infer_npm_prefix_from_uloop_path "$legacy_uloop")
+  if [ -n "$legacy_tloop" ] && is_legacy_npm_tloop_path "$legacy_tloop"; then
+    legacy_prefix=$(infer_npm_prefix_from_tloop_path "$legacy_tloop")
   fi
 
   if [ -z "$legacy_prefix" ]; then
@@ -285,11 +285,11 @@ try_remove_legacy_npm_package() {
   fi
 
   if [ -n "$legacy_prefix" ]; then
-    if npm uninstall -g --prefix "$legacy_prefix" uloop-cli; then
-      if [ -e "$legacy_uloop" ] || [ -L "$legacy_uloop" ]; then
+    if npm uninstall -g --prefix "$legacy_prefix" tloop-cli; then
+      if [ -e "$legacy_tloop" ] || [ -L "$legacy_tloop" ]; then
         return
       else
-        echo "Removed legacy npm package: uloop-cli"
+        echo "Removed legacy npm package: tloop-cli"
       fi
       return
     fi
@@ -370,20 +370,20 @@ set_download_urls() {
   fi
   if [ -z "$download_url" ]; then
     echo "Could not find a $VERSION release asset named $asset_name." >&2
-    echo "Set ULOOP_VERSION to a release tag that provides this asset." >&2
+    echo "Set TLOOP_VERSION to a release tag that provides this asset." >&2
     exit 1
   fi
   checksum_url="$download_url.sha256"
 }
 
-# Why: ULOOP_REF is interpolated into a raw.githubusercontent.com URL. Reject
+# Why: TLOOP_REF is interpolated into a raw.githubusercontent.com URL. Reject
 # empty values, path traversal (`..`), and any character outside the ref
 # alphabet so a hostile env cannot break out of the intended pin path.
-validate_uloop_ref() {
+validate_tloop_ref() {
   candidate=$1
   case $candidate in
     ''|*..*|*[!0-9A-Za-z._/-]*)
-      echo "Invalid ULOOP_REF: $candidate" >&2
+      echo "Invalid TLOOP_REF: $candidate" >&2
       echo "Expected a git ref such as 'main' or 'v3-beta'." >&2
       exit 1
       ;;
@@ -448,15 +448,15 @@ validate_pin_manifest() {
 }
 
 resolve_manifest_from_pin_if_needed() {
-  if [ -n "${ULOOP_ARCHIVE_MANIFEST:-}" ]; then
+  if [ -n "${TLOOP_ARCHIVE_MANIFEST:-}" ]; then
     return 0
   fi
 
-  validate_uloop_ref "$PIN_REF"
+  validate_tloop_ref "$PIN_REF"
 
   pin_json=$(fetch_pin_json) || {
     echo "Could not fetch project-runner pin from https://raw.githubusercontent.com/$REPOSITORY/$PIN_REF/Packages/src/project-runner-pin.json" >&2
-    echo "Set ULOOP_ARCHIVE_MANIFEST from a verified attestation (see SECURITY.md), or fix ULOOP_REF." >&2
+    echo "Set TLOOP_ARCHIVE_MANIFEST from a verified attestation (see SECURITY.md), or fix TLOOP_REF." >&2
     exit 1
   }
 
@@ -476,7 +476,7 @@ resolve_manifest_from_pin_if_needed() {
     echo "project-runner pin dispatcherArchiveManifest failed format validation" >&2
     exit 1
   }
-  validate_uloop_version "$pin_tag"
+  validate_tloop_version "$pin_tag"
 
   if [ "$VERSION" = "$LATEST_VERSION" ] || [ "$VERSION" = "$LATEST_BETA_VERSION" ]; then
     VERSION=$pin_tag
@@ -484,22 +484,22 @@ resolve_manifest_from_pin_if_needed() {
   elif [ "$VERSION" = "$pin_tag" ]; then
     :
   else
-    echo "ULOOP_VERSION ($VERSION) does not match the pin dispatcherReleaseTag ($pin_tag) at $PIN_REF." >&2
-    echo "Unset ULOOP_VERSION, or supply ULOOP_ARCHIVE_MANIFEST from a verified attestation (see SECURITY.md)." >&2
+    echo "TLOOP_VERSION ($VERSION) does not match the pin dispatcherReleaseTag ($pin_tag) at $PIN_REF." >&2
+    echo "Unset TLOOP_VERSION, or supply TLOOP_ARCHIVE_MANIFEST from a verified attestation (see SECURITY.md)." >&2
     exit 1
   fi
 
-  ULOOP_ARCHIVE_MANIFEST=$pin_manifest
+  TLOOP_ARCHIVE_MANIFEST=$pin_manifest
 }
 
-zip_extracted_uloop_present() {
+zip_extracted_tloop_present() {
   [ -f "$tmp_dir/$installed_command_name" ]
 }
 
 try_extract_zip_with_unzip() {
   command -v unzip >/dev/null 2>&1 || return 1
   unzip -q "$tmp_dir/$asset_name" -d "$tmp_dir" || return 1
-  zip_extracted_uloop_present
+  zip_extracted_tloop_present
 }
 
 try_extract_zip_with_tar() {
@@ -507,7 +507,7 @@ try_extract_zip_with_tar() {
   # Why: omit -z. A zip is not gzip, and a failed extract must fall
   # through so GNU tar (which may reject zip) can yield to the next tool.
   tar -xf "$tmp_dir/$asset_name" -C "$tmp_dir" || return 1
-  zip_extracted_uloop_present
+  zip_extracted_tloop_present
 }
 
 try_extract_zip_with_powershell() {
@@ -523,18 +523,18 @@ try_extract_zip_with_powershell() {
     zip_win=$(cygpath -w "$tmp_dir/$asset_name")
     dest_win=$(cygpath -w "$tmp_dir")
   fi
-  ULOOP_ZIP_PATH=$zip_win
-  ULOOP_ZIP_DEST=$dest_win
-  export ULOOP_ZIP_PATH ULOOP_ZIP_DEST
-  powershell.exe -NoProfile -Command 'Expand-Archive -LiteralPath $env:ULOOP_ZIP_PATH -DestinationPath $env:ULOOP_ZIP_DEST -Force' || return 1
-  zip_extracted_uloop_present
+  TLOOP_ZIP_PATH=$zip_win
+  TLOOP_ZIP_DEST=$dest_win
+  export TLOOP_ZIP_PATH TLOOP_ZIP_DEST
+  powershell.exe -NoProfile -Command 'Expand-Archive -LiteralPath $env:TLOOP_ZIP_PATH -DestinationPath $env:TLOOP_ZIP_DEST -Force' || return 1
+  zip_extracted_tloop_present
 }
 
 extract_zip_asset() {
   # Why: Git Bash and some Windows hosts have no unzip. Prefer unzip, then
   # tar (macOS/Windows 10+ bsdtar extracts zip; GNU tar often does not),
   # then PowerShell Expand-Archive on Windows. Try the next tool when the
-  # current one is missing or the extract does not produce uloop.exe.
+  # current one is missing or the extract does not produce tloop.exe.
   if try_extract_zip_with_unzip; then
     return
   fi
@@ -560,10 +560,10 @@ extract_asset() {
   esac
 }
 
-test_uloop_native_install_supported() {
-  uloop_path=$1
+test_tloop_native_install_supported() {
+  tloop_path=$1
 
-  help_output=$("$uloop_path" install --help 2>/dev/null) || return 1
+  help_output=$("$tloop_path" install --help 2>/dev/null) || return 1
   case "$(uname -s)" in
     Darwin)
       printf '%s\n' "$help_output" | grep -F "On macOS," >/dev/null
@@ -580,11 +580,11 @@ test_uloop_native_install_supported() {
   esac
 }
 
-invoke_uloop_native_install() {
-  uloop_path=$1
+invoke_tloop_native_install() {
+  tloop_path=$1
 
-  echo "Configuring global uloop dispatcher..."
-  "$uloop_path" install --dir "$INSTALL_DIR"
+  echo "Configuring global tloop dispatcher..."
+  "$tloop_path" install --dir "$INSTALL_DIR"
 }
 
 prepend_current_path() {
@@ -598,17 +598,17 @@ prepend_current_path() {
 }
 
 cleanup_preinstall_legacy_npm_if_needed() {
-  if [ "$legacy_npm_removed_before_install" -ne 0 ] || [ "$legacy_npm_uloop_detected_before_install" -ne 1 ]; then
+  if [ "$legacy_npm_removed_before_install" -ne 0 ] || [ "$legacy_npm_tloop_detected_before_install" -ne 1 ]; then
     return
   fi
-  if [ -z "$legacy_uloop_before_install" ]; then
+  if [ -z "$legacy_tloop_before_install" ]; then
     return
   fi
-  if [ ! -e "$legacy_uloop_before_install" ] && [ ! -L "$legacy_uloop_before_install" ]; then
+  if [ ! -e "$legacy_tloop_before_install" ] && [ ! -L "$legacy_tloop_before_install" ]; then
     return
   fi
 
-  try_remove_legacy_npm_package "$legacy_uloop_before_install" "$final_uloop_path"
+  try_remove_legacy_npm_package "$legacy_tloop_before_install" "$final_tloop_path"
 }
 
 run_compatibility_install_setup() {
@@ -624,10 +624,10 @@ run_compatibility_install_setup() {
 
 asset_name=$(detect_asset_name)
 installed_command_name=$(detect_installed_command_name)
-legacy_uloop_before_install=$(command -v uloop 2>/dev/null || true)
-legacy_npm_uloop_detected_before_install=0
-if is_legacy_npm_uloop_path "$legacy_uloop_before_install"; then
-  legacy_npm_uloop_detected_before_install=1
+legacy_tloop_before_install=$(command -v tloop 2>/dev/null || true)
+legacy_npm_tloop_detected_before_install=0
+if is_legacy_npm_tloop_path "$legacy_tloop_before_install"; then
+  legacy_npm_tloop_detected_before_install=1
 fi
 download_url=""
 checksum_url=""
@@ -635,33 +635,33 @@ resolve_manifest_from_pin_if_needed
 set_download_urls
 
 tmp_dir=$(mktemp -d)
-staged_uloop_path=""
-replaced_uloop_backup_path=""
-final_uloop_path=""
+staged_tloop_path=""
+replaced_tloop_backup_path=""
+final_tloop_path=""
 install_completed=0
 
 # Why: if the install failed after the old binary was moved aside, put it
-# back so a failed update never leaves the user without a working uloop.
+# back so a failed update never leaves the user without a working tloop.
 # That includes post-place failures such as --version: the new binary is
 # already at the destination, so remove it first and only then restore.
 # If the new binary cannot be removed, leave the backup in place.
 cleanup_install() {
-  if [ "$install_completed" -eq 0 ] && [ -n "$replaced_uloop_backup_path" ] && [ -f "$replaced_uloop_backup_path" ]; then
-    if [ -n "$final_uloop_path" ]; then
-      rm -f "$final_uloop_path" 2>/dev/null || true
+  if [ "$install_completed" -eq 0 ] && [ -n "$replaced_tloop_backup_path" ] && [ -f "$replaced_tloop_backup_path" ]; then
+    if [ -n "$final_tloop_path" ]; then
+      rm -f "$final_tloop_path" 2>/dev/null || true
     fi
-    if [ -n "$final_uloop_path" ] && [ ! -e "$final_uloop_path" ]; then
-      mv "$replaced_uloop_backup_path" "$final_uloop_path"
+    if [ -n "$final_tloop_path" ] && [ ! -e "$final_tloop_path" ]; then
+      mv "$replaced_tloop_backup_path" "$final_tloop_path"
     fi
   fi
-  if [ -n "$staged_uloop_path" ]; then
-    rm -f "$staged_uloop_path"
+  if [ -n "$staged_tloop_path" ]; then
+    rm -f "$staged_tloop_path"
   fi
   rm -rf "$tmp_dir"
 }
 trap cleanup_install EXIT
 # Why: POSIX does not run the EXIT trap on INT/HUP/TERM unless the handler
-# exits. Between move-aside and place that would leave uloop missing.
+# exits. Between move-aside and place that would leave tloop missing.
 trap "exit 129" INT HUP TERM
 
 compute_asset_sha256() {
@@ -695,19 +695,19 @@ verify_checksum() {
 
 verify_archive_attestation_manifest() {
   # Why: when the dispatcher self-update path invokes this script it passes an
-  # ULOOP_ARCHIVE_MANIFEST env carrying "<digest>  <filename>" lines that were
+  # TLOOP_ARCHIVE_MANIFEST env carrying "<digest>  <filename>" lines that were
   # extracted from a Sigstore attestation bundle already verified against the
   # release commit SHA. Enforce that the digest we just computed matches the
   # entry for our asset_name so a compromised same-origin .sha256 file alone
   # cannot bless a swapped archive. A missing manifest must fail before
   # extraction because same-origin checksums alone do not authenticate a first
   # installation.
-  if [ -z "${ULOOP_ARCHIVE_MANIFEST:-}" ]; then
+  if [ -z "${TLOOP_ARCHIVE_MANIFEST:-}" ]; then
     echo "Attestation manifest is required" >&2
     exit 1
   fi
   manifest_hash=$(
-    printf '%s\n' "$ULOOP_ARCHIVE_MANIFEST" | awk -v name="$asset_name" '
+    printf '%s\n' "$TLOOP_ARCHIVE_MANIFEST" | awk -v name="$asset_name" '
       $2 == name { print $1; found = 1; exit }
       END { if (!found) exit 1 }
     '
@@ -726,32 +726,32 @@ verify_archive_attestation_manifest() {
 }
 
 mkdir -p "$INSTALL_DIR"
-echo "Downloading uloop dispatcher archive..."
+echo "Downloading tloop dispatcher archive..."
 curl -fsSL "$download_url" -o "$tmp_dir/$asset_name"
 curl -fsSL "$checksum_url" -o "$tmp_dir/$asset_name.sha256"
-echo "Verifying uloop dispatcher archive..."
+echo "Verifying tloop dispatcher archive..."
 verify_checksum
 verify_archive_attestation_manifest
-echo "Extracting uloop dispatcher archive..."
+echo "Extracting tloop dispatcher archive..."
 extract_asset
-staged_uloop_path="$INSTALL_DIR/.uloop-install-$$"
-if [ "$installed_command_name" = "uloop.exe" ]; then
-  staged_uloop_path="$staged_uloop_path.exe"
+staged_tloop_path="$INSTALL_DIR/.tloop-install-$$"
+if [ "$installed_command_name" = "tloop.exe" ]; then
+  staged_tloop_path="$staged_tloop_path.exe"
 fi
-install -m 0755 "$tmp_dir/$installed_command_name" "$staged_uloop_path"
-"$staged_uloop_path" --version >/dev/null
+install -m 0755 "$tmp_dir/$installed_command_name" "$staged_tloop_path"
+"$staged_tloop_path" --version >/dev/null
 native_install_supported=0
-if test_uloop_native_install_supported "$staged_uloop_path"; then
+if test_tloop_native_install_supported "$staged_tloop_path"; then
   native_install_supported=1
 fi
-final_uloop_path="$INSTALL_DIR/$installed_command_name"
+final_tloop_path="$INSTALL_DIR/$installed_command_name"
 legacy_npm_removed_before_install=0
-if [ "$legacy_uloop_before_install" = "$final_uloop_path" ] || [ "$legacy_uloop_before_install.exe" = "$final_uloop_path" ]; then
-  if [ "$legacy_npm_uloop_detected_before_install" -eq 1 ]; then
-    try_remove_legacy_npm_package "$legacy_uloop_before_install" ""
+if [ "$legacy_tloop_before_install" = "$final_tloop_path" ] || [ "$legacy_tloop_before_install.exe" = "$final_tloop_path" ]; then
+  if [ "$legacy_npm_tloop_detected_before_install" -eq 1 ]; then
+    try_remove_legacy_npm_package "$legacy_tloop_before_install" ""
     legacy_npm_removed_before_install=1
   fi
-  legacy_uloop_before_install=""
+  legacy_tloop_before_install=""
 fi
 
 # Why: earlier installs rename the then-running binary aside; those
@@ -766,22 +766,22 @@ for leftover in "$INSTALL_DIR/$installed_command_name".old-*; do
 done
 
 # Why: Windows locks the image file of a running executable against
-# overwrite and delete but still allows rename. `uloop update` runs this
-# script as a child of the running uloop.exe, so overwriting the target
+# overwrite and delete but still allows rename. `tloop update` runs this
+# script as a child of the running tloop.exe, so overwriting the target
 # in place can never succeed there. Move the existing binary aside first;
 # the EXIT trap restores it if the new binary was not placed.
-if [ -e "$final_uloop_path" ]; then
-  replaced_uloop_backup_path="$final_uloop_path.old-$$-$(date +%s)"
-  mv "$final_uloop_path" "$replaced_uloop_backup_path"
+if [ -e "$final_tloop_path" ]; then
+  replaced_tloop_backup_path="$final_tloop_path.old-$$-$(date +%s)"
+  mv "$final_tloop_path" "$replaced_tloop_backup_path"
 fi
-mv "$staged_uloop_path" "$final_uloop_path"
-staged_uloop_path=""
+mv "$staged_tloop_path" "$final_tloop_path"
+staged_tloop_path=""
 if [ "$native_install_supported" -eq 1 ]; then
-  if invoke_uloop_native_install "$final_uloop_path"; then
+  if invoke_tloop_native_install "$final_tloop_path"; then
     cleanup_preinstall_legacy_npm_if_needed
     prepend_current_path
   else
-    echo "Native install setup failed. The uloop binary was installed, but PATH setup may need manual repair." >&2
+    echo "Native install setup failed. The tloop binary was installed, but PATH setup may need manual repair." >&2
     run_compatibility_install_setup
   fi
 else

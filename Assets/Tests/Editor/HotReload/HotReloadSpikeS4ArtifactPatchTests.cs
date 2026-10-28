@@ -30,7 +30,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReloadSpike
     {
         // Test-scoped id: sharing the production hot reload id would let this suite's
         // UnpatchAll remove real hot reload patches from the Editor domain.
-        private const string HarmonyId = "io.github.hatayama.uloop.hot-reload-spike-s4";
+        private const string HarmonyId = "io.github.tongguang.tloop.hot-reload-spike-s4";
 
         private const string IntroducedTypeMetadataName = "SpikeS4.Introduced";
 

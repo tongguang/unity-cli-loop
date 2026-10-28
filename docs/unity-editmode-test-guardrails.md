@@ -6,7 +6,7 @@ async execution, cancellation, threads, or dynamic-code runtime paths.
 
 ## Hard rules
 
-- `uloop` is single-flight per Editor: a `run-tests` sent while another command runs is rejected with BUSY after a bounded retry, so runs never overlap. On BUSY, wait for the running command and run once; do not retry in a loop.
+- `tloop` is single-flight per Editor: a `run-tests` sent while another command runs is rejected with BUSY after a bounded retry, so runs never overlap. On BUSY, wait for the running command and run once; do not retry in a loop.
 - Do not add tests that rely on infinite waits, long-lived `TaskCompletionSource`, background fire-and-forget work, or cancellation handoff across domain reload boundaries.
 - Avoid tests that intentionally cancel linked `CancellationTokenSource` instances while Unity may still dispose them during reload or teardown.
 - Do not add Unity EditMode tests that use `Task.Run`, raw `Thread` work, or cross-thread coordination primitives such as `ManualResetEventSlim` unless the test is explicitly reviewed as unavoidable.
@@ -29,6 +29,6 @@ async execution, cancellation, threads, or dynamic-code runtime paths.
 ## Preferred approach and incident response
 
 - Prefer pure unit tests for cancellation, dispose, and race-condition coverage. Only promote them to Unity EditMode after the logic is structured so the test completes without background leftovers or main-thread blocking.
-- If a new test causes `uloop run-tests` to stall, immediately remove or disable that test instead of retrying the same suite repeatedly.
+- If a new test causes `tloop run-tests` to stall, immediately remove or disable that test instead of retrying the same suite repeatedly.
 - If `Editor.log` shows messages such as `Attempted to call .Dispose on an already disposed CancellationTokenSource`, treat the latest cancellation-focused test changes as suspect first.
-- If Unity freezes or stops responding to `uloop`, restart the Editor with `uloop launch -r` before attempting any further compile, test, or log commands.
+- If Unity freezes or stops responding to `tloop`, restart the Editor with `tloop launch -r` before attempting any further compile, test, or log commands.

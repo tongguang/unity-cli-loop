@@ -266,7 +266,7 @@ func runDispatcherMinimumVersionGit(args []string) int {
 	appendLogLine("GIT_LOG", args)
 
 	if argAt(args, 0) == "rev-parse" && argAt(args, 1) == "--show-toplevel" {
-		fmt.Fprintf(os.Stdout, "%s\n", os.Getenv("ULOOP_REPOSITORY_ROOT"))
+		fmt.Fprintf(os.Stdout, "%s\n", os.Getenv("TLOOP_REPOSITORY_ROOT"))
 		return 0
 	}
 
@@ -326,7 +326,7 @@ func runProtocolMinimumVersionGit(args []string) int {
 	appendLogLine("GIT_LOG", args)
 
 	if argAt(args, 0) == "rev-parse" && argAt(args, 1) == "--show-toplevel" {
-		fmt.Fprintf(os.Stdout, "%s\n", os.Getenv("ULOOP_REPOSITORY_ROOT"))
+		fmt.Fprintf(os.Stdout, "%s\n", os.Getenv("TLOOP_REPOSITORY_ROOT"))
 		return 0
 	}
 
@@ -345,25 +345,25 @@ func runProtocolMinimumVersionGit(args []string) int {
 		{pattern: "protocol-release:Packages/src/project-runner-pin.json", contentEnv: "GIT_HEAD_PIN"},
 		{pattern: "protocol-release:*", contentEnv: "GIT_HEAD_CONSTANTS"},
 		{
-			pattern:       "uloop-project-runner-v*:cli/common/clicontract/contract.json",
+			pattern:       "tloop-project-runner-v*:cli/common/clicontract/contract.json",
 			contentEnv:    "GIT_RELEASE_CONTENT",
 			missingStderr: "fatal: path 'cli/common/clicontract/contract.json' exists on disk, but not in '{target}'",
 		},
 		{
-			pattern:       "uloop-project-runner-v*:common/clicontract/contract.json",
+			pattern:       "tloop-project-runner-v*:common/clicontract/contract.json",
 			contentEnv:    "GIT_MIDDLE_RELEASE_CONTENT",
 			missingStderr: "middle release not found",
 		},
 		{
-			pattern:       "uloop-project-runner-v*:cli/contract.json",
+			pattern:       "tloop-project-runner-v*:cli/contract.json",
 			contentEnv:    "GIT_LEGACY_RELEASE_CONTENT",
 			missingStderr: "release not found",
 		},
 	}
 	catFileRules := []envConditionalCatFileRule{
-		{pattern: "uloop-project-runner-v*:cli/common/clicontract/contract.json", envName: "GIT_RELEASE_CONTENT"},
-		{pattern: "uloop-project-runner-v*:common/clicontract/contract.json", envName: "GIT_MIDDLE_RELEASE_CONTENT"},
-		{pattern: "uloop-project-runner-v*:cli/contract.json", envName: "GIT_LEGACY_RELEASE_CONTENT"},
+		{pattern: "tloop-project-runner-v*:cli/common/clicontract/contract.json", envName: "GIT_RELEASE_CONTENT"},
+		{pattern: "tloop-project-runner-v*:common/clicontract/contract.json", envName: "GIT_MIDDLE_RELEASE_CONTENT"},
+		{pattern: "tloop-project-runner-v*:cli/contract.json", envName: "GIT_LEGACY_RELEASE_CONTENT"},
 	}
 
 	switch argAt(args, 0) {
@@ -397,7 +397,7 @@ func runProtocolMinimumVersionGh(args []string) int {
 		}
 		releaseView := os.Getenv("GH_RELEASE_VIEW")
 		if releaseView == "" {
-			releaseView = `{"isDraft":false,"assets":[{"name":"uloop-project-runner-darwin-amd64.tar.gz","size":1},{"name":"uloop-project-runner-darwin-amd64.tar.gz.sha256","size":1},{"name":"uloop-project-runner-darwin-arm64.tar.gz","size":1},{"name":"uloop-project-runner-darwin-arm64.tar.gz.sha256","size":1},{"name":"uloop-project-runner-windows-amd64.zip","size":1},{"name":"uloop-project-runner-windows-amd64.zip.sha256","size":1}]}`
+			releaseView = `{"isDraft":false,"assets":[{"name":"tloop-project-runner-darwin-amd64.tar.gz","size":1},{"name":"tloop-project-runner-darwin-amd64.tar.gz.sha256","size":1},{"name":"tloop-project-runner-darwin-arm64.tar.gz","size":1},{"name":"tloop-project-runner-darwin-arm64.tar.gz.sha256","size":1},{"name":"tloop-project-runner-windows-amd64.zip","size":1},{"name":"tloop-project-runner-windows-amd64.zip.sha256","size":1}]}`
 		}
 		fmt.Fprintf(os.Stdout, "%s\n", releaseView)
 		return 0

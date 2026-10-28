@@ -110,8 +110,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(File.Exists(firstPath), Is.True, "Cached publicized DLL must exist on disk.");
             Assert.That(
                 firstPath.Replace('\\', '/'),
-                Does.Contain("/Library/UloopHotReload/PublicizedRefs/"),
-                "Cache must live under Library/UloopHotReload/PublicizedRefs/.");
+                Does.Contain("/Library/TloopHotReload/PublicizedRefs/"),
+                "Cache must live under Library/TloopHotReload/PublicizedRefs/.");
             Assert.That(
                 Path.GetFileName(firstPath),
                 Does.StartWith(TestAssemblyName + "-"),
@@ -331,7 +331,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string artifactDirectoryPath = Path.Combine(
                 projectRootPath,
                 "Library",
-                "UloopHotReload",
+                "TloopHotReload",
                 "IntroducedTypes",
                 "publicizer-fixture");
             Directory.CreateDirectory(artifactDirectoryPath);

@@ -221,7 +221,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             {
                 _dialogs.ShowMessage(
                     "CLI Not Found",
-                    "uloop CLI is not installed. Please install the CLI first.");
+                    "tloop CLI is not installed. Please install the CLI first.");
                 return;
             }
 
@@ -281,7 +281,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             {
                 _dialogs.ShowMessage(
                     "CLI Not Found",
-                    "uloop CLI is not installed. Please install the CLI first.");
+                    "tloop CLI is not installed. Please install the CLI first.");
                 return;
             }
 
@@ -357,7 +357,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
                     Debug.LogWarning(
                         $"[UnityCliLoop] Skill for '{toolName}' was not installed after enabling. " +
                         "The skill source may have an incorrect directory structure " +
-                        "(expected: <ToolDir>/Skill/SKILL.md). Run 'uloop skills list' for details."
+                        "(expected: <ToolDir>/Skill/SKILL.md). Run 'tloop skills list' for details."
                     );
                 }
             }

@@ -288,7 +288,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             GameObject probe = null;
             try
             {
-                probe = new GameObject("__uloop_ddol_probe__");
+                probe = new GameObject("__tloop_ddol_probe__");
                 UnityEngine.Object.DontDestroyOnLoad(probe);
 
                 Scene ddolScene = probe.scene;

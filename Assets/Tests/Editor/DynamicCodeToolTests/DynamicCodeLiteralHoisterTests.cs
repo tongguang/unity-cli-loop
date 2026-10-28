@@ -38,8 +38,8 @@ return Compute(3);";
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite(source);
 
             Assert.That(result.RewrittenSource, Does.Contain("x * 2"));
-            Assert.That(result.RewrittenSource, Does.Contain("return Compute(__uloop_literal_0)"));
-            Assert.That(result.RewrittenSource, Does.Not.Contain("x * __uloop_literal"));
+            Assert.That(result.RewrittenSource, Does.Contain("return Compute(__tloop_literal_0)"));
+            Assert.That(result.RewrittenSource, Does.Not.Contain("x * __tloop_literal"));
             Assert.That(result.Bindings, Has.Count.EqualTo(1));
             Assert.That(result.Bindings[0].Value, Is.EqualTo(3));
         }
@@ -60,7 +60,7 @@ return Build();";
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite(source);
 
             Assert.That(result.RewrittenSource, Does.Contain("return \"ok\""));
-            Assert.That(result.RewrittenSource, Does.Not.Contain("__uloop_literal_0"));
+            Assert.That(result.RewrittenSource, Does.Not.Contain("__tloop_literal_0"));
             Assert.That(result.Bindings, Is.Empty);
         }
 
@@ -76,8 +76,8 @@ return Double(3);";
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite(source);
 
             Assert.That(result.RewrittenSource, Does.Contain("x * 2"));
-            Assert.That(result.RewrittenSource, Does.Not.Contain("x * __uloop_literal"));
-            Assert.That(result.RewrittenSource, Does.Contain("return Double(__uloop_literal_0)"));
+            Assert.That(result.RewrittenSource, Does.Not.Contain("x * __tloop_literal"));
+            Assert.That(result.RewrittenSource, Does.Contain("return Double(__tloop_literal_0)"));
             Assert.That(result.Bindings, Has.Count.EqualTo(1));
             Assert.That(result.Bindings[0].Value, Is.EqualTo(3));
         }
@@ -94,7 +94,7 @@ return Label();";
             HoistedLiteralRewriteResult result = DynamicCodeLiteralHoister.Rewrite(source);
 
             Assert.That(result.RewrittenSource, Does.Contain("return \"ok\""));
-            Assert.That(result.RewrittenSource, Does.Not.Contain("__uloop_literal_0"));
+            Assert.That(result.RewrittenSource, Does.Not.Contain("__tloop_literal_0"));
             Assert.That(result.Bindings, Is.Empty);
         }
     }

@@ -31,7 +31,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         private readonly object _gate = new object();
         private readonly Dictionary<string, Entry> _entries = new Dictionary<string, Entry>(StringComparer.Ordinal);
         private readonly string _persistenceDirectory;
-        private const string PersistedFormatHeader = "uloop-referenced-methods 1";
+        private const string PersistedFormatHeader = "tloop-referenced-methods 1";
 
         private int _loadCount;
         private int _persistedLoadCount;

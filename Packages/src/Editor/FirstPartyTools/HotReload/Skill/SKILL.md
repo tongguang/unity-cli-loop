@@ -1,10 +1,10 @@
 ---
-name: uloop-hot-reload
+name: tloop-hot-reload
 toolName: hot-reload
 description: "Apply C# edits to the running Editor without a compile or domain reload, keeping Play Mode state. Use instead of compile after editing method bodies or adding methods, fields, or new classes."
 ---
 
-# uloop hot-reload
+# tloop hot-reload
 
 Replaces method bodies in the running Editor (EditMode or PlayMode) directly from edited
 project source files — no domain reload, no attributes, no source markers. Private/internal
@@ -18,18 +18,18 @@ it is compiled in and no patch is active).
 ## Usage
 
 ```bash
-uloop hot-reload --files Assets/Scripts/Enemy.cs
-uloop hot-reload --files Assets/Scripts/Enemy.cs,Assets/Scripts/Boss.cs
-uloop hot-reload
-uloop hot-reload --files Assets/Scripts/Enemy.cs --compile-on-skip off
-uloop hot-reload --revert-all
+tloop hot-reload --files Assets/Scripts/Enemy.cs
+tloop hot-reload --files Assets/Scripts/Enemy.cs,Assets/Scripts/Boss.cs
+tloop hot-reload
+tloop hot-reload --files Assets/Scripts/Enemy.cs --compile-on-skip off
+tloop hot-reload --revert-all
 ```
 
 Multiple files are one comma-separated value (or a JSON array); array options
 consume exactly one value token.
 
-A script under a brand-new `.asmdef` cannot be hot-reloaded before its first import: Unity
-has not created that assembly yet. Run `uloop compile` once, then iterate with hot reload.
+A script under a brand-new `.asmdef` cannot be hot-reloaded before its first import: Tuanjie
+has not created that assembly yet. Run `tloop compile` once, then iterate with hot reload.
 A new file under an existing `.asmdef` can be hot-reloaded, but it is never selected
 automatically — pass it with `--files`.
 
@@ -37,14 +37,14 @@ automatically — pass it with `--files`.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `--files` | array | - | Project-relative `.cs` paths to hot-reload (method bodies, added members, and new top-level types). When omitted or empty on apply, selects compiled snapshot sources only — those whose bytes changed since the last compile snapshot, capped at 50 changed files per assembly with a warning when the cap trims the list; a file that has never been compiled is never selected and must be passed explicitly, except an introduced type's file after Play Mode entry or `--revert-all`, which is selected again; run `uloop compile` first when no snapshot exists, or pass explicit paths when no changed source is found |
+| `--files` | array | - | Project-relative `.cs` paths to hot-reload (method bodies, added members, and new top-level types). When omitted or empty on apply, selects compiled snapshot sources only — those whose bytes changed since the last compile snapshot, capped at 50 changed files per assembly with a warning when the cap trims the list; a file that has never been compiled is never selected and must be passed explicitly, except an introduced type's file after Play Mode entry or `--revert-all`, which is selected again; run `tloop compile` first when no snapshot exists, or pass explicit paths when no changed source is found |
 | `--revert-all` | flag | - | Remove every active hot-reload patch and added member and clear the ledger; introduced types stay loaded until the next domain reload. When set, `--files` is ignored |
 | `--status` | flag | - | Lists the currently active changes (patched methods, added members, and introduced types) without applying or reverting anything. |
-| `--compile-on-skip` | enum | `auto` | When edits stay unapplied (Skipped/Failed methods, Failed types; a re-bound sibling's Skipped rows and uncompared bodyless members aside), run `uloop compile` in this command: `auto` only in Edit Mode (never stops a Play session), `on` always unless Unity holds compiles until Play ends, `off` never. The response's `CompileFallback` says which; when the compile ran, `Compile` carries its result and `Success` is the compile's. |
+| `--compile-on-skip` | enum | `auto` | When edits stay unapplied (Skipped/Failed methods, Failed types; a re-bound sibling's Skipped rows and uncompared bodyless members aside), run `tloop compile` in this command: `auto` only in Edit Mode (never stops a Play session), `on` always unless Tuanjie holds compiles until Play ends, `off` never. The response's `CompileFallback` says which; when the compile ran, `Compile` carries its result and `Success` is the compile's. |
 
 ## Status
 
-`uloop hot-reload --status` lists the currently active changes; it cannot be combined with
+`tloop hot-reload --status` lists the currently active changes; it cannot be combined with
 `--files` or `--revert-all`. Every change is static Editor state, so after a domain reload
 it reports zero. Each `Active`/`Added` row's `InvocationCount` counts calls
 into its body since it was applied — a reachability signal only while the code is
@@ -72,8 +72,8 @@ changed are patched (`UnchangedTotal` counts the rest).
 - New types: a top-level class, struct, enum, or interface declared in an edited
   file is introduced by that reload and listed in `IntroducedTypes`; other valid shapes are
   refused with a `Warnings` line naming the reason. Use from another assembly or from files
-  outside the reload, reflection, serialization, and Unity message discovery still need
-  `uloop compile`.
+  outside the reload, reflection, serialization, and Tuanjie message discovery still need
+  `tloop compile`.
 - Signature changes: a return-type change is `Skipped` unless this or an earlier reload
   patched every live compiled caller, none in another assembly; a rename or parameter change
   applies as an added method and warns about call sites left on the old signature.
@@ -84,16 +84,16 @@ changed are patched (`UnchangedTotal` counts the rest).
 
 ## Workflow
 
-Treat hot reload as the exploration phase and `uloop compile` as the landing phase:
+Treat hot reload as the exploration phase and `tloop compile` as the landing phase:
 keep edits inside the edited files, collect structural changes, and compile once —
 every compile drops all patches and pause points and resets the PlayMode session (the compile response's Warning says how many).
 While hot-reload changes are active, `AutoRefreshHeld` is true so returning focus does not
-recompile; `uloop compile` releases the hold, and `--revert-all` only when no introduced type
+recompile; `tloop compile` releases the hold, and `--revert-all` only when no introduced type
 remains.
 One-shot methods (`Awake`, `Start`, init helpers) patch but show no effect on the call that
 already ran; the response marks them with `LifecycleNote`. To re-run an edited compiled
 `OnEnable`, set `enabled = false` with `execute-dynamic-code`, reload, then set it back to `true`
-(Unity calls the old `OnDisable`, then the patched `OnEnable`). An edited `OnDisable` runs the
+(Tuanjie calls the old `OnDisable`, then the patched `OnEnable`). An edited `OnDisable` runs the
 next time the component is disabled; to run it now, toggle `enabled` after the reload.
 To tune a value while playing, expose a static property getter instead of a `const`; its
 body is patched on compiled and introduced types alike.

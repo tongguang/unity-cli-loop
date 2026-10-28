@@ -18,9 +18,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         // A script in an embedded package whose folder name differs from its package name, so the
         // asset path Unity reports for it and the path its PDB records differ.
         private const string PackageFixtureAssetPath =
-            "Packages/io.github.hatayama.uloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/io.github.tongguang.tloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const string PackageFixturePhysicalPath =
-            "Packages/uloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/tloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const int PackageFixtureSecondStatementLine = 16;
 
         [Test]

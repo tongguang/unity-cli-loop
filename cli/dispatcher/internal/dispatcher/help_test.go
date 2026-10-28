@@ -32,11 +32,11 @@ func TestPrintDispatcherHelpListsNativeCommandsAndLiveToolGuidance(t *testing.T)
 		"  version",
 		"Unity tool commands are project-specific.",
 		"does not include the full command list",
-		"uloop --project-path /path/to/project --help",
-		"uloop list",
+		"tloop --project-path /path/to/project --help",
+		"tloop list",
 		"--project-path <path>",
-		"uloop --project-path /path/to/project list",
-		"uloop <command> --help",
+		"tloop --project-path /path/to/project list",
+		"tloop <command> --help",
 		"Show help for native and Unity tool commands",
 	} {
 		if !strings.Contains(output, expected) {
@@ -50,8 +50,8 @@ func TestPrintDispatcherHelpListsNativeCommandsAndLiveToolGuidance(t *testing.T)
 		"  verify-project",
 		"  get-logs",
 		"  run-tests",
-		"uloop --list-commands",
-		"uloop --list-options <command>",
+		"tloop --list-commands",
+		"tloop --list-options <command>",
 	} {
 		if strings.Contains(output, unexpected) {
 			t.Fatalf("help output should not include baked-in Unity tool %q:\n%s", unexpected, output)
@@ -76,10 +76,10 @@ func TestPrintProjectLocalHelpListsNativeCommandsAndLiveToolGuidance(t *testing.
 		"  version",
 		"Unity tool commands are project-specific.",
 		"does not include the full command list",
-		"uloop --project-path /path/to/project --help",
+		"tloop --project-path /path/to/project --help",
 		"--project-path <path>",
-		"uloop --project-path /path/to/project list",
-		"uloop list",
+		"tloop --project-path /path/to/project list",
+		"tloop list",
 	} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("help output missing %q:\n%s", expected, output)
@@ -92,8 +92,8 @@ func TestPrintProjectLocalHelpListsNativeCommandsAndLiveToolGuidance(t *testing.
 		"  verify-project",
 		"  get-logs",
 		"  run-tests",
-		"uloop --list-commands",
-		"uloop --list-options <command>",
+		"tloop --list-commands",
+		"tloop --list-options <command>",
 	} {
 		if strings.Contains(output, unexpected) {
 			t.Fatalf("help output should not include baked-in Unity tool %q:\n%s", unexpected, output)
@@ -108,9 +108,9 @@ func TestPrintDispatcherHelpListsNamesOnlyFooterLine(t *testing.T) {
 
 	printDispatcherHelp(&stdout)
 
-	const expected = "  uloop list --names                          Show command names only, one per line"
+	const expected = "  tloop list --names                          Show command names only, one per line"
 	for _, line := range strings.Split(stdout.String(), "\n") {
-		if !strings.HasPrefix(line, "  uloop list --names") {
+		if !strings.HasPrefix(line, "  tloop list --names") {
 			continue
 		}
 		if line != expected {
@@ -196,7 +196,7 @@ func TestRunDispatcherLaunchHelpShowsGlobalOptions(t *testing.T) {
 	output := stdout.String()
 	for _, expected := range []string{
 		"Usage:",
-		"uloop launch [options] [project-path]",
+		"tloop launch [options] [project-path]",
 		"Compiler errors are ignored by default during Unity startup.",
 		"--editor-version <version>",
 		"Global options:",
@@ -227,7 +227,7 @@ func TestRunDispatcherCompileHelpDoesNotRequireUnityProject(t *testing.T) {
 	output := stdout.String()
 	for _, expected := range []string{
 		"Usage:",
-		"uloop compile",
+		"tloop compile",
 		"--force-recompile",
 		"--timeout-seconds",
 		"--no-wait-for-domain-reload",
@@ -311,7 +311,7 @@ func TestCommandHelpPointsAtTheToolSkill(t *testing.T) {
 	if !handled || code != 0 {
 		t.Fatalf("simulate-keyboard help was not handled: handled=%v code=%d stderr=%s", handled, code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "Load the uloop-simulate-keyboard skill") {
+	if !strings.Contains(stdout.String(), "Load the tloop-simulate-keyboard skill") {
 		t.Fatalf("simulate-keyboard help does not point at its skill:\n%s", stdout.String())
 	}
 }
@@ -329,7 +329,7 @@ func TestCommandHelpPointsWatchCommandsAtThePausePointSkill(t *testing.T) {
 			if !handled || code != 0 {
 				t.Fatalf("%s help was not handled: handled=%v code=%d stderr=%s", command, handled, code, stderr.String())
 			}
-			if !strings.Contains(stdout.String(), "Load the uloop-pause-point skill") {
+			if !strings.Contains(stdout.String(), "Load the tloop-pause-point skill") {
 				t.Fatalf("%s help does not point at the pause-point skill:\n%s", command, stdout.String())
 			}
 		})
@@ -348,7 +348,7 @@ func TestLaunchHelpPointsAtTheLaunchSkill(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("launch help failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "Load the uloop-launch skill") {
+	if !strings.Contains(stdout.String(), "Load the tloop-launch skill") {
 		t.Fatalf("launch help does not point at its skill:\n%s", stdout.String())
 	}
 }
@@ -432,7 +432,7 @@ func TestRunDispatcherExecuteDynamicCodeHelpDoesNotRequireUnityProject(t *testin
 	output := stdout.String()
 	for _, expected := range []string{
 		"Usage:",
-		"uloop execute-dynamic-code",
+		"tloop execute-dynamic-code",
 		"--code <value>",
 		tooldocs.DynamicCodeFileOptionUsage,
 		"--wait-for-domain-reload",
@@ -461,7 +461,7 @@ func TestRunDispatcherClearPausePointHelpListsFileLine(t *testing.T) {
 	output := stdout.String()
 	for _, expected := range []string{
 		"Usage:",
-		"uloop clear-pause-point",
+		"tloop clear-pause-point",
 		"--id <value>",
 		"--all",
 		"--file <value>",
@@ -488,7 +488,7 @@ func TestRunDispatcherCompileHelpWinsAfterOtherOptions(t *testing.T) {
 	output := stdout.String()
 	for _, expected := range []string{
 		"Usage:",
-		"uloop compile",
+		"tloop compile",
 		"--force-recompile",
 	} {
 		if !strings.Contains(output, expected) {
@@ -511,7 +511,7 @@ func TestRunDispatcherRunTestsHelpDoesNotRequireUnityProject(t *testing.T) {
 	output := stdout.String()
 	for _, expected := range []string{
 		"Usage:",
-		"uloop run-tests",
+		"tloop run-tests",
 		"--test-mode",
 		"--filter-type",
 		"--filter-value",
@@ -537,7 +537,7 @@ func TestRunDispatcherUpdateHelpListsToVersionOption(t *testing.T) {
 		t.Fatalf("update help failed: code=%d stderr=%s", code, stderr.String())
 	}
 	output := stdout.String()
-	for _, expected := range []string{"Usage:", "uloop update", "--to-version <version>"} {
+	for _, expected := range []string{"Usage:", "tloop update", "--to-version <version>"} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("update help missing %q:\n%s", expected, output)
 		}
@@ -556,7 +556,7 @@ func TestRunDispatcherSkillsSubcommandHelpDoesNotRequireUnityProject(t *testing.
 		t.Fatalf("skills install help failed: code=%d stderr=%s", code, stderr.String())
 	}
 	output := stdout.String()
-	for _, expected := range []string{"Usage:", "uloop skills install", "--claude", "--codex"} {
+	for _, expected := range []string{"Usage:", "tloop skills install", "--claude", "--codex"} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("skills install help missing %q:\n%s", expected, output)
 		}

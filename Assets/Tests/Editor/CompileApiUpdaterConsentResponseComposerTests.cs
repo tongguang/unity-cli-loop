@@ -11,7 +11,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     public sealed class CompileApiUpdaterConsentResponseComposerTests
     {
         private const string WarningText =
-            "Unity's API Updater requested consent to rewrite source files ('Script Updating Consent' dialog). uloop declines this automatically: source files are not rewritten without explicit user consent. The obsolete-API compile errors it would have fixed are reported in Errors.";
+            "Unity's API Updater requested consent to rewrite source files ('Script Updating Consent' dialog). tloop declines this automatically: source files are not rewritten without explicit user consent. The obsolete-API compile errors it would have fixed are reported in Errors.";
 
         private const string NextActionText =
             "Fix the obsolete API usages reported in Errors, or ask the user to accept the Script Updating Consent dialog in an interactive Unity session.";
@@ -54,7 +54,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void Apply_WhenNextActionsAlreadyExist_AppendsFixedNextAction()
         {
             CompileResponse response = CreateEmptyResponse();
-            response.NextActions = new[] { "Wait for domain reload to complete, then run `uloop compile` without --force-recompile to obtain a definitive result." };
+            response.NextActions = new[] { "Wait for domain reload to complete, then run `tloop compile` without --force-recompile to obtain a definitive result." };
 
             CompileApiUpdaterConsentResponseComposer.Apply(response, apiUpdaterConsentDeclined: true);
 
@@ -63,7 +63,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 response.NextActions,
                 Is.EqualTo(new[]
                 {
-                    "Wait for domain reload to complete, then run `uloop compile` without --force-recompile to obtain a definitive result.",
+                    "Wait for domain reload to complete, then run `tloop compile` without --force-recompile to obtain a definitive result.",
                     NextActionText
                 }));
         }
@@ -76,7 +76,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             CompileResponse response = CreateEmptyResponse();
             response.Warning = "Play Mode was active with 2 enabled pause point(s).";
-            response.NextActions = new[] { "Wait for domain reload to complete, then run `uloop compile` without --force-recompile to obtain a definitive result." };
+            response.NextActions = new[] { "Wait for domain reload to complete, then run `tloop compile` without --force-recompile to obtain a definitive result." };
 
             CompileApiUpdaterConsentResponseComposer.Apply(response, apiUpdaterConsentDeclined: true);
 
@@ -87,7 +87,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 response.NextActions,
                 Is.EqualTo(new[]
                 {
-                    "Wait for domain reload to complete, then run `uloop compile` without --force-recompile to obtain a definitive result.",
+                    "Wait for domain reload to complete, then run `tloop compile` without --force-recompile to obtain a definitive result.",
                     NextActionText
                 }));
         }

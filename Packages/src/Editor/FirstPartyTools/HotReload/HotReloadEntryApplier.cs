@@ -274,7 +274,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     Exception cause = invocationException.InnerException ?? invocationException;
                     failureReasonByShimTypeName[shimType.Name] =
                         "Accessor binding failed for shim type '" + shimType.Name + "': "
-                        + cause.Message + " Run 'uloop compile' and retry.";
+                        + cause.Message + " Run 'tloop compile' and retry.";
                 }
             }
 

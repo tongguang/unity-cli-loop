@@ -83,7 +83,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Assert.That(
                     response.Message,
                     Is.EqualTo(
-                        "No compile snapshots exist yet. Run 'uloop compile' first or pass project-relative "
+                        "No compile snapshots exist yet. Run 'tloop compile' first or pass project-relative "
                         + ".cs paths with --files. Files that have never been compiled are not selected "
                         + "automatically; pass them (and any other path) with --files."));
                 Assert.That(response.ErrorCode, Is.EqualTo(HotReloadValidationErrorCodes.FilesRequired));
@@ -92,7 +92,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     Is.EqualTo(
                         new[]
                         {
-                            "Run 'uloop compile' to create source snapshots.",
+                            "Run 'tloop compile' to create source snapshots.",
                             "Pass project-relative .cs paths with --files (required for new files that have "
                             + "not been compiled yet)."
                         }));
@@ -138,7 +138,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Assert.That(
                     response.NextActions[response.NextActions.Length - 1],
                     Is.EqualTo(
-                        "Run 'uloop hot-reload --status' to inspect the active changes, or 'uloop hot-reload --revert-all' to drop them."));
+                        "Run 'tloop hot-reload --status' to inspect the active changes, or 'tloop hot-reload --revert-all' to drop them."));
             }
             finally
             {
@@ -180,7 +180,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     Is.EqualTo(
                         new[]
                         {
-                            "Save the edited .cs files to disk, then run 'uloop hot-reload' again.",
+                            "Save the edited .cs files to disk, then run 'tloop hot-reload' again.",
                             "Pass project-relative .cs paths with --files (required for new files that have "
                             + "not been compiled yet)."
                         }));
@@ -266,7 +266,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Assert.That(
                     activeRow.Reason,
                     Is.EqualTo(
-                        "Not invoked since this patch was applied. Calls that already finished before the patch (for example one-time initialization) do not re-run automatically; the patched body takes effect the next time this method is called. If this method only runs during initialization, trigger that path again — re-create the object that runs it, toggle the component's `enabled` to false and back to true when it runs from OnEnable or OnDisable (for example with `uloop execute-dynamic-code`), or run 'uloop compile' and enter Play Mode again."));
+                        "Not invoked since this patch was applied. Calls that already finished before the patch (for example one-time initialization) do not re-run automatically; the patched body takes effect the next time this method is called. If this method only runs during initialization, trigger that path again — re-create the object that runs it, toggle the component's `enabled` to false and back to true when it runs from OnEnable or OnDisable (for example with `tloop execute-dynamic-code`), or run 'tloop compile' and enter Play Mode again."));
                 Assert.That(
                     activeRow.Reason,
                     Is.EqualTo(HotReloadConstants.ActivePatchNeverInvokedReason));
@@ -577,7 +577,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     new[]
                     {
-                        "Run 'uloop hot-reload --status' with no other flags to inspect active patches.",
+                        "Run 'tloop hot-reload --status' with no other flags to inspect active patches.",
                         "To apply or revert patches, drop --status and pass --files or --revert-all."
                     }));
         }
@@ -687,7 +687,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 response.RecommendedNextAction,
                 Is.EqualTo(
-                    "Partially applied. Fix the failed declarations or methods and rerun, run 'uloop compile' to apply every edit, or run 'uloop hot-reload --revert-all' to discard the applied patches."));
+                    "Partially applied. Fix the failed declarations or methods and rerun, run 'tloop compile' to apply every edit, or run 'tloop hot-reload --revert-all' to discard the applied patches."));
             Assert.That(response.ShouldSerializeRecommendedNextAction(), Is.True);
         }
 
@@ -713,7 +713,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 response.RecommendedNextAction,
                 Is.EqualTo(
-                    "Partially applied. Fix the failed declarations or methods and rerun, run 'uloop compile' to apply every edit, or run 'uloop hot-reload --revert-all' to discard the applied patches."));
+                    "Partially applied. Fix the failed declarations or methods and rerun, run 'tloop compile' to apply every edit, or run 'tloop hot-reload --revert-all' to discard the applied patches."));
             Assert.That(response.ShouldSerializeRecommendedNextAction(), Is.True);
         }
 
@@ -737,7 +737,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             Assert.That(
                 response.RecommendedNextAction,
-                Is.EqualTo("Fix the failed declarations or methods and rerun, or run 'uloop compile'."));
+                Is.EqualTo("Fix the failed declarations or methods and rerun, or run 'tloop compile'."));
             Assert.That(response.ShouldSerializeRecommendedNextAction(), Is.True);
         }
 
@@ -1605,7 +1605,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             const string indirectNote =
                 "SetUp is called only from one-shot lifecycle method(s) (Awake) in the compiled assemblies; "
                 + "objects that already ran them will not run the patched body. It takes effect only for "
-                + "newly created objects, or run `uloop compile` and re-enter Play Mode.";
+                + "newly created objects, or run `tloop compile` and re-enter Play Mode.";
             HotReloadOrchestratorResult result = new HotReloadOrchestratorResult(
                 new List<HotReloadMethodOutcome>
                 {
@@ -1830,7 +1830,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             const string multiLineReason =
                 "Compilation of the shim assembly failed.\nAssets/A.cs(3,5): error CS0103: unknown\n"
-                + "Add the new member with 'uloop compile'.";
+                + "Add the new member with 'tloop compile'.";
             HotReloadOrchestratorResult result = new HotReloadOrchestratorResult(
                 new List<HotReloadMethodOutcome>
                 {
@@ -1886,7 +1886,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 empty.Message,
                 Is.EqualTo(
                     "Hot reload found no patchable method bodies in the given files; nothing was changed. "
-                    + "Hot reload only replaces existing ordinary method bodies; use uloop compile for other edits. "
+                    + "Hot reload only replaces existing ordinary method bodies; use tloop compile for other edits. "
                     + "1 warning(s). See Warnings."));
 
             HotReloadResponse allUnchanged = HotReloadTool.BuildApplyResponse(
@@ -2832,7 +2832,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(response.Success, Is.True);
             Assert.That(response.Outcome, Is.EqualTo("NothingToApply"));
             Assert.That(response.SkippedTotal, Is.EqualTo(2));
-            Assert.That(response.Message, Does.Not.Contain("Run 'uloop compile' to apply"));
+            Assert.That(response.Message, Does.Not.Contain("Run 'tloop compile' to apply"));
             Assert.That(response.RecommendedNextAction, Is.Empty);
             Assert.That(response.CompileFallback, Is.EqualTo("NotNeeded"));
         }

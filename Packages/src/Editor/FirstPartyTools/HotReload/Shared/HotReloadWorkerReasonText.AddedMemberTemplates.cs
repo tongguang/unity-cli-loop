@@ -28,7 +28,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     "The method signature names a type the hot-reload compilation could not resolve "
                     + "('{0}'), so hot reload cannot tell whether this method already exists in the "
                     + "compiled assembly. If the type is declared in another file of this edit, pass "
-                    + "that file with --files too; otherwise run 'uloop compile'.",
+                    + "that file with --files too; otherwise run 'tloop compile'.",
                     1));
             // Why each method-group reason names a step before the compile: a call to an added
             // method is rewritten, so a lambda applies without leaving Play Mode, and the compile
@@ -39,7 +39,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     "Methods that capture the added method '{0}' as a method group or delegate are "
                     + "skipped; the shim signature does not match. A call is rewritten, so wrapping the "
                     + "method group in a lambda that calls it{1} keeps hot reloading; otherwise run "
-                    + "'uloop compile'.",
+                    + "'tloop compile'.",
                     2));
             templates.Add(
                 HotReloadWorkerReasonCode.AddedMethodMethodGroupSubscription,
@@ -47,7 +47,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     "Subscribing the added method '{0}' as a method group is skipped; the shim "
                     + "signature does not match. Subscribe a lambda that calls it instead{1}; to remove "
                     + "it later, keep that lambda in an added field and use '-=' with the same field. "
-                    + "Otherwise run 'uloop compile'.",
+                    + "Otherwise run 'tloop compile'.",
                     2));
             // Why no lambda is offered: a lambda on the right of '-=' is a new delegate, so it would
             // compile and leave the handler subscribed.
@@ -57,7 +57,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     "Removing the added method '{0}' as a method group with '-=' is skipped; the shim "
                     + "signature does not match, and a lambda there would remove a different delegate. "
                     + "Subscribe through a delegate kept in an added field and '-=' that same field, or "
-                    + "run 'uloop compile'.",
+                    + "run 'tloop compile'.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.AddedMethodConditionalAccess,
@@ -71,14 +71,14 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 // passing a new file to --files). Repeating a bare compile here hid that fix.
                 Plain(
                     "Calls the added method '{0}', which this reload skipped; the Skipped row for that "
-                    + "member names the fix. Apply it and rerun; run 'uloop compile' only if that row "
+                    + "member names the fix. Apply it and rerun; run 'tloop compile' only if that row "
                     + "asks for it.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.AddedMethodTypeNotIntroduced,
                 Plain(
                     "Declared on a type that is not in the compiled assembly and was not introduced by this "
-                    + "run. Run 'uloop compile'; when the file's introduced-type diagnostics name this type, "
+                    + "run. Run 'tloop compile'; when the file's introduced-type diagnostics name this type, "
                     + "that line gives the reason it was not introduced.",
                     0));
             templates.Add(
@@ -102,7 +102,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 Plain(
                     "The added '{0}' is a Unity message that hot reload does not forward (Awake, OnEnable, "
                     + "OnDisable, OnDestroy, and the editor-only messages), so no rewrite of its body would "
-                    + "make the engine call it. Run 'uloop compile' to have Unity invoke it.",
+                    + "make the engine call it. Run 'tloop compile' to have Unity invoke it.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.AddedMethodBodyUnbound,
@@ -111,7 +111,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     + "hot reload cannot verify a member it cannot bind, so it is skipped. If the name is "
                     + "declared in a new file, pass that file to --files too (new files are not selected "
                     + "automatically). If the name is generated at compile time, for example by a source "
-                    + "generator, hot reload cannot see it: run 'uloop compile'. Also run 'uloop compile' if "
+                    + "generator, hot reload cannot see it: run 'tloop compile'. Also run 'tloop compile' if "
                     + "it still does not bind.",
                     1));
             // Why the next step is not worded here: which step works (pass the file, leave it
@@ -157,7 +157,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     + "instead - an added field without an initializer applies without compiling and starts "
                     + "at default(T); for a reference type, guard the assignment with "
                     + "'if (_field == null) { _field = ...; }' ('??=' is not rewritable). "
-                    + "Or run 'uloop compile'.",
+                    + "Or run 'tloop compile'.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.AddedFieldFieldTypeNotExternallyVisible,
@@ -165,7 +165,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             templates.Add(
                 HotReloadWorkerReasonCode.AddedFieldFieldTypeUnresolved,
                 Plain(
-                    "Added field type '{0}' could not be resolved; check for a missing using directive or a typo, fix the declaration, and rerun. If the type is declared in a new file, pass that file to --files too (new files are not selected automatically); run 'uloop compile' only if it still does not resolve.",
+                    "Added field type '{0}' could not be resolved; check for a missing using directive or a typo, fix the declaration, and rerun. If the type is declared in a new file, pass that file to --files too (new files are not selected automatically); run 'tloop compile' only if it still does not resolve.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.AddedFieldIncrementNotNumeric,
@@ -209,7 +209,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 HotReloadWorkerReasonCode.AddedFieldCoalesceAssignment,
                 Plain(
                     "'??=' on added field '{0}' cannot be rewritten. "
-                    + "Write 'if ({0} == null) { {0} = ...; }' instead, or run 'uloop compile'.",
+                    + "Write 'if ({0} == null) { {0} = ...; }' instead, or run 'tloop compile'.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.AddedFieldFieldTypeChanged,
@@ -268,7 +268,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 HotReloadWorkerReasonCode.AddedPropertyValueTypeUnresolved,
                 Plain(
                     "Added property type '{0}' could not be resolved; check for a missing using directive or a typo, "
-                    + "fix the declaration, and rerun. If the type is declared in a new file, pass that file to --files too (new files are not selected automatically); run 'uloop compile' only if it still does not resolve.",
+                    + "fix the declaration, and rerun. If the type is declared in a new file, pass that file to --files too (new files are not selected automatically); run 'tloop compile' only if it still does not resolve.",
                     1));
             templates.Add(
                 HotReloadWorkerReasonCode.AddedPropertyValueTypeNotExternallyVisible,

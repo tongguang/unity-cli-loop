@@ -4,39 +4,39 @@
 set -e
 
 cleanup() {
-    uloop control-play-mode --action Stop 2>/dev/null
+    tloop control-play-mode --action Stop 2>/dev/null
 }
 trap cleanup EXIT INT TERM
 
 press() {
-    uloop simulate-keyboard --action Press --key "$1" --duration "${2:-0.5}"
+    tloop simulate-keyboard --action Press --key "$1" --duration "${2:-0.5}"
 }
 
 hold_for() {
     duration="$1"
     shift
     for key in "$@"; do
-        uloop simulate-keyboard --action KeyDown --key "$key"
+        tloop simulate-keyboard --action KeyDown --key "$key"
     done
     sleep "$duration"
     for key in "$@"; do
-        uloop simulate-keyboard --action KeyUp --key "$key"
+        tloop simulate-keyboard --action KeyUp --key "$key"
     done
 }
 
 hold() {
-    uloop simulate-keyboard --action KeyDown --key "$1"
+    tloop simulate-keyboard --action KeyDown --key "$1"
 }
 
 release() {
-    uloop simulate-keyboard --action KeyUp --key "$1"
+    tloop simulate-keyboard --action KeyUp --key "$1"
 }
 
 echo "=== Keyboard Cube Input Test ==="
 
-uloop control-play-mode --action Play
+tloop control-play-mode --action Play
 sleep 2
-# uloop focus-window
+# tloop focus-window
 # sleep 0.5
 
 # Idle jump

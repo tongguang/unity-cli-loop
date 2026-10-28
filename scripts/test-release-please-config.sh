@@ -114,7 +114,7 @@ assert_changelog_exists() {
 }
 
 assert_json_value '.["pull-request-header"] | contains("unity-package")' 'true'
-assert_json_value '.["pull-request-header"] | contains("uloop-project-runner")' 'true'
+assert_json_value '.["pull-request-header"] | contains("tloop-project-runner")' 'true'
 assert_json_value '.["pull-request-header"] | contains("`dispatcher`")' 'true'
 # The dispatcher joined release-please management, so the header must not keep
 # claiming that dispatcher releases are outside this release PR.
@@ -143,19 +143,19 @@ assert_json_value '.packages["Packages/src"]["extra-files"] | length' '1'
 assert_json_value '.packages["Packages/src"]["extra-files"][0].path' 'package.json'
 assert_json_value '.packages["Packages/src"]["extra-files"][0].jsonpath' '$.version'
 
-assert_json_value '.packages["cli/project-runner"].component' 'uloop-project-runner'
+assert_json_value '.packages["cli/project-runner"].component' 'tloop-project-runner'
 assert_json_value '.packages["cli/project-runner"].["include-component-in-tag"]' 'true'
 assert_json_value '.packages["cli/project-runner"].["changelog-path"]' 'CHANGELOG.md'
 # The release automation cmd and internal packages live in cli/release-automation,
 # so there is nothing left under cli/project-runner to exclude from
-# uloop-project-runner releases.
+# tloop-project-runner releases.
 assert_json_value '.packages["cli/project-runner"] | has("exclude-paths")' 'false'
 assert_json_value '.packages["cli/project-runner"]["extra-files"] | length' '3'
 assert_json_value '.packages["cli/project-runner"]["extra-files"][0].path' '/cli/common/clicontract/contract.json'
 assert_json_value '.packages["cli/project-runner"]["extra-files"][0].jsonpath' '$.projectRunnerVersion'
 assert_json_value '.packages["cli/project-runner"]["extra-files"][1].path' '/Packages/src/project-runner-pin.json'
 assert_json_value '.packages["cli/project-runner"]["extra-files"][1].jsonpath' '$.projectRunnerVersion'
-assert_json_value '.packages["cli/project-runner"]["extra-files"][2].path' '/.uloop/project-runner-pin.json'
+assert_json_value '.packages["cli/project-runner"]["extra-files"][2].path' '/.tloop/project-runner-pin.json'
 assert_json_value '.packages["cli/project-runner"]["extra-files"][2].jsonpath' '$.projectRunnerVersion'
 
 # The dispatcher tag format must stay dispatcher-v<version> to continue the

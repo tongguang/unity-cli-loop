@@ -12,7 +12,7 @@ import (
 
 const (
 	dispatcherV2CacheDirectoryName  = "v2"
-	dispatcherV2CLIPackageName      = "uloop-cli"
+	dispatcherV2CLIPackageName      = "tloop-cli"
 	dispatcherNPMCommandName        = "npm"
 	dispatcherNPMWindowsCommandName = "npm.cmd"
 )

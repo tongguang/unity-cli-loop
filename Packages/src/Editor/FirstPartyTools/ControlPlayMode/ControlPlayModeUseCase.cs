@@ -443,7 +443,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         {
             ControlPlayModeCompileError[] errors = compileErrors ?? Array.Empty<ControlPlayModeCompileError>();
             string message = errors.Length == 0
-                ? "Play mode could not start because Unity reports script compilation failed, but no saved compiler diagnostics are available. Run `uloop compile` or `uloop get-logs` for details."
+                ? "Play mode could not start because Unity reports script compilation failed, but no saved compiler diagnostics are available. Run `tloop compile` or `tloop get-logs` for details."
                 : "Play mode could not start because Unity has compiler errors.";
 
             ControlPlayModeResponse response = CreateResponse(message, false, false);

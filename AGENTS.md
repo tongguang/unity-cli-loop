@@ -1,8 +1,8 @@
 ## Architecture Overview
 
-This project provides a **CLI tool (`uloop`)** that communicates with Unity Editor over local IPC
+This project provides a **CLI tool (`tloop`)** that communicates with Unity Editor over local IPC
 (a Unix domain socket on macOS/Linux, a named pipe on Windows — not TCP).
-AI agents interact with Unity through `uloop` CLI commands (e.g., `uloop get-logs`, `uloop compile`).
+AI agents interact with Unity through `tloop` CLI commands (e.g., `tloop get-logs`, `tloop compile`).
 The Unity Editor side hosts a local project IPC server that accepts short-lived CLI command sessions.
 
 ## Repository Map
@@ -10,18 +10,18 @@ The Unity Editor side hosts a local project IPC server that accepts short-lived 
 Directory-level responsibilities. Kept deliberately coarse — check the directory itself for file-level detail.
 
 - `Packages/src/` — the Unity package (C#). Each first-party tool lives in `Editor/FirstPartyTools/<Tool>/` with its implementation and agent skill (`Skill/SKILL.md`, optional `Skill/references/`).
-- `Packages/src/Editor/CliOnlyTools~/<Tool>/Skill/` — skills for CLI-only commands (launch, pause-point, etc.) that have no Unity tool class. Tilde-suffixed folders are ignored by Unity, so files there need no `.meta`; files under `FirstPartyTools` do (run `uloop compile` to let Unity generate them).
+- `Packages/src/Editor/CliOnlyTools~/<Tool>/Skill/` — skills for CLI-only commands (launch, pause-point, etc.) that have no Unity tool class. Tilde-suffixed folders are ignored by Unity, so files there need no `.meta`; files under `FirstPartyTools` do (run `tloop compile` to let Unity generate them).
 - `Assets/` — the development/test Unity project, including custom-command samples under `Assets/Editor/CustomCommandSamples/`.
 - `Assets/RegressionHarness/<TrapName>/` — permanent manual repro scenes for verification-round "traps" (pause-point, simulate-keyboard, physics callbacks, etc.), paired with a driver script under `scripts/regression-harness-<trap-name>.sh`. See `docs/regression-harness.md`.
-- `cli/dispatcher/` — the globally installed `uloop` entry command (also owns `uloop skills install` and skill syncing).
+- `cli/dispatcher/` — the globally installed `tloop` entry command (also owns `tloop skills install` and skill syncing).
 - `cli/project-runner/` — the per-project CLI runner that talks to the Unity-side IPC server.
 - `cli/common/` — Go modules shared by dispatcher and project runner. Tool parameter schemas live in `cli/common/tools/default-tools.json`; skill discovery in `cli/common/skillscan/`.
 - `cli/release-automation/` — Go logic backing GitHub Actions release/CI workflows.
 - `tools/UnityCliLoop.DeadCodeScanner/` — the C# dead-code scanner described below.
 - `docs/` — reference docs for the rules in this file. `docs/adr/` holds architecture decision records: read the relevant one before reopening a settled design question, and note its stated reversal condition rather than relitigating from scratch.
-- `dist/` — locally built development binaries (`dist/darwin-arm64/uloop`, etc.); never committed.
+- `dist/` — locally built development binaries (`dist/darwin-arm64/tloop`, etc.); never committed.
 - `.claude/`, `.agents/` — generated skill copies; never edit directly (see Generated Skill Files).
-- `.uloop/` — runtime state and command outputs (screenshots, test results, hierarchy dumps).
+- `.tloop/` — runtime state and command outputs (screenshots, test results, hierarchy dumps).
 
 Do not rename public package, assembly, or extension API identifiers as part of cleanup-only changes.
 
@@ -56,7 +56,7 @@ realignment; see `docs/version-series-realignment.md`). Bump criteria and releas
 ## Project Runner Pin
 
 `Packages/src/project-runner-pin.json` (mirrored byte-identically to
-`.uloop/project-runner-pin.json`) is the single source for cross-component version
+`.tloop/project-runner-pin.json`) is the single source for cross-component version
 requirements. `minimumDispatcherVersion` is the only manually maintained field — raise it only
 when the package genuinely needs a newly published dispatcher. All other fields are stamped by
 automation; never edit them by hand. The pin evolves additively only — never delete or rename
@@ -68,7 +68,7 @@ Do not directly edit skill files under the project-root `.agents/` or `.claude/`
 These files are generated copies. Update the source skill definitions instead, then regenerate the copies.
 
 - Sources: `Packages/src/Editor/FirstPartyTools/<Tool>/Skill/SKILL.md` and `Packages/src/Editor/CliOnlyTools~/<Tool>/Skill/SKILL.md` (plus each skill's `references/` files, which are copied along with it).
-- Regenerate: `dist/darwin-arm64/uloop skills install --claude --agents` from the project root, substituting the binary for your platform (e.g. `dist/windows-amd64/uloop.exe` on Windows, `dist/linux-amd64/uloop` on Linux). Only `.claude/` and `.agents/` are tracked in git; other targets are local-only.
+- Regenerate: `dist/darwin-arm64/tloop skills install --claude --agents` from the project root, substituting the binary for your platform (e.g. `dist/windows-amd64/tloop.exe` on Windows, `dist/linux-amd64/tloop` on Linux). Only `.claude/` and `.agents/` are tracked in git; other targets are local-only.
 
 Every `SKILL.md` must stay at or under 8,000 bytes as a whole file (frontmatter included):
 8,000 bytes is the strictest skill-injection cap in the Codex source, and released Codex
@@ -81,7 +81,7 @@ skill, run it locally from `cli/release-automation` with
 ## Generated Tool Catalog
 
 `cli/common/tools/default-tools.json` is generated from the skill parameter tables — it is what
-`--help` and `uloop list` print when no project cache is available, and its descriptions must never
+`--help` and `tloop list` print when no project cache is available, and its descriptions must never
 be hand-edited. When you change a parameter table or a tool description in
 `Packages/src/Editor/FirstPartyTools/<Tool>/Skill/SKILL.md` or
 `Packages/src/Editor/CliOnlyTools~/<Tool>/Skill/SKILL.md`, run `scripts/sync-tool-docs.sh` and
@@ -134,7 +134,7 @@ parsing, read `docs/windows-compatibility.md` (encoding, line endings, path sepa
 PowerShell validation). Add a regression test whenever a fix depends on encoding, line endings,
 or separator normalization — a passing macOS test alone is not enough for these cases.
 On Windows, an abrupt dispatcher exit or `UNITY_NOT_REACHABLE` can be Microsoft Defender
-quarantining `uloop.exe` rather than an IPC problem; the verification and recovery
+quarantining `tloop.exe` rather than an IPC problem; the verification and recovery
 procedure is in `docs/windows-compatibility.md`.
 
 ## Package Manager Distribution
@@ -208,18 +208,18 @@ a forbidden reference. Prefer removing the reference (promote to Common, or inve
 
 ## Native Go CLI Validation
 
-When running `uloop` commands for this project during CLI development, do not use the `uloop`
+When running `tloop` commands for this project during CLI development, do not use the `tloop`
 resolved from `PATH`. Run this checkout's built development binary (rebuilt after relevant CLI
 source changes) so validation uses the code under review:
 
 ```bash
-dist/darwin-arm64/uloop compile --project-path "$(git rev-parse --show-toplevel)"
+dist/darwin-arm64/tloop compile --project-path "$(git rev-parse --show-toplevel)"
 ```
 
-Substitute the binary for your platform (e.g. `dist/windows-amd64/uloop.exe` on Windows, `dist/linux-amd64/uloop` on Linux).
+Substitute the binary for your platform (e.g. `dist/windows-amd64/tloop.exe` on Windows, `dist/linux-amd64/tloop` on Linux).
 
 When an AI agent runs these dev-binary commands through a sandboxed shell, Unity IPC over the
-Unix socket is denied with EPERM even though plain `uloop ...` may appear to work: the sandbox
+Unix socket is denied with EPERM even though plain `tloop ...` may appear to work: the sandbox
 exclusion is matched against the command text, and which command shapes survive that matching
 is not guessable from the outside. Read `docs/claude-code-sandbox.md` *before* running
 dev-binary commands in that setting, not only once a "Unity not reachable" symptom appears. A
@@ -235,39 +235,39 @@ equivalent of Go CLI CI (format, vet, lint, tests, binary rebuild). Use `scripts
 to refresh `dist` binaries; they are git-ignored and must not be committed.
 
 To validate an unreleased project runner from an external Unity project, set the
-`ULOOP_PROJECT_RUNNER_PATH` environment variable to a locally built binary — it overrides the
+`TLOOP_PROJECT_RUNNER_PATH` environment variable to a locally built binary — it overrides the
 pin-based resolution entirely (see `docs/project-runner-pin.md`). Inside this checkout the
-variable is not what makes a run use your build: `dist/<platform>/uloop` already takes the
+variable is not what makes a run use your build: `dist/<platform>/tloop` already takes the
 runner built beside it, and no response field says which runner served a command. Read "Which
 runner actually ran" in that document before concluding that a runner-side change does or does
 not work.
 
-`uloop compile-check` compiles the project's C# offline by replaying the last Unity build's Bee
+`tloop compile-check` compiles the project's C# offline by replaying the last Unity build's Bee
 response files through the Editor-bundled Roslyn compiler; it never contacts the Editor and its
 output is never loaded by Unity. What it can and cannot detect, and why it sometimes refuses to
 run, are in `docs/compile-check.md`.
 
 ## Tool-Side Logs (VibeLogs)
 
-Before calling a BUSY error, a hang, or an unexplained `uloop` result undiagnosable, read the
+Before calling a BUSY error, a hang, or an unexplained `tloop` result undiagnosable, read the
 tool's own logs in the Unity project the command ran against:
-`<project>/.uloop/outputs/VibeLogs/unity_vibe_YYYYMMDD.json` (Editor side) and
-`cli_vibe_YYYYMMDD.json` (CLI side). They are written only when `ULOOP_DEBUG` is set, the file
+`<project>/.tloop/outputs/VibeLogs/unity_vibe_YYYYMMDD.json` (Editor side) and
+`cli_vibe_YYYYMMDD.json` (CLI side). They are written only when `TLOOP_DEBUG` is set, the file
 date is UTC, and they survive git resets. A `*_start` entry with no matching `*_complete` is the
 first thing to look for behind BUSY. Details: `docs/vibe-logs.md`.
 
 ## Unity Freeze Prevention
 
-Unity EditMode tests can freeze the Editor. `uloop` is single-flight per Editor: a command sent
+Unity EditMode tests can freeze the Editor. `tloop` is single-flight per Editor: a command sent
 while another is still running is rejected with a BUSY error after a bounded retry, so two
-`uloop run-tests` runs never overlap in one Editor. `uloop hot-reload` is the one exception: it
+`tloop run-tests` runs never overlap in one Editor. `tloop hot-reload` is the one exception: it
 waits for the running command to finish (up to 10 minutes) and then sends once. When you see BUSY, wait for the running
 command to finish and run yours once — do not retry in a loop. Separate Unity projects run in
 separate Editors and do not block each other. Before adding or modifying Unity EditMode
 tests (especially anything touching async execution, cancellation, threads, or dynamic-code
 runtime paths), read `docs/unity-editmode-test-guardrails.md` and follow its rules. If a new
-test makes `uloop run-tests` stall, remove or disable it instead of retrying the suite. If
-Unity freezes or stops responding to `uloop`, restart the Editor with `uloop launch -r`.
+test makes `tloop run-tests` stall, remove or disable it instead of retrying the suite. If
+Unity freezes or stops responding to `tloop`, restart the Editor with `tloop launch -r`.
 CI runs the full EditMode suite on a schedule (and on a manual `workflow_dispatch` of
 `unity-editmode-tests.yml`); that scheduled run is the full-suite gate. Pull-request CI and local
 pre-commit verification do not run the full suite — it takes far too long. Before a commit or

@@ -17,7 +17,7 @@ func TestDispatcherV2ModeNoticeReportsDelegatedPackageAndVersion(t *testing.T) {
 	// Verifies the notice names the delegated V2 CLI package, its version, and the dispatcher version behind it.
 	notice := dispatcherV2ModeNotice("2.2.0")
 
-	want := "uloop: executing in V2 mode (" + dispatcherV2CLIPackageName + "@2.2.0) via uloop dispatcher " + dispatcherVersion + "\n"
+	want := "tloop: executing in V2 mode (" + dispatcherV2CLIPackageName + "@2.2.0) via tloop dispatcher " + dispatcherVersion + "\n"
 	if notice != want {
 		t.Fatalf("notice = %q, want %q", notice, want)
 	}
@@ -61,7 +61,7 @@ func TestRunDispatcherV2CLIExecutesCachedEntrypointWithNode(t *testing.T) {
 	// Verifies the cached V2 CLI entrypoint runs through node with the original args, after the V2 mode notice.
 	cacheRoot := t.TempDir()
 	t.Setenv(nativepath.CacheDirEnvName, cacheRoot)
-	installPath := writeCachedDispatcherV2CLI(t, cacheRoot, "2.2.0", `{"uloop":"dist/cli.js"}`)
+	installPath := writeCachedDispatcherV2CLI(t, cacheRoot, "2.2.0", `{"tloop":"dist/cli.js"}`)
 	writeDispatcherFakeNode(t, `echo "node:$*"; exit 4`)
 
 	var stdout bytes.Buffer

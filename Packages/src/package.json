@@ -1,15 +1,15 @@
 {
-  "name": "io.github.hatayama.uloopmcp",
+  "name": "io.github.tongguang.tloop",
   "version": "3.21.1",
-  "displayName": "Unity CLI Loop",
-  "description": "AI-driven development loop for Unity via CLI.",
+  "displayName": "Tuanjie CLI Loop",
+  "description": "AI-driven development loop for Tuanjie via CLI.",
   "unity": "2022.3",
-  "documentationUrl": "https://github.com/hatayama/unity-cli-loop/blob/main/README.md",
-  "licensesUrl": "https://github.com/hatayama/unity-cli-loop/blob/main/LICENSE.md",
+  "documentationUrl": "https://github.com/tongguang/unity-cli-loop/blob/main/README.md",
+  "licensesUrl": "https://github.com/tongguang/unity-cli-loop/blob/main/LICENSE.md",
   "author": {
     "name": "hatayama",
     "email": "booqle@gmail.com",
-    "url": "https://github.com/hatayama/unity-cli-loop"
+    "url": "https://github.com/tongguang/unity-cli-loop"
   },
   "dependencies": {
     "com.unity.ugui": "1.0.0",
@@ -17,8 +17,8 @@
     "com.unity.nuget.mono-cecil": "1.11.6"
   },
   "keywords": [
-    "Unity CLI Loop",
-    "uloop",
+    "Tuanjie CLI Loop",
+    "tloop",
     "Cursor",
     "Claude",
     "Windsurf",
@@ -28,6 +28,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hatayama/unity-cli-loop.git"
+    "url": "git+https://github.com/tongguang/unity-cli-loop.git"
   }
 } 

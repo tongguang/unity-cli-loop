@@ -19,8 +19,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [Test]
         public void RequestLine_RoundTripsPathsWithSpacesAndUnicode()
         {
-            string inputPath = "/tmp/uloop hot reload/入力 \"quoted\".json";
-            string outputPath = "C:\\Temp\\uloop\\出力.json";
+            string inputPath = "/tmp/tloop hot reload/入力 \"quoted\".json";
+            string outputPath = "C:\\Temp\\tloop\\出力.json";
 
             string line = TransformWorkerServeProtocol.EncodeRequestLine(inputPath, outputPath);
             bool decoded = TransformWorkerServeProtocol.TryDecodeRequestLine(line, out string decodedInput, out string decodedOutput);
@@ -83,10 +83,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [TestCase(null)]
         [TestCase("")]
         [TestCase("noise")]
-        [TestCase("__ULOOP_TRANSFORM_RESULT__ 0")]
-        [TestCase("__ULOOP_TRANSFORM_RESULT__ zero 0")]
-        [TestCase("__ULOOP_TRANSFORM_RESULT__ 0 -1")]
-        [TestCase("__ULOOP_TRANSFORM_RESULT__ 0 0 extra")]
+        [TestCase("__TLOOP_TRANSFORM_RESULT__ 0")]
+        [TestCase("__TLOOP_TRANSFORM_RESULT__ zero 0")]
+        [TestCase("__TLOOP_TRANSFORM_RESULT__ 0 -1")]
+        [TestCase("__TLOOP_TRANSFORM_RESULT__ 0 0 extra")]
         public void TryParseResponseHeader_MalformedHeader_ReturnsFalse(string header)
         {
             bool parsed = TransformWorkerServeProtocol.TryParseResponseHeader(header, out int _, out int _);

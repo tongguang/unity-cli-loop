@@ -220,7 +220,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(added.LifecycleNote, Is.EqualTo(HotReloadUnityMessageNotes.NotForwarded));
             Assert.That(
                 result.Warnings,
-                Has.Exactly(1).Contains("Added Unity messages not invoked until 'uloop compile':"));
+                Has.Exactly(1).Contains("Added Unity messages not invoked until 'tloop compile':"));
             Assert.That(
                 target.gameObject.GetComponents<HotReloadUnityMessageProxy>(), Is.Empty);
         }

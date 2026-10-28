@@ -33,9 +33,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             + "to the same assembly and is part of this reload: passed, or unchanged since it was "
             + "last applied. Constructors, initializers, setters, indexers, operators and event "
             + "accessors cannot. Pass that file too or move the call into a method, or run "
-            + "'uloop compile' to make the added members compiled, then rerun. A subscription to an "
+            + "'tloop compile' to make the added members compiled, then rerun. A subscription to an "
             + "added event the added-field store cannot hold (custom add/remove accessors, or a "
-            + "delegate type not visible outside the assembly) needs 'uloop compile' wherever it is "
+            + "delegate type not visible outside the assembly) needs 'tloop compile' wherever it is "
             + "written.";
 
         // Why it points at the warning: the enum-member warning of the same run already carries
@@ -43,8 +43,8 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         private const string AddedEnumMemberInvisibleHint =
             "One or more of the missing members share a name with an enum member this reload adds "
             + "to a compiled enum. Hot reload cannot add an enum member, so no compilation sees it "
-            + "until 'uloop compile'. Write the underlying value as the cast the enum-member warning "
-            + "in Warnings shows, or run 'uloop compile' to add the member, then rerun.";
+            + "until 'tloop compile'. Write the underlying value as the cast the enum-member warning "
+            + "in Warnings shows, or run 'tloop compile' to add the member, then rerun.";
 
         private const string MissingMemberErrorCode = "CS1061:";
 

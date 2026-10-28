@@ -6,12 +6,12 @@
 # Prerequisites:
 #   - Unity Editor running for the target project
 #   - PlayMode is not running because this script starts it
-#   - Record input with Window > Unity CLI Loop > Recordings when prompted
+#   - Record input with Window > Tuanjie CLI Loop > Recordings when prompted
 
 set -e
 
 PROJECT_PATH=""
-ULOOP_PATH="${ULOOP_BIN:-uloop}"
+TLOOP_PATH="${TLOOP_BIN:-tloop}"
 SCENE_PATH="Assets/Scenes/InputReplayVerificationScene.unity"
 
 fail() {
@@ -26,13 +26,13 @@ while [ "$#" -gt 0 ]; do
             PROJECT_PATH=$2
             shift 2
             ;;
-        --uloop-path)
-            [ "$#" -ge 2 ] || fail "--uloop-path requires a value"
-            ULOOP_PATH=$2
+        --tloop-path)
+            [ "$#" -ge 2 ] || fail "--tloop-path requires a value"
+            TLOOP_PATH=$2
             shift 2
             ;;
         -h|--help)
-            echo "Usage: sh verify-replay-via-cli.sh [--project-path <path>] [--uloop-path <path>]"
+            echo "Usage: sh verify-replay-via-cli.sh [--project-path <path>] [--tloop-path <path>]"
             exit 0
             ;;
         *)
@@ -41,30 +41,30 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        "$ULOOP_PATH" --project-path "$PROJECT_PATH" "$@"
+        "$TLOOP_PATH" --project-path "$PROJECT_PATH" "$@"
     else
-        "$ULOOP_PATH" "$@"
+        "$TLOOP_PATH" "$@"
     fi
 }
 
-RECORDING_LOG=".uloop/outputs/InputRecordings/recording-event-log.txt"
-REPLAY_LOG=".uloop/outputs/InputRecordings/replay-event-log.txt"
+RECORDING_LOG=".tloop/outputs/InputRecordings/recording-event-log.txt"
+REPLAY_LOG=".tloop/outputs/InputRecordings/replay-event-log.txt"
 
 if [ -n "$PROJECT_PATH" ]; then
     RECORDING_LOG="$PROJECT_PATH/$RECORDING_LOG"
     REPLAY_LOG="$PROJECT_PATH/$REPLAY_LOG"
 fi
 
-run_uloop_json() {
-    output=$(run_uloop "$@" 2>&1) || {
+run_tloop_json() {
+    output=$(run_tloop "$@" 2>&1) || {
         printf '%s\n' "$output" >&2
-        fail "uloop $* failed"
+        fail "tloop $* failed"
     }
     if printf '%s\n' "$output" | grep -Eq '"Success"[[:space:]]*:[[:space:]]*false'; then
         printf '%s\n' "$output" >&2
-        fail "uloop $* returned success=false"
+        fail "tloop $* returned success=false"
     fi
 
     printf '%s\n' "$output"
@@ -82,7 +82,7 @@ assert_json_result() {
 wait_for_unity() {
     i=0
     while [ $i -lt 15 ]; do
-        if run_uloop get-logs --max-count 1 > /dev/null 2>&1; then
+        if run_tloop get-logs --max-count 1 > /dev/null 2>&1; then
             return 0
         fi
         sleep 2
@@ -93,7 +93,7 @@ wait_for_unity() {
 }
 
 activate_for_record() {
-    json=$(run_uloop_json execute-dynamic-code --code '
+    json=$(run_tloop_json execute-dynamic-code --code '
 var cube = GameObject.Find("VerificationCube");
 if (cube == null) return "ERROR: VerificationCube not found";
 cube.SendMessage("ActivateForExternalControl");
@@ -103,7 +103,7 @@ return "OK: activated for recording";
 }
 
 activate_for_replay() {
-    json=$(run_uloop_json execute-dynamic-code --code '
+    json=$(run_tloop_json execute-dynamic-code --code '
 var cube = GameObject.Find("VerificationCube");
 if (cube == null) return "ERROR: VerificationCube not found";
 cube.SendMessage("ActivateForExternalReplay");
@@ -119,7 +119,7 @@ save_log() {
     fi
     escaped_path=$(printf '%s\n' "$unity_path" | sed 's/\\/\\\\/g; s/"/\\"/g')
     rm -f "$1"
-    json=$(run_uloop_json execute-dynamic-code --code "
+    json=$(run_tloop_json execute-dynamic-code --code "
 var cube = GameObject.Find(\"VerificationCube\");
 if (cube == null) return \"ERROR: VerificationCube not found\";
 cube.SendMessage(\"SaveLog\", \"$escaped_path\");
@@ -130,9 +130,9 @@ return \"OK: log saved\";
 }
 
 initialize_replay_scene() {
-    run_uloop control-play-mode --action Stop >/dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop >/dev/null 2>&1 || true
 
-    json=$(run_uloop_json execute-dynamic-code --code "
+    json=$(run_tloop_json execute-dynamic-code --code "
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 string scenePath = \"$SCENE_PATH\";
@@ -157,7 +157,7 @@ echo "[1/8] Loading replay verification scene..."
 initialize_replay_scene
 
 echo "[2/8] Starting PlayMode..."
-run_uloop_json control-play-mode --action Play >/dev/null
+run_tloop_json control-play-mode --action Play >/dev/null
 echo "  Waiting for Unity..."
 sleep 6
 wait_for_unity
@@ -168,7 +168,7 @@ activate_for_record
 echo "[4/8] Recording input with the Recordings window..."
 echo ""
 echo "========================================="
-echo "  Open Window > Unity CLI Loop > Recordings."
+echo "  Open Window > Tuanjie CLI Loop > Recordings."
 echo "  Click Start Recording, play in the Game View, then click Stop Recording."
 echo ""
 echo "  WASD: move | Mouse: rotate"
@@ -187,9 +187,9 @@ save_log "$RECORDING_LOG"
 # ---- Phase 2: Replay via CLI ----
 
 echo "[6/8] Restarting PlayMode..."
-run_uloop_json control-play-mode --action Stop >/dev/null
+run_tloop_json control-play-mode --action Stop >/dev/null
 sleep 3
-run_uloop_json control-play-mode --action Play >/dev/null
+run_tloop_json control-play-mode --action Play >/dev/null
 echo "  Waiting for Unity..."
 sleep 6
 wait_for_unity
@@ -197,14 +197,14 @@ wait_for_unity
 echo "[7/8] Activating controller + starting replay via CLI..."
 activate_for_replay
 echo "  Starting replay of the latest Recordings window file..."
-REPLAY_RESULT=$(run_uloop replay-input --action start 2>&1) || true
+REPLAY_RESULT=$(run_tloop replay-input --action start 2>&1) || true
 echo "  $REPLAY_RESULT"
 
 echo "  Waiting for replay to finish..."
 sleep 2
 waited=0
 while [ $waited -lt 60 ]; do
-    STATUS_RESULT=$(run_uloop replay-input --action status 2>&1) || true
+    STATUS_RESULT=$(run_tloop replay-input --action status 2>&1) || true
     playing=$(echo "$STATUS_RESULT" | grep -o '"IsReplaying": *[a-z]*' | sed 's/.*: *//')
     if [ "$playing" = "false" ]; then
         echo "  Replay completed."

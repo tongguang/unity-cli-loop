@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	debugTimingEnvName                 = "ULOOP_DEBUG_TIMING"
+	debugTimingEnvName                 = "TLOOP_DEBUG_TIMING"
 	dynamicCodeIncludeTimingsParamName = "IncludeTimings"
 )
 
@@ -25,7 +25,7 @@ func writeDebugTiming(writer io.Writer, command string, total time.Duration, out
 	timing := outcome.Timing
 	_, _ = fmt.Fprintf(
 		writer,
-		"[uloop timing] command=%s total=%s rpc_total=%s dial=%s write=%s read=%s decode=%s\n",
+		"[tloop timing] command=%s total=%s rpc_total=%s dial=%s write=%s read=%s decode=%s\n",
 		command,
 		formatDebugDuration(total),
 		formatDebugDuration(timing.Total),
@@ -35,7 +35,7 @@ func writeDebugTiming(writer io.Writer, command string, total time.Duration, out
 		formatDebugDuration(timing.Decode),
 	)
 	for _, unityTiming := range extractUnityDebugTimings(command, outcome.Result) {
-		_, _ = fmt.Fprintf(writer, "[uloop timing] unity %s\n", unityTiming)
+		_, _ = fmt.Fprintf(writer, "[tloop timing] unity %s\n", unityTiming)
 	}
 }
 

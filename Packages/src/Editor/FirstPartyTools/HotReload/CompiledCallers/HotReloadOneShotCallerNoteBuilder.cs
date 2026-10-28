@@ -28,14 +28,14 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string IndirectFormat =
             "{0} is called only from one-shot lifecycle method(s) ({1}) in the compiled assemblies; "
             + "objects that already ran them will not run the patched body. It takes effect only for "
-            + "newly created objects, or run `uloop compile` and re-enter Play Mode. Callers hot reload "
+            + "newly created objects, or run `tloop compile` and re-enter Play Mode. Callers hot reload "
             + "added or patched are not counted; if one of them calls it, the patched body already runs.";
 
         // Why only when OnEnable or OnDisable is a caller: toggling enabled makes Unity call those
         // two again on a live object, while Awake and Start never run again that way.
         public const string ReEnableSuffix =
             " To run it on live objects from OnEnable or OnDisable, set the component's `enabled` to "
-            + "false and back to true (for example with `uloop execute-dynamic-code`); Awake and Start "
+            + "false and back to true (for example with `tloop execute-dynamic-code`); Awake and Start "
             + "do not run again that way.";
 
         /// <summary>

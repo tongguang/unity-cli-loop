@@ -194,7 +194,7 @@ func TestBuildCompilePlanWithAllKeepsDependencyOrder(t *testing.T) {
 	if plan.Units[0].Reason != "" {
 		t.Errorf("an --all unit should carry no change reason, got %q", plan.Units[0].Reason)
 	}
-	if plan.OutputDir != filepath.Join("Library", "uloop", "compile-check", "aaaa.dag") {
+	if plan.OutputDir != filepath.Join("Library", "tloop", "compile-check", "aaaa.dag") {
 		t.Errorf("output directory = %s", plan.OutputDir)
 	}
 }

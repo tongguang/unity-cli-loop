@@ -41,14 +41,14 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
                 if (string.IsNullOrWhiteSpace(result.Plan.ManualCommand))
                 {
                     EditorUtility.DisplayDialog(
-                        "Finish uLoop CLI PATH Setup",
+                        "Finish tloop CLI PATH Setup",
                         BuildManualSetupMessage(result.Plan),
                         "OK");
                     return;
                 }
 
                 bool copyCommand = EditorUtility.DisplayDialog(
-                    "Finish uLoop CLI PATH Setup",
+                    "Finish tloop CLI PATH Setup",
                     BuildManualSetupMessage(result.Plan),
                     "Copy Command",
                     "OK");
@@ -74,7 +74,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             {
                 EditorUtility.DisplayDialog(
                     "PATH Setup Still Needed",
-                    "PATH setup was updated, but a fresh terminal still cannot find uloop.\n\n"
+                    "PATH setup was updated, but a fresh terminal still cannot find tloop.\n\n"
                     + $"Profile: {result.Plan.ConfigurationFilePath}\n\n"
                     + BuildManualCommandFallback(result.Plan),
                     "OK");
@@ -92,7 +92,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             string shellName = string.IsNullOrWhiteSpace(plan.ShellName)
                 ? "your shell"
                 : plan.ShellName;
-            return "The uLoop CLI was installed, but your terminal cannot find the uloop command yet.\n\n"
+            return "The tloop CLI was installed, but your terminal cannot find the tloop command yet.\n\n"
                 + $"Detected shell: {shellName}\n"
                 + BuildInstallDirectoryLine(plan)
                 + "Add the install directory to PATH in your shell profile."
@@ -121,7 +121,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             }
 
             return string.IsNullOrWhiteSpace(plan.InstallDirectory)
-                ? "Could not determine the CLI install directory. Add the directory that contains uloop to PATH manually."
+                ? "Could not determine the CLI install directory. Add the directory that contains tloop to PATH manually."
                 : $"Add this directory to PATH in your shell profile:\n{plan.InstallDirectory}";
         }
 
@@ -130,7 +130,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             string action = result.Status == CliPathSetupFlowStatus.AlreadyConfiguredAndVisible
                 ? "Your shell profile already contains the PATH setup."
                 : "PATH setup was updated.";
-            return "The uLoop CLI is now available from a fresh terminal.\n\n"
+            return "The tloop CLI is now available from a fresh terminal.\n\n"
                 + action + "\n\n"
                 + $"Profile: {result.Plan.ConfigurationFilePath}\n"
                 + $"Line: {result.Plan.ConfigurationLine}";

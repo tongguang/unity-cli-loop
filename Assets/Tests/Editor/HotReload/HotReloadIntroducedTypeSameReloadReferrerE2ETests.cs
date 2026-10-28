@@ -252,7 +252,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Assert.That(description, Does.Contain("'" + FactoryMetadataName + "'"), description);
                 Assert.That(description, Does.Not.Contain("first without the change to"), description);
                 Assert.That(description, Does.Contain(AppliedChangesOnlyPhrase), description);
-                Assert.That(description, Does.Contain("uloop compile"), description);
+                Assert.That(description, Does.Contain("tloop compile"), description);
                 Assert.That(CallTheCaller(), Is.EqualTo(PongValue + HostValue), "A refused run must leave the previous patch in place.");
             });
         }

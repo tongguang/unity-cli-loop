@@ -10,7 +10,7 @@ import (
 	"github.com/hatayama/unity-cli-loop/dispatcher/internal/projectverify"
 )
 
-// tryHandleVerifyProjectRequest answers `uloop verify-project` inside the dispatcher process: the
+// tryHandleVerifyProjectRequest answers `tloop verify-project` inside the dispatcher process: the
 // check reads files only, so it must work while Unity is closed and in projects without the package.
 func tryHandleVerifyProjectRequest(
 	args []string,
@@ -82,14 +82,14 @@ func unknownVerifyProjectOptionError(arg string) error {
 		Message:     "Unknown verify-project option: " + arg,
 		Option:      arg,
 		Command:     clicore.VerifyProjectCommandName,
-		NextActions: []string{"Run `uloop verify-project --help` to inspect supported options."},
+		NextActions: []string{"Run `tloop verify-project --help` to inspect supported options."},
 	}
 }
 
 // printVerifyProjectHelp documents the command and its exit codes.
 func printVerifyProjectHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop verify-project")
+	clicore.WriteLine(stdout, "  tloop verify-project")
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Checks this Unity project's files without starting Unity: missing or orphaned .meta files,")
 	clicore.WriteLine(stdout, "invalid or duplicate GUIDs, leftover merge conflict markers, and a broken Packages/manifest.json.")

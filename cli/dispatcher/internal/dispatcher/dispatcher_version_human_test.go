@@ -63,7 +63,7 @@ func TestRunDispatcherPrintsDispatcherVersionAndV2ContextWhenStdoutIsTerminal(t 
 		t.Fatalf("exit code = %d, want 0", code)
 	}
 	want := dispatcherVersion + "\n" +
-		"This Unity project uses the uloop V2 package 2.2.0, so its commands run through the V2 CLI (" +
+		"This Unity project uses the tloop V2 package 2.2.0, so its commands run through the V2 CLI (" +
 		dispatcherV2CLIPackageName + "@2.2.0).\n"
 	if stdout.String() != want {
 		t.Fatalf("stdout = %q, want %q", stdout.String(), want)
@@ -92,7 +92,7 @@ func TestRunDispatcherPrintsDispatcherVersionAndPinContextWhenStdoutIsTerminal(t
 		t.Fatalf("exit code = %d, want 0", code)
 	}
 	want := dispatcherVersion + "\n" +
-		"This Unity project pins uloop project runner " + clicontract.ProjectRunnerVersion() + ".\n"
+		"This Unity project pins tloop project runner " + clicontract.ProjectRunnerVersion() + ".\n"
 	if stdout.String() != want {
 		t.Fatalf("stdout = %q, want %q", stdout.String(), want)
 	}
@@ -188,8 +188,8 @@ func TestDispatcherV2VersionContextSentenceWithoutResolvedVersion(t *testing.T) 
 	// Verifies a V2 project whose package version is ambiguous points the user at the error from other commands.
 	sentence := dispatcherV2VersionContextSentence(dispatcherV2Project{IsV2: true, PackageVersionCandidates: []string{"2.1.0", "2.2.0"}})
 
-	want := "This Unity project uses the uloop V2 package, but its package version could not be resolved; " +
-		"see the error from any other uloop command here."
+	want := "This Unity project uses the tloop V2 package, but its package version could not be resolved; " +
+		"see the error from any other tloop command here."
 	if sentence != want {
 		t.Fatalf("unexpected sentence: %s", sentence)
 	}

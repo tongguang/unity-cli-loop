@@ -44,7 +44,7 @@ func TestWaitForToolReadinessUsesDefaultTimeout(t *testing.T) {
 func TestWaitForToolReadinessReturnsCliUpdateRequiredImmediately(t *testing.T) {
 	expectedErr := &unityipc.RPCError{
 		Code:    -32603,
-		Message: "The installed uloop CLI uses an IPC protocol that does not match this Unity package.",
+		Message: "The installed tloop CLI uses an IPC protocol that does not match this Unity package.",
 		Data:    json.RawMessage(`{"type":"cli_update_required"}`),
 	}
 	deps := toolReadinessDeps{
@@ -65,11 +65,11 @@ func TestWaitForToolReadinessReturnsCliUpdateRequiredImmediately(t *testing.T) {
 // with server-not-responding guidance the caller cannot act on.
 func TestWaitForToolReadinessReturnsPermanentlyRefusedConnectImmediately(t *testing.T) {
 	expectedErr := &unityipc.ConnectionAttemptError{
-		Endpoint: "/tmp/uloop-501/UnityCliLoop-sample.sock",
+		Endpoint: "/tmp/tloop-501/TuanjieCliLoop-sample.sock",
 		Cause: &net.OpError{
 			Op:   "dial",
 			Net:  "unix",
-			Addr: &net.UnixAddr{Name: "/tmp/uloop-501/UnityCliLoop-sample.sock", Net: "unix"},
+			Addr: &net.UnixAddr{Name: "/tmp/tloop-501/TuanjieCliLoop-sample.sock", Net: "unix"},
 			Err:  os.NewSyscallError("connect", syscall.EPERM),
 		},
 	}
@@ -234,7 +234,7 @@ func TestToolReadinessDoneErrorIncludesProjectEndpoint(t *testing.T) {
 	err := toolReadinessDoneErrorWithDeps(context.Background(), projectRoot, errors.New("probe failed"), deps)
 
 	var notRespondingErr clierrors.UnityServerNotRespondingError
-	if !errors.As(err, &notRespondingErr) || !strings.Contains(notRespondingErr.Endpoint, "UnityCliLoop-") {
+	if !errors.As(err, &notRespondingErr) || !strings.Contains(notRespondingErr.Endpoint, "TuanjieCliLoop-") {
 		t.Fatalf("expected an endpoint in the not-responding error, got %#v", err)
 	}
 }

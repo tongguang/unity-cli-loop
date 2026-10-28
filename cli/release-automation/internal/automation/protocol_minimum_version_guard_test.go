@@ -82,7 +82,7 @@ func TestRunProtocolMinimumVersionGuard_WhenMinimumReleaseMatches_Passes(t *test
 		t.Fatalf("expected exit code 0, got %d\nstderr: %s", result.exitCode, result.stderr)
 	}
 	assertProtocolMinimumVersionLogContains(t, result.stdout, "Protocol minimum version guard passed.")
-	assertProtocolMinimumVersionLogContains(t, result.gitLog, "uloop-project-runner-v3.0.0-beta.33:"+cliContractFile)
+	assertProtocolMinimumVersionLogContains(t, result.gitLog, "tloop-project-runner-v3.0.0-beta.33:"+cliContractFile)
 }
 
 // Verifies project runner releases published between the v3 module split and
@@ -100,8 +100,8 @@ func TestRunProtocolMinimumVersionGuard_WhenMinimumReleaseIsMiddleGeneration_Fal
 		t.Fatalf("expected exit code 0, got %d\nstderr: %s", result.exitCode, result.stderr)
 	}
 	assertProtocolMinimumVersionLogContains(t, result.stdout, "Protocol minimum version guard passed.")
-	assertProtocolMinimumVersionLogContains(t, result.gitLog, "uloop-project-runner-v3.0.0-beta.33:"+cliContractFile)
-	assertProtocolMinimumVersionLogContains(t, result.gitLog, "uloop-project-runner-v3.0.0-beta.33:"+rootModulesRunnerContractFile)
+	assertProtocolMinimumVersionLogContains(t, result.gitLog, "tloop-project-runner-v3.0.0-beta.33:"+cliContractFile)
+	assertProtocolMinimumVersionLogContains(t, result.gitLog, "tloop-project-runner-v3.0.0-beta.33:"+rootModulesRunnerContractFile)
 }
 
 func TestRunProtocolMinimumVersionGuard_WhenMinimumReleasePredatesDirectorySplit_FallsBackToLegacyContractPath(t *testing.T) {
@@ -119,9 +119,9 @@ func TestRunProtocolMinimumVersionGuard_WhenMinimumReleasePredatesDirectorySplit
 		t.Fatalf("expected exit code 0, got %d\nstderr: %s", result.exitCode, result.stderr)
 	}
 	assertProtocolMinimumVersionLogContains(t, result.stdout, "Protocol minimum version guard passed.")
-	assertProtocolMinimumVersionLogContains(t, result.gitLog, "uloop-project-runner-v3.0.0-beta.33:"+cliContractFile)
-	assertProtocolMinimumVersionLogContains(t, result.gitLog, "uloop-project-runner-v3.0.0-beta.33:"+rootModulesRunnerContractFile)
-	assertProtocolMinimumVersionLogContains(t, result.gitLog, "uloop-project-runner-v3.0.0-beta.33:"+legacyRunnerContractFile)
+	assertProtocolMinimumVersionLogContains(t, result.gitLog, "tloop-project-runner-v3.0.0-beta.33:"+cliContractFile)
+	assertProtocolMinimumVersionLogContains(t, result.gitLog, "tloop-project-runner-v3.0.0-beta.33:"+rootModulesRunnerContractFile)
+	assertProtocolMinimumVersionLogContains(t, result.gitLog, "tloop-project-runner-v3.0.0-beta.33:"+legacyRunnerContractFile)
 }
 
 func TestParseProtocolMinimumVersionValues_WhenPinIsMissingProjectRunnerVersion_Fails(t *testing.T) {
@@ -307,7 +307,7 @@ func TestRunMinimumCliReleaseProtocolCheck_WhenRefIsProvided_ReadsValuesAtRef(t 
 	})
 
 	t.Setenv("PATH", mockBin+string(os.PathListSeparator)+os.Getenv("PATH"))
-	t.Setenv("ULOOP_REPOSITORY_ROOT", workDir)
+	t.Setenv("TLOOP_REPOSITORY_ROOT", workDir)
 	t.Setenv("GIT_LOG", gitLogPath)
 	t.Setenv("GH_LOG", ghLogPath)
 
@@ -322,10 +322,10 @@ func TestRunMinimumCliReleaseProtocolCheck_WhenRefIsProvided_ReadsValuesAtRef(t 
 	if exitCode != 0 {
 		t.Fatalf("expected exit code 0, got %d\nstderr: %s", exitCode, stderr.String())
 	}
-	assertProtocolMinimumVersionLogContains(t, stdout.String(), "Minimum project runner release uloop-project-runner-v3.0.0-beta.33 advertises protocol 2.")
+	assertProtocolMinimumVersionLogContains(t, stdout.String(), "Minimum project runner release tloop-project-runner-v3.0.0-beta.33 advertises protocol 2.")
 	assertProtocolMinimumVersionLogContains(t, readFile(t, gitLogPath), "protocol-release:"+protocolMinimumVersionFile)
 	assertProtocolMinimumVersionLogContains(t, readFile(t, gitLogPath), "protocol-release:"+unityPackageCliPinFile)
-	assertProtocolMinimumVersionLogContains(t, readFile(t, ghLogPath), "release view uloop-project-runner-v3.0.0-beta.33")
+	assertProtocolMinimumVersionLogContains(t, readFile(t, ghLogPath), "release view tloop-project-runner-v3.0.0-beta.33")
 }
 
 func TestRunMinimumCliReleaseProtocolCheck_WhenMinimumVersionHasPrefix_NormalizesReleaseTag(t *testing.T) {
@@ -350,7 +350,7 @@ func TestRunMinimumCliReleaseProtocolCheck_WhenMinimumVersionHasPrefix_Normalize
 	})
 
 	t.Setenv("PATH", mockBin+string(os.PathListSeparator)+os.Getenv("PATH"))
-	t.Setenv("ULOOP_REPOSITORY_ROOT", workDir)
+	t.Setenv("TLOOP_REPOSITORY_ROOT", workDir)
 	t.Setenv("GIT_LOG", gitLogPath)
 	t.Setenv("GH_LOG", ghLogPath)
 
@@ -365,9 +365,9 @@ func TestRunMinimumCliReleaseProtocolCheck_WhenMinimumVersionHasPrefix_Normalize
 	if exitCode != 0 {
 		t.Fatalf("expected exit code 0, got %d\nstderr: %s", exitCode, stderr.String())
 	}
-	assertProtocolMinimumVersionLogContains(t, stdout.String(), "Minimum project runner release uloop-project-runner-v3.0.0-beta.33 advertises protocol 2.")
-	assertProtocolMinimumVersionLogContains(t, readFile(t, gitLogPath), "uloop-project-runner-v3.0.0-beta.33:"+cliContractFile)
-	assertProtocolMinimumVersionLogContains(t, readFile(t, ghLogPath), "release view uloop-project-runner-v3.0.0-beta.33")
+	assertProtocolMinimumVersionLogContains(t, stdout.String(), "Minimum project runner release tloop-project-runner-v3.0.0-beta.33 advertises protocol 2.")
+	assertProtocolMinimumVersionLogContains(t, readFile(t, gitLogPath), "tloop-project-runner-v3.0.0-beta.33:"+cliContractFile)
+	assertProtocolMinimumVersionLogContains(t, readFile(t, ghLogPath), "release view tloop-project-runner-v3.0.0-beta.33")
 }
 
 func TestRunProtocolMinimumVersionComment_WhenWarningExists_UpsertsComment(t *testing.T) {
@@ -462,7 +462,7 @@ func runProtocolMinimumVersionGuardCase(t *testing.T, testCase protocolMinimumVe
 	prepareProtocolMinimumVersionGitContents(t, workDir, testCase)
 
 	t.Setenv("PATH", mockBin+string(os.PathListSeparator)+os.Getenv("PATH"))
-	t.Setenv("ULOOP_REPOSITORY_ROOT", workDir)
+	t.Setenv("TLOOP_REPOSITORY_ROOT", workDir)
 	t.Setenv("GIT_LOG", gitLogPath)
 	t.Setenv("GH_LOG", ghLogPath)
 	if testCase.releaseView != "" {
@@ -532,7 +532,7 @@ func runProtocolMinimumVersionCommentCase(t *testing.T, testCase protocolMinimum
 	})
 
 	t.Setenv("PATH", mockBin+string(os.PathListSeparator)+os.Getenv("PATH"))
-	t.Setenv("ULOOP_REPOSITORY_ROOT", workDir)
+	t.Setenv("TLOOP_REPOSITORY_ROOT", workDir)
 	t.Setenv("PR_NUMBER", "456")
 	t.Setenv("GITHUB_REPOSITORY", "owner/repository")
 	if testCase.repositoryFromGh {
@@ -626,7 +626,7 @@ set -eu
 printf '%s\n' "$*" >> "$GIT_LOG"
 
 if [ "$1" = "rev-parse" ] && [ "$2" = "--show-toplevel" ]; then
-  printf '%s\n' "$ULOOP_REPOSITORY_ROOT"
+  printf '%s\n' "$TLOOP_REPOSITORY_ROOT"
   exit 0
 fi
 
@@ -649,7 +649,7 @@ if [ "$1" = "show" ]; then
     protocol-pr-head:*) cat "$GIT_HEAD_CONSTANTS" ;;
     protocol-release:Packages/src/project-runner-pin.json) cat "$GIT_HEAD_PIN" ;;
     protocol-release:*) cat "$GIT_HEAD_CONSTANTS" ;;
-    uloop-project-runner-v*:cli/common/clicontract/contract.json)
+    tloop-project-runner-v*:cli/common/clicontract/contract.json)
       if [ -n "${GIT_RELEASE_CONTENT:-}" ]; then
         cat "$GIT_RELEASE_CONTENT"
       else
@@ -657,7 +657,7 @@ if [ "$1" = "show" ]; then
         exit 1
       fi
       ;;
-    uloop-project-runner-v*:common/clicontract/contract.json)
+    tloop-project-runner-v*:common/clicontract/contract.json)
       if [ -n "${GIT_MIDDLE_RELEASE_CONTENT:-}" ]; then
         cat "$GIT_MIDDLE_RELEASE_CONTENT"
       else
@@ -665,7 +665,7 @@ if [ "$1" = "show" ]; then
         exit 1
       fi
       ;;
-    uloop-project-runner-v*:cli/contract.json)
+    tloop-project-runner-v*:cli/contract.json)
       if [ -n "${GIT_LEGACY_RELEASE_CONTENT:-}" ]; then
         cat "$GIT_LEGACY_RELEASE_CONTENT"
       else
@@ -680,15 +680,15 @@ fi
 
 if [ "$1" = "cat-file" ] && [ "$2" = "-e" ]; then
   case "$3" in
-    uloop-project-runner-v*:cli/common/clicontract/contract.json)
+    tloop-project-runner-v*:cli/common/clicontract/contract.json)
       [ -n "${GIT_RELEASE_CONTENT:-}" ] && exit 0
       exit 1
       ;;
-    uloop-project-runner-v*:common/clicontract/contract.json)
+    tloop-project-runner-v*:common/clicontract/contract.json)
       [ -n "${GIT_MIDDLE_RELEASE_CONTENT:-}" ] && exit 0
       exit 1
       ;;
-    uloop-project-runner-v*:cli/contract.json)
+    tloop-project-runner-v*:cli/contract.json)
       [ -n "${GIT_LEGACY_RELEASE_CONTENT:-}" ] && exit 0
       exit 1
       ;;
@@ -733,7 +733,7 @@ if [ "$1" = "release" ] && [ "$2" = "view" ]; then
   if [ -n "${GH_RELEASE_VIEW:-}" ]; then
     printf '%s\n' "$GH_RELEASE_VIEW"
   else
-    printf '%s\n' '{"isDraft":false,"assets":[{"name":"uloop-project-runner-darwin-amd64.tar.gz","size":1},{"name":"uloop-project-runner-darwin-amd64.tar.gz.sha256","size":1},{"name":"uloop-project-runner-darwin-arm64.tar.gz","size":1},{"name":"uloop-project-runner-darwin-arm64.tar.gz.sha256","size":1},{"name":"uloop-project-runner-windows-amd64.zip","size":1},{"name":"uloop-project-runner-windows-amd64.zip.sha256","size":1}]}'
+    printf '%s\n' '{"isDraft":false,"assets":[{"name":"tloop-project-runner-darwin-amd64.tar.gz","size":1},{"name":"tloop-project-runner-darwin-amd64.tar.gz.sha256","size":1},{"name":"tloop-project-runner-darwin-arm64.tar.gz","size":1},{"name":"tloop-project-runner-darwin-arm64.tar.gz.sha256","size":1},{"name":"tloop-project-runner-windows-amd64.zip","size":1},{"name":"tloop-project-runner-windows-amd64.zip.sha256","size":1}]}'
   fi
   exit 0
 fi
@@ -813,7 +813,7 @@ func setupProtocolMinimumVersionMocks(t *testing.T, testCase protocolMinimumVers
 	writeProtocolMinimumVersionMockGH(t, filepath.Join(mockBin, "gh"))
 	prepareProtocolMinimumVersionGitContents(t, workDir, testCase)
 	t.Setenv("PATH", mockBin+string(os.PathListSeparator)+os.Getenv("PATH"))
-	t.Setenv("ULOOP_REPOSITORY_ROOT", workDir)
+	t.Setenv("TLOOP_REPOSITORY_ROOT", workDir)
 	t.Setenv("GIT_LOG", filepath.Join(workDir, "git.log"))
 	t.Setenv("GH_LOG", filepath.Join(workDir, "gh.log"))
 	return workDir
@@ -847,7 +847,7 @@ func TestRunMinimumCliReleaseProtocolCheck_FailsOnUnusableInputs(t *testing.T) {
 		{"missing pin", validConstants, "", validRelease, nil, "failed to read " + unityPackageCliPinFile},
 		{"invalid pin", validConstants, "{", validRelease, nil, "invalid"},
 		{"no required protocol", "public static class CliConstants {}", validPin, validRelease, nil, "does not define REQUIRED_CLI_PROTOCOL_VERSION"},
-		{"no release contract", validConstants, validPin, "", nil, releaseContractMissingSentinel + ": project runner release uloop-project-runner-v3.0.0-beta.33 does not provide"},
+		{"no release contract", validConstants, validPin, "", nil, releaseContractMissingSentinel + ": project runner release tloop-project-runner-v3.0.0-beta.33 does not provide"},
 		{"invalid release contract", validConstants, validPin, "{", nil, "project runner release contract is invalid JSON"},
 		{"unpublished release", validConstants, validPin, validRelease, map[string]string{"GH_FAIL_RELEASE_VIEW": "1"}, "is not published with complete native assets"},
 		{"invalid release metadata", validConstants, validPin, validRelease, map[string]string{"GH_RELEASE_VIEW": "{"}, "metadata is invalid JSON"},
@@ -871,7 +871,7 @@ func TestRunMinimumCliReleaseProtocolCheck_FailsOnUnusableInputs(t *testing.T) {
 			if testCase.name == "no required protocol" {
 				// The working-tree precondition must stop the check before any release is looked up.
 				gitLog, _ := os.ReadFile(filepath.Join(workDir, "git.log"))
-				if strings.Contains(string(gitLog), "show uloop-project-runner-v") {
+				if strings.Contains(string(gitLog), "show tloop-project-runner-v") {
 					t.Fatalf("expected no release lookup, got git log:\n%s", gitLog)
 				}
 			}
@@ -943,7 +943,7 @@ func TestRunProtocolMinimumVersionGuard_FailsWhenRefsCannotBeAnalyzed(t *testing
 
 func TestVerifyMinimumProjectRunnerReleaseProtocol_WhenRequiredProtocolIsMissing_Fails(t *testing.T) {
 	// Verifies the release check refuses to compare against a package that declares no required protocol.
-	err := verifyMinimumProjectRunnerReleaseProtocol("uloop-project-runner-v3.0.0", ProtocolMinimumVersionValues{}, []byte(`{"protocolVersion":2}`))
+	err := verifyMinimumProjectRunnerReleaseProtocol("tloop-project-runner-v3.0.0", ProtocolMinimumVersionValues{}, []byte(`{"protocolVersion":2}`))
 
 	if err == nil || !strings.Contains(err.Error(), "does not define REQUIRED_CLI_PROTOCOL_VERSION") {
 		t.Fatalf("expected a missing required protocol error, got %v", err)

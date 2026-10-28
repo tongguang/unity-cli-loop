@@ -9,7 +9,7 @@ import (
 
 // Verifies enable-pause-point's --help lists every CLI-only pause-point flag. The schema-driven
 // loop cannot produce them because none of them exist in the Unity-side EnablePausePointSchema,
-// so --help documented none of the six while `uloop list` documented all six.
+// so --help documented none of the six while `tloop list` documented all six.
 func TestVisibleOptionHelpEntriesIncludePausePointEnableCLIOnlyOptions(t *testing.T) {
 	tool, ok := tools.Find(tools.LoadDefault(), pausePointEnableCommandName)
 	if !ok {
@@ -169,12 +169,12 @@ func TestVisibleOptionHelpEntriesOmitPausePointCLIOnlyOptionsForOtherTools(t *te
 }
 
 const (
-	wantPausePointAwaitTriggerDescription  = "Runs a single uloop subcommand in-process right after arming/registration. Pass the subcommand without the leading 'uloop', e.g. \"simulate-keyboard --action Press --key Space\""
-	wantPausePointEnableTriggerDescription = "Requires --await. Same as await-pause-point's --trigger: a uloop subcommand without the leading 'uloop', e.g. \"simulate-keyboard --action Press --key Space\""
+	wantPausePointAwaitTriggerDescription  = "Runs a single tloop subcommand in-process right after arming/registration. Pass the subcommand without the leading 'tloop', e.g. \"simulate-keyboard --action Press --key Space\""
+	wantPausePointEnableTriggerDescription = "Requires --await. Same as await-pause-point's --trigger: a tloop subcommand without the leading 'tloop', e.g. \"simulate-keyboard --action Press --key Space\""
 )
 
 // Verifies both --trigger help rows state the in-process subcommand form and include an
-// example without a leading uloop token.
+// example without a leading tloop token.
 func TestPausePointTriggerDescriptionsDocumentSubcommandForm(t *testing.T) {
 	var awaitDescription string
 	for _, option := range PausePointAwaitCLIOnlyOptions() {

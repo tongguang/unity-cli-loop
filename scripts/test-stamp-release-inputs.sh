@@ -52,7 +52,7 @@ run_stamp() {
 
   # Surface the captured logs on failure; the temp files vanish with the trap
   # cleanup, so a silent redirect would leave CI failures undiagnosable.
-  if ULOOP_REPO_ROOT="$work_dir" "$SCRIPT" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"; then
+  if TLOOP_REPO_ROOT="$work_dir" "$SCRIPT" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"; then
     return 0
   fi
   echo "stamp-release-inputs.sh failed; captured output follows." >&2
@@ -271,7 +271,7 @@ fi
 
 # Verifies stamping fails instead of writing a partial hash when an input cannot be hashed.
 rm "$work_dir/cli/common/go.mod"
-if ULOOP_REPO_ROOT="$work_dir" "$SCRIPT" > /dev/null 2>&1; then
+if TLOOP_REPO_ROOT="$work_dir" "$SCRIPT" > /dev/null 2>&1; then
   echo "Expected stamping to fail when a tracked input cannot be hashed." >&2
   exit 1
 fi

@@ -22,11 +22,11 @@ internal static class AddedFieldSkippedWriterWarnings
 {
     public const string FieldWarningFormat =
         "Added field '{0}' is assigned only in {1}, which this reload skipped, but {2} was applied "
-        + "and reads it; the field keeps its default value until 'uloop compile'.";
+        + "and reads it; the field keeps its default value until 'tloop compile'.";
 
     public const string AutoPropertyWarningFormat =
         "Added auto-property '{0}' is assigned only in {1}, which this reload skipped, but {2} was applied "
-        + "and reads it; the property keeps its default value until 'uloop compile'.";
+        + "and reads it; the property keeps its default value until 'tloop compile'.";
 
     // Why a second wording: a skipped writer whose earlier reload's patch is still active keeps
     // running that body, and whether that body assigns the value is not recorded anywhere, so
@@ -35,13 +35,13 @@ internal static class AddedFieldSkippedWriterWarnings
         "Added field '{0}' is assigned only in {1}, which this reload skipped, but {2} was applied "
         + "and reads it; an earlier hot reload applied {3}, so while that body stays active the field "
         + "holds what it assigns, and if it assigns nothing the field keeps its default value until "
-        + "'uloop compile'.";
+        + "'tloop compile'.";
 
     public const string AutoPropertyEarlierPatchWarningFormat =
         "Added auto-property '{0}' is assigned only in {1}, which this reload skipped, but {2} was applied "
         + "and reads it; an earlier hot reload applied {3}, so while that body stays active the property "
         + "holds what it assigns, and if it assigns nothing the property keeps its default value until "
-        + "'uloop compile'.";
+        + "'tloop compile'.";
 
     private const int MaxListedWriters = 3;
 

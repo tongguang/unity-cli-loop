@@ -47,7 +47,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-compilation-list-store-" + Guid.NewGuid().ToString("N"));
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-compilation-list-store-" + Guid.NewGuid().ToString("N"));
             string scriptAssemblies = Path.Combine(_projectRoot, HotReloadConstants.ScriptAssembliesRelativeDirectory);
             Directory.CreateDirectory(scriptAssemblies);
             File.WriteAllText(Path.Combine(scriptAssemblies, "Saved" + HotReloadConstants.CompiledAssemblyExtension), "dll");

@@ -10,9 +10,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     {
         // Why: domain reload clears static fields; SessionState is the Editor-local store that survives it.
         private const string ActiveKey =
-            "io.github.hatayama.uloopmcp.cliPlayModeRunInBackground.active";
+            "io.github.tongguang.tloop.cliPlayModeRunInBackground.active";
         private const string OriginalKey =
-            "io.github.hatayama.uloopmcp.cliPlayModeRunInBackground.original";
+            "io.github.tongguang.tloop.cliPlayModeRunInBackground.original";
 
         public bool IsActive => SessionState.GetBool(ActiveKey, false);
 

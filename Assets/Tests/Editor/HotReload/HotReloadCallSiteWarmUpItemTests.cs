@@ -25,7 +25,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _tempDirectory = Path.Combine(Path.GetTempPath(), "uloop-call-site-warm-up-" + Guid.NewGuid().ToString("N"));
+            _tempDirectory = Path.Combine(Path.GetTempPath(), "tloop-call-site-warm-up-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDirectory);
             _cache = new HotReloadCompiledCallSiteCache(long.MaxValue);
         }

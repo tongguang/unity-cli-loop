@@ -54,7 +54,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             CliPinLoadResult result = CliPinReaderService.LoadPinFromPath(pinPath);
 
             Assert.That(result.Success, Is.False);
-            Assert.That(result.ErrorMessage, Is.EqualTo($"Unity CLI Loop pin file not found at {pinPath}."));
+            Assert.That(result.ErrorMessage, Is.EqualTo($"Tuanjie CLI Loop pin file not found at {pinPath}."));
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 CliPinLoadResult result = CliPinReaderService.LoadPinFromPath(pinPath);
 
                 Assert.That(result.Success, Is.False);
-                Assert.That(result.ErrorMessage, Is.EqualTo($"Unity CLI Loop pin file at {pinPath} is empty."));
+                Assert.That(result.ErrorMessage, Is.EqualTo($"Tuanjie CLI Loop pin file at {pinPath} is empty."));
             }
             finally
             {
@@ -102,7 +102,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Assert.That(result.Success, Is.False);
                 Assert.That(
                     result.ErrorMessage,
-                    Is.EqualTo($"Unity CLI Loop pin file at {pinPath} is missing projectRunnerVersion."));
+                    Is.EqualTo($"Tuanjie CLI Loop pin file at {pinPath} is missing projectRunnerVersion."));
             }
             finally
             {
@@ -132,7 +132,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Assert.That(result.Success, Is.False);
                 Assert.That(
                     result.ErrorMessage,
-                    Is.EqualTo($"Unity CLI Loop pin file at {pinPath} is missing minimumDispatcherVersion."));
+                    Is.EqualTo($"Tuanjie CLI Loop pin file at {pinPath} is missing minimumDispatcherVersion."));
             }
             finally
             {
@@ -163,7 +163,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Assert.That(result.Success, Is.False);
                 Assert.That(
                     result.ErrorMessage,
-                    Does.StartWith($"Unity CLI Loop pin file at {pinPath} contains invalid JSON:"));
+                    Does.StartWith($"Tuanjie CLI Loop pin file at {pinPath} contains invalid JSON:"));
             }
             finally
             {
@@ -277,7 +277,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Directory.CreateDirectory(root);
                 File.WriteAllText(
                     pinPath,
-                    "{\"projectRunnerVersion\":\"3.0.0\",\"minimumDispatcherVersion\":\"3.0.1\",\"dispatcherReleaseTag\":\"dispatcher-v3.0.1\",\"dispatcherArchiveManifest\":\"not-a-digest  uloop-dispatcher-darwin-arm64.zip\"}");
+                    "{\"projectRunnerVersion\":\"3.0.0\",\"minimumDispatcherVersion\":\"3.0.1\",\"dispatcherReleaseTag\":\"dispatcher-v3.0.1\",\"dispatcherArchiveManifest\":\"not-a-digest  tloop-dispatcher-darwin-arm64.zip\"}");
 
                 DispatcherBootstrapPinLoadResult result =
                     CliPinReaderService.LoadDispatcherBootstrapPinFromPath(pinPath);
@@ -336,7 +336,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string manifest =
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  install.sh\n"
                 + "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  install.ps1\n"
-                + "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  uloop-dispatcher-darwin-arm64.zip";
+                + "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  tloop-dispatcher-darwin-arm64.zip";
 
             try
             {
@@ -378,7 +378,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private const string WindowsInstallerEntry =
             "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  install.ps1";
         private const string ArchiveEntry =
-            "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  uloop-dispatcher-darwin-arm64.zip";
+            "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc  tloop-dispatcher-darwin-arm64.zip";
 
         /// <summary>
         /// Verifies that a whitespace-only pin path fails with the empty-path message before touching the file system.
@@ -389,7 +389,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             CliPinLoadResult result = CliPinReaderService.LoadPinFromPath("   ");
 
             Assert.That(result.Success, Is.False);
-            Assert.That(result.ErrorMessage, Is.EqualTo("Unity CLI Loop pin file path is empty."));
+            Assert.That(result.ErrorMessage, Is.EqualTo("Tuanjie CLI Loop pin file path is empty."));
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             DispatcherBootstrapPinLoadResult result = CliPinReaderService.LoadDispatcherBootstrapPinFromPath(pinPath);
 
             Assert.That(result.Success, Is.False);
-            Assert.That(result.ErrorMessage, Is.EqualTo($"Unity CLI Loop pin file not found at {pinPath}."));
+            Assert.That(result.ErrorMessage, Is.EqualTo($"Tuanjie CLI Loop pin file not found at {pinPath}."));
         }
 
         /// <summary>
@@ -505,7 +505,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Assert.That(result.Success, Is.False);
                 Assert.That(
                     result.ErrorMessage,
-                    Is.EqualTo($"Unity CLI Loop pin file at {pinPath} {expectedMessageSuffix}"));
+                    Is.EqualTo($"Tuanjie CLI Loop pin file at {pinPath} {expectedMessageSuffix}"));
             }
             finally
             {
@@ -523,7 +523,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
         private static string CreateUniqueTempRoot()
         {
-            return Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            return Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
         }
     }
 }

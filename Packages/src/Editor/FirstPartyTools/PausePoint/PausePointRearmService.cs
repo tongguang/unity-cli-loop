@@ -102,7 +102,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             if (response.ErrorCode == SourcePausePointConstants.ErrorCodeReleaseCodeOptimization)
             {
                 return "Code Optimization is Release and the re-arm does not switch it. Run "
-                    + "uloop set-code-optimization debug, compile, then enable-pause-point again "
+                    + "tloop set-code-optimization debug, compile, then enable-pause-point again "
                     + "with --persist.";
             }
 

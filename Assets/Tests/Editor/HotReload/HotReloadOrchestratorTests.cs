@@ -55,13 +55,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             return "Calls the added method '" + calledMethodDisplayName
                 + "', which this reload skipped; the Skipped row for that member names the fix. "
-                + "Apply it and rerun; run 'uloop compile' only if that row asks for it.";
+                + "Apply it and rerun; run 'tloop compile' only if that row asks for it.";
         }
 
         // Mirrors the MethodTransformGenericMethodOrType template in
         // Packages/src/Editor/FirstPartyTools/HotReload/Shared/HotReloadWorkerReasonText.MethodTransformTemplates.cs.
         private const string ExpectedGenericMethodSkipReason =
-            "Generic methods and methods inside generic types cannot be safely patched with Harmony. Run 'uloop compile'.";
+            "Generic methods and methods inside generic types cannot be safely patched with Harmony. Run 'tloop compile'.";
 
         /// <summary>
         /// What: the added-field store assembly is injected only when the store flag is set,
@@ -599,7 +599,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             const string expectedReason =
                 "Property setter, init, or indexer accessors are skipped; "
-                + "run 'uloop compile' to apply accessor edits.";
+                + "run 'tloop compile' to apply accessor edits.";
             bool foundPropertyGetterPatched = false;
             bool foundIndexerGetter = false;
             bool foundPropertySetter = false;
@@ -673,7 +673,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             const string expectedReason =
                 "Constructors, operators, and event accessors are skipped; "
-                + "run 'uloop compile' to apply these edits.";
+                + "run 'tloop compile' to apply these edits.";
             AssertHasSkipped(result, ".ctor()", expectedReason);
 
             bool foundUneditedOverload = false;
@@ -1695,7 +1695,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(failures[nameof(HotReloadBindFailShim)], Does.Contain("no such member"));
             Assert.That(
                 failures[nameof(HotReloadBindFailShim)],
-                Does.Contain("Run 'uloop compile' and retry."));
+                Does.Contain("Run 'tloop compile' and retry."));
         }
 
         /// <summary>
@@ -1745,7 +1745,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             const string genericSkipReason =
                 "Added generic methods are skipped; hot reload cannot emit a typed shim for them. "
-                + "Run 'uloop compile'.";
+                + "Run 'tloop compile'.";
             string expectedLastLine = string.Format(
                 HotReloadConstants.SkippedMemberCompileFailureNoteFormat,
                 "DescribeValue",
@@ -1795,7 +1795,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             const string genericSkipReason =
                 "Added generic methods are skipped; hot reload cannot emit a typed shim for them. "
-                + "Run 'uloop compile'.";
+                + "Run 'tloop compile'.";
             string expectedLastLine = string.Format(
                 HotReloadConstants.SkippedMemberCompileFailureNoteFormat,
                 "DescribeValue",
@@ -1863,7 +1863,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             {
                 if (warning.Contains("TuningConst")
                     && warning.Contains("is 4 in the edited source but 3 in the compiled assembly")
-                    && warning.Contains("uloop compile"))
+                    && warning.Contains("tloop compile"))
                 {
                     foundDrift = true;
                 }
@@ -2154,7 +2154,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             {
                 if (warning.Contains("HotReloadE2EMode.Active")
                     && warning.Contains("is 2 in the edited source but 1 in the compiled assembly")
-                    && warning.Contains("uloop compile"))
+                    && warning.Contains("tloop compile"))
                 {
                     foundDrift = true;
                 }
@@ -2198,7 +2198,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             {
                 if (warning.Contains("TuningConst")
                     && warning.Contains("is 5 in the edited source but 3 in the compiled assembly")
-                    && warning.Contains("uloop compile"))
+                    && warning.Contains("tloop compile"))
                 {
                     foundDrift = true;
                 }
@@ -2279,7 +2279,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             AssertNoFileLevelFailure(result);
             string expectedWarning = string.Format(
-                "Compiled property '{0}' was removed or redeclared as a different member kind in the edited source; the compiled member stays until 'uloop compile'.",
+                "Compiled property '{0}' was removed or redeclared as a different member kind in the edited source; the compiled member stays until 'tloop compile'.",
                 typeof(HotReloadFieldKindChangeFixture).FullName + ".Hp");
             Assert.That(
                 result.Warnings,
@@ -2982,7 +2982,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 failed.Reason.Contains(" ... (truncated)"),
                 Is.False,
-                "uloop must not truncate shim-compile Reason.\n" + failed.Reason);
+                "tloop must not truncate shim-compile Reason.\n" + failed.Reason);
         }
 
         /// <summary>
@@ -5774,7 +5774,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(actualExternalReason, Is.EqualTo(expectedExternalReason));
             Assert.That(
                 actualExternalReason,
-                Does.Contain("Run 'uloop compile'."),
+                Does.Contain("Run 'tloop compile'."),
                 "Other-file uncovered callers keep the compile-only CTA.");
             Assert.That(
                 actualExternalReason,
@@ -6578,7 +6578,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 actualReason,
                 Does.Contain(
-                    "Editing the bodies of HotReloadSignatureChangeUnchangedCallerFixture.StoreTarget in this file and reloading again applies them together, or run 'uloop compile'."));
+                    "Editing the bodies of HotReloadSignatureChangeUnchangedCallerFixture.StoreTarget in this file and reloading again applies them together, or run 'tloop compile'."));
             Assert.That(
                 CountWarningsContaining(result.Warnings, "Removed members stay present"),
                 Is.EqualTo(0),
@@ -7632,7 +7632,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             foreach (string warning in result.Warnings)
             {
                 if (warning.Contains(nameof(HotReloadAddedMemberHost.ExistingFail))
-                    && warning.Contains("'uloop compile'"))
+                    && warning.Contains("'tloop compile'"))
                 {
                     foundWarning = true;
                 }
@@ -9057,10 +9057,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         }
 
         private const string ExpectedSiblingTuningDriftWarning =
-            "const io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingConstDefinitions.SiblingTuning is 7 in the edited source but 6 in the compiled assembly; edits outside method bodies never take effect through hot reload - a method body patched in the same run still compiles against the compiled assembly and keeps the old value, so nothing runs with 7 yet. This warning repeats on every reload while the two values differ. Run 'uloop compile' to apply this change.";
+            "const io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingConstDefinitions.SiblingTuning is 7 in the edited source but 6 in the compiled assembly; edits outside method bodies never take effect through hot reload - a method body patched in the same run still compiles against the compiled assembly and keeps the old value, so nothing runs with 7 yet. This warning repeats on every reload while the two values differ. Run 'tloop compile' to apply this change.";
 
         private const string ExpectedAddedSiblingTuningWarning =
-            "const io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingConstDefinitions.AddedSiblingTuning exists only in the edited source, not in the compiled assembly. Method bodies patched in this same run already have its value folded in, so this run needs no compile; only bodies in files outside this reload that reference it fail shim compilation. Run 'uloop compile' when one of those files has to see it.";
+            "const io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingConstDefinitions.AddedSiblingTuning exists only in the edited source, not in the compiled assembly. Method bodies patched in this same run already have its value folded in, so this run needs no compile; only bodies in files outside this reload that reference it fail shim compilation. Run 'tloop compile' when one of those files has to see it.";
 
         private static IDisposable MutateSiblingTuningValue(int newValue)
         {
@@ -9123,7 +9123,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         }
 
         private const string ExpectedSiblingEnumMemberWarning =
-            "enum member io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingEnum.Third exists only in the edited source, not in the compiled assembly. Hot reload does not fold an added enum member into patched bodies, so every body that names it fails shim compilation (CS0117), including bodies in this reload's files. Write the underlying value as a cast instead ('(io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingEnum)3'; ToString() then prints the number, not the name), or run 'uloop compile' to add the member.";
+            "enum member io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingEnum.Third exists only in the edited source, not in the compiled assembly. Hot reload does not fold an added enum member into patched bodies, so every body that names it fails shim compilation (CS0117), including bodies in this reload's files. Write the underlying value as a cast instead ('(io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadSiblingEnum)3'; ToString() then prints the number, not the name), or run 'tloop compile' to add the member.";
 
         private static IDisposable MutateSiblingEnumToAddMemberAndUseIt()
         {

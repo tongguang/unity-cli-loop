@@ -14,7 +14,7 @@ Returns JSON with:
 - `EndPositionY`: Drag end Y coordinate (nullable float; populated for drag actions only)
 - `InterruptedByPausePoint` / `PausePointId` / `PausePointHitCount` / `PausePointHits`: Pause-point interruption info (all nullable except the boolean). `PausePointHits` lists every marker hit during this input in hit order; `PausePointId` only names the latest one. See the Pause Point Inspection section in SKILL.md
 
-Verify the visual outcome with a follow-up `uloop screenshot --capture-mode rendering --annotate-elements`.
+Verify the visual outcome with a follow-up `tloop screenshot --capture-mode rendering --annotate-elements`.
 
 Note: Click and LongPress on empty space (no UI element) still return `Success = true` with `HitGameObjectName = null`. Drag actions on empty space return `Success = false`.
 

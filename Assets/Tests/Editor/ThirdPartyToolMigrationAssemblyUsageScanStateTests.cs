@@ -64,7 +64,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             ThirdPartyToolMigrationAssemblyUsageScanState scanState = CreateScanState();
 
             bool recorded = scanState.RecordInitialSourceFacts(
-                "using io.github.hatayama.uLoopMCP;\npublic class Foo { }\n",
+                "using io.github.tongguang.tloop;\npublic class Foo { }\n",
                 SourceFilePath);
 
             Assert.That(recorded, Is.True);
@@ -81,7 +81,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             ThirdPartyToolMigrationAssemblyUsageScanState scanState = CreateScanState();
 
             scanState.RecordInitialSourceFacts(
-                "global using LegacyAlias = io.github.hatayama.uLoopMCP;\n",
+                "global using LegacyAlias = io.github.tongguang.tloop;\n",
                 SourceFilePath);
 
             Assert.That(scanState.AssemblyScopedLegacyDirectories, Is.EquivalentTo(new[] { AssemblyDirectory }));

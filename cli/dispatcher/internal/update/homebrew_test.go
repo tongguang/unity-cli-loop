@@ -12,32 +12,32 @@ func TestIsHomebrewManagedPath(t *testing.T) {
 	}{
 		{
 			name: "apple silicon cellar",
-			path: "/opt/homebrew/Cellar/uloop/3.0.0/bin/uloop",
+			path: "/opt/homebrew/Cellar/tloop/3.0.0/bin/tloop",
 			want: true,
 		},
 		{
 			name: "intel mac cellar",
-			path: "/usr/local/Cellar/uloop/3.0.0-beta.30/bin/uloop",
+			path: "/usr/local/Cellar/tloop/3.0.0-beta.30/bin/tloop",
 			want: true,
 		},
 		{
 			name: "linuxbrew cellar",
-			path: "/home/linuxbrew/.linuxbrew/Cellar/uloop/3.0.0/bin/uloop",
+			path: "/home/linuxbrew/.linuxbrew/Cellar/tloop/3.0.0/bin/tloop",
 			want: true,
 		},
 		{
 			name: "curl install location",
-			path: "/Users/someone/.local/bin/uloop",
+			path: "/Users/someone/.local/bin/tloop",
 			want: false,
 		},
 		{
 			name: "cellar substring segment only",
-			path: "/Users/someone/MyCellarTools/uloop",
+			path: "/Users/someone/MyCellarTools/tloop",
 			want: false,
 		},
 		{
 			name: "windows path with backslashes",
-			path: `C:\Users\someone\AppData\Local\uloop\uloop.exe`,
+			path: `C:\Users\someone\AppData\Local\tloop\tloop.exe`,
 			want: false,
 		},
 		{

@@ -8,13 +8,13 @@ Any state you arrange while PlayMode runs live can be consumed by the game befor
 
 ```bash
 # 1) Freeze the whole player loop before arranging anything
-uloop control-play-mode --action Pause
+tloop control-play-mode --action Pause
 
 # 2) While paused, build the exact scenario (production methods preferred; see below)
-uloop execute-dynamic-code --code '...'
+tloop execute-dynamic-code --code '...'
 
 # 3) One call: confirm the marker armed, resume PlayMode, fire the input, await the hit
-uloop enable-pause-point --file Assets/Scripts/Enemy.cs --line 42 --timeout-seconds 60 \
+tloop enable-pause-point --file Assets/Scripts/Enemy.cs --line 42 --timeout-seconds 60 \
   --await --resume-play --trigger "simulate-keyboard --action Press --key Digit3"
 ```
 

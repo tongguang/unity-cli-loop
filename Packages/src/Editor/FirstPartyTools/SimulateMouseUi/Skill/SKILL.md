@@ -1,19 +1,19 @@
 ---
-name: uloop-simulate-mouse-ui
+name: tloop-simulate-mouse-ui
 toolName: simulate-mouse-ui
 description: "Simulate PlayMode UI mouse actions on uGUI and UI Toolkit using screen coordinates. Use for UI clicks, long-presses, or drags from annotated screenshots."
 ---
 
 # Task
 
-Simulate mouse interaction on Unity PlayMode UI.
+Simulate mouse interaction on Tuanjie PlayMode UI.
 
 ## Workflow
 
-1. Ensure Unity is in PlayMode (use `uloop control-play-mode --action Play` if not)
-2. Get UI element info: `uloop screenshot --capture-mode rendering --annotate-elements --elements-only`
+1. Ensure Tuanjie is in PlayMode (use `tloop control-play-mode --action Play` if not)
+2. Get UI element info: `tloop screenshot --capture-mode rendering --annotate-elements --elements-only`
 3. Use the `AnnotatedElements` array to find the target element by `Path` or `Name` (labels are ordered by `SortingOrder`/`SiblingIndex`, which can differ from the real draw order, so do not choose a target by `A`, `B`, ... alone). Use `Interaction` to distinguish click targets from drag/drop/text targets, then use `SimX`/`SimY` directly as `--x`/`--y` coordinates.
-4. Execute the needed `uloop simulate-mouse-ui` commands
+4. Execute the needed `tloop simulate-mouse-ui` commands
 5. Inspect the result with the lightest useful evidence: runtime state, logs, or a screenshot
 6. When this UI input verifies a state transition, use Pause Point inspection from the section below as the standard frame proof
 7. Report what happened and which evidence was used
@@ -21,7 +21,7 @@ Simulate mouse interaction on Unity PlayMode UI.
 ## Tool Reference
 
 ```bash
-uloop simulate-mouse-ui --action <action> --x <x> --y <y> [options]
+tloop simulate-mouse-ui --action <action> --x <x> --y <y> [options]
 ```
 
 ### Parameters
@@ -65,40 +65,40 @@ uloop simulate-mouse-ui --action <action> --x <x> --y <y> [options]
 - `--bypass-raycast` still uses coordinates for pointer event positions, but chooses the clicked, long-pressed, or dragged GameObject by `--target-path`
 - If `--target-path` or `--drop-target-path` matches multiple active GameObjects, the command fails instead of choosing an arbitrary duplicate
 - UI Toolkit entries (`UiSystem` `UIToolkit`) can be clicked, long-pressed, and dragged at `SimX`/`SimY`; `--bypass-raycast`, `--target-path`, and `--drop-target-path` take GameObjects only. Details: `references/ui-toolkit.md`.
-- Device Simulator play view is supported. Prefer `uloop screenshot --capture-mode rendering --annotate-elements` for coordinates; they use the simulated device resolution (`Handles.GetMainGameViewSize()` / `Screen`), not the Simulator chrome scale.
+- Device Simulator play view is supported. Prefer `tloop screenshot --capture-mode rendering --annotate-elements` for coordinates; they use the simulated device resolution (`Handles.GetMainGameViewSize()` / `Screen`), not the Simulator chrome scale.
 
 ## Pause Point Inspection (Standard for E2E)
 
-For standard frame proof when this UI input drives a state transition, follow the `uloop-pause-point` skill — it covers line placement and interruption semantics. Tool-specific note: if `InterruptedByPausePoint: true`, `Success: true` only means the command ended cleanly; read `Message` first — it states whether the pointer event was already dispatched before the pause (only the overlay animation was interrupted) or the pause landed first (no pointer event was fired). Clear inspection-only pause points (`uloop clear-pause-point --all`) before final validation.
+For standard frame proof when this UI input drives a state transition, follow the `tloop-pause-point` skill — it covers line placement and interruption semantics. Tool-specific note: if `InterruptedByPausePoint: true`, `Success: true` only means the command ended cleanly; read `Message` first — it states whether the pointer event was already dispatched before the pause (only the overlay animation was interrupted) or the pause landed first (no pointer event was fired). Clear inspection-only pause points (`tloop clear-pause-point --all`) before final validation.
 
 ## Examples
 
 ```bash
 # Click a button at screen position
-uloop simulate-mouse-ui --action Click --x 400 --y 300
+tloop simulate-mouse-ui --action Click --x 400 --y 300
 
 # Force-click a button behind a raycast blocker by path
-uloop simulate-mouse-ui --action Click --x 400 --y 300 --bypass-raycast --target-path "Canvas/Panel/Button"
+tloop simulate-mouse-ui --action Click --x 400 --y 300 --bypass-raycast --target-path "Canvas/Panel/Button"
 
 # Force-drag and dispatch Drop to a blocked drop zone
-uloop simulate-mouse-ui --action Drag --from-x 400 --from-y 300 --x 600 --y 300 --bypass-raycast --target-path "Canvas/Item" --drop-target-path "Canvas/DropZone"
+tloop simulate-mouse-ui --action Drag --from-x 400 --from-y 300 --x 600 --y 300 --bypass-raycast --target-path "Canvas/Item" --drop-target-path "Canvas/DropZone"
 
 # Long-press a button for 3 seconds
-uloop simulate-mouse-ui --action LongPress --x 400 --y 300 --duration 3.0
+tloop simulate-mouse-ui --action LongPress --x 400 --y 300 --duration 3.0
 
 # One-shot drag (add --drag-speed 200 to slow it for visual inspection)
-uloop simulate-mouse-ui --action Drag --from-x 400 --from-y 300 --x 600 --y 300
+tloop simulate-mouse-ui --action Drag --from-x 400 --from-y 300 --x 600 --y 300
 
 # Split drag with hold (for inspection between steps)
-uloop simulate-mouse-ui --action DragStart --x 400 --y 300
-uloop screenshot --window-name Game
-uloop simulate-mouse-ui --action DragMove --x 500 --y 300
-uloop simulate-mouse-ui --action DragEnd --x 600 --y 300
+tloop simulate-mouse-ui --action DragStart --x 400 --y 300
+tloop screenshot --window-name Game
+tloop simulate-mouse-ui --action DragMove --x 500 --y 300
+tloop simulate-mouse-ui --action DragEnd --x 600 --y 300
 ```
 
 ## Prerequisites
 
-- Unity must be in **PlayMode**
+- Tuanjie must be in **PlayMode**
 - uGUI targets need an **EventSystem** and a **GraphicRaycaster** on their Canvas; UI Toolkit targets need neither
 - If you need runtime mouse input rather than UI pointer events, `simulate-mouse-input` assumes the project uses the New Input System; otherwise prefer `execute-dynamic-code`
 
@@ -111,4 +111,4 @@ which UI system was hit and give its path in the annotation's form. Two readings
 `HitGameObjectName = null` (drag actions on empty space fail), and on a pause-point
 interruption `Message` states whether the pointer event fired before the pause.
 Field-by-field semantics are in `references/output.md`. Verify the visual outcome with a
-follow-up `uloop screenshot --capture-mode rendering --annotate-elements`.
+follow-up `tloop screenshot --capture-mode rendering --annotate-elements`.

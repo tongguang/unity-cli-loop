@@ -54,7 +54,7 @@ func tryHandleCommandHelp(command string, startPath string, projectPath string, 
 
 func printNativeSingleCommandHelp(command string, stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteFormat(stdout, "  uloop %s", command)
+	clicore.WriteFormat(stdout, "  tloop %s", command)
 	if options, ok := nativeCommandOptions[command]; ok && len(options) > 0 {
 		clicore.WriteLine(stdout, " [options]")
 		clicore.WriteLine(stdout, "")
@@ -93,7 +93,7 @@ func printToolHelp(tool clicore.ToolDefinition, projectRoot string, stdout io.Wr
 	tool = skilldocs.ApplyToTool(tool, projectRoot)
 
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteFormat(stdout, "  uloop %s", tool.Name)
+	clicore.WriteFormat(stdout, "  tloop %s", tool.Name)
 	if len(tooldocs.VisibleOptionHelpEntriesForTool(tool)) > 0 {
 		clicore.WriteLine(stdout, " [options]")
 	} else {

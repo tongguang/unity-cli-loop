@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-const sampleSkillContent = "---\nname: uloop-sample\n---\n\n# sample\n"
+const sampleSkillContent = "---\nname: tloop-sample\n---\n\n# sample\n"
 
 // createSkillsTestProject creates a Unity project with one discoverable project skill.
 func createSkillsTestProject(t *testing.T) string {
@@ -49,7 +49,7 @@ func stubSkillsUserHomeDir(t *testing.T, homeDir string, err error) {
 func TestTryHandleSkillsRequestInstallListUninstallRoundTrip(t *testing.T) {
 	// Verifies install, list, and uninstall through the public request entry point act on the project's skill.
 	projectRoot := createSkillsTestProject(t)
-	installedSkillFile := filepath.Join(projectRoot, ".claude", "skills", "uloop-sample", "SKILL.md")
+	installedSkillFile := filepath.Join(projectRoot, ".claude", "skills", "tloop-sample", "SKILL.md")
 
 	code, stdout, stderr := runSkillsRequestForTest(t, projectRoot, "install", "--claude")
 	if code != 0 || !strings.Contains(stdout, "Installed: 1") {
@@ -58,7 +58,7 @@ func TestTryHandleSkillsRequestInstallListUninstallRoundTrip(t *testing.T) {
 	assertFileContent(t, installedSkillFile, sampleSkillContent)
 
 	code, stdout, stderr = runSkillsRequestForTest(t, projectRoot, "list", "--claude")
-	if code != 0 || !strings.Contains(stdout, "uloop-sample (installed)") || !strings.Contains(stdout, "Claude Code (Project)") {
+	if code != 0 || !strings.Contains(stdout, "tloop-sample (installed)") || !strings.Contains(stdout, "Claude Code (Project)") {
 		t.Fatalf("list failed: code=%d stdout=%s stderr=%s", code, stdout, stderr)
 	}
 
@@ -72,7 +72,7 @@ func TestTryHandleSkillsRequestInstallListUninstallRoundTrip(t *testing.T) {
 }
 
 func TestTryHandleSkillsRequestPrintsTargetGuidanceWithoutTargets(t *testing.T) {
-	// Verifies install and uninstall without target flags only print guidance and change nothing when no target holds a uloop skill yet.
+	// Verifies install and uninstall without target flags only print guidance and change nothing when no target holds a tloop skill yet.
 	projectRoot := createSkillsTestProject(t)
 	for _, subcommand := range []string{"install", "uninstall"} {
 		code, stdout, stderr := runSkillsRequestForTest(t, projectRoot, subcommand)
@@ -86,9 +86,9 @@ func TestTryHandleSkillsRequestPrintsTargetGuidanceWithoutTargets(t *testing.T) 
 }
 
 func TestRunSkillsSubcommandInstallWithoutTargetRefreshesDetectedInstall(t *testing.T) {
-	// Verifies install without a target flag refreshes a target that already holds a uloop skill instead of printing guidance.
+	// Verifies install without a target flag refreshes a target that already holds a tloop skill instead of printing guidance.
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	skills := []skillDefinition{skill}
 	claudeOptions := skillCommandOptions{targets: []skillTarget{targetConfigs["claude"]}}
 	var setupStderr bytes.Buffer
@@ -120,9 +120,9 @@ func TestRunSkillsSubcommandInstallWithoutTargetRefreshesDetectedInstall(t *test
 }
 
 func TestRunSkillsSubcommandInstallWithoutTargetAndNoInstallPrintsGuidance(t *testing.T) {
-	// Verifies install without a target flag still prints guidance and writes no skill when no target holds a uloop skill.
+	// Verifies install without a target flag still prints guidance and writes no skill when no target holds a tloop skill.
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
@@ -154,7 +154,7 @@ func TestRunSkillsSubcommandInstallWithoutTargetAndNoInstallPrintsGuidance(t *te
 func TestRunSkillsSubcommandInstallWithoutTargetReportsDetectionErrors(t *testing.T) {
 	// Verifies install without a target flag fails with code 1 instead of printing guidance when installed targets cannot be detected.
 	stubSkillsUserHomeDir(t, "", errors.New("home unavailable"))
-	skill := skillDefinition{name: "uloop-sample", content: []byte(sampleSkillContent)}
+	skill := skillDefinition{name: "tloop-sample", content: []byte(sampleSkillContent)}
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
@@ -174,13 +174,13 @@ func TestTryHandleSkillsRequestInstallsIntoOutputDir(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("dir install failed: code=%d stdout=%s stderr=%s", code, stdout, stderr)
 	}
-	assertFileContent(t, filepath.Join(outputDir, "uloop-sample", "SKILL.md"), sampleSkillContent)
+	assertFileContent(t, filepath.Join(outputDir, "tloop-sample", "SKILL.md"), sampleSkillContent)
 
 	code, stdout, stderr = runSkillsRequestForTest(t, projectRoot, "uninstall", "--output-dir", outputDir)
 	if code != 0 {
 		t.Fatalf("dir uninstall failed: code=%d stdout=%s stderr=%s", code, stdout, stderr)
 	}
-	if fileExists(filepath.Join(outputDir, "uloop-sample")) {
+	if fileExists(filepath.Join(outputDir, "tloop-sample")) {
 		t.Fatal("dir uninstall must remove the installed skill")
 	}
 }
@@ -228,7 +228,7 @@ func TestTryHandleSkillsRequestUsesExplicitProjectPath(t *testing.T) {
 
 	handled, code := tryHandleSkillsRequest([]string{"skills", "list", "--claude"}, t.TempDir(), projectRoot, &stdout, &stderr)
 
-	if !handled || code != 0 || !strings.Contains(stdout.String(), "uloop-sample (not installed)") {
+	if !handled || code != 0 || !strings.Contains(stdout.String(), "tloop-sample (not installed)") {
 		t.Fatalf("explicit project list mismatch: code=%d stdout=%s stderr=%s", code, stdout.String(), stderr.String())
 	}
 }
@@ -236,7 +236,7 @@ func TestTryHandleSkillsRequestUsesExplicitProjectPath(t *testing.T) {
 func TestTryHandleSkillsRequestInstallsV3MigrationSkill(t *testing.T) {
 	// Verifies install-v3-migration installs the temporary migration skill from the package root.
 	projectRoot := createDispatcherUnityProject(t)
-	writeV3MigrationSkillFixture(t, projectRoot, "---\nname: v3-cli-invocation-migration\n---\n")
+	writeV3MigrationSkillFixture(t, projectRoot, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
 
 	code, stdout, stderr := runSkillsRequestForTest(t, projectRoot, "install-v3-migration", "--claude")
 
@@ -318,7 +318,7 @@ func TestPathContainsRejectsUnrelatablePaths(t *testing.T) {
 
 func TestRunSkillsListReportsBaseDirAndStatusErrors(t *testing.T) {
 	// Verifies list fails with code 1 when the global home cannot be resolved or a skill status cannot be read.
-	skill := skillDefinition{name: "uloop-sample", content: []byte(sampleSkillContent)}
+	skill := skillDefinition{name: "tloop-sample", content: []byte(sampleSkillContent)}
 	t.Run("home lookup", func(t *testing.T) {
 		stubSkillsUserHomeDir(t, "", errors.New("home unavailable"))
 		var stderr bytes.Buffer
@@ -332,7 +332,7 @@ func TestRunSkillsListReportsBaseDirAndStatusErrors(t *testing.T) {
 		blockSkillsDirWithFile(t, projectRoot, ".claude")
 		var stderr bytes.Buffer
 		code := runSkillsList(projectRoot, []skillDefinition{skill}, skillCommandOptions{targets: []skillTarget{targetConfigs["claude"]}}, &bytes.Buffer{}, &stderr)
-		if code != 1 || !strings.Contains(stderr.String(), filepath.Join(".claude", "skills", "uloop-sample", "SKILL.md")+": not a directory") {
+		if code != 1 || !strings.Contains(stderr.String(), filepath.Join(".claude", "skills", "tloop-sample", "SKILL.md")+": not a directory") {
 			t.Fatalf("expected a status error: code=%d stderr=%s", code, stderr.String())
 		}
 	})
@@ -350,7 +350,7 @@ func blockSkillsDirWithFile(t *testing.T, projectRoot string, targetDir string) 
 
 func TestRunSkillsInstallReportsTargetErrors(t *testing.T) {
 	// Verifies install fails with code 1 when auto-refresh detection or the requested target cannot be read.
-	skill := skillDefinition{name: "uloop-sample", content: []byte(sampleSkillContent)}
+	skill := skillDefinition{name: "tloop-sample", content: []byte(sampleSkillContent)}
 	cases := []struct {
 		name        string
 		blocked     string
@@ -358,8 +358,8 @@ func TestRunSkillsInstallReportsTargetErrors(t *testing.T) {
 		wantMessage string
 	}{
 		{name: "global home lookup", global: true, wantMessage: "home unavailable"},
-		{name: "unrequested target unreadable", blocked: ".codex", wantMessage: filepath.Join(".codex", "skills", "uloop-sample", "SKILL.md") + ": not a directory"},
-		{name: "requested target unreadable", blocked: ".claude", wantMessage: filepath.Join(".claude", "skills", "unity-cli-loop") + string(filepath.Separator)},
+		{name: "unrequested target unreadable", blocked: ".codex", wantMessage: filepath.Join(".codex", "skills", "tloop-sample", "SKILL.md") + ": not a directory"},
+		{name: "requested target unreadable", blocked: ".claude", wantMessage: filepath.Join(".claude", "skills", "tuanjie-cli-loop") + string(filepath.Separator)},
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -385,7 +385,7 @@ func TestRunSkillsUninstallReportsTargetErrors(t *testing.T) {
 	// Verifies uninstall fails with code 1 when the requested target cannot be read.
 	projectRoot := t.TempDir()
 	blockSkillsDirWithFile(t, projectRoot, ".claude")
-	skill := skillDefinition{name: "uloop-sample"}
+	skill := skillDefinition{name: "tloop-sample"}
 	var stderr bytes.Buffer
 
 	code := runSkillsUninstall(projectRoot, []skillDefinition{skill}, skillCommandOptions{targets: []skillTarget{targetConfigs["claude"]}}, &bytes.Buffer{}, &stderr)
@@ -404,7 +404,7 @@ func TestRunSkillsInstallReportsDeprecatedRemovals(t *testing.T) {
 	writeSkillFile(t, sourceDir, sampleSkillContent)
 	deprecatedDir := filepath.Join(projectRoot, ".claude", "skills", deprecatedSkillNames[0])
 	writeSkillFile(t, deprecatedDir, "---\nname: retired\n---\n")
-	skill := skillDefinition{name: "uloop-sample", content: []byte(sampleSkillContent), sourceDirectory: sourceDir}
+	skill := skillDefinition{name: "tloop-sample", content: []byte(sampleSkillContent), sourceDirectory: sourceDir}
 	var stdout bytes.Buffer
 
 	code := runSkillsInstall(projectRoot, []skillDefinition{skill}, skillCommandOptions{targets: []skillTarget{targetConfigs["claude"]}}, &stdout, &bytes.Buffer{})

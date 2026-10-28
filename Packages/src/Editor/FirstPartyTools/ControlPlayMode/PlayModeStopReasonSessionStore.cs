@@ -12,9 +12,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     {
         // Why: domain reload clears static fields; SessionState is the Editor-local store that survives it.
         private const string ReasonKey =
-            "io.github.hatayama.uloopmcp.playModeStopReason.reason";
+            "io.github.tongguang.tloop.playModeStopReason.reason";
         private const string StoppedAtKey =
-            "io.github.hatayama.uloopmcp.playModeStopReason.stoppedAtUtc";
+            "io.github.tongguang.tloop.playModeStopReason.stoppedAtUtc";
 
         private static string? _pendingReason;
 

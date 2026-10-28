@@ -55,7 +55,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
 
         private void ApplyDebugStyle()
         {
-#if ULOOP_DEBUG
+#if TLOOP_DEBUG
             VisualElement mainContainer = _root.Q<VisualElement>("main-scroll-view");
             mainContainer?.AddToClassList("unity-cli-loop-main-container--debug");
 #endif

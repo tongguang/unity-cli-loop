@@ -9,8 +9,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     /// </summary>
     public sealed class HotReloadSiblingVerdictCacheTests
     {
-        private const string SnapshotPath = "/proj/Library/UloopHotReload/SourceSnapshot/Asm-mvid1/a.cs";
-        private const string OtherSnapshotPath = "/proj/Library/UloopHotReload/SourceSnapshot/Asm-mvid2/a.cs";
+        private const string SnapshotPath = "/proj/Library/TloopHotReload/SourceSnapshot/Asm-mvid1/a.cs";
+        private const string OtherSnapshotPath = "/proj/Library/TloopHotReload/SourceSnapshot/Asm-mvid2/a.cs";
         private const string SourcePath = "/proj/Assets/A.cs";
         private const string OtherSourcePath = "/proj/Temp/Copy/A.cs";
 

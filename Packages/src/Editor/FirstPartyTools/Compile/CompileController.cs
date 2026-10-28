@@ -212,7 +212,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             {
                 // Why before Refresh: AssetDatabase.Refresh() can start a script compile itself,
                 // and that compile can raise Script Updating Consent. Begin must be set first
-                // or the prefix lets the modal through on the typical "edit then uloop compile" path.
+                // or the prefix lets the modal through on the typical "edit then tloop compile" path.
                 CompileApiUpdaterConsentState.BeginCliCompile();
                 _pipeline.RefreshAssets();
 

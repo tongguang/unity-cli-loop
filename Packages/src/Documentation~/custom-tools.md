@@ -2,7 +2,7 @@
 
 English | [日本語](custom-tools_ja.md)
 
-Unity CLI Loop enables efficient development of project-specific tools without requiring changes to the core package.
+Tuanjie CLI Loop enables efficient development of project-specific tools without requiring changes to the core package.
 The type-safe design allows for reliable custom tool implementation in minimal time.
 (If you ask AI, they should be able to make it for you soon ✨)
 
@@ -97,7 +97,7 @@ When you create a custom tool, you can create a `Skill/` subfolder within the to
 **How it works:**
 1. Create a `Skill/` subfolder in your custom tool's folder
 2. Place `SKILL.md` inside the `Skill/` folder
-3. Run `uloop skills install --claude` to install all skills (bundled + project)
+3. Run `tloop skills install --claude` to install all skills (bundled + project)
 4. LLM tools will automatically recognize your custom skill
 
 **Directory structure:**
@@ -113,11 +113,11 @@ Assets/Editor/CustomTools/MyTool/
 **SKILL.md format:**
 ```markdown
 ---
-name: uloop-my-custom-tool
+name: tloop-my-custom-tool
 description: "Description of what the tool does and when to use it."
 ---
 
-# uloop my-custom-tool
+# tloop my-custom-tool
 
 Detailed documentation for the tool...
 ```

@@ -13,9 +13,9 @@ changed. Smaller assemblies are always compiled in full.
 |------|-----------|--------------|
 | A body-only edit of up to 30 files in a large assembly with a baseline | Changed-files check | A few seconds |
 | A body-only edit of more than 30 files | Full compile (`FastPathFallbacks`: too many changed files) | As for a full compile |
-| A new, deleted or renamed `.cs` file | Full compile of the assembly | About Unity's compile of it, without the import and the domain reload |
+| A new, deleted or renamed `.cs` file | Full compile of the assembly | About Tuanjie's compile of it, without the import and the domain reload |
 | A declaration change (a member, a signature, a `using` directive) | Full compile, plus the dependents that can see the change | The assembly, then its dependents |
-| The first run after a Unity build | Full compile of every changed assembly | As for a full compile |
+| The first run after a Tuanjie build | Full compile of every changed assembly | As for a full compile |
 | The first run after a full compile that had errors | Full compile (no baseline was recorded) | As for a full compile |
 | An assembly compiled only because a reference changed | Full compile now, and again on its next body-only edit (it records no baseline) | As for a full compile |
 | `--full` | In full: whatever differs from its last full compile - the assemblies fast-checked since, the dependents their rebuilt reference assemblies reach, and anything edited since the last run; the rest reused | As for a full compile of those; about a second right after a run that compiled in full |
@@ -24,8 +24,8 @@ changed. Smaller assemblies are always compiled in full.
 ## Dependents
 
 When an assembly compiles in full, its public surface (its reference assembly) is compared with the
-one from the last Unity build, not with the previous compile-check run; a surface that differs from
-Unity's keeps compiling its dependents until Unity builds again. Only the dependents that write a
+one from the last Tuanjie build, not with the previous compile-check run; a surface that differs from
+Tuanjie's keeps compiling its dependents until Tuanjie builds again. Only the dependents that write a
 name the change touches are compiled; adding a member counts the type's name among the changed
 names. A change a dependent can feel without writing any name is unnamed and compiles every
 dependent: a new base type or interface, an operator, an added abstract member, a member C# binds by
@@ -36,7 +36,7 @@ the compiled dependents the change reached, with the name that selected each.
 An assembly starts once every assembly it references that this run also compiles has finished. An
 assembly selected for its own sources, or a dependent already known to need compiling, starts
 sooner: as soon as every assembly it references that was selected for its own sources has finished.
-The dependents it references that are still compiling are assumed to keep Unity's public surface;
+The dependents it references that are still compiling are assumed to keep Tuanjie's public surface;
 when one of them turns out to have changed it, the assembly is compiled again after they finish, at
 most twice per run. A dependent whose recorded result may still apply once those finish waits for
 them instead.
@@ -56,14 +56,14 @@ there is none, `FastPathFallbacks[].Reason` says why:
   different compile-check build.
 
 `<time>` is when that full compile finished, in UTC; it can be from an earlier session or from
-before a Unity build in between.
+before a Tuanjie build in between.
 
 In every case the next full compile that succeeds records one, and body-only edits after it are
 fast-checked.
 
 A run with `--all` records baselines too. Under `--all`, a reference whose rebuilt API differs from
-Unity's build is read from this check's output; when a later run leaves that reference out and so
-reads Unity's build again, the first body edit of an assembly referencing it is compiled in full,
+Tuanjie's build is read from this check's output; when a later run leaves that reference out and so
+reads Tuanjie's build again, the first body edit of an assembly referencing it is compiled in full,
 with `inputs other than source contents changed: references` as the reason.
 
 ## Runs that stop on declaration errors
@@ -75,7 +75,7 @@ are fixed. Such a run is also faster than a full compile. Fix the declaration er
 
 ## Analyzers
 
-A full compile uses the response file as Unity wrote it, its `-analyzer:` entries and flags such as
+A full compile uses the response file as Tuanjie wrote it, its `-analyzer:` entries and flags such as
 `-warnaserror` included; compile-check adds only the output folder for generated files. The
 changed-files check skips the rules listed in `FastChecks[].UncheckedCodes`: those of CS0067,
 CS0169, CS0414 and CS0649 that the project does not suppress, and the rules of analyzers that look

@@ -13,7 +13,7 @@ import (
 func installDirModeSkillWithNotes(t *testing.T) (skillDefinition, string) {
 	t.Helper()
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	writeDispatcherTestFile(t, filepath.Join(skill.sourceDirectory, "notes.md"), "notes\n")
 	store := filepath.Join(root, "store")
 	if err := syncSkillDirectoryPreservingForeignFiles(skill.sourceDirectory, filepath.Join(store, skill.name)); err != nil {
@@ -106,7 +106,7 @@ func TestGetDirSkillStateReportsUnreadableInstalledSkillFileAsConflict(t *testin
 	if err != nil {
 		t.Fatalf("getDirSkillState failed: %v", err)
 	}
-	if state.status != "conflict" || !strings.Contains(state.conflictReason, `cannot read SKILL.md for skill "uloop-sample"`) {
+	if state.status != "conflict" || !strings.Contains(state.conflictReason, `cannot read SKILL.md for skill "tloop-sample"`) {
 		t.Fatalf("unexpected state: %+v", state)
 	}
 }
@@ -114,7 +114,7 @@ func TestGetDirSkillStateReportsUnreadableInstalledSkillFileAsConflict(t *testin
 func TestGetDirSkillStateTreatsDirectoryWithOnlyForeignFilesAsNotInstalled(t *testing.T) {
 	// Verifies a skill directory holding nothing at source-owned names is not installed rather than a conflict.
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	store := filepath.Join(root, "store")
 	writeDispatcherTestFile(t, filepath.Join(store, skill.name, "user-notes.txt"), "mine")
 
@@ -181,7 +181,7 @@ func TestGetDirSkillStateReportsUnreadableStore(t *testing.T) {
 		t.Skip("Windows reports listing a file differently from ENOTDIR.")
 	}
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	storeFile := filepath.Join(root, "store-file")
 	writeDispatcherTestFile(t, storeFile, "not a directory")
 

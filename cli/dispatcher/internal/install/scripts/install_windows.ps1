@@ -1,5 +1,5 @@
 $InstallDir = '{{INSTALL_DIR}}'
-$ExpectedUloopPath = '{{EXPECTED_ULOOP_PATH}}'
+$ExpectedUloopPath = '{{EXPECTED_TLOOP_PATH}}'
 $NormalizePath = {
     param([string]$Path)
     if (-not $Path) {
@@ -37,7 +37,7 @@ function Test-LegacyNpmUloopPath {
     if ($null -eq $CommandContent) {
         return $false
     }
-    return $CommandContent.Contains('node_modules/uloop-cli') -or $CommandContent.Contains('node_modules\uloop-cli')
+    return $CommandContent.Contains('node_modules/tloop-cli') -or $CommandContent.Contains('node_modules\tloop-cli')
 }
 function Write-LegacyNpmMultilineArgumentWarning {
     Write-Host 'Legacy npm shims can alter multiline PowerShell arguments before the native CLI receives them.'
@@ -50,13 +50,13 @@ function Remove-LegacyNpmArtifacts {
     if (-not $LegacyPrefix) {
         return
     }
-    foreach ($ShimName in @('uloop', 'uloop.cmd', 'uloop.ps1')) {
+    foreach ($ShimName in @('tloop', 'tloop.cmd', 'tloop.ps1')) {
         Remove-Item -Path (Join-Path $LegacyPrefix $ShimName) -Force -ErrorAction SilentlyContinue
         Remove-Item -Path (Join-Path (Join-Path $LegacyPrefix 'bin') $ShimName) -Force -ErrorAction SilentlyContinue
     }
     foreach ($PackagePath in @(
-            (Join-Path (Join-Path $LegacyPrefix 'node_modules') 'uloop-cli'),
-            (Join-Path (Join-Path (Join-Path $LegacyPrefix 'lib') 'node_modules') 'uloop-cli'))) {
+            (Join-Path (Join-Path $LegacyPrefix 'node_modules') 'tloop-cli'),
+            (Join-Path (Join-Path (Join-Path $LegacyPrefix 'lib') 'node_modules') 'tloop-cli'))) {
         Remove-Item -Path $PackagePath -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
@@ -68,14 +68,14 @@ function Test-LegacyNpmArtifactsExist {
     if (-not $LegacyPrefix) {
         return $false
     }
-    foreach ($ShimName in @('uloop', 'uloop.cmd', 'uloop.ps1')) {
+    foreach ($ShimName in @('tloop', 'tloop.cmd', 'tloop.ps1')) {
         if ((Test-Path (Join-Path $LegacyPrefix $ShimName) -PathType Leaf) -or (Test-Path (Join-Path (Join-Path $LegacyPrefix 'bin') $ShimName) -PathType Leaf)) {
             return $true
         }
     }
     foreach ($PackagePath in @(
-            (Join-Path (Join-Path $LegacyPrefix 'node_modules') 'uloop-cli'),
-            (Join-Path (Join-Path (Join-Path $LegacyPrefix 'lib') 'node_modules') 'uloop-cli'))) {
+            (Join-Path (Join-Path $LegacyPrefix 'node_modules') 'tloop-cli'),
+            (Join-Path (Join-Path (Join-Path $LegacyPrefix 'lib') 'node_modules') 'tloop-cli'))) {
         if (Test-Path $PackagePath -PathType Container) {
             return $true
         }
@@ -101,7 +101,7 @@ function Invoke-LegacyNpmPackageRemoval {
         return $false
     }
     if ($NpmCommand) {
-        $NpmArgs = @('uninstall', '-g', '--prefix', $LegacyPrefix, 'uloop-cli')
+        $NpmArgs = @('uninstall', '-g', '--prefix', $LegacyPrefix, 'tloop-cli')
         $null = & $NpmCommand.Source @NpmArgs
     }
     if ((-not $NpmCommand) -or $LASTEXITCODE -ne 0 -or (Test-LegacyNpmArtifactsExist -LegacyUloopPath $LegacyUloopPath -LegacyPrefix $LegacyPrefix)) {
@@ -110,7 +110,7 @@ function Invoke-LegacyNpmPackageRemoval {
     if (Test-LegacyNpmArtifactsExist -LegacyUloopPath $LegacyUloopPath -LegacyPrefix $LegacyPrefix) {
         return $false
     }
-    Write-Host 'Removed legacy npm package: uloop-cli'
+    Write-Host 'Removed legacy npm package: tloop-cli'
     return $true
 }
 function Invoke-DefaultLegacyNpmPackageRemoval {
@@ -118,7 +118,7 @@ function Invoke-DefaultLegacyNpmPackageRemoval {
     if (-not $NpmCommand) {
         return
     }
-    $null = & $NpmCommand.Source @('uninstall', '-g', 'uloop-cli')
+    $null = & $NpmCommand.Source @('uninstall', '-g', 'tloop-cli')
 }
 function Get-LegacyNpmUloopPathsFromPath {
     $PathValues = @(
@@ -134,7 +134,7 @@ function Get-LegacyNpmUloopPathsFromPath {
             if (-not $PathEntry) {
                 continue
             }
-            foreach ($ShimName in @('uloop', 'uloop.cmd', 'uloop.ps1')) {
+            foreach ($ShimName in @('tloop', 'tloop.cmd', 'tloop.ps1')) {
                 $CandidatePath = Join-Path $PathEntry $ShimName
                 if (-not (Test-LegacyNpmUloopPath -CommandPath $CandidatePath)) {
                     continue
@@ -196,7 +196,7 @@ function Get-FirstUloopCommandFromPath {
         if ($NormalizedPathEntry -match '^[A-Za-z]:$') {
             $NormalizedPathEntry = $NormalizedPathEntry + '\'
         }
-        foreach ($ShimName in @('uloop.exe', 'uloop.cmd', 'uloop.ps1', 'uloop')) {
+        foreach ($ShimName in @('tloop.exe', 'tloop.cmd', 'tloop.ps1', 'tloop')) {
             $CandidatePath = Join-Path $NormalizedPathEntry $ShimName
             if (Test-Path $CandidatePath -PathType Leaf) {
                 return $CandidatePath
@@ -215,7 +215,7 @@ function Report-PathShadowing {
     if ([string]::Equals($ResolvedPath, $ExpectedUloopPath, [System.StringComparison]::OrdinalIgnoreCase)) {
         return
     }
-    Write-Host "Installed uloop to $ExpectedUloopPath, but PATH resolves uloop to:"
+    Write-Host "Installed tloop to $ExpectedUloopPath, but PATH resolves tloop to:"
     Write-Host "  $ResolvedPath"
     if (Test-LegacyNpmUloopPath -CommandPath $ResolvedPath) {
         Write-LegacyNpmMultilineArgumentWarning

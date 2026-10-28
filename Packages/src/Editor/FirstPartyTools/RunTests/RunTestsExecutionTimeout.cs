@@ -80,7 +80,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
             string message =
                 $"run-tests timed out after {timeoutSeconds} seconds without a RunFinished callback. " +
-                "Increase --timeout-seconds for long suites, or restart with `uloop launch -r` if Unity is stuck.";
+                "Increase --timeout-seconds for long suites, or restart with `tloop launch -r` if Unity is stuck.";
             if (!string.IsNullOrEmpty(stopRestoreDegradationNote))
             {
                 return message + " " + stopRestoreDegradationNote;

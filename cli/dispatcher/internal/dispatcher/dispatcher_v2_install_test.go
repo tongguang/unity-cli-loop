@@ -109,7 +109,7 @@ func TestInstallDispatcherV2CLIReportsInstallFailures(t *testing.T) {
 				writeInstalledDispatcherV2Package(t, args[2], "2.1.0")
 				return nil
 			},
-			wantMessage: "npm did not install uloop-cli@2.2.0",
+			wantMessage: "npm did not install tloop-cli@2.2.0",
 		},
 	}
 	for _, testCase := range cases {

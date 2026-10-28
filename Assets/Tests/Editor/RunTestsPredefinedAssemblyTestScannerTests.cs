@@ -105,7 +105,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 notice,
                 Is.EqualTo(
-                    " Additionally, 2 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha, Assembly-CSharp-Editor: Editor.Bar.Beta. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'uloop compile' and rerun the tests."));
+                    " Additionally, 2 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha, Assembly-CSharp-Editor: Editor.Bar.Beta. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'tloop compile' and rerun the tests."));
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 notice,
                 Is.EqualTo(
-                    " Additionally, 7 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.One.A, Assembly-CSharp: Game.Two.B, Assembly-CSharp: Game.Three.C, Assembly-CSharp: Game.Four.D, Assembly-CSharp: Game.Five.E (+2 more). Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'uloop compile' and rerun the tests."));
+                    " Additionally, 7 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.One.A, Assembly-CSharp: Game.Two.B, Assembly-CSharp: Game.Three.C, Assembly-CSharp: Game.Four.D, Assembly-CSharp: Game.Five.E (+2 more). Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'tloop compile' and rerun the tests."));
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 message,
                 Is.EqualTo(
-                    "No tests found matching the specified filter criteria. Additionally, 1 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'uloop compile' and rerun the tests."));
+                    "No tests found matching the specified filter criteria. Additionally, 1 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'tloop compile' and rerun the tests."));
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 message,
                 Is.EqualTo(
-                    "No tests found matching the specified filter criteria Possible asmdef issues: Assets/Tests/EditMode/Sample.Tests.asmdef: sample finding. Additionally, 1 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'uloop compile' and rerun the tests."));
+                    "No tests found matching the specified filter criteria Possible asmdef issues: Assets/Tests/EditMode/Sample.Tests.asmdef: sample finding. Additionally, 1 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'tloop compile' and rerun the tests."));
         }
 
         /// <summary>

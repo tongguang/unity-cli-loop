@@ -44,7 +44,7 @@ func tryHandleUpdateRequest(ctx context.Context, args []string, stdout io.Writer
 	managedInstall := update.DetectManagedInstall(executablePath)
 	if managedInstall.IsManaged() {
 		clierrors.WriteErrorEnvelope(stderr, invalidArgumentExecutionError(
-			"uloop is managed by "+managedInstall.DisplayName+" ("+executablePath+"); self-update would create a second install outside the package manager",
+			"tloop is managed by "+managedInstall.DisplayName+" ("+executablePath+"); self-update would create a second install outside the package manager",
 			clierrors.ErrorContext{Command: clicore.UpdateCommandName},
 			[]string{"Run `" + managedInstall.UpgradeCommand + "` to update."},
 		))
@@ -70,7 +70,7 @@ func tryHandleUpdateRequest(ctx context.Context, args []string, stdout io.Writer
 		return true, 1
 	}
 	if !targetChanged {
-		clicore.WriteLine(stdout, "uloop dispatcher is already up to date ("+targetVersion+").")
+		clicore.WriteLine(stdout, "tloop dispatcher is already up to date ("+targetVersion+").")
 		return true, 0
 	}
 	updateCommand, err := update.CommandForOS(runtime.GOOS, resolvedOptions)
@@ -79,7 +79,7 @@ func tryHandleUpdateRequest(ctx context.Context, args []string, stdout io.Writer
 		return true, 1
 	}
 
-	clicore.WriteLine(stdout, "Updating global uloop dispatcher...")
+	clicore.WriteLine(stdout, "Updating global tloop dispatcher...")
 	if err := updateRunCommand(ctx, updateCommand, stdout, stderr); err != nil {
 		clierrors.WriteErrorEnvelope(stderr, clierrors.CLIError{
 			ErrorCode:   clierrors.ErrorCodeInternalError,
@@ -88,7 +88,7 @@ func tryHandleUpdateRequest(ctx context.Context, args []string, stdout io.Writer
 			Retryable:   true,
 			SafeToRetry: true,
 			Command:     clicore.UpdateCommandName,
-			NextActions: []string{"Retry `uloop update` after checking network access to GitHub."},
+			NextActions: []string{"Retry `tloop update` after checking network access to GitHub."},
 			Details: map[string]any{
 				"Cause": err.Error(),
 			},
@@ -115,7 +115,7 @@ func updateCommandForOSWithOptions(goos string, options updateOptions) (string, 
 }
 
 func runUpdateCommand(ctx context.Context, updateCommand update.Command, stdout io.Writer, stderr io.Writer) error {
-	tempDir, err := os.MkdirTemp("", "uloop-update-")
+	tempDir, err := os.MkdirTemp("", "tloop-update-")
 	if err != nil {
 		return err
 	}
@@ -174,7 +174,7 @@ func updateExecutionArgs(updateCommand update.Command, installerPath string) []s
 
 func printUpdateHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop update [--to-version <version>]")
+	clicore.WriteLine(stdout, "  tloop update [--to-version <version>]")
 }
 
 // resolveUpdateExecutablePath returns the on-disk path of this dispatcher binary.
@@ -201,7 +201,7 @@ func parseUpdateOptions(args []string) (updateOptions, error) {
 				Message:     "Unknown update option: --" + name,
 				Option:      "--" + name,
 				Command:     "update",
-				NextActions: []string{"Run `uloop update` or `uloop update --to-version <version>`."},
+				NextActions: []string{"Run `tloop update` or `tloop update --to-version <version>`."},
 			}
 		}
 		if options.targetVersion != "" {

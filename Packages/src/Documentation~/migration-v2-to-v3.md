@@ -3,14 +3,14 @@
 English | [日本語](migration-v2-to-v3_ja.md)
 
 > [!NOTE]
-> **Most users do not need this guide.** If you have no C# custom tools and no hand-written skills or scripts that call `uloop`, upgrading is just three steps: raise the Unity package version, press **Install CLI** (or **Update CLI**) in `Window > Unity CLI Loop > Settings`, then press **Install Skills** (or **Update Skills**) in the same window. You are done — you can stop reading here. For what changed in V3, see [What's New in V3](whats-new-v3.md).
+> **Most users do not need this guide.** If you have no C# custom tools and no hand-written skills or scripts that call `tloop`, upgrading is just three steps: raise the Unity package version, press **Install CLI** (or **Update CLI**) in `Window > Tuanjie CLI Loop > Settings`, then press **Install Skills** (or **Update Skills**) in the same window. You are done — you can stop reading here. For what changed in V3, see [What's New in V3](whats-new-v3.md).
 
 ## Who needs this guide
 
 Read on if either of these applies to your project:
 
-- **You have C# custom tools written against the V2 API** — classes deriving from the V2 tool base type, or anything else importing the `io.github.hatayama.uLoopMCP` namespace. Follow Step 1 through Step 2; the migration wizard rewrites them for you.
-- **You have `SKILL.md` files, Markdown docs, POSIX shell scripts, or PowerShell scripts that invoke `uloop`** — V3 changed the boolean option syntax and removed several commands, so existing invocations can silently break. Follow Step 3 onward.
+- **You have C# custom tools written against the V2 API** — classes deriving from the V2 tool base type, or anything else importing the `io.github.tongguang.tloop` namespace. Follow Step 1 through Step 2; the migration wizard rewrites them for you.
+- **You have `SKILL.md` files, Markdown docs, POSIX shell scripts, or PowerShell scripts that invoke `tloop`** — V3 changed the boolean option syntax and removed several commands, so existing invocations can silently break. Follow Step 3 onward.
 
 If both apply, work through the guide from the top in order.
 
@@ -29,7 +29,7 @@ As a precondition, the steps below start from **the Unity Editor starting up wit
 
 On startup, Unity finds the compile errors from the V2 sources and asks whether to enter Safe Mode. **Press `Ignore` so that Unity starts up without entering Safe Mode.**
 
-**Why this matters:** Safe Mode loads only a whitelisted set of assemblies. The Unity CLI Loop editor extension is not on that whitelist, so in Safe Mode the package code never runs and **the migration window cannot open**. Declining Safe Mode is what makes the rest of this guide possible.
+**Why this matters:** Safe Mode loads only a whitelisted set of assemblies. The Tuanjie CLI Loop editor extension is not on that whitelist, so in Safe Mode the package code never runs and **the migration window cannot open**. Declining Safe Mode is what makes the rest of this guide possible.
 
 ![The Safe Mode confirmation dialog shown on startup. Press Ignore](images/migration-safe-mode-dialog.png)
 
@@ -38,13 +38,13 @@ On startup, Unity finds the compile errors from the V2 sources and asks whether 
 
 Entering Safe Mode by accident is recoverable. Because the package code does not run in Safe Mode, nothing is recorded about the migration state — restart Unity, press `Ignore`, and the wizard opens as described below.
 
-Launching from the CLI does not avoid this dialog. `uloop launch` shows the same prompt: Unity's `-ignorecompilererrors` switch does not suppress it in GUI mode.
+Launching from the CLI does not avoid this dialog. `tloop launch` shows the same prompt: Unity's `-ignorecompilererrors` switch does not suppress it in GUI mode.
 
 ## Step 2: Press Migrate
 
-Once the Editor is up, the `Unity CLI Loop Migration` window **opens by itself**. This automatic open fires on the first startup after the package major version goes from V2 to V3, so it is a one-time event rather than something you can trigger again by restarting. **If the window did not open on its own**, open it manually from `Window > Unity CLI Loop > Custom Tool Migration`.
+Once the Editor is up, the `Tuanjie CLI Loop Migration` window **opens by itself**. This automatic open fires on the first startup after the package major version goes from V2 to V3, so it is a one-time event rather than something you can trigger again by restarting. **If the window did not open on its own**, open it manually from `Window > Tuanjie CLI Loop > Custom Tool Migration`.
 
-![The Unity CLI Loop Migration window, showing both the C# Source Structure Migration and AI Skill and Script Migration sections, with the detection status and the Migrate button](images/migration-wizard-detected.png)
+![The Tuanjie CLI Loop Migration window, showing both the C# Source Structure Migration and AI Skill and Script Migration sections, with the detection status and the Migrate button](images/migration-wizard-detected.png)
 
 The `C# Source Structure Migration` section reports the detection from the compile error like this (`{N}` is the number of affected files; the wording drops the count when it could not be determined):
 
@@ -79,14 +79,14 @@ At that point the rewritten sources compile, and the errors you saw on startup a
 
 ### What the wizard rewrites
 
-- **Namespace** — `io.github.hatayama.uLoopMCP` becomes `io.github.hatayama.UnityCliLoop.ToolContracts` for tool contract types.
+- **Namespace** — `io.github.tongguang.tloop` becomes `io.github.hatayama.UnityCliLoop.ToolContracts` for tool contract types.
 - **Base types** — `AbstractUnityTool` becomes `UnityCliLoopTool<TSchema, TResponse>`, `BaseToolSchema` becomes `UnityCliLoopToolSchema`, and `BaseToolResponse` becomes `UnityCliLoopToolResponse`.
 - **Attribute** — `[McpTool]` becomes `[UnityCliLoopTool]`. The `Description` argument is dropped, while `DisplayDevelopmentOnly` and `RequiredSecuritySetting` are carried over.
 - **Assembly definition references** — `uLoopMCP.Editor` and `uLoopMCP.Runtime` references in your `.asmdef` files are repointed at the V3 assemblies.
 
-## Step 3: Migrate skills and scripts that call uloop
+## Step 3: Migrate skills and scripts that call tloop
 
-The second section, `AI Skill and Script Migration`, covers the other half of the job: your `SKILL.md` files, Markdown docs, shell scripts, and PowerShell scripts that invoke `uloop`.
+The second section, `AI Skill and Script Migration`, covers the other half of the job: your `SKILL.md` files, Markdown docs, shell scripts, and PowerShell scripts that invoke `tloop`.
 
 ![The AI Skill and Script Migration section, showing the Install Migration Skill button and the Prompt for your AI agent contents](images/migration-wizard-ai-skill.png)
 
@@ -94,12 +94,12 @@ The second section, `AI Skill and Script Migration`, covers the other half of th
 
 1. Press **`Install Migration Skill`**. This installs a temporary skill named `v3-cli-invocation-migration` into your project.
 2. Expand the **`Prompt for your AI agent`** foldout and press **`Copy AI Prompt`**.
-3. Paste that prompt into your AI agent and let it run. The skill teaches the agent to search for `uloop` invocations, read the surrounding context, and update only genuine V2 CLI usage — leaving C# snippets, enum references, and unrelated JSON alone.
+3. Paste that prompt into your AI agent and let it run. The skill teaches the agent to search for `tloop` invocations, read the surrounding context, and update only genuine V2 CLI usage — leaving C# snippets, enum references, and unrelated JSON alone.
 4. Review the agent's changes. It reports which files it edited, which removed commands it found as migration candidates, and what you should verify by hand.
 
 ## CLI option changes
 
-The AI agent applies these changes for you. This table is here so you can review its work — the canonical source is `Packages/src/TemporarySkills~/v3-cli-invocation-migration/Skill/references/first-party-v2-to-v3.md`.
+The AI agent applies these changes for you. This table is here so you can review its work — the canonical source is `Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill/references/first-party-v2-to-v3.md`.
 
 ### Boolean argument rules
 
@@ -112,31 +112,31 @@ V3 boolean options do not take a value. How a V2 invocation converts depends on 
 | `--flag true` / `--flag=true` | remove the option, when the V3 default is already true |
 | `--flag false` / `--flag=false` | use the V3 negative option, when the V3 default is true |
 
-For any boolean not listed below, run `uloop <command> --help`: every V3 flag prints its default as `default: enabled` (true) or `default: disabled` (false).
+For any boolean not listed below, run `tloop <command> --help`: every V3 flag prints its default as `default: enabled` (true) or `default: disabled` (false).
 
 ### Renamed first-party options
 
 | V2 command | V2 option | V3 replacement |
 |---|---|---|
-| `uloop compile` | `--force-recompile true` | `--force-recompile` |
-| `uloop compile` | `--force-recompile false` | remove |
-| `uloop compile` | `--wait-for-domain-reload true` or bare | remove |
-| `uloop compile` | `--wait-for-domain-reload false` | `--no-wait-for-domain-reload` |
-| `uloop compile` | `--reload-external-scene-changes true` | remove |
-| `uloop compile` | `--reload-external-scene-changes false` | `--stop-on-external-scene-changes` |
-| `uloop run-tests` | `--save-before-run true` or bare | remove |
-| `uloop run-tests` | `--save-before-run false` | `--unsaved-changes fail` |
-| `uloop replay-input` | `--show-overlay true` | remove |
-| `uloop replay-input` | `--show-overlay false` | `--no-show-overlay` |
-| `uloop get-hierarchy` | `--include-components true` | remove |
-| `uloop get-hierarchy` | `--include-components false` | `--no-include-components` |
-| `uloop get-hierarchy` | `--include-inactive true` | remove |
-| `uloop get-hierarchy` | `--include-inactive false` | `--no-include-inactive` |
-| `uloop execute-dynamic-code` | `--compile-only true` | `--compile-only` |
-| `uloop execute-dynamic-code` | `--compile-only false` | remove |
+| `tloop compile` | `--force-recompile true` | `--force-recompile` |
+| `tloop compile` | `--force-recompile false` | remove |
+| `tloop compile` | `--wait-for-domain-reload true` or bare | remove |
+| `tloop compile` | `--wait-for-domain-reload false` | `--no-wait-for-domain-reload` |
+| `tloop compile` | `--reload-external-scene-changes true` | remove |
+| `tloop compile` | `--reload-external-scene-changes false` | `--stop-on-external-scene-changes` |
+| `tloop run-tests` | `--save-before-run true` or bare | remove |
+| `tloop run-tests` | `--save-before-run false` | `--unsaved-changes fail` |
+| `tloop replay-input` | `--show-overlay true` | remove |
+| `tloop replay-input` | `--show-overlay false` | `--no-show-overlay` |
+| `tloop get-hierarchy` | `--include-components true` | remove |
+| `tloop get-hierarchy` | `--include-components false` | `--no-include-components` |
+| `tloop get-hierarchy` | `--include-inactive true` | remove |
+| `tloop get-hierarchy` | `--include-inactive false` | `--no-include-inactive` |
+| `tloop execute-dynamic-code` | `--compile-only true` | `--compile-only` |
+| `tloop execute-dynamic-code` | `--compile-only false` | remove |
 
 > [!WARNING]
-> Two of these option names are also **valid V3 syntax on a different command**, so never migrate them by name alone. Bare `--wait-for-domain-reload` is a valid default-false flag on `uloop execute-dynamic-code`, and bare `--include-inactive` is a valid default-false flag on `uloop find-game-objects`. Check which command an invocation belongs to before editing it.
+> Two of these option names are also **valid V3 syntax on a different command**, so never migrate them by name alone. Bare `--wait-for-domain-reload` is a valid default-false flag on `tloop execute-dynamic-code`, and bare `--include-inactive` is a valid default-false flag on `tloop find-game-objects`. Check which command an invocation belongs to before editing it.
 
 ### Removed and renamed commands
 
@@ -144,15 +144,15 @@ The six commands from `capture-window` through `get-menu-items` were already rem
 
 | V2 command | V3 handling |
 |---|---|
-| `uloop capture-window` | Renamed to `uloop screenshot`. |
-| `uloop unity-search` | Removed. Use `uloop execute-dynamic-code`, or `uloop find-game-objects` for ordinary scene lookups. |
-| `uloop get-unity-search-providers` | Removed. Use `uloop execute-dynamic-code`. |
-| `uloop get-provider-details` | Removed. Use `uloop execute-dynamic-code`. |
-| `uloop execute-menu-item` | Removed. Use `uloop execute-dynamic-code` with `EditorApplication.ExecuteMenuItem(...)`. |
-| `uloop get-menu-items` | Removed. Use `uloop execute-dynamic-code`. |
-| `uloop get-version` | Removed as a user command. Use `uloop --version` for the CLI version, or `uloop execute-dynamic-code` for the Unity Editor version. |
-| `uloop get-project-info` | Removed. Use `uloop execute-dynamic-code` to read the project metadata you need. |
-| `uloop record-input` | Removed in V3. Record input in the Unity Editor from **Window > Unity CLI Loop > Recordings**. |
+| `tloop capture-window` | Renamed to `tloop screenshot`. |
+| `tloop unity-search` | Removed. Use `tloop execute-dynamic-code`, or `tloop find-game-objects` for ordinary scene lookups. |
+| `tloop get-unity-search-providers` | Removed. Use `tloop execute-dynamic-code`. |
+| `tloop get-provider-details` | Removed. Use `tloop execute-dynamic-code`. |
+| `tloop execute-menu-item` | Removed. Use `tloop execute-dynamic-code` with `EditorApplication.ExecuteMenuItem(...)`. |
+| `tloop get-menu-items` | Removed. Use `tloop execute-dynamic-code`. |
+| `tloop get-version` | Removed as a user command. Use `tloop --version` for the CLI version, or `tloop execute-dynamic-code` for the Unity Editor version. |
+| `tloop get-project-info` | Removed. Use `tloop execute-dynamic-code` to read the project metadata you need. |
+| `tloop record-input` | Removed in V3. Record input in the Unity Editor from **Window > Tuanjie CLI Loop > Recordings**. |
 
 The migration skill reports these as candidates rather than rewriting them, because the replacement depends on what your script was doing.
 
@@ -165,8 +165,8 @@ Once your docs and scripts are migrated, remove the temporary skill. The window 
 Press **`Remove Migration Skill`** in the wizard, or remove it from the CLI for each target you installed it to:
 
 ```bash
-uloop skills uninstall-v3-migration --claude
-uloop skills uninstall-v3-migration --codex
+tloop skills uninstall-v3-migration --claude
+tloop skills uninstall-v3-migration --codex
 ```
 
 ## Verify
@@ -175,19 +175,19 @@ Work through these three checks:
 
 ```bash
 # 1. The project compiles with no errors
-uloop compile
+tloop compile
 
 # 2. Your custom tools are registered and callable
-uloop list
+tloop list
 ```
 
-- `uloop compile` should report zero errors. Warnings unrelated to the migration are fine.
-- `uloop list` should include every custom tool you had before the upgrade, under the same tool names — the migration changes namespaces and base types, not your `ToolName` values.
-- Finally, run one of your own skills or scripts end to end and confirm the `uloop` invocations inside it still behave as expected. Option syntax errors surface immediately as a failed command rather than a silent no-op.
+- `tloop compile` should report zero errors. Warnings unrelated to the migration are fine.
+- `tloop list` should include every custom tool you had before the upgrade, under the same tool names — the migration changes namespaces and base types, not your `ToolName` values.
+- Finally, run one of your own skills or scripts end to end and confirm the `tloop` invocations inside it still behave as expected. Option syntax errors surface immediately as a failed command rather than a silent no-op.
 
 ## Manual migration reference
 
-If you prefer to migrate by hand, these are the concrete replacements the wizard performs. The legacy namespace is `io.github.hatayama.uLoopMCP`; the V3 tool contract namespace is `io.github.hatayama.UnityCliLoop.ToolContracts`.
+If you prefer to migrate by hand, these are the concrete replacements the wizard performs. The legacy namespace is `io.github.tongguang.tloop`; the V3 tool contract namespace is `io.github.hatayama.UnityCliLoop.ToolContracts`.
 
 | V2 type | V3 type |
 |---|---|
@@ -211,8 +211,8 @@ If you prefer to migrate by hand, these are the concrete replacements the wizard
 
 **Unity entered Safe Mode.** The package code does not run there, so nothing was recorded and nothing was lost. Restart the Editor and press `Ignore` at the prompt. If you were never asked, re-enable `Preferences > Asset Pipeline > Show Enter Safe Mode Dialog` and restart again.
 
-**The wizard did not open automatically.** First confirm the Editor actually went through a fresh startup on V3 — the automatic open happens during startup, on the first launch after the major version goes from V2 to V3. If you updated from Package Manager while Unity was running, that session does not count; restart the Editor. Open it manually from `Window > Unity CLI Loop > Custom Tool Migration`; everything in Step 2 onward works the same way from the manual route.
+**The wizard did not open automatically.** First confirm the Editor actually went through a fresh startup on V3 — the automatic open happens during startup, on the first launch after the major version goes from V2 to V3. If you updated from Package Manager while Unity was running, that session does not count; restart the Editor. Open it manually from `Window > Tuanjie CLI Loop > Custom Tool Migration`; everything in Step 2 onward works the same way from the manual route.
 
 **Compile errors remain after `Migrate` finishes.** Read the remaining errors before doing anything else: sources that mix custom logic with V2 API calls can need a manual touch-up that the rules do not cover. Use your VCS diff to see what the wizard changed, restore from your commit or backup if you want a clean slate, and work through the Manual migration reference above for whatever is left.
 
-**Your AI agent cannot see the temporary skill.** The skill is installed per target, so check that you installed it for the agent you are actually using (`--claude`, `--codex`, and so on) rather than a different one. Re-running `uloop skills install` for the right target refreshes the installed copies.
+**Your AI agent cannot see the temporary skill.** The skill is installed per target, so check that you installed it for the agent you are actually using (`--claude`, `--codex`, and so on) rather than a different one. Re-running `tloop skills install` for the right target refreshes the installed copies.

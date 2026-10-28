@@ -12,7 +12,7 @@ import (
 // tryHandleRunnerInfoRequest answers the project runner's own identity
 // requests. Version output must stay here because the dispatcher forwards
 // project-scoped version queries to the pinned runner, while help output is
-// kept minimal: the full help UX is owned by the global uloop dispatcher.
+// kept minimal: the full help UX is owned by the global tloop dispatcher.
 func tryHandleRunnerInfoRequest(args []string, stdout io.Writer) (bool, int) {
 	if len(args) == 0 || clicore.IsHelpRequest(args) {
 		printRunnerUsage(stdout)
@@ -33,20 +33,20 @@ func tryHandleRunnerInfoRequest(args []string, stdout io.Writer) (bool, int) {
 // exactly one binary: interactive use always goes through the global dispatcher.
 func printRunnerUsage(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop-project-runner <command> [options]")
+	clicore.WriteLine(stdout, "  tloop-project-runner <command> [options]")
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "This binary executes Unity project commands forwarded by the global `uloop` dispatcher.")
-	clicore.WriteLine(stdout, "Run `uloop --help` for the full command list and command help.")
+	clicore.WriteLine(stdout, "This binary executes Unity project commands forwarded by the global `tloop` dispatcher.")
+	clicore.WriteLine(stdout, "Run `tloop --help` for the full command list and command help.")
 }
 
 func dispatcherOwnedCommandError(command string) clierrors.CLIError {
 	return clierrors.CLIError{
 		ErrorCode:   clierrors.ErrorCodeInvalidArgument,
 		Phase:       clierrors.ErrorPhaseArgumentParsing,
-		Message:     "The `" + command + "` command is handled by the global uloop dispatcher, not by the project runner binary.",
+		Message:     "The `" + command + "` command is handled by the global tloop dispatcher, not by the project runner binary.",
 		Retryable:   false,
 		SafeToRetry: false,
 		Command:     command,
-		NextActions: []string{"Run `uloop " + command + "` so the global uloop dispatcher handles it."},
+		NextActions: []string{"Run `tloop " + command + "` so the global tloop dispatcher handles it."},
 	}
 }

@@ -28,7 +28,7 @@ type compileCheckVibeLog struct {
 }
 
 // startCompileCheckVibeLog writes the start entry of a run and returns what writes its complete
-// entry. With ULOOP_DEBUG unset it writes nothing and builds no context.
+// entry. With TLOOP_DEBUG unset it writes nothing and builds no context.
 func startCompileCheckVibeLog(projectRoot string, options compileCheckOptions) compileCheckVibeLog {
 	if !vibelog.IsCLIVibeLogEnabled() {
 		return compileCheckVibeLog{}

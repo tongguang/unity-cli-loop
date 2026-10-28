@@ -28,7 +28,7 @@ func (err UnityBuildRequiredError) ToCLIError(context clierrors.ErrorContext) cl
 		SafeToRetry: false,
 		ProjectRoot: context.ProjectRoot,
 		Command:     context.Command,
-		NextActions: []string{"Run `uloop compile`, then retry `compile-check`."},
+		NextActions: []string{"Run `tloop compile`, then retry `compile-check`."},
 	}
 }
 

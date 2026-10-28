@@ -92,16 +92,16 @@ func clarifyReleasePRCheckComponentHeadingBlock(block string) (string, bool) {
 
 // releasePRCheckComponentDisplaySlug labels both the collapsible summary and
 // the changelog heading of a component block with the same slug. The
-// dispatcher slug gains the uloop prefix for display, while its release tag
+// dispatcher slug gains the tloop prefix for display, while its release tag
 // keeps the bare component id, so consumers that resolve tags from summaries
 // must also accept the renamed slug (see release_tag_from_body in
 // scripts/sync-published-release-pr-labels.sh).
 func releasePRCheckComponentDisplaySlug(component string) (string, bool) {
 	switch component {
-	case "unity-package", "uloop-project-runner":
+	case "unity-package", "tloop-project-runner":
 		return component, true
-	case "dispatcher", "uloop-dispatcher":
-		return "uloop-dispatcher", true
+	case "dispatcher", "tloop-dispatcher":
+		return "tloop-dispatcher", true
 	default:
 		return "", false
 	}

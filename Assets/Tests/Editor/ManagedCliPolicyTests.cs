@@ -12,10 +12,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// <summary>
         /// Verifies that executable paths resolve to Homebrew, winget, or no package manager.
         /// </summary>
-        [TestCase("/opt/homebrew/Cellar/uloop/3.1.0/bin/uloop", ManagedCliKind.Homebrew)]
-        [TestCase(@"C:\Program Files\WinGet\Links\uloop.exe", ManagedCliKind.Winget)]
-        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Programs\uloop\bin\uloop.exe", ManagedCliKind.None)]
-        [TestCase("/opt/homebrew/Cellar/uloop/3.1.0/WinGet/Links/uloop", ManagedCliKind.Homebrew)]
+        [TestCase("/opt/homebrew/Cellar/tloop/3.1.0/bin/tloop", ManagedCliKind.Homebrew)]
+        [TestCase(@"C:\Program Files\WinGet\Links\tloop.exe", ManagedCliKind.Winget)]
+        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Programs\tloop\bin\tloop.exe", ManagedCliKind.None)]
+        [TestCase("/opt/homebrew/Cellar/tloop/3.1.0/WinGet/Links/tloop", ManagedCliKind.Homebrew)]
         public void Resolve_ReturnsExpectedKind(string executablePath, ManagedCliKind expectedKind)
         {
             ManagedCliKind result = ManagedCliPolicy.Resolve(executablePath, directoryPath => false);

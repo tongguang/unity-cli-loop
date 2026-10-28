@@ -93,7 +93,7 @@ function Invoke-UloopCapture {
     [string]$previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     try {
-        [object[]]$output = & uloop @arguments 2>&1
+        [object[]]$output = & tloop @arguments 2>&1
         [int]$exitCode = $LASTEXITCODE
     }
     finally {
@@ -122,7 +122,7 @@ function Invoke-UloopChecked {
         Write-Host $result.Text
     }
 
-    [string]$commandText = "uloop " + ($result.Arguments -join " ")
+    [string]$commandText = "tloop " + ($result.Arguments -join " ")
     throw "$commandText failed with exit code $($result.ExitCode)"
 }
 
@@ -134,7 +134,7 @@ function Invoke-UloopJsonChecked {
     [string]$text = Invoke-UloopChecked -CommandArguments $CommandArguments
     [pscustomobject]$json = $text | ConvertFrom-Json
     if ($json.PSObject.Properties.Name -contains "Success" -and $json.Success -ne $true) {
-        throw "uloop $($CommandArguments -join " ") returned success=false: $text"
+        throw "tloop $($CommandArguments -join " ") returned success=false: $text"
     }
 
     return $json
@@ -155,7 +155,7 @@ function Wait-UnityReady {
 
 function Get-UnityProcessIdsForProject {
     [int[]]$processIds = @()
-    [object[]]$processes = @(Get-CimInstance Win32_Process -Filter "Name = 'Unity.exe'" | Where-Object { $_.CommandLine })
+    [object[]]$processes = @(Get-CimInstance Win32_Process -Filter "Name = 'Tuanjie.exe'" | Where-Object { $_.CommandLine })
     foreach ($process in $processes) {
         [string]$commandLine = $process.CommandLine
         if ($commandLine.IndexOf($ResolvedProjectPath, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) {
@@ -352,11 +352,11 @@ function Invoke-CoreToolSmoke {
 }
 
 function Invoke-CliRecoveryReadinessSmoke {
-    [System.Management.Automation.CommandInfo]$uloopCommand = Get-Command uloop -CommandType Application -ErrorAction Stop
+    [System.Management.Automation.CommandInfo]$uloopCommand = Get-Command tloop -CommandType Application -ErrorAction Stop
     Invoke-GoScriptChecked -ScriptPath (Resolve-ProjectRelativePath -RelativePath "scripts\smoke-cli-recovery-readiness.go") -Arguments @(
         "--project-path",
         $ResolvedProjectPath,
-        "--uloop-path",
+        "--tloop-path",
         $uloopCommand.Source
     )
 }

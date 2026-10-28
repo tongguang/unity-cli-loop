@@ -198,7 +198,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
             {
                 // Don't suppress this exception - corrupted settings should be reported
                 throw new InvalidOperationException(
-                    $"Failed to load Unity CLI Loop Editor settings from: {SettingsFilePath}. Settings file may be corrupted.", ex);
+                    $"Failed to load Tuanjie CLI Loop Editor settings from: {SettingsFilePath}. Settings file may be corrupted.", ex);
             }
         }
 

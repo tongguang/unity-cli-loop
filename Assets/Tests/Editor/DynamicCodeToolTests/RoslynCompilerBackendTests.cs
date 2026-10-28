@@ -38,7 +38,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         [Test]
         public void WriteCompilerResponseFile_IncludesPortableDebugOption()
         {
-            string responseFilePath = Path.Combine(Path.GetTempPath(), "uloop-roslyn-rsp-" + Path.GetRandomFileName());
+            string responseFilePath = Path.Combine(Path.GetTempPath(), "tloop-roslyn-rsp-" + Path.GetRandomFileName());
             try
             {
                 RoslynCompilerRequestFileWriter.WriteCompilerResponseFile(
@@ -70,7 +70,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         [Test]
         public void WriteCompilerResponseFile_IncludesEnglishDiagnosticsAndUtf8OutputOptions()
         {
-            string responseFilePath = Path.Combine(Path.GetTempPath(), "uloop-roslyn-rsp-" + Path.GetRandomFileName());
+            string responseFilePath = Path.Combine(Path.GetTempPath(), "tloop-roslyn-rsp-" + Path.GetRandomFileName());
             try
             {
                 RoslynCompilerRequestFileWriter.WriteCompilerResponseFile(
@@ -101,7 +101,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         [Test]
         public void WriteCompilerResponseFile_WithEmitDebugCode_DisablesOptimization()
         {
-            string responseFilePath = Path.Combine(Path.GetTempPath(), "uloop-roslyn-rsp-" + Path.GetRandomFileName());
+            string responseFilePath = Path.Combine(Path.GetTempPath(), "tloop-roslyn-rsp-" + Path.GetRandomFileName());
             try
             {
                 RoslynCompilerRequestFileWriter.WriteCompilerResponseFile(
@@ -132,7 +132,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         [Test]
         public void WriteCompilerResponseFile_MapsSourceDirectoryToProjectRoot()
         {
-            string tempDirectory = Path.Combine(Path.GetTempPath(), "uloop-roslyn-pathmap-" + Path.GetRandomFileName());
+            string tempDirectory = Path.Combine(Path.GetTempPath(), "tloop-roslyn-pathmap-" + Path.GetRandomFileName());
             Directory.CreateDirectory(tempDirectory);
             string responseFilePath = Path.Combine(tempDirectory, "snippet.rsp");
             string sourcePath = Path.Combine(tempDirectory, "snippet.cs");
@@ -255,9 +255,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         [Test]
         public void WriteWorkerRequestFile_IncludesDebugCodeFlag()
         {
-            string requestFilePath = Path.Combine(Path.GetTempPath(), "uloop-roslyn-worker-" + Path.GetRandomFileName());
-            string sourcePath = Path.Combine(Path.GetTempPath(), "uloop-roslyn-src-" + Path.GetRandomFileName() + ".cs");
-            string dllPath = Path.Combine(Path.GetTempPath(), "uloop-roslyn-dll-" + Path.GetRandomFileName() + ".dll");
+            string requestFilePath = Path.Combine(Path.GetTempPath(), "tloop-roslyn-worker-" + Path.GetRandomFileName());
+            string sourcePath = Path.Combine(Path.GetTempPath(), "tloop-roslyn-src-" + Path.GetRandomFileName() + ".cs");
+            string dllPath = Path.Combine(Path.GetTempPath(), "tloop-roslyn-dll-" + Path.GetRandomFileName() + ".dll");
             File.WriteAllText(sourcePath, "class C {}");
             try
             {

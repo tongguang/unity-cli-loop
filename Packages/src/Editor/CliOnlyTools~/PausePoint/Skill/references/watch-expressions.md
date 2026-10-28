@@ -3,8 +3,8 @@
 Use watch expressions when the value should be evaluated automatically after each paused Play Mode Step:
 
 ```bash
-uloop enable-watch --id "speed" --expression "UloopPausePoint.TryGetCapturedValue(\"speed\").Value" --max-history 20
-uloop get-watch-values --id "speed"
+tloop enable-watch --id "speed" --expression "UloopPausePoint.TryGetCapturedValue(\"speed\").Value" --max-history 20
+tloop get-watch-values --id "speed"
 ```
 
 ## Evaluation Rules
@@ -17,7 +17,7 @@ The expression may use `UloopPausePoint.TryGetCapturedValue("name")` to inspect 
 
 ## Lifetime
 
-Watch expressions survive a domain reload. They are saved in Editor session state, so `uloop compile`, a script recompilation, and a Play entry with Domain Reload enabled all keep them registered — the expression is recompiled after the reload and evaluation starts from a fresh baseline, so history collected before the reload is gone.
+Watch expressions survive a domain reload. They are saved in Editor session state, so `tloop compile`, a script recompilation, and a Play entry with Domain Reload enabled all keep them registered — the expression is recompiled after the reload and evaluation starts from a fresh baseline, so history collected before the reload is gone.
 
 A watch whose expression no longer compiles after the reload (its type was renamed or deleted) is dropped, and the next `enable-watch` or `get-watch-values` response reports it in `Warning` with the id and the compiler message.
 

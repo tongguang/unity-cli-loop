@@ -52,7 +52,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string response = await processor.ProcessRequest(BuildToolRequest(DeterministicSuccessTool.Name, 1), CancellationToken.None);
 
             Assert.That(response, Is.EqualTo(
-                "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Tool 'deterministic-success' is disabled. To enable it, go to Window > Unity CLI Loop > Settings\",\"data\":{\"type\":\"internal_error\",\"message\":\"This tool has been disabled in project settings.\"}}}"));
+                "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Tool 'deterministic-success' is disabled. To enable it, go to Window > Tuanjie CLI Loop > Settings\",\"data\":{\"type\":\"internal_error\",\"message\":\"This tool has been disabled in project settings.\"}}}"));
         }
 
         [Test]
@@ -162,11 +162,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             string response = await processor.ProcessRequest(request, CancellationToken.None);
 
             Assert.That(response, Is.EqualTo(
-                "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"The installed uloop CLI uses an IPC protocol that does not match this Unity package.\",\"data\":{\"type\":\"cli_update_required\",\"currentCliVersion\":null,\"currentProtocolVersion\":" +
+                "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"The installed tloop CLI uses an IPC protocol that does not match this Unity package.\",\"data\":{\"type\":\"cli_update_required\",\"currentCliVersion\":null,\"currentProtocolVersion\":" +
                 (CliConstants.REQUIRED_CLI_PROTOCOL_VERSION - 1) +
                 ",\"requiredProtocolVersion\":" +
                 CliConstants.REQUIRED_CLI_PROTOCOL_VERSION +
-                ",\"updateCommand\":\"uloop update\",\"retryableAfterUpdate\":true,\"message\":\"Install matching uloop CLI and Unity package versions, then retry the original command.\"}}}"));
+                ",\"updateCommand\":\"tloop update\",\"retryableAfterUpdate\":true,\"message\":\"Install matching tloop CLI and Unity package versions, then retry the original command.\"}}}"));
         }
 
         private static JsonRpcRequestProcessor CreateProcessor(UnityCliLoopToolRegistrarService service)

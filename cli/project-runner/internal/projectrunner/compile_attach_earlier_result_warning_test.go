@@ -13,7 +13,7 @@ import (
 
 // Why a literal and not the production constant: rewording the constant must fail these tests
 // instead of silently changing what they expect.
-const expectedEarlierCompileResultWarning = "This result comes from the earlier compile that timed out, so it does not include script changes saved after that compile started. If you changed scripts since then, run `uloop compile` again to compile the current scripts."
+const expectedEarlierCompileResultWarning = "This result comes from the earlier compile that timed out, so it does not include script changes saved after that compile started. If you changed scripts since then, run `tloop compile` again to compile the current scripts."
 
 // Verifies that the note is put at the front of the result's Warning, and that a result it cannot
 // safely rewrite is returned as is.

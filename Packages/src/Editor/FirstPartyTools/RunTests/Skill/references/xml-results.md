@@ -1,6 +1,6 @@
 # run-tests XML result file
 
-When a test or suite fails or a test ends inconclusive, run-tests saves NUnit XML results to `{project_root}/.uloop/outputs/TestResults/<timestamp>.xml` and returns the path in `XmlPath`. A run in which every test passed or was skipped saves no XML, and `XmlPath` is `null`.
+When a test or suite fails or a test ends inconclusive, run-tests saves NUnit XML results to `{project_root}/.tloop/outputs/TestResults/<timestamp>.xml` and returns the path in `XmlPath`. A run in which every test passed or was skipped saves no XML, and `XmlPath` is `null`.
 
 The XML contains per-test-case results including:
 

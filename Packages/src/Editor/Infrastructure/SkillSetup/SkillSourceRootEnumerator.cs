@@ -137,6 +137,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                     string skillName = SkillSourceFrontmatterReader.ParseNameFromFrontmatter(skillContent);
                     if (string.IsNullOrEmpty(skillName)
                         || !SkillInstallLayout.IsSafeSkillPathComponent(skillName)
+                        || skillName.StartsWith("uloop-", StringComparison.Ordinal)
                         || sources.ContainsKey(skillName))
                     {
                         continue;

@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void GetLegacyNamespaceAliases_WhenOneAliasDirectiveIsInComment_ReturnsOnlyCodeAlias()
         {
             const string source =
-                "// using Commented = io.github.hatayama.uLoopMCP;\nusing Legacy = io.github.hatayama.uLoopMCP;";
+                "// using Commented = io.github.tongguang.tloop;\nusing Legacy = io.github.tongguang.tloop;";
 
             string[] aliases = ThirdPartyToolMigrationAliasRules.GetLegacyNamespaceAliases(source);
 

@@ -13,7 +13,7 @@ import (
 func TestResolveDispatcherV2CLIEntrypointReadsObjectBin(t *testing.T) {
 	// Verifies the V2 CLI entrypoint is resolved from the published object-form bin declaration.
 	installPath := t.TempDir()
-	writeDispatcherV2PackageBin(t, installPath, `{"uloop":"dist/cli.bundle.cjs"}`)
+	writeDispatcherV2PackageBin(t, installPath, `{"tloop":"dist/cli.bundle.cjs"}`)
 
 	entrypoint, err := resolveDispatcherV2CLIEntrypoint(installPath)
 	if err != nil {
@@ -74,8 +74,8 @@ func TestResolveDispatcherV2CLIEntrypointRejectsInvalidPackages(t *testing.T) {
 		{name: "missing package", wantNotExist: true},
 		{name: "unparsable package", rawContent: "{", wantMessage: "parse "},
 		{name: "bin is neither string nor object", bin: "5", wantMessage: "package bin must be a string or object"},
-		{name: "bin object without uloop", bin: `{"other":"cli.js"}`, wantMessage: "package bin does not define uloop"},
-		{name: "bin object with empty uloop", bin: `{"uloop":""}`, wantMessage: "package bin does not define uloop"},
+		{name: "bin object without tloop", bin: `{"other":"cli.js"}`, wantMessage: "package bin does not define tloop"},
+		{name: "bin object with empty tloop", bin: `{"tloop":""}`, wantMessage: "package bin does not define tloop"},
 		{name: "absolute entrypoint", bin: dispatcherTestJSONString(t, filepath.Join(t.TempDir(), "cli.js")), wantMessage: "bin entrypoint must be relative"},
 	}
 	for _, testCase := range cases {

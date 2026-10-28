@@ -264,7 +264,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 "\"isReconnecting\":true," +
                 "\"showReconnectingUI\":true," +
                 "\"showPostCompileReconnectingUI\":true," +
-                "\"connectedLLMTools\":[{\"Name\":\"codex\",\"Endpoint\":\"/tmp/uloop/test.sock#1\",\"Port\":18449}]" +
+                "\"connectedLLMTools\":[{\"Name\":\"codex\",\"Endpoint\":\"/tmp/tloop/test.sock#1\",\"Port\":18449}]" +
                 "}");
 
             _editorSettingsPort.RecoverSettingsFileIfNeeded();
@@ -341,7 +341,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             InvalidOperationException exception =
                 Assert.Throws<InvalidOperationException>(() => _editorSettingsPort.GetSettings());
 
-            StringAssert.StartsWith("Failed to load Unity CLI Loop Editor settings from: ", exception.Message);
+            StringAssert.StartsWith("Failed to load Tuanjie CLI Loop Editor settings from: ", exception.Message);
             Assert.That(exception.InnerException, Is.InstanceOf<JsonReaderException>());
             Assert.That(File.ReadAllText(SettingsFilePath), Is.EqualTo(content));
         }

@@ -67,7 +67,7 @@ namespace io.github.hatayama.UnityCliLoop.UnitTests
             Assert.That(message, Does.Contain("600"));
             Assert.That(message, Does.Contain("--timeout-seconds"));
             Assert.That(message, Does.Contain("background"));
-            Assert.That(message, Does.Contain("uloop launch -r"));
+            Assert.That(message, Does.Contain("tloop launch -r"));
         }
 
         [Test]

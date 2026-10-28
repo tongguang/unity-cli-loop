@@ -6,7 +6,7 @@ Constructors, operators, and explicit event accessors are reported as `Skipped`
 when edited (with a verified baseline, unchanged members of those kinds produce
 no row). Finalizers and `interface` members (including default interface
 implementations) are never scanned: **edits** to them produce **no per-method
-entry at all** and are silently not applied — use `uloop compile` for those.
+entry at all** and are silently not applied — use `tloop compile` for those.
 Adding a constructor, operator, or explicit event accessor is reported as
 `Skipped` as well, same as an edit to an existing one.
 Methods and property getters of `partial` types are patched like any other; the
@@ -20,13 +20,13 @@ compiled assembly. Files that compile into one assembly are reloaded together th
 one shim assembly, so a body edited in one of them can call a member added in another
 — pass the declaring file and its callers to the same command. Compiled, unedited
 code cannot see it, and neither can anything that resolves members by name at
-runtime: reflection (`GetType().GetMethod("NewM")` returns `null`), Unity's message
-discovery (see "Added Unity messages" below), the Unity Test Runner (an added `[Test]` /
-`[UnityTest]` method is not enumerated by `uloop run-tests --skip-compile` — a
-`Warnings` entry names it; run `uloop compile` first), UnityEvent/inspector wiring, and
+runtime: reflection (`GetType().GetMethod("NewM")` returns `null`), Tuanjie's message
+discovery (see "Added Tuanjie messages" below), the Tuanjie Test Runner (an added `[Test]` /
+`[UnityTest]` method is not enumerated by `tloop run-tests --skip-compile` — a
+`Warnings` entry names it; run `tloop compile` first), UnityEvent/inspector wiring, and
 serialization. Referencing an added member from a file that is neither passed to this reload nor
 already hot-reloaded, or from another assembly, fails that file's hot reload with
-the usual new-member hint; run `uloop compile` instead. Unchanged files of the same
+the usual new-member hint; run `tloop compile` instead. Unchanged files of the same
 assembly that already hold active patches are re-applied automatically so they bind
 to the newest shim. An edited body that reaches an added method through a
 compiled type still binds when the receiver's static type name, method name, and
@@ -66,7 +66,7 @@ Because the initializer runs on first access, one this reload adds to — or cha
 field an earlier reload already added never reaches a value the side table already holds:
 it runs only where the field has not been read yet. That reload names those fields in
 `Warnings`; the way to reach the existing instances is to assign the value inside a patched
-method, rename the field, or run `uloop compile`.
+method, rename the field, or run `tloop compile`.
 To apply such a field without compiling, declare it
 without an initializer — it starts at `default(T)` — and assign it inside the patched
 method instead; for a reference type, guard that with
@@ -79,14 +79,14 @@ call on it (copy the field into a local, change the local, and assign it back). 
 method that assigns such a field is `Skipped` but a
 method that reads it was applied, a `Warnings` entry names the field, the skipped
 writers and the reader: the reader sees `default(T)`. Fix the skip reason and reload
-again, or run `uloop compile`. Accessors of properties added in the same edit count as
+again, or run `tloop compile`. Accessors of properties added in the same edit count as
 readers and writers too: an applied getter is a reader, and a skipped setter is a skipped
 writer. An added auto-property without an initializer gets the same check, with a warning
 that starts `Added auto-property`. Added `const` values are folded into edited bodies as literals,
 like `nameof`. Pause-point
 `CapturedVariables` never includes added fields; `enable-pause-point` warns when the
 resolved type has any — their values live in the hot-reload shim, and a
-`uloop execute-dynamic-code` snippet cannot name them as members (it compiles against
+`tloop execute-dynamic-code` snippet cannot name them as members (it compiles against
 the compiled assembly, so that fails with CS1061). Read one there with
 `HotReloadAddedFieldWiring.TryReadInstanceField` (`TryReadStaticField` for a static
 field) instead. When such a
@@ -109,7 +109,7 @@ discarded — they do not migrate into the compiled field's initializer semantic
 Deleting an added member from the edit and re-applying (or reverting the file to its
 compiled source) removes it from the ledger on that run. Deleting a *compiled*
 member is reported in `Warnings`, but its IL remains callable from unedited code
-until `uloop compile`.
+until `tloop compile`.
 
 Adding a constructor, operator, or explicit event accessor is still out of
 scope and is reported as `Skipped`, same as edits to them. With a verified
@@ -122,7 +122,7 @@ A new top-level `class`, `struct`, `enum`, or `interface` is introduced instead,
 limits in [introduced-types.md](introduced-types.md); a `record` is refused there.
 A member added to a compiled enum is out of scope too: it is not folded like an added
 `const`, so every body that names it fails with CS0117, including bodies in the same
-reload. Write the underlying value as a cast (`(MyEnum)3`) or run `uloop compile`.
+reload. Write the underlying value as a cast (`(MyEnum)3`) or run `tloop compile`.
 While the enum's file is in the reload, an added member that passes the enum to or takes
 it from compiled code or an introduced type is skipped. The `Skipped` row names the step
 for that run (pass a file, leave the enum file out, undo the edit and leave it out, or
@@ -135,7 +135,7 @@ reported on this failure path.
 When `--files` is omitted and the enum's file has no edit besides its new enum members,
 the reload leaves that file out instead, so the added members of the other files apply;
 a `Warnings` line names the left-out file and the enum members that still need
-`uloop compile`. A file that already holds patches or declares a new type stays in the
+`tloop compile`. A file that already holds patches or declares a new type stays in the
 reload.
 
 An added property applies unless its shape is listed below. A bodied getter or setter is
@@ -162,7 +162,7 @@ rewritten as a plain assignment statement (`X = X + 1;`).
 Types, indexers, and added events the store cannot hold (a struct host, a delegate type not
 visible outside the assembly) are not reported per member — no `Skipped` row names them;
 at most they surface as outside-body drift in `Warnings`. Treat their silence
-as "not applied" and land them with `uloop compile`.
+as "not applied" and land them with `tloop compile`.
 
 Outside method bodies, only member additions (previous section) take effect.
 Every other declaration edit — changing a `const` value, a compiled field's
@@ -177,9 +177,9 @@ baseline is available (next paragraph), other outside-body drift — existing-fi
 initializers, attributes, and other declaration edits — is reported as a `Warnings`
 entry as well (handled added members and reported removed members are excluded
 from this generic warning); without a baseline it stays silent. Either way, use
-`uloop compile` for such edits. The comparison is against the source the loaded
+`tloop compile` for such edits. The comparison is against the source the loaded
 assembly was compiled from, so an earlier edit outside method bodies keeps this
-warning on every reload until `uloop compile`. Comment-only edits (line, block, and
+warning on every reload until `tloop compile`. Comment-only edits (line, block, and
 XML documentation comments) do not count.
 
 ## Signature changes: return type, rename, parameters
@@ -197,11 +197,11 @@ A caller this reload did not edit — in another file or an *unedited* method in
 edited file itself (an implicit `int`→`long` widening can leave a caller's source
 untouched) — would keep calling the old method silently, so the run reports the
 changed method and its edited callers as `Skipped` instead; land the change with
-`uloop compile`. A caller in another assembly gates the change even when this or an
+`tloop compile`. A caller in another assembly gates the change even when this or an
 earlier reload patched it: that patch is compiled against the compiled assembly, where
 the old signature still exists. When every uncovered caller is in the edited file itself, the
 `Skipped` reason names those callers: editing their bodies and reloading again
-applies them together without `uloop compile`.
+applies them together without `tloop compile`.
 Call sites inside methods that the same edit removes or
 re-signatures do not gate: those compiled bodies are already stale, and anything
 still reaching them stays on the consistent old behavior.
@@ -211,7 +211,7 @@ Renaming a method or changing its parameter list follows the delete rules rather
 than the gate: the new signature is an ordinary added method, the old one is
 reported removed, and a `Warnings` entry names each compiled call site of the old
 signature that the reload leaves unpatched — those call sites keep the previous
-behavior until `uloop compile`. Deleting a method emits the same warning when
+behavior until `tloop compile`. Deleting a method emits the same warning when
 compiled callers remain. A caller whose patch is active when the reload ends —
 patched by this reload in any assembly, or kept from an earlier reload — is left out,
 because it no longer runs its compiled body. The warning does not check what the
@@ -227,11 +227,11 @@ earlier body; `Warnings` then names that call (see [troubleshooting.md](troubles
 Field declarations are stricter: when a compiled field's type — or its `static`/
 `const` modifier — differs from the edited source, every edited method that reads
 or writes that field is `Skipped` with a per-method reason. Retyped storage has no
-session illusion; run `uloop compile`.
+session illusion; run `tloop compile`.
 
 ## Explore with hot reload, land structure with compile
 
-Treat hot reload as the exploration phase and `uloop compile` as the landing phase. While
+Treat hot reload as the exploration phase and `tloop compile` as the landing phase. While
 diagnosing or tuning, keep every edit inside existing method bodies — inline a would-be
 helper's logic at its call site for now instead of extracting it. New helper methods
 and fields can now be explored directly with hot reload, across the files of one
@@ -240,14 +240,14 @@ patches are re-applied with that group. A top-level class, struct, enum, or inte
 or without an access modifier in an edited file is introduced by that reload too, and can use the
 assembly's internal members (`introduced-types.md`). When the change needs
 another new-type shape, visibility from another assembly or from a file outside the reload,
-runtime name-based lookup, or serialization, collect those and run `uloop compile` once: every compile triggers a domain reload that drops all active patches and pause points
+runtime name-based lookup, or serialization, collect those and run `tloop compile` once: every compile triggers a domain reload that drops all active patches and pause points
 and resets the running PlayMode session, so compiling member-by-member pays that cost
 repeatedly. After the one compile, re-enter PlayMode and continue exploring on the freshly
 compiled code.
 
-## Added Unity messages
+## Added Tuanjie messages
 
-Unity finds a `MonoBehaviour`'s messages by name on the compiled class, so a message a
+Tuanjie finds a `MonoBehaviour`'s messages by name on the compiled class, so a message a
 reload added is not one the engine knows about. While Play Mode runs, hot reload stands a
 generated proxy component next to each live instance of the target type and forwards the
 message from there, so an added `Update`, `OnTriggerEnter`, or `OnMouseDown` does run. The
@@ -260,15 +260,15 @@ method's row says which answer it got in `LifecycleNote` (see Output).
 - Not forwarded, and listed together in one `Warnings` line: `Awake`, `OnEnable`,
   `OnDisable`, `OnDestroy`, the editor-only messages (`Reset`, `OnValidate`,
   `OnDrawGizmos`, `OnDrawGizmosSelected`), and any message declared with a return value or a
-  `ref`/`out` parameter. Run `uloop compile` to have the engine dispatch those.
+  `ref`/`out` parameter. Run `tloop compile` to have the engine dispatch those.
   When such a message's body is also skipped for a private access with no accessor rewrite,
-  its `Skipped` row names `uloop compile` as the only step: no rewrite of the body would make
+  its `Skipped` row names `tloop compile` as the only step: no rewrite of the body would make
   the engine call it.
 
 To re-run an edited compiled `OnEnable` on live objects — for example after adding a
 subscription to it — toggle the component around the reload instead of compiling: set
 `enabled = false` with `execute-dynamic-code`, run `hot-reload`, then set `enabled = true`.
-Unity calls the old `OnDisable` (so the old subscription is removed) and then the patched
+Tuanjie calls the old `OnDisable` (so the old subscription is removed) and then the patched
 `OnEnable`; coroutines keep running because only the component is toggled. An edited
 `OnDisable` runs the next time the component is disabled; to run it now, toggle `enabled`
 after the reload. This works only for an `OnEnable` / `OnDisable` the compiled class already
@@ -300,8 +300,8 @@ reload), the note is omitted; the run then reads those assemblies in the backgro
 next run can prove it. Only compiled callers
 are counted: a method hot reload added or patched that calls the method already runs the patched
 body, which the note does not see. To see an
-initialization change take effect, run `uloop compile` and restart
-Play Mode — with Domain Reload enabled (the default for projects created before Unity 6.6), a fresh Play entry reloads the
+initialization change take effect, run `tloop compile` and restart
+Play Mode — with Domain Reload enabled (the default for projects created before Tuanjie 6.6), a fresh Play entry reloads the
 domain and drops the patch, so the patched body alone cannot carry the change into the
 next session. Better, keep values you expect to
 tune out of one-shot paths entirely: read them in a body that runs per frame or per event,
@@ -317,7 +317,7 @@ adding one in the same edit works, so the getter does not have to exist yet:
     public static float HeightAmplitude => 5f;
 
 A getter body is an ordinary patchable method body, so editing the literal and running
-`uloop hot-reload` updates every consumer on its next call — across all files, without
+`tloop hot-reload` updates every consumer on its next call — across all files, without
 restarting Play Mode. JIT-inlined call sites are the exception — the reload response's
 `Warnings` lists the at-risk methods (see [troubleshooting.md](troubleshooting.md)).
 Keep `const` for values you never tune at runtime.
@@ -332,7 +332,7 @@ This works only for consumers that read the getter on a live call path — a per
 initialization and cached the value in a field never observes the new value: the patch
 lands, but nothing reads the getter again (the one-shot rule above).
 
-Each `uloop compile` also establishes a per-assembly source baseline: a snapshot of
+Each `tloop compile` also establishes a per-assembly source baseline: a snapshot of
 the sources exactly as they were compiled, captured after the compile's domain reload
 and adopted only once it verifies against the compiled assembly's PDB checksums. With
 a baseline, hot reload patches only the methods whose bodies actually changed;
@@ -344,7 +344,7 @@ the baseline again is unpatched on that run — the compiled IL comes back,
 `ActivePatchTotal` drops, and its pause-point block lifts.
 Without a baseline — for example before
 the first compile after installing or updating the package — every editable method in
-the file is patched and a `Warnings` line reports the fallback; run `uloop compile`
+the file is patched and a `Warnings` line reports the fallback; run `tloop compile`
 to establish the baseline. A member of that file without a body (an interface,
 abstract, or extern method) that has no body in the compiled assembly either is
 `Skipped` with a reason saying it could not be compared: there is nothing to patch, but
@@ -403,10 +403,10 @@ compiled method already holds `E += OnValue;`, keep that line and add the lambda
 subscription beside it: the method applies, only the private accesses inside the lambda are
 rewritten, and a compiled `-= OnValue` still removes the kept handler. Do not wrap the kept
 line itself in a lambda, since the `-=` would stop removing it.
-Subscriptions live on the store's delegate, not on Unity objects: `+=` is not atomic, so
+Subscriptions live on the store's delegate, not on Tuanjie objects: `+=` is not atomic, so
 subscribe and raise on the main thread only. A handler subscribed by an earlier reload
 keeps running the body it was subscribed with until it is removed and subscribed again
-(for a subscription made in `OnEnable`, toggle `enabled` as described under "Added Unity
+(for a subscription made in `OnEnable`, toggle `enabled` as described under "Added Tuanjie
 messages"). Changing the event's delegate type in a later reload drops its subscribers unless the
 new type can still read the old list (a variance-compatible change), and that reload names
 it in `Warnings`. The store keeps subscriptions until `--revert-all`, a compile, or a domain
@@ -423,12 +423,12 @@ source on disk. When a run skips a method it had patched before, `Warnings` name
 
 | Condition | Why |
 |-----------|-----|
-| Method on a `partial` type when another part of the type changed since the last compile and was not passed, or when a file that names the type has syntax errors (passed or not) | Hot reload binds against the compiled type; pass that file with `--files` too, or run `uloop compile`. For a file with syntax errors, fix it and run hot reload again |
-| Method on a `partial` type when the other parts could not be checked against the last compile (no source snapshot yet, or more than 50 changed files in the assembly) | Run `uloop compile` |
-| Method on a `partial` type whose body names a member no source file of the assembly declares | A part generated at compile time (a source generator's output) is not visible to hot reload; run `uloop compile` |
-| Method or getter whose body uses an `internal` member of a type the reload was not given, by its bare name, inside a lambda, local function, query, iterator or async method, in a body where a lambda, local function or query works with a value hot reload could not resolve (such as the member's result), or in a body patched through a delegating shim | Hot reload reaches such a member only in the method's own statements, written with its receiver (`this.Name`, `Type.Name`, `value.Name`); qualify a bare name, or run `uloop compile` |
-| Method or getter on a `partial` type whose body passes an `internal` method of such a type as a delegate, uses an `internal` event of it, or names an `internal` member of it in an object initializer or a property pattern | On a `partial` type hot reload patches such a member only as a field, a property or a method call written with its receiver; run `uloop compile` |
-| Method or getter on a `partial` type whose body uses an `internal` member of a type in another assembly (through `InternalsVisibleTo`) | Reported as a name no source file of the `partial` type declares; hot reload does not patch this use from a `partial` type yet. Run `uloop compile` |
+| Method on a `partial` type when another part of the type changed since the last compile and was not passed, or when a file that names the type has syntax errors (passed or not) | Hot reload binds against the compiled type; pass that file with `--files` too, or run `tloop compile`. For a file with syntax errors, fix it and run hot reload again |
+| Method on a `partial` type when the other parts could not be checked against the last compile (no source snapshot yet, or more than 50 changed files in the assembly) | Run `tloop compile` |
+| Method on a `partial` type whose body names a member no source file of the assembly declares | A part generated at compile time (a source generator's output) is not visible to hot reload; run `tloop compile` |
+| Method or getter whose body uses an `internal` member of a type the reload was not given, by its bare name, inside a lambda, local function, query, iterator or async method, in a body where a lambda, local function or query works with a value hot reload could not resolve (such as the member's result), or in a body patched through a delegating shim | Hot reload reaches such a member only in the method's own statements, written with its receiver (`this.Name`, `Type.Name`, `value.Name`); qualify a bare name, or run `tloop compile` |
+| Method or getter on a `partial` type whose body passes an `internal` method of such a type as a delegate, uses an `internal` event of it, or names an `internal` member of it in an object initializer or a property pattern | On a `partial` type hot reload patches such a member only as a field, a property or a method call written with its receiver; run `tloop compile` |
+| Method or getter on a `partial` type whose body uses an `internal` member of a type in another assembly (through `InternalsVisibleTo`) | Reported as a name no source file of the `partial` type declares; hot reload does not patch this use from a `partial` type yet. Run `tloop compile` |
 | Method on a struct (value type) | Value-type patching is out of scope |
 | Generic method, or method on a generic type | Harmony cannot safely patch open generics |
 | Explicit interface implementation | Dotted metadata names cannot be expressed as shim identifiers |
@@ -436,10 +436,10 @@ source on disk. When a run skips a method it had patched before, `Warnings` name
 | Body contains a `base.` call | `base` cannot be expressed from outside the type |
 | Private/internal access inside an async/iterator/closure body has no accessor-delegate shape | Conditional access (`?.`), `??=`, indexers, static field writes, initializer member assignments, compound writes whose receiver could be evaluated twice, assignments whose value is consumed, deconstructions that set a property through a private/internal setter, and calls with `ref`/`out`/`in`, named, optional, or `params` arguments (or to extension/generic/by-ref-returning methods) cannot be rewritten to accessor delegates. Neither can ref-returning properties. These limits apply to compiled members; a `ref`/`out` method added in the same reload is reached directly. A compiled private/internal static property can be read, assigned, and compound-assigned |
 | An async/iterator/closure body references a private/internal type | Accessor delegates rescue member access, not type references; the body still cannot JIT-compile from the shim assembly |
-| A declared return or parameter type cannot be resolved (a new type this reload could not introduce, a missing using, or a typo) | Skipped; a supported new type declared in an edited file of the same assembly is introduced by this reload, so check `Warnings` for the refusal reason (`introduced-types.md`); otherwise add the type or the `using`, or fix the typo, then run `uloop compile` |
-| An added member's body cannot be fully bound in the hot-reload compilation | Hot reload cannot verify a member it cannot bind. A common cause: another file of the same reload, passed or pulled back in because it holds active patches, declares a compiled type from source, while a compiled API the body calls still names the compiled copy (for example, a lambda handed to a compiled `Register(Action<T>)`). The reason then names both types and the file declaring the compiled API. When the called member belongs to a type an earlier reload introduced and its signature was bound to the compiled copy, the reason names the introduced type and that compiled type instead. Either way the `Skipped` row names the step for that run (pass the file declaring the compiled API, leave the file declaring the type out, undo its edit and leave it out, or `uloop compile`), chosen from whether each file was passed, carried in, or already holds patches; a row about an added property's body points to the row of its accessor instead. A file passed this way is brought back by every later reload of the assembly while it stays unchanged, including the reload that re-applies after `--revert-all` or Play entry, until the next successful compile. When the skip deactivated added members an earlier reload applied, the next reload of the assembly retries their unchanged file once, so passing only the declaring file applies them again |
-| Edited setter, init, or indexer accessor of a *compiled* property | Accessor patching covers getters only; `uloop compile` applies these edits. Accessors of a property added in this edit are emitted instead |
-| Constructor (instance or static), operator, conversion operator, or explicit event accessor (add/remove) | Skipped; `uloop compile` applies these edits |
+| A declared return or parameter type cannot be resolved (a new type this reload could not introduce, a missing using, or a typo) | Skipped; a supported new type declared in an edited file of the same assembly is introduced by this reload, so check `Warnings` for the refusal reason (`introduced-types.md`); otherwise add the type or the `using`, or fix the typo, then run `tloop compile` |
+| An added member's body cannot be fully bound in the hot-reload compilation | Hot reload cannot verify a member it cannot bind. A common cause: another file of the same reload, passed or pulled back in because it holds active patches, declares a compiled type from source, while a compiled API the body calls still names the compiled copy (for example, a lambda handed to a compiled `Register(Action<T>)`). The reason then names both types and the file declaring the compiled API. When the called member belongs to a type an earlier reload introduced and its signature was bound to the compiled copy, the reason names the introduced type and that compiled type instead. Either way the `Skipped` row names the step for that run (pass the file declaring the compiled API, leave the file declaring the type out, undo its edit and leave it out, or `tloop compile`), chosen from whether each file was passed, carried in, or already holds patches; a row about an added property's body points to the row of its accessor instead. A file passed this way is brought back by every later reload of the assembly while it stays unchanged, including the reload that re-applies after `--revert-all` or Play entry, until the next successful compile. When the skip deactivated added members an earlier reload applied, the next reload of the assembly retries their unchanged file once, so passing only the declaring file applies them again |
+| Edited setter, init, or indexer accessor of a *compiled* property | Accessor patching covers getters only; `tloop compile` applies these edits. Accessors of a property added in this edit are emitted instead |
+| Constructor (instance or static), operator, conversion operator, or explicit event accessor (add/remove) | Skipped; `tloop compile` applies these edits |
 | Method raises or reads a field-like event that has no reachable backing field | Custom `add`/`remove` accessors, an `abstract`/`extern`/interface event, a delegate type that is not visible outside the assembly, or an added event the added-field store cannot hold leave nothing for the shim's Harmony accessor to bind |
 | Method raises or reads a field-like event through a conditional receiver (`other?.E`) | The shim has no name for the conditional receiver to pass to the accessor call |
 | Method names a field-like event inside `nameof` | The shim is a different type and cannot keep the bare event name |
@@ -450,17 +450,17 @@ source on disk. When a run skips a method it had patched before, `Warnings` name
 | Condition | Notes |
 |-----------|-------|
 | File does not belong to any compiled assembly | Per-file entry with `Method` = `(file)`; only `Assets/` and `Packages/` sources resolve |
-| Resolved assembly name is missing from CompilationPipeline | Per-file entry with `Method` = `(file)`; Unity may have mapped a not-yet-imported `.asmdef` onto a predefined assembly. Run `uloop compile` first |
-| Script is not in the last compiled assembly's source list and its assembly membership cannot be confirmed | Per-file entry with `Method` = `(file)`; a new file passed with `--files` is hot-reloadable when its membership in an existing, unchanged compiled assembly is confirmed (`.asmdef` / `.asmref` boundaries are checked when present; a predefined assembly with none also passes), but fails when the Editor is not ready or an `.asmdef` / `.asmref` on its path was added, deleted, or changed since the last import — run `uloop compile` first |
+| Resolved assembly name is missing from CompilationPipeline | Per-file entry with `Method` = `(file)`; Tuanjie may have mapped a not-yet-imported `.asmdef` onto a predefined assembly. Run `tloop compile` first |
+| Script is not in the last compiled assembly's source list and its assembly membership cannot be confirmed | Per-file entry with `Method` = `(file)`; a new file passed with `--files` is hot-reloadable when its membership in an existing, unchanged compiled assembly is confirmed (`.asmdef` / `.asmref` boundaries are checked when present; a predefined assembly with none also passes), but fails when the Editor is not ready or an `.asmdef` / `.asmref` on its path was added, deleted, or changed since the last import — run `tloop compile` first |
 | The Editor is a Multiplayer Play Mode Virtual Player and the main Editor's project has not compiled the assembly | Per-file entry with `Method` = `(file)`; a Virtual Player reads the main Editor's `Library/ScriptAssemblies`, and the reason says to compile the main Editor's project first. Until then the edit reaches that player only through a compile: the CLI's compile fallback brings it in when `--compile-on-skip` lets the compile run, and `auto` holds it while that player is in Play Mode (`CompileFallback` is `HeldForPlayMode`). A patch applied to the main Editor does not reach Virtual Players (each is a separate Editor process) |
-| The Editor is compiling or importing when the request arrives, or starts to before the reload is applied | Per-file entry with `Method` = `(file)`; nothing in the source needs a change. The response sets `RetryAfterEditorReady`, and the CLI waits for the Editor to settle (up to 10 minutes) and applies the same request again once; if Unity's own compile already took the edit in, the second apply reports `NothingToApply`. A second refusal falls through to `--compile-on-skip`. |
-| Another uloop command still holds the Editor when the request arrives (for example a `uloop compile` sent a moment earlier) | The request is not run; the CLI does not retry against the busy Editor and does not bring it to the front. It waits for that command to finish and the Editor to be ready (up to 10 minutes), then sends the same request once. `EditorReadyRetryNote` names the command it waited for and `Timing.EditorReadyWaitMs` is the wait. A busy answer to that one request is reported as `UNITY_SERVER_BUSY` without another wait. While a cancelled `execute-dynamic-code` request still holds the Editor, the wait sends the request again every 5 seconds, because the Editor takes such a request's slot back only when another request arrives. When the command that ran was a compile that already took the edit in, give `--files`: with no files the Editor selects changed files anew, finds none, and fails validation instead of reporting `NothingToApply` |
-| Loaded assembly differs from the one on disk (pending compile) | Run `uloop compile` first, then retry |
+| The Editor is compiling or importing when the request arrives, or starts to before the reload is applied | Per-file entry with `Method` = `(file)`; nothing in the source needs a change. The response sets `RetryAfterEditorReady`, and the CLI waits for the Editor to settle (up to 10 minutes) and applies the same request again once; if Tuanjie's own compile already took the edit in, the second apply reports `NothingToApply`. A second refusal falls through to `--compile-on-skip`. |
+| Another tloop command still holds the Editor when the request arrives (for example a `tloop compile` sent a moment earlier) | The request is not run; the CLI does not retry against the busy Editor and does not bring it to the front. It waits for that command to finish and the Editor to be ready (up to 10 minutes), then sends the same request once. `EditorReadyRetryNote` names the command it waited for and `Timing.EditorReadyWaitMs` is the wait. A busy answer to that one request is reported as `UNITY_SERVER_BUSY` without another wait. While a cancelled `execute-dynamic-code` request still holds the Editor, the wait sends the request again every 5 seconds, because the Editor takes such a request's slot back only when another request arrives. When the command that ran was a compile that already took the edit in, give `--files`: with no files the Editor selects changed files anew, finds none, and fails validation instead of reporting `NothingToApply` |
+| Loaded assembly differs from the one on disk (pending compile) | Run `tloop compile` first, then retry |
 | Source file fails to parse | Per-file `Failed` entry with `Method` = `(file)` carrying the parse errors; nothing from that file is applied, its earlier patches stay active, and `Success` is false |
-| Method signature not found in the loaded assembly | Usually a stale assembly; run `uloop compile`. In-file renames and signature changes are classified as added members before reaching this point |
-| Shim compile error (e.g. the body calls a member that does not exist yet) | The error is attributed to the file it came from: that file reports `Failed` with its own compiler errors (plus the `uloop compile` hint when they indicate a missing member) and the rest of the file is `Skipped`, while the other files of the assembly are recompiled without it and applied. Bodies elsewhere that call an added method this reload left out — its shim failed to compile, or another method of its file did — are `Skipped` with a reason naming that method; its own row says which. When errors cannot be attributed to a file, every file of that assembly reports one `(shim-compile)` entry; if only one method was edited, the failure is attributed to that method's name instead |
+| Method signature not found in the loaded assembly | Usually a stale assembly; run `tloop compile`. In-file renames and signature changes are classified as added members before reaching this point |
+| Shim compile error (e.g. the body calls a member that does not exist yet) | The error is attributed to the file it came from: that file reports `Failed` with its own compiler errors (plus the `tloop compile` hint when they indicate a missing member) and the rest of the file is `Skipped`, while the other files of the assembly are recompiled without it and applied. Bodies elsewhere that call an added method this reload left out — its shim failed to compile, or another method of its file did — are `Skipped` with a reason naming that method; its own row says which. When errors cannot be attributed to a file, every file of that assembly reports one `(shim-compile)` entry; if only one method was edited, the failure is attributed to that method's name instead |
 | Patch rejected or crashed at apply time (e.g. `[BurstCompile]`, a patch-engine emit failure) | The entry carries the rejection reason or the underlying engine error |
-| Accessor binding failed for a shim type | The source references a member the compiled assembly does not have yet; the first method of that shim type reports the binder error and the rest of its file is `Skipped` — run `uloop compile` and retry |
-| The signature-change gate could not finish the run safely — the retry that skips a gated change failed, or shim-compile isolation dropped an edited caller that had covered a change | Every file of that assembly reports `Method` = `(signature-change-gate)` carrying the specific cause; nothing from those files is applied, because the reload has no retry budget left to split them — fix the failing edit or run `uloop compile`. Files of other assemblies in the same command are unaffected |
+| Accessor binding failed for a shim type | The source references a member the compiled assembly does not have yet; the first method of that shim type reports the binder error and the rest of its file is `Skipped` — run `tloop compile` and retry |
+| The signature-change gate could not finish the run safely — the retry that skips a gated change failed, or shim-compile isolation dropped an edited caller that had covered a change | Every file of that assembly reports `Method` = `(signature-change-gate)` carrying the specific cause; nothing from those files is applied, because the reload has no retry budget left to split them — fix the failing edit or run `tloop compile`. Files of other assemblies in the same command are unaffected |
 
-A reload applies each file all-or-nothing: when any method in a file fails to compile or validate, nothing from that file is applied and patches from earlier reloads stay active. The other files of the same assembly are still applied, except a body that calls an added method the reload left out, whether its own shim failed to compile or another method of its file did — that body is `Skipped` until the method applies. The one exception to all-or-nothing is a Harmony patch-engine failure in the middle of applying a validated file; that run reports itself as partially applied and recommends 'uloop hot-reload --revert-all'. A `Failed` row in `IntroducedTypes` widens the unit from the file to the assembly: type preparation runs once per assembly before any of its method bodies is transformed, so every file sharing that assembly is left unapplied, while files in other assemblies still apply.
+A reload applies each file all-or-nothing: when any method in a file fails to compile or validate, nothing from that file is applied and patches from earlier reloads stay active. The other files of the same assembly are still applied, except a body that calls an added method the reload left out, whether its own shim failed to compile or another method of its file did — that body is `Skipped` until the method applies. The one exception to all-or-nothing is a Harmony patch-engine failure in the middle of applying a validated file; that run reports itself as partially applied and recommends 'tloop hot-reload --revert-all'. A `Failed` row in `IntroducedTypes` widens the unit from the file to the assembly: type preparation runs once per assembly before any of its method bodies is transformed, so every file sharing that assembly is left unapplied, while files in other assemblies still apply.

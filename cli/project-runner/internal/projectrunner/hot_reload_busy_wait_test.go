@@ -107,7 +107,7 @@ func assertFailedWithEmptyStdout(t *testing.T, run editorReadyRetryRun, stderrFr
 	}
 }
 
-// Verifies a request refused because another uloop command holds the Editor waits for the Editor
+// Verifies a request refused because another tloop command holds the Editor waits for the Editor
 // to be ready through a domain reload, then is sent once more, unchanged, and that answer is reported.
 func TestRunHotReloadWaitsForTheRunningCommandAndAppliesOnce(t *testing.T) {
 	useFastEditorReadyWait(t, fastEditorReadyWaitOptions())

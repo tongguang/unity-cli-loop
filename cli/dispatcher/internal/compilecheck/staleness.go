@@ -21,7 +21,7 @@ const (
 	// upstream failure kept from ever being compiled never had one.
 	changeReasonUnityArtifactMissing = "no artifact from the last Unity build"
 
-	runCompileFirstAdvice = "run `uloop compile` first"
+	runCompileFirstAdvice = "run `tloop compile` first"
 )
 
 // ChangeReport says whether an assembly's inputs moved since Unity last built it, and what moved.

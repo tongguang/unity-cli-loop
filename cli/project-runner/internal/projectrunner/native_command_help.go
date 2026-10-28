@@ -94,12 +94,12 @@ func printNativeCommandHelp(command string, stdout io.Writer) {
 
 func nativeCommandUsage(command string, hasOptions bool) string {
 	if command == clicore.SetCodeOptimizationCommandName {
-		return "uloop set-code-optimization debug [options]"
+		return "tloop set-code-optimization debug [options]"
 	}
 	if hasOptions {
-		return "uloop " + command + " [options]"
+		return "tloop " + command + " [options]"
 	}
-	return "uloop " + command
+	return "tloop " + command
 }
 
 func sortedNativeCommandHelpEntries(entries []tooldocs.OptionHelpEntry) []tooldocs.OptionHelpEntry {

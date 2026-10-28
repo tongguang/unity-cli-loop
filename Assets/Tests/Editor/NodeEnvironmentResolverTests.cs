@@ -321,12 +321,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// <summary>
         /// Verifies a .cmd or .exe entry is chosen over an earlier extensionless entry, ignoring extension case.
         /// </summary>
-        [TestCase(@"C:\tools\uloop.cmd")]
-        [TestCase(@"C:\tools\uloop.EXE")]
+        [TestCase(@"C:\tools\tloop.cmd")]
+        [TestCase(@"C:\tools\tloop.EXE")]
         public void SelectWindowsExecutable_WhenLaunchableEntryFollowsExtensionlessEntry_ReturnsLaunchableEntry(
             string launchablePath)
         {
-            string[] paths = { @"C:\tools\uloop", launchablePath };
+            string[] paths = { @"C:\tools\tloop", launchablePath };
 
             string result = NodeEnvironmentResolver.SelectWindowsExecutable(paths);
 
@@ -339,11 +339,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void SelectWindowsExecutable_WhenNoLaunchableEntryExists_ReturnsFirstEntry()
         {
-            string[] paths = { @"C:\tools\uloop", @"C:\tools\uloop.ps1" };
+            string[] paths = { @"C:\tools\tloop", @"C:\tools\tloop.ps1" };
 
             string result = NodeEnvironmentResolver.SelectWindowsExecutable(paths);
 
-            Assert.That(result, Is.EqualTo(@"C:\tools\uloop"));
+            Assert.That(result, Is.EqualTo(@"C:\tools\tloop"));
         }
 
         /// <summary>
@@ -362,11 +362,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ParseWhereOutput_WhenOutputUsesCrlf_ReturnsTrimmedPaths()
         {
-            string output = "C:\\tools\\uloop\r\n\r\n  C:\\tools\\uloop.cmd  \r\n";
+            string output = "C:\\tools\\tloop\r\n\r\n  C:\\tools\\tloop.cmd  \r\n";
 
             string[] result = NodeEnvironmentResolver.ParseWhereOutput(output);
 
-            Assert.That(result, Is.EqualTo(new[] { @"C:\tools\uloop", @"C:\tools\uloop.cmd" }));
+            Assert.That(result, Is.EqualTo(new[] { @"C:\tools\tloop", @"C:\tools\tloop.cmd" }));
         }
 
         /// <summary>
@@ -375,11 +375,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ParseWhereOutput_WhenOutputUsesLf_ReturnsPaths()
         {
-            string output = "C:\\tools\\uloop\nC:\\tools\\uloop.exe";
+            string output = "C:\\tools\\tloop\nC:\\tools\\tloop.exe";
 
             string[] result = NodeEnvironmentResolver.ParseWhereOutput(output);
 
-            Assert.That(result, Is.EqualTo(new[] { @"C:\tools\uloop", @"C:\tools\uloop.exe" }));
+            Assert.That(result, Is.EqualTo(new[] { @"C:\tools\tloop", @"C:\tools\tloop.exe" }));
         }
 
         /// <summary>

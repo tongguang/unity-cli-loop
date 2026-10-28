@@ -18,11 +18,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             "Tetris.Presentation.TetrisGameController.DescribeValue`1(T)";
 
         private const string Surface11SkippedReason =
-            "Added generic methods are skipped; hot reload cannot emit a typed shim for them. Run 'uloop compile'.";
+            "Added generic methods are skipped; hot reload cannot emit a typed shim for them. Run 'tloop compile'.";
 
         private const string ExpectedSkippedMemberNote =
             "'DescribeValue' was skipped by this hot reload run, which is why this compile failed: "
-            + "Added generic methods are skipped; hot reload cannot emit a typed shim for them. Run 'uloop compile'.";
+            + "Added generic methods are skipped; hot reload cannot emit a typed shim for them. Run 'tloop compile'.";
 
         /// <summary>
         /// What: the surface-11 CS1061 line yields the unresolved member name DescribeValue.
@@ -153,7 +153,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             const string reason =
                 "Added properties with only a setter are skipped; the shim requires a getter identity. "
-                + "Run 'uloop compile' to add the property.";
+                + "Run 'tloop compile' to add the property.";
             TransformWorkerSkippedDto[] getterSkipped =
             {
                 new TransformWorkerSkippedDto
@@ -417,7 +417,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         private const string ExpectedRefusedTypeNote =
             "'Spawner' was refused by this hot reload run (" + RefusedTypeNotice
-            + "), which is why this compile failed; run 'uloop compile'.";
+            + "), which is why this compile failed; run 'tloop compile'.";
 
         private static HotReloadCompileFailureNoteSources CreateRefusedTypeSources(string refusedMetadataName)
         {

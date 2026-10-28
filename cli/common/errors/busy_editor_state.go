@@ -32,7 +32,7 @@ func unityServerBusyNextActions(data serverBusyErrorData) []string {
 	if data.RunningToolName == "compile" {
 		actions = append(
 			actions,
-			"A compile can take several minutes on large projects. Wait for it to finish, then retry. If your own `uloop compile` previously failed with COMPILE_WAIT_TIMEOUT, re-running `uloop compile` reattaches to that compile instead of starting a new one.",
+			"A compile can take several minutes on large projects. Wait for it to finish, then retry. If your own `tloop compile` previously failed with COMPILE_WAIT_TIMEOUT, re-running `tloop compile` reattaches to that compile instead of starting a new one.",
 		)
 	}
 
@@ -40,7 +40,7 @@ func unityServerBusyNextActions(data serverBusyErrorData) []string {
 		*data.SecondsSinceLastMainThreadTick >= unityServerBusyResponsivenessStallThresholdSeconds {
 		actions = append(
 			actions,
-			"Run a light command such as `uloop get-logs --max-count 1` to check whether Unity is still responsive before treating this as a freeze.")
+			"Run a light command such as `tloop get-logs --max-count 1` to check whether Unity is still responsive before treating this as a freeze.")
 	}
 
 	return actions
@@ -49,20 +49,20 @@ func unityServerBusyNextActions(data serverBusyErrorData) []string {
 // Why a paused Play Mode needs its own guidance: the default wait/retry pair is wrong
 // advice there. A running command that waits for a frame or a physics step never reaches
 // one while the Editor is paused, so it never completes and never releases the
-// single-flight gate; the caller can wait forever. Why uloop cancel: while the gate is held,
+// single-flight gate; the caller can wait forever. Why tloop cancel: while the gate is held,
 // clear-pause-point and control-play-mode are themselves rejected as busy, and
-// await-pause-point reaches Unity but only reports the hit. uloop cancel answers while the gate
+// await-pause-point reaches Unity but only reports the hit. tloop cancel answers while the gate
 // is held, cancels the running command, and releases the Editor pause.
 func pausedInPlayModeNextActions(runningToolName string) []string {
 	actions := []string{
 		"Unity is paused in Play Mode. A running command that waits for a frame or a physics step cannot finish until play resumes, so this busy state does not clear on its own.",
-		"Run `uloop pause-point-status` (it answers while Unity is busy) to see whether a pause-point hit is holding the pause.",
+		"Run `tloop pause-point-status` (it answers while Unity is busy) to see whether a pause-point hit is holding the pause.",
 	}
 
 	if ClientDisconnectCancelsRunningTool(runningToolName) {
 		actions = append(
 			actions,
-			"Run `uloop cancel` (it answers while Unity is busy): the running command is cancelled and the Editor pause is released.")
+			"Run `tloop cancel` (it answers while Unity is busy): the running command is cancelled and the Editor pause is released.")
 	}
 
 	return append(
@@ -71,9 +71,9 @@ func pausedInPlayModeNextActions(runningToolName string) []string {
 }
 
 // ClientDisconnectCancelsRunningTool reports whether the running tool is one a client
-// disconnect, and so uloop cancel, can stop. Why these two tool names are excluded: the Editor
+// disconnect, and so tloop cancel, can stop. Why these two tool names are excluded: the Editor
 // keeps a run-tests run that respects Enter Play Mode settings, and a compile that waits for a
-// domain reload, alive across a client disconnect and uloop cancel alike. The busy payload
+// domain reload, alive across a client disconnect and tloop cancel alike. The busy payload
 // carries only the tool name, not the options that decide it, so both names drop the step
 // rather than promise a recovery that may not happen.
 func ClientDisconnectCancelsRunningTool(runningToolName string) bool {

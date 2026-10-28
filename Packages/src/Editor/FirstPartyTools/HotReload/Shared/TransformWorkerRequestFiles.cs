@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         {
             _directory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-hot-reload-" + Guid.NewGuid().ToString("N"));
+                "tloop-hot-reload-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_directory);
             OutputJsonPath = Path.Combine(_directory, "output.json");
         }

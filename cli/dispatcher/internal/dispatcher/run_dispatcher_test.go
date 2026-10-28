@@ -78,7 +78,7 @@ func TestRunRealCLICommandReportsStartFailure(t *testing.T) {
 		t.Fatalf("exit code mismatch: %d", code)
 	}
 	envelope := decodeDispatcherTestEnvelope(t, stderr.String())
-	if !strings.Contains(stderr.String(), "Failed to run resolved uloop CLI") {
+	if !strings.Contains(stderr.String(), "Failed to run resolved tloop CLI") {
 		t.Fatalf("missing start failure message: %s", stderr.String())
 	}
 	errorObject, _ := envelope["Error"].(map[string]any)
@@ -155,7 +155,7 @@ func TestRunDispatcherReportsUnresolvableProjectForRunnerCommand(t *testing.T) {
 }
 
 func TestRunDispatcherReportsRealCLIResolutionFailure(t *testing.T) {
-	// Verifies an unusable ULOOP_PROJECT_RUNNER_PATH override is reported as a runner resolution error.
+	// Verifies an unusable TLOOP_PROJECT_RUNNER_PATH override is reported as a runner resolution error.
 	projectRoot := createDispatcherUnityProject(t)
 	writeDispatcherProjectPin(t, projectRoot, "3.0.0")
 	t.Setenv(dispatcherDisableSelfUpdateEnvName, "1")

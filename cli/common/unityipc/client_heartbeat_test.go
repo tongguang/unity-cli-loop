@@ -108,7 +108,7 @@ func TestSendAdvertisesHeartbeatSupport(t *testing.T) {
 	request := <-captured
 	metadata, ok := request["uloop"].(map[string]any)
 	if !ok {
-		t.Fatalf("request misses uloop metadata: %#v", request)
+		t.Fatalf("request misses tloop metadata: %#v", request)
 	}
 	if metadata["acceptsHeartbeat"] != true {
 		t.Fatalf("acceptsHeartbeat not advertised: %#v", metadata)
@@ -260,7 +260,7 @@ func TestSendFailsWhenMainThreadStallExceedsLimit(t *testing.T) {
 	if !errors.As(err, &unresponsiveErr) {
 		t.Fatalf("expected EditorUnresponsiveError, got %v", err)
 	}
-	if !strings.Contains(err.Error(), "uloop launch -r") {
+	if !strings.Contains(err.Error(), "tloop launch -r") {
 		t.Fatalf("error misses restart hint: %v", err)
 	}
 }

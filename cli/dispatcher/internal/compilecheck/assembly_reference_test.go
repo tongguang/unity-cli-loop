@@ -78,7 +78,7 @@ func TestDetectAssemblyReferenceChangeRejectsAnAsmrefAddedAfterTheLastBuild(t *t
 	if err == nil {
 		t.Fatal("expected an assembly reference added after the last build to be rejected")
 	}
-	if !strings.Contains(err.Error(), "uloop compile") {
+	if !strings.Contains(err.Error(), "tloop compile") {
 		t.Errorf("the error should tell the user how to recover, got: %v", err)
 	}
 }

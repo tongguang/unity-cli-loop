@@ -16,7 +16,7 @@ on:
       - 'scripts/**'
       - 'cli/dispatcher/attestation/trusted_root.json'
       - 'Packages/src/project-runner-pin.json'
-      - '.uloop/project-runner-pin.json'
+      - '.tloop/project-runner-pin.json'
   pull_request:
     branches: [ main, v3-beta ]
     paths:
@@ -32,7 +32,7 @@ on:
       - 'scripts/**'
       - 'cli/dispatcher/attestation/trusted_root.json'
       - 'Packages/src/project-runner-pin.json'
-      - '.uloop/project-runner-pin.json'
+      - '.tloop/project-runner-pin.json'
   workflow_dispatch:
 
 jobs:

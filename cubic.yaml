@@ -10,7 +10,7 @@ version: 1
 
 reviews:
   ignore:
-    # Generated skill copies. `uloop skills install --claude --agents` rewrites
+    # Generated skill copies. `tloop skills install --claude --agents` rewrites
     # these wholesale from the sources under Packages/src/Editor, so a finding
     # here can never be actioned in place — it belongs on the source file, which
     # is part of the same pull request and reviewed on its own.
@@ -25,7 +25,7 @@ reviews:
 
     Everything under `.agents/skills/` and `.claude/skills/` is a generated
     copy of a skill source under `Packages/src/Editor/`, produced by
-    `uloop skills install`.
+    `tloop skills install`.
     The copies are committed on purpose and are always regenerated, never
     edited by hand. Never report a change to those paths as a direct edit of a
     generated file, and never ask for the change to be relocated to the source:

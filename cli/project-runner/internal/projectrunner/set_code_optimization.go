@@ -46,7 +46,7 @@ func parseSetCodeOptimizationArguments(args []string) (setCodeOptimizationArgume
 				Option:  argument,
 				Command: clicore.SetCodeOptimizationCommandName,
 				NextActions: []string{
-					"Run `uloop set-code-optimization --help` to inspect supported arguments.",
+					"Run `tloop set-code-optimization --help` to inspect supported arguments.",
 				},
 			}
 		}
@@ -65,8 +65,8 @@ func setCodeOptimizationModeError(mode string) *clierrors.ArgumentError {
 		Option:  mode,
 		Command: clicore.SetCodeOptimizationCommandName,
 		NextActions: []string{
-			"Run `uloop set-code-optimization debug` for this Editor session.",
-			"Run `uloop set-code-optimization debug --startup` to also persist the machine-wide startup preference after user approval.",
+			"Run `tloop set-code-optimization debug` for this Editor session.",
+			"Run `tloop set-code-optimization debug --startup` to also persist the machine-wide startup preference after user approval.",
 		},
 	}
 }

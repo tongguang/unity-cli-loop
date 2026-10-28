@@ -34,7 +34,7 @@ func TestBuildToolParamsUnknownOptionNextActionsGuideToHelp(t *testing.T) {
 	if len(argumentError.NextActions) != 1 {
 		t.Fatalf("expected exactly one NextAction, got %#v", argumentError.NextActions)
 	}
-	want := "Run `uloop sample-tool --help` to inspect supported options."
+	want := "Run `tloop sample-tool --help` to inspect supported options."
 	if argumentError.NextActions[0] != want {
 		t.Fatalf("NextActions mismatch:\nwant: %q\ngot:  %q", want, argumentError.NextActions[0])
 	}
@@ -151,7 +151,7 @@ func requireNextActions(t *testing.T, err error, want []string) {
 func TestBuildToolParamsUnexpectedArgumentSuggestsMatchingEnumOption(t *testing.T) {
 	_, _, err := buildToolParams([]string{"status"}, toolParamsSuggestionTool())
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop sample-tool --action Status",
+		"Did you mean: tloop sample-tool --action Status",
 		"Pass tool inputs as `--option value` pairs.",
 	})
 }
@@ -244,8 +244,8 @@ func TestBuildToolParamsUnexpectedArgumentAfterArrayThenLaterOptionOmitsCommaSep
 func TestBuildToolParamsUnknownOptionSuggestsMatchingEnumValue(t *testing.T) {
 	_, _, err := buildToolParams([]string{"--status"}, toolParamsSuggestionTool())
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop sample-tool --action Status",
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Did you mean: tloop sample-tool --action Status",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -253,8 +253,8 @@ func TestBuildToolParamsUnknownOptionSuggestsMatchingEnumValue(t *testing.T) {
 func TestBuildToolParamsUnknownOptionSuggestsCloseTypo(t *testing.T) {
 	_, _, err := buildToolParams([]string{"--output-directry"}, toolParamsSuggestionTool())
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop sample-tool --output-directory",
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Did you mean: tloop sample-tool --output-directory",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -262,8 +262,8 @@ func TestBuildToolParamsUnknownOptionSuggestsCloseTypo(t *testing.T) {
 func TestBuildToolParamsUnknownOptionSuggestsSharedKebabToken(t *testing.T) {
 	_, _, err := buildToolParams([]string{"--output-path"}, toolParamsSuggestionTool())
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop sample-tool --output-directory",
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Did you mean: tloop sample-tool --output-directory",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -276,8 +276,8 @@ func TestBuildToolParamsUnknownOptionSuggestsDynamicCodeFileFromSharedLaterToken
 
 	_, _, err := buildToolParams([]string{"--file"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop execute-dynamic-code --code-file",
-		"Run `uloop execute-dynamic-code --help` to inspect supported options.",
+		"Did you mean: tloop execute-dynamic-code --code-file",
+		"Run `tloop execute-dynamic-code --help` to inspect supported options.",
 	})
 }
 
@@ -290,8 +290,8 @@ func TestBuildToolParamsUnknownOptionSuggestsClearPausePointFile(t *testing.T) {
 
 	_, _, err := buildToolParams([]string{"--fil"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop clear-pause-point --file",
-		"Run `uloop clear-pause-point --help` to inspect supported options.",
+		"Did you mean: tloop clear-pause-point --file",
+		"Run `tloop clear-pause-point --help` to inspect supported options.",
 	})
 }
 
@@ -315,8 +315,8 @@ func TestBuildToolParamsUnknownOptionSuggestsTestModeFromSharedLaterToken(t *tes
 
 	_, _, err := buildToolParams([]string{"--mode"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop run-tests --test-mode",
-		"Run `uloop run-tests --help` to inspect supported options.",
+		"Did you mean: tloop run-tests --test-mode",
+		"Run `tloop run-tests --help` to inspect supported options.",
 	})
 }
 
@@ -329,8 +329,8 @@ func TestBuildToolParamsUnknownOptionSuggestsRunTestsSkipCompile(t *testing.T) {
 
 	_, _, err := buildToolParams([]string{"--skip-compil"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop run-tests --skip-compile",
-		"Run `uloop run-tests --help` to inspect supported options.",
+		"Did you mean: tloop run-tests --skip-compile",
+		"Run `tloop run-tests --help` to inspect supported options.",
 	})
 }
 
@@ -385,16 +385,16 @@ func TestBuildToolParamsRejectsRemovedFirstPartyToolOptionsWithReplacementSugges
 			command: clicore.CompileCommandName,
 			args:    []string{"--compile-wait-timeout-seconds", "45"},
 			want: []string{
-				"Did you mean: uloop compile --timeout-seconds",
-				"Run `uloop compile --help` to inspect supported options.",
+				"Did you mean: tloop compile --timeout-seconds",
+				"Run `tloop compile --help` to inspect supported options.",
 			},
 		},
 		{
 			command: "find-game-objects",
 			args:    []string{"--max-results", "5"},
 			want: []string{
-				"Did you mean: uloop find-game-objects --max-count",
-				"Run `uloop find-game-objects --help` to inspect supported options.",
+				"Did you mean: tloop find-game-objects --max-count",
+				"Run `tloop find-game-objects --help` to inspect supported options.",
 			},
 		},
 	}
@@ -426,8 +426,8 @@ func TestBuildToolParamsUnknownOptionSuggestsPausePointTrigger(t *testing.T) {
 
 	_, _, err := buildToolParams([]string{"--triger"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop enable-pause-point --trigger",
-		"Run `uloop enable-pause-point --help` to inspect supported options.",
+		"Did you mean: tloop enable-pause-point --trigger",
+		"Run `tloop enable-pause-point --help` to inspect supported options.",
 	})
 }
 
@@ -435,7 +435,7 @@ func TestBuildToolParamsUnknownOptionSuggestsPausePointTrigger(t *testing.T) {
 func TestBuildToolParamsUnknownOptionWithoutSuggestionKeepsHelpNextAction(t *testing.T) {
 	_, _, err := buildToolParams([]string{"--zzzzzzzz"}, toolParamsSuggestionTool())
 	requireNextActions(t, err, []string{
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -452,7 +452,7 @@ func TestBuildToolParamsUnknownOptionIgnoresShortSharedKebabToken(t *testing.T) 
 
 	_, _, err := buildToolParams([]string{"--no-foo"}, tool)
 	requireNextActions(t, err, []string{
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -470,8 +470,8 @@ func TestBuildToolParamsUnknownOptionPrefersEnumMatchOverCloseOptionName(t *test
 
 	_, _, err := buildToolParams([]string{"--status"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop sample-tool --action Status",
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Did you mean: tloop sample-tool --action Status",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -489,8 +489,8 @@ func TestBuildToolParamsUnknownOptionPrefersCloseTypoOverSharedKebabToken(t *tes
 
 	_, _, err := buildToolParams([]string{"--time-out"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop sample-tool --timeout",
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Did you mean: tloop sample-tool --timeout",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -507,8 +507,8 @@ func TestBuildToolParamsUnknownOptionSuggestsAtEditDistanceTwo(t *testing.T) {
 
 	_, _, err := buildToolParams([]string{"--acxxon"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop sample-tool --action",
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Did you mean: tloop sample-tool --action",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -525,7 +525,7 @@ func TestBuildToolParamsUnknownOptionDoesNotSuggestAtEditDistanceThree(t *testin
 
 	_, _, err := buildToolParams([]string{"--acxxxn"}, tool)
 	requireNextActions(t, err, []string{
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 
@@ -543,8 +543,8 @@ func TestBuildToolParamsUnknownOptionTieBreaksToSortedFirstOptionName(t *testing
 
 	_, _, err := buildToolParams([]string{"--output-bile"}, tool)
 	requireNextActions(t, err, []string{
-		"Did you mean: uloop sample-tool --output-file",
-		"Run `uloop sample-tool --help` to inspect supported options.",
+		"Did you mean: tloop sample-tool --output-file",
+		"Run `tloop sample-tool --help` to inspect supported options.",
 	})
 }
 

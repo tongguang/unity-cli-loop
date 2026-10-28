@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.Application
 
         private static string CreateMessage(string toolName)
         {
-            return $"'{toolName}' was cancelled by uloop cancel.";
+            return $"'{toolName}' was cancelled by tloop cancel.";
         }
     }
 }

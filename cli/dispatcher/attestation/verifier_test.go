@@ -105,6 +105,23 @@ func TestVerifySubjects_HappyPath(t *testing.T) {
 	}
 }
 
+// Verifies Tuanjie release policy rejects a valid attestation belonging to the original Unity CLI.
+func TestTloopReleasePolicyRejectsUpstreamBundle(t *testing.T) {
+	f := loadHappyFixture(t)
+	trusted, err := LoadEmbeddedTrustedMaterial()
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = VerifySubjects(trusted, SubjectsOptions{
+		BundleData:        f.bundle,
+		ExpectedCommitSHA: f.commitSHA,
+		Identity:          DispatcherPublishIdentity(),
+	})
+	if !errors.Is(err, ErrVerificationFailed) {
+		t.Fatalf("original Unity release must be rejected: %v", err)
+	}
+}
+
 // Verifies VerifySubjects fail-closed when the certificate's Source Repository Digest differs from ExpectedCommitSHA.
 func TestVerifySubjects_CommitMismatchFailsClosed(t *testing.T) {
 	f := loadHappyFixture(t)
@@ -407,7 +424,7 @@ func TestFetchTagCommitSHA_Lightweight(t *testing.T) {
 	setGithubAPIBase(server.URL)
 	defer setGithubAPIBase(original)
 
-	sha, err := FetchTagCommitSHA(context.Background(), "hatayama/unity-cli-loop", "dispatcher-v3.0.1-beta.12")
+	sha, err := FetchTagCommitSHA(context.Background(), "tongguang/unity-cli-loop", "dispatcher-v3.0.1-beta.12")
 	if err != nil {
 		t.Fatalf("expected happy tag lookup, got: %v", err)
 	}
@@ -438,7 +455,7 @@ func TestFetchTagCommitSHA_Annotated(t *testing.T) {
 	setGithubAPIBase(server.URL)
 	defer setGithubAPIBase(original)
 
-	sha, err := FetchTagCommitSHA(context.Background(), "hatayama/unity-cli-loop", "annotated-tag")
+	sha, err := FetchTagCommitSHA(context.Background(), "tongguang/unity-cli-loop", "annotated-tag")
 	if err != nil {
 		t.Fatalf("expected annotated tag lookup to resolve, got: %v", err)
 	}
@@ -461,7 +478,7 @@ func TestFetchTagCommitSHA_ServerError(t *testing.T) {
 	setGithubAPIBase(server.URL)
 	defer setGithubAPIBase(original)
 
-	_, err := FetchTagCommitSHA(context.Background(), "hatayama/unity-cli-loop", "any")
+	_, err := FetchTagCommitSHA(context.Background(), "tongguang/unity-cli-loop", "any")
 	if err == nil {
 		t.Fatalf("expected server error to fail-closed")
 	}
@@ -484,7 +501,7 @@ func TestFetchTagCommitSHA_RateLimited(t *testing.T) {
 	setGithubAPIBase(server.URL)
 	defer setGithubAPIBase(original)
 
-	_, err := FetchTagCommitSHA(context.Background(), "hatayama/unity-cli-loop", "any")
+	_, err := FetchTagCommitSHA(context.Background(), "tongguang/unity-cli-loop", "any")
 	if !errors.Is(err, ErrTagRefFetch) {
 		t.Fatalf("expected ErrTagRefFetch, got: %v", err)
 	}
@@ -514,7 +531,7 @@ func TestFetchTagCommitSHA_RateLimitedWithToken(t *testing.T) {
 	setGithubAPIBase(server.URL)
 	defer setGithubAPIBase(original)
 
-	_, err := FetchTagCommitSHA(context.Background(), "hatayama/unity-cli-loop", "any")
+	_, err := FetchTagCommitSHA(context.Background(), "tongguang/unity-cli-loop", "any")
 	var rateLimit githubapi.RateLimitError
 	if !errors.As(err, &rateLimit) {
 		t.Fatalf("expected RateLimitError, got: %v", err)
@@ -540,7 +557,7 @@ func TestFetchTagCommitSHASendsResolvedTokenAsBearer(t *testing.T) {
 	setGithubAPIBase(server.URL)
 	defer setGithubAPIBase(original)
 
-	sha, err := FetchTagCommitSHA(context.Background(), "hatayama/unity-cli-loop", "any")
+	sha, err := FetchTagCommitSHA(context.Background(), "tongguang/unity-cli-loop", "any")
 	if err != nil {
 		t.Fatalf("FetchTagCommitSHA failed: %v", err)
 	}

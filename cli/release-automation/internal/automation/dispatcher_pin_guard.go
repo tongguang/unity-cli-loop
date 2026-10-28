@@ -20,10 +20,10 @@ const (
 var requiredDispatcherPinAssets = []string{
 	"install.sh",
 	"install.ps1",
-	"uloop-dispatcher-darwin-amd64.tar.gz",
-	"uloop-dispatcher-darwin-arm64.tar.gz",
-	"uloop-dispatcher-linux-amd64.tar.gz",
-	"uloop-dispatcher-windows-amd64.zip",
+	"tloop-dispatcher-darwin-amd64.tar.gz",
+	"tloop-dispatcher-darwin-arm64.tar.gz",
+	"tloop-dispatcher-linux-amd64.tar.gz",
+	"tloop-dispatcher-windows-amd64.zip",
 }
 
 type dispatcherPinGuardValues struct {

@@ -21,7 +21,7 @@ func TestRunDispatcherUninstallHelpDoesNotRequireUnityProject(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("uninstall help failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop uninstall") {
+	if !strings.Contains(stdout.String(), "tloop uninstall") {
 		t.Fatalf("uninstall help output mismatch: %s", stdout.String())
 	}
 }
@@ -57,7 +57,7 @@ func TestPrintUninstallHelpDescribesPosixPathBlockRemoval(t *testing.T) {
 
 	printUninstallHelp(&stdout)
 
-	if !strings.Contains(stdout.String(), "On macOS and Linux, removes the uloop PATH block from the shell profile.") {
+	if !strings.Contains(stdout.String(), "On macOS and Linux, removes the tloop PATH block from the shell profile.") {
 		t.Fatalf("uninstall help output mismatch: %s", stdout.String())
 	}
 }
@@ -82,11 +82,11 @@ func TestTryHandleUninstallRequestRejectsExtraArguments(t *testing.T) {
 }
 
 func TestResolveUninstallInstallDir(t *testing.T) {
-	// Verifies uninstall honors ULOOP_INSTALL_DIR and reports the uninstall-specific message on unsupported platforms.
-	t.Setenv(nativepath.InstallDirEnvName, "/opt/uloop/bin")
+	// Verifies uninstall honors TLOOP_INSTALL_DIR and reports the uninstall-specific message on unsupported platforms.
+	t.Setenv(nativepath.InstallDirEnvName, "/opt/tloop/bin")
 
 	installDir, err := resolveUninstallInstallDir("linux")
-	if err != nil || installDir != "/opt/uloop/bin" {
+	if err != nil || installDir != "/opt/tloop/bin" {
 		t.Fatalf("unexpected result: dir=%q err=%v", installDir, err)
 	}
 

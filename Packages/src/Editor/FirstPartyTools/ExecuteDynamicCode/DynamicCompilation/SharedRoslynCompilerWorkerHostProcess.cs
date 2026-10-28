@@ -49,7 +49,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         {
             return Path.Combine(
                 Path.GetTempPath(),
-                "UnityCliLoopCompilation",
+                "TuanjieCliLoopCompilation",
                 $"RoslynWorker-{Process.GetCurrentProcess().Id}");
         }
 
@@ -60,7 +60,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         {
             return Path.Combine(
                 Path.GetTempPath(),
-                "UnityCliLoopCompilation",
+                "TuanjieCliLoopCompilation",
                 $"SharedWorkerWarmUp-{Process.GetCurrentProcess().Id}");
         }
 

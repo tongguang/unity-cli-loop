@@ -38,7 +38,7 @@ const (
 
 	dispatcherReleaseTagPrefix          = "dispatcher-v"
 	unityPackageCliPinFile              = "Packages/src/project-runner-pin.json"
-	unityProjectCliPinFile              = ".uloop/project-runner-pin.json"
+	unityProjectCliPinFile              = ".tloop/project-runner-pin.json"
 	minimumDispatcherVersionDescription = "minimumDispatcherVersion"
 )
 

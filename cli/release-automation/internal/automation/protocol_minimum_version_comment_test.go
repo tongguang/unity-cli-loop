@@ -177,7 +177,7 @@ func TestRunProtocolMinimumVersionComment_WithoutPullRequestOrBaseRef_Skips(t *t
 func TestRunProtocolMinimumVersionComment_WhenGitIsUnavailable_Fails(t *testing.T) {
 	// Verifies a guard analysis failure fails the command instead of deleting the existing comment.
 	t.Setenv("PATH", t.TempDir())
-	t.Setenv("ULOOP_REPOSITORY_ROOT", t.TempDir())
+	t.Setenv("TLOOP_REPOSITORY_ROOT", t.TempDir())
 	t.Setenv("PR_NUMBER", "1")
 	t.Setenv("PROTOCOL_MINIMUM_VERSION_BASE_REF", "origin/main")
 	stdout := bytes.Buffer{}
@@ -193,7 +193,7 @@ func TestRunProtocolMinimumVersionComment_WhenGitIsUnavailable_Fails(t *testing.
 
 func TestProtocolMinimumVersionCommentConfigFromEnvironment_AppliesDefaults(t *testing.T) {
 	// Verifies the working directory, origin-prefixed base ref, HEAD, and bot author are used when their variables are unset.
-	t.Setenv("ULOOP_REPOSITORY_ROOT", "")
+	t.Setenv("TLOOP_REPOSITORY_ROOT", "")
 	t.Setenv("PROTOCOL_MINIMUM_VERSION_BASE_REF", "")
 	t.Setenv("GITHUB_BASE_REF", "main")
 	t.Setenv("PROTOCOL_MINIMUM_VERSION_HEAD_REF", "")

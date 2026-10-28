@@ -41,7 +41,7 @@ func FocusUnityProcessWithRestore(ctx context.Context, pid int) (RestoreFocusFun
 
 func focusUnityWindow(ctx context.Context, pid int) error {
 	if !unityProcessExists(pid) {
-		return fmt.Errorf("Unity process was not found: %d", pid)
+		return fmt.Errorf("editor process was not found: %d", pid)
 	}
 	processID := uint32(pid)
 	handle, err := findMainWindowHandle(processID)
@@ -69,7 +69,7 @@ func focusUnityWindow(ctx context.Context, pid int) error {
 	if err != nil || reached {
 		return err
 	}
-	return fmt.Errorf("Windows refused to bring the Unity window (PID: %d) to the foreground (foreground lock). Click the Unity window or its taskbar icon to focus it manually.", pid)
+	return fmt.Errorf("windows refused to bring the Editor window (PID: %d) to the foreground (foreground lock); click the Editor window or its taskbar icon to focus it manually", pid)
 }
 
 // tryFocusStage refuses a later focus fallback after cancel so Ctrl+C cannot
@@ -114,7 +114,7 @@ func findMainWindowHandle(pid uint32) (windows.HWND, error) {
 	_ = windows.EnumWindows(mainWindowEnumCallback, unsafe.Pointer(search))
 	runtime.KeepAlive(search)
 	if search.found == 0 {
-		return 0, fmt.Errorf("Unity process has no main window handle: %d", pid)
+		return 0, fmt.Errorf("editor process has no main window handle: %d", pid)
 	}
 	return search.found, nil
 }
@@ -141,7 +141,7 @@ func restoreUnityWindowIfMinimized(handle windows.HWND) error {
 		return nil
 	}
 	if !user32.ShowWindowAsync(handle, SW_RESTORE) {
-		return fmt.Errorf("Failed to show Unity window")
+		return fmt.Errorf("failed to show Editor window")
 	}
 	return nil
 }
@@ -232,14 +232,14 @@ func restoreWindowsForegroundWindow(ctx context.Context, handle windows.HWND) er
 
 func restoreForegroundWindow(handle windows.HWND) error {
 	if handle == 0 {
-		return fmt.Errorf("Saved foreground window handle is invalid")
+		return fmt.Errorf("saved foreground window handle is invalid")
 	}
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
 	targetThreadID := windowThreadID(handle)
 	if targetThreadID == 0 {
-		return fmt.Errorf("Saved foreground window thread is invalid")
+		return fmt.Errorf("saved foreground window thread is invalid")
 	}
 	currentThreadID := windows.GetCurrentThreadId()
 	foregroundThreadID := windowThreadID(windows.GetForegroundWindow())
@@ -248,12 +248,12 @@ func restoreForegroundWindow(handle windows.HWND) error {
 
 	if user32.IsIconic(handle) {
 		if !user32.ShowWindowAsync(handle, SW_RESTORE) {
-			return fmt.Errorf("Failed to show previous foreground window")
+			return fmt.Errorf("failed to show previous foreground window")
 		}
 	}
 	user32.BringWindowToTop(handle)
 	if !user32.SetForegroundWindow(handle) {
-		return fmt.Errorf("Failed to restore previous foreground window")
+		return fmt.Errorf("failed to restore previous foreground window")
 	}
 	return nil
 }

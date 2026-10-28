@@ -1,17 +1,17 @@
 ---
-name: uloop-set-game-view-size
+name: tloop-set-game-view-size
 toolName: set-game-view-size
-description: "Set or inspect the Unity Game View custom rendering resolution."
+description: "Set or inspect the Tuanjie Game View custom rendering resolution."
 ---
 
-# uloop set-game-view-size
+# tloop set-game-view-size
 
-Set or inspect the Unity Game View custom rendering resolution.
+Set or inspect the Tuanjie Game View custom rendering resolution.
 
 ## Usage
 
 ```bash
-uloop set-game-view-size [--width <width> --height <height>]
+tloop set-game-view-size [--width <width> --height <height>]
 ```
 
 ## Parameters
@@ -35,13 +35,13 @@ Returns JSON containing:
 
 ```bash
 # Read the current custom rendering resolution
-uloop set-game-view-size
+tloop set-game-view-size
 
 # Set a Full HD custom rendering resolution
-uloop set-game-view-size --width 1920 --height 1080
+tloop set-game-view-size --width 1920 --height 1080
 ```
 
 ## Notes
 
 - Width and height must be provided together when changing the resolution.
-- The tool uses Unity's public `UnityEditor.PlayModeWindow` API and does not require reflection.
+- The tool uses Tuanjie's public `UnityEditor.PlayModeWindow` API and does not require reflection.

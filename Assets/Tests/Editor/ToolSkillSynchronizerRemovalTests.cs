@@ -18,7 +18,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _temporaryProjectRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _temporaryProjectRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_temporaryProjectRoot);
         }
 
@@ -38,10 +38,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void RemoveSkillFilesAtProjectRoot_WhenInstalledSkillsBelongToOtherTools_KeepsThem()
         {
             string targetRoot = Path.Combine(_temporaryProjectRoot, ".claude");
-            string groupedSkillDirectory = Path.Combine(SkillInstallLayout.GetManagedSkillsRoot(targetRoot), "uloop-get-logs");
-            string flatSkillDirectory = Path.Combine(SkillInstallLayout.GetSkillsRoot(targetRoot), "uloop-run-tests");
-            WriteInstalledSkillFile(groupedSkillDirectory, "---\nname: uloop-get-logs\n---\n");
-            WriteInstalledSkillFile(flatSkillDirectory, "---\nname: uloop-run-tests\n---\n");
+            string groupedSkillDirectory = Path.Combine(SkillInstallLayout.GetManagedSkillsRoot(targetRoot), "tloop-get-logs");
+            string flatSkillDirectory = Path.Combine(SkillInstallLayout.GetSkillsRoot(targetRoot), "tloop-run-tests");
+            WriteInstalledSkillFile(groupedSkillDirectory, "---\nname: tloop-get-logs\n---\n");
+            WriteInstalledSkillFile(flatSkillDirectory, "---\nname: tloop-run-tests\n---\n");
 
             ToolSkillSynchronizer.RemoveSkillFilesAtInstallRoot(_temporaryProjectRoot, "compile");
 

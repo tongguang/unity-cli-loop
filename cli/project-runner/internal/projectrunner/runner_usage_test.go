@@ -10,7 +10,7 @@ import (
 )
 
 // Verifies the project runner refuses dispatcher-owned bootstrap
-// commands and points the caller at the global uloop dispatcher.
+// commands and points the caller at the global tloop dispatcher.
 func TestRunProjectLocalRejectsDispatcherOwnedCommands(t *testing.T) {
 	t.Chdir(t.TempDir())
 
@@ -29,8 +29,8 @@ func TestRunProjectLocalRejectsDispatcherOwnedCommands(t *testing.T) {
 		if code != 1 {
 			t.Fatalf("%s: expected rejection exit code, got %d stdout=%s", command, code, stdout.String())
 		}
-		if !strings.Contains(stderr.String(), "global uloop dispatcher") {
-			t.Fatalf("%s: rejection must point at the global uloop dispatcher: %s", command, stderr.String())
+		if !strings.Contains(stderr.String(), "global tloop dispatcher") {
+			t.Fatalf("%s: rejection must point at the global tloop dispatcher: %s", command, stderr.String())
 		}
 		if !strings.Contains(stderr.String(), command) {
 			t.Fatalf("%s: rejection must name the rejected command: %s", command, stderr.String())
@@ -39,7 +39,7 @@ func TestRunProjectLocalRejectsDispatcherOwnedCommands(t *testing.T) {
 }
 
 // Verifies the project runner keeps its direct help output minimal and defers
-// the full help UX to the global uloop dispatcher.
+// the full help UX to the global tloop dispatcher.
 func TestRunProjectLocalHelpPrintsRunnerUsage(t *testing.T) {
 	t.Chdir(t.TempDir())
 
@@ -55,10 +55,10 @@ func TestRunProjectLocalHelpPrintsRunnerUsage(t *testing.T) {
 		if code != 0 {
 			t.Fatalf("%v: runner usage failed: code=%d stderr=%s", args, code, stderr.String())
 		}
-		if !strings.Contains(stdout.String(), "uloop-project-runner") {
+		if !strings.Contains(stdout.String(), "tloop-project-runner") {
 			t.Fatalf("%v: runner usage must name the runner binary: %s", args, stdout.String())
 		}
-		if !strings.Contains(stdout.String(), "uloop --help") {
+		if !strings.Contains(stdout.String(), "tloop --help") {
 			t.Fatalf("%v: runner usage must defer to the dispatcher help: %s", args, stdout.String())
 		}
 	}
@@ -76,7 +76,7 @@ func TestRunProjectLocalCommandHelpPrintsRunnerUsage(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("compile --help failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop --help") {
+	if !strings.Contains(stdout.String(), "tloop --help") {
 		t.Fatalf("command help must defer to the dispatcher help: %s", stdout.String())
 	}
 	if strings.Contains(stdout.String(), "--force-recompile") {

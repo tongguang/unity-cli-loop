@@ -3,7 +3,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
     internal static class UnixEndpointSecurityConstants
     {
         public const string ParentPath = "/tmp";
-        public const string EndpointDirectoryPrefix = "uloop-";
+        public const string EndpointDirectoryPrefix = "tloop-";
         public const uint RootUserId = 0;
         public const uint StickyBit = 0x200;
         public const uint EndpointDirectoryMode = 0x1C0;

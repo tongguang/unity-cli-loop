@@ -195,7 +195,7 @@ jobs:
           if [ "${{ matrix.package-warning-scope }}" == "true" ]; then
             PACKAGE_ASSEMBLY_COUNT=$(find "${{ matrix.project-path }}/Library/ScriptAssemblies" -maxdepth 1 -type f -name 'UnityCLILoop*.dll' 2>/dev/null | wc -l | tr -d ' ')
             if [ "$PACKAGE_ASSEMBLY_COUNT" -eq 0 ]; then
-              echo "::error::Unity did not resolve or compile the io.github.hatayama.uloopmcp package"
+              echo "::error::Unity did not resolve or compile the io.github.tongguang.tloop package"
               if [ -f "$LOG_FILE" ]; then
                 echo "=== Unity log tail ==="
                 tail -100 "$LOG_FILE"
@@ -211,9 +211,9 @@ jobs:
             echo "Analyzing log file: $LOG_FILE"
 
             if [ "${{ matrix.package-warning-scope }}" == "true" ]; then
-              PACKAGE_EVIDENCE_PATTERN='io\.github\.hatayama\.uloopmcp|UnityCLILoop\.Runtime'
+              PACKAGE_EVIDENCE_PATTERN='io\.github\.tongguang\.tloop|UnityCLILoop\.Runtime'
               if ! grep -Eq "$PACKAGE_EVIDENCE_PATTERN" "$LOG_FILE"; then
-                echo "::error::Unity did not resolve or compile the io.github.hatayama.uloopmcp package"
+                echo "::error::Unity did not resolve or compile the io.github.tongguang.tloop package"
                 exit 1
               fi
               echo "Package compilation evidence found in Unity log."
@@ -222,8 +222,8 @@ jobs:
             if [ "${{ matrix.package-warning-scope }}" == "true" ]; then
               # Unity 6000.5 can emit compiler noise from other packages. Only
               # package source diagnostics determine this compatibility check.
-              ERROR_PATTERN='(Packages/src/|io\.github\.hatayama\.uloopmcp).*error CS[0-9]*:|error CS[0-9]*:.*(Packages/src/|io\.github\.hatayama\.uloopmcp)'
-              WARNING_PATTERN='(Packages/src/|io\.github\.hatayama\.uloopmcp).*warning CS[0-9]*:|warning CS[0-9]*:.*(Packages/src/|io\.github\.hatayama\.uloopmcp)'
+              ERROR_PATTERN='(Packages/src/|io\.github\.tongguang\.tloop).*error CS[0-9]*:|error CS[0-9]*:.*(Packages/src/|io\.github\.tongguang\.tloop)'
+              WARNING_PATTERN='(Packages/src/|io\.github\.tongguang\.tloop).*warning CS[0-9]*:|warning CS[0-9]*:.*(Packages/src/|io\.github\.tongguang\.tloop)'
             else
               ERROR_PATTERN='error CS[0-9]*:'
               WARNING_PATTERN='warning CS[0-9]*:'

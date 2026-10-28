@@ -4,8 +4,8 @@ package dispatcher
 // .agents/skills, ...) receive project-local skills. People differ in where
 // their agents start: some open the Unity project itself, others open the
 // Git repository that contains it, so both are supported. The choice made in
-// the Editor is saved in the project's .uloop/settings.skills.json, which a
-// team can commit to share, and a flagless `uloop skills` command follows it
+// the Editor is saved in the project's .tloop/settings.skills.json, which a
+// team can commit to share, and a flagless `tloop skills` command follows it
 // so the CLI and the Editor never install into different places; --root
 // overrides it for one invocation.
 // Only the destination moves: skill sources and tool settings still come from
@@ -33,7 +33,7 @@ const (
 	// by parsing, validation, errors, and help output.
 	skillsRootFlagName = "--root"
 
-	skillSettingsDir  = ".uloop"
+	skillSettingsDir  = ".tloop"
 	skillSettingsFile = "settings.skills.json"
 	gitMarkerName     = ".git"
 )

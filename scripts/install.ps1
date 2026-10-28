@@ -8,19 +8,19 @@ if ($PSVersionTable.PSVersion.Major -lt 6) {
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 }
 
-$Repository = "hatayama/unity-cli-loop"
-$Version = if ($env:ULOOP_VERSION) { $env:ULOOP_VERSION } else { "latest" }
+$Repository = "tongguang/unity-cli-loop"
+$Version = if ($env:TLOOP_VERSION) { $env:TLOOP_VERSION } else { "latest" }
 $LatestVersion = "latest"
 $LatestBetaVersion = "latest-beta"
 $DefaultPinRef = "main"
-$PinRef = if ($env:ULOOP_REF) { $env:ULOOP_REF } else { $DefaultPinRef }
+$PinRef = if ($env:TLOOP_REF) { $env:TLOOP_REF } else { $DefaultPinRef }
 $ResolvedArchiveManifest = $null
-$InstallDir = if ($env:ULOOP_INSTALL_DIR) {
-    $env:ULOOP_INSTALL_DIR
+$InstallDir = if ($env:TLOOP_INSTALL_DIR) {
+    $env:TLOOP_INSTALL_DIR
 } else {
-    Join-Path $env:LOCALAPPDATA "Programs\uloop\bin"
+    Join-Path $env:LOCALAPPDATA "Programs\tloop\bin"
 }
-$AssetName = "uloop-dispatcher-windows-amd64.zip"
+$AssetName = "tloop-dispatcher-windows-amd64.zip"
 
 function Test-UloopVersionFormat {
     param(
@@ -36,11 +36,11 @@ function Test-UloopVersionFormat {
     if ($Candidate -eq $LatestVersion -or $Candidate -eq $LatestBetaVersion) {
         return
     }
-    $Pattern = '^(dispatcher-v|uloop-project-runner-v|v)?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'
+    $Pattern = '^(dispatcher-v|tloop-project-runner-v|v)?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'
     if ($Candidate -match $Pattern) {
         return
     }
-    throw "Invalid ULOOP_VERSION: $Candidate. Expected 'latest', 'latest-beta', or a semver tag such as '3.0.0-beta.5' / 'dispatcher-v3.0.0-beta.5'."
+    throw "Invalid TLOOP_VERSION: $Candidate. Expected 'latest', 'latest-beta', or a semver tag such as '3.0.0-beta.5' / 'dispatcher-v3.0.0-beta.5'."
 }
 
 Test-UloopVersionFormat -Candidate $Version
@@ -84,7 +84,7 @@ function Find-LatestAssetUrl {
     }
 }
 
-# Why: ULOOP_REF is interpolated into a raw.githubusercontent.com URL. Reject
+# Why: TLOOP_REF is interpolated into a raw.githubusercontent.com URL. Reject
 # empty values, path traversal (`..`), and characters outside the ref alphabet
 # so a hostile env cannot break out of the intended pin path.
 function Test-UloopRefFormat {
@@ -95,7 +95,7 @@ function Test-UloopRefFormat {
     )
 
     if ([string]::IsNullOrEmpty($Candidate) -or $Candidate.Contains("..") -or ($Candidate -notmatch '^[0-9A-Za-z._/-]+$')) {
-        throw "Invalid ULOOP_REF: $Candidate. Expected a git ref such as 'main' or 'v3-beta'."
+        throw "Invalid TLOOP_REF: $Candidate. Expected a git ref such as 'main' or 'v3-beta'."
     }
 }
 
@@ -149,7 +149,7 @@ function Test-UloopPinManifestFormat {
 }
 
 function Resolve-UloopManifestFromPin {
-    $ExistingManifest = [Environment]::GetEnvironmentVariable("ULOOP_ARCHIVE_MANIFEST")
+    $ExistingManifest = [Environment]::GetEnvironmentVariable("TLOOP_ARCHIVE_MANIFEST")
     if (-not [string]::IsNullOrEmpty($ExistingManifest)) {
         return
     }
@@ -160,7 +160,7 @@ function Resolve-UloopManifestFromPin {
     try {
         $PinJsonText = Get-UloopPinJson
     } catch {
-        throw "Could not fetch project-runner pin from $PinUrl. Set ULOOP_ARCHIVE_MANIFEST from a verified attestation (see SECURITY.md), or fix ULOOP_REF."
+        throw "Could not fetch project-runner pin from $PinUrl. Set TLOOP_ARCHIVE_MANIFEST from a verified attestation (see SECURITY.md), or fix TLOOP_REF."
     }
 
     $PinDocument = ConvertFrom-UloopPinDocument -JsonText $PinJsonText
@@ -180,7 +180,7 @@ function Resolve-UloopManifestFromPin {
         $script:Version = $PinTag
         Write-Host "Using dispatcher release $($script:Version) pinned at $PinRef"
     } elseif ($Version -ne $PinTag) {
-        throw "ULOOP_VERSION ($Version) does not match the pin dispatcherReleaseTag ($PinTag) at $PinRef. Unset ULOOP_VERSION, or supply ULOOP_ARCHIVE_MANIFEST from a verified attestation (see SECURITY.md)."
+        throw "TLOOP_VERSION ($Version) does not match the pin dispatcherReleaseTag ($PinTag) at $PinRef. Unset TLOOP_VERSION, or supply TLOOP_ARCHIVE_MANIFEST from a verified attestation (see SECURITY.md)."
     }
 
     $script:ResolvedArchiveManifest = $PinManifest
@@ -192,7 +192,7 @@ if ($Version -eq $LatestVersion -or $Version -eq $LatestBetaVersion) {
     $ReleaseChannel = if ($Version -eq $LatestBetaVersion) { "beta" } else { "stable" }
     $DownloadUrl = Find-LatestAssetUrl -ReleaseChannel $ReleaseChannel
     if (-not $DownloadUrl) {
-        throw "Could not find a $Version release asset named $AssetName. Set ULOOP_VERSION to a release tag that provides this asset."
+        throw "Could not find a $Version release asset named $AssetName. Set TLOOP_VERSION to a release tag that provides this asset."
     }
 } else {
     $DownloadUrl = "https://github.com/$Repository/releases/download/$Version/$AssetName"
@@ -214,7 +214,7 @@ function Assert-UloopVersionSucceeds {
     }
 
     if ($LASTEXITCODE -ne 0) {
-        throw "uloop binary verification failed for $UloopPath"
+        throw "tloop binary verification failed for $UloopPath"
     }
 }
 
@@ -260,7 +260,7 @@ function Invoke-UloopNativeInstall {
     $NativeInstallArgs = @("install", "--dir", $Directory)
     & $UloopPath @NativeInstallArgs
     if ($LASTEXITCODE -ne 0) {
-        throw "uloop native install setup failed for $UloopPath"
+        throw "tloop native install setup failed for $UloopPath"
     }
 }
 
@@ -337,7 +337,7 @@ function Test-LegacyNpmUloopPath {
         return $false
     }
 
-    return $CommandContent.Contains("node_modules/uloop-cli") -or $CommandContent.Contains("node_modules\uloop-cli")
+    return $CommandContent.Contains("node_modules/tloop-cli") -or $CommandContent.Contains("node_modules\tloop-cli")
 }
 
 function Remove-LegacyNpmArtifacts {
@@ -354,14 +354,14 @@ function Remove-LegacyNpmArtifacts {
         return
     }
 
-    foreach ($ShimName in @("uloop", "uloop.cmd", "uloop.ps1")) {
+    foreach ($ShimName in @("tloop", "tloop.cmd", "tloop.ps1")) {
         Remove-Item -Path (Join-Path $LegacyPrefix $ShimName) -Force -ErrorAction SilentlyContinue
         Remove-Item -Path (Join-Path (Join-Path $LegacyPrefix "bin") $ShimName) -Force -ErrorAction SilentlyContinue
     }
 
     foreach ($PackagePath in @(
-            (Join-Path (Join-Path $LegacyPrefix "node_modules") "uloop-cli"),
-            (Join-Path (Join-Path (Join-Path $LegacyPrefix "lib") "node_modules") "uloop-cli"))) {
+            (Join-Path (Join-Path $LegacyPrefix "node_modules") "tloop-cli"),
+            (Join-Path (Join-Path (Join-Path $LegacyPrefix "lib") "node_modules") "tloop-cli"))) {
         Remove-Item -Path $PackagePath -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
@@ -380,15 +380,15 @@ function Test-LegacyNpmArtifactsExist {
         return $false
     }
 
-    foreach ($ShimName in @("uloop", "uloop.cmd", "uloop.ps1")) {
+    foreach ($ShimName in @("tloop", "tloop.cmd", "tloop.ps1")) {
         if ((Test-Path (Join-Path $LegacyPrefix $ShimName) -PathType Leaf) -or (Test-Path (Join-Path (Join-Path $LegacyPrefix "bin") $ShimName) -PathType Leaf)) {
             return $true
         }
     }
 
     foreach ($PackagePath in @(
-            (Join-Path (Join-Path $LegacyPrefix "node_modules") "uloop-cli"),
-            (Join-Path (Join-Path (Join-Path $LegacyPrefix "lib") "node_modules") "uloop-cli"))) {
+            (Join-Path (Join-Path $LegacyPrefix "node_modules") "tloop-cli"),
+            (Join-Path (Join-Path (Join-Path $LegacyPrefix "lib") "node_modules") "tloop-cli"))) {
         if (Test-Path $PackagePath -PathType Container) {
             return $true
         }
@@ -424,7 +424,7 @@ function Invoke-LegacyNpmPackageRemoval {
     }
 
     if ($NpmCommand) {
-        $NpmArgs = @("uninstall", "-g", "--prefix", $LegacyPrefix, "uloop-cli")
+        $NpmArgs = @("uninstall", "-g", "--prefix", $LegacyPrefix, "tloop-cli")
         $null = & $NpmCommand.Source @NpmArgs
     }
 
@@ -436,7 +436,7 @@ function Invoke-LegacyNpmPackageRemoval {
         return $false
     }
 
-    Write-Host "Removed legacy npm package: uloop-cli"
+    Write-Host "Removed legacy npm package: tloop-cli"
     return $true
 }
 
@@ -446,7 +446,7 @@ function Invoke-DefaultLegacyNpmPackageRemoval {
         return
     }
 
-    $null = & $NpmCommand.Source @("uninstall", "-g", "uloop-cli")
+    $null = & $NpmCommand.Source @("uninstall", "-g", "tloop-cli")
 }
 
 function Get-LegacyNpmUloopPathsFromPath {
@@ -466,7 +466,7 @@ function Get-LegacyNpmUloopPathsFromPath {
                 continue
             }
 
-            foreach ($ShimName in @("uloop", "uloop.cmd", "uloop.ps1")) {
+            foreach ($ShimName in @("tloop", "tloop.cmd", "tloop.ps1")) {
                 $CandidatePath = Join-Path $PathEntry $ShimName
                 if (-not (Test-LegacyNpmUloopPath -CommandPath $CandidatePath)) {
                     continue
@@ -557,7 +557,7 @@ function Get-FirstUloopCommandFromPath {
             $NormalizedPathEntry = $NormalizedPathEntry + "\"
         }
 
-        foreach ($ShimName in @("uloop.exe", "uloop.cmd", "uloop.ps1", "uloop")) {
+        foreach ($ShimName in @("tloop.exe", "tloop.cmd", "tloop.ps1", "tloop")) {
             $CandidatePath = Join-Path $NormalizedPathEntry $ShimName
             if (Test-Path $CandidatePath -PathType Leaf) {
                 return $CandidatePath
@@ -585,7 +585,7 @@ function Report-PathShadowing {
         return
     }
 
-    Write-Host "Installed uloop to $ExpectedUloopPath, but PATH resolves uloop to:"
+    Write-Host "Installed tloop to $ExpectedUloopPath, but PATH resolves tloop to:"
     Write-Host "  $ResolvedPath"
     Write-Host "Move $Directory earlier in PATH, or remove the legacy installation if it owns that command."
 }
@@ -598,28 +598,28 @@ function Invoke-CompatibilityWindowsInstall {
         [string]$ExpectedUloopPath
     )
 
-    Write-Host "Configuring global uloop dispatcher..."
+    Write-Host "Configuring global tloop dispatcher..."
     Set-UserPathWithInstallDirectoryFirst -Directory $Directory
     Invoke-AllLegacyNpmPackageRemoval -ExpectedUloopPath $ExpectedUloopPath | Out-Null
 
     Report-PathShadowing -Directory $Directory -ExpectedUloopPath $ExpectedUloopPath
     Write-Host "The package-owned User PATH entry was configured."
-    Write-Host "Legacy npm uloop-cli launchers were cleaned up when detected."
+    Write-Host "Legacy npm tloop-cli launchers were cleaned up when detected."
 }
 
-$TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("uloop-stage-" + [System.Guid]::NewGuid().ToString("N"))
+$TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("tloop-stage-" + [System.Guid]::NewGuid().ToString("N"))
 $StagedUloopPath = $null
-$FinalUloopPath = Join-Path $InstallDir "uloop.exe"
+$FinalUloopPath = Join-Path $InstallDir "tloop.exe"
 $ReplacedUloopBackupPath = $null
 New-Item -ItemType Directory -Path $TempDir | Out-Null
 
 try {
     $ArchivePath = Join-Path $TempDir $AssetName
     $ChecksumPath = Join-Path $TempDir "$AssetName.sha256"
-    Write-Host "Downloading uloop dispatcher archive..."
+    Write-Host "Downloading tloop dispatcher archive..."
     Invoke-WebRequest -UseBasicParsing -Uri $DownloadUrl -OutFile $ArchivePath
     Invoke-WebRequest -UseBasicParsing -Uri $ChecksumUrl -OutFile $ChecksumPath
-    Write-Host "Verifying uloop dispatcher archive..."
+    Write-Host "Verifying tloop dispatcher archive..."
     $ExpectedHash = ((Get-Content -Path $ChecksumPath -Raw) -split "\s+")[0].ToLowerInvariant()
     $ActualHash = Get-UloopSha256Hash -Path $ArchivePath
     if ($ExpectedHash -ne $ActualHash) {
@@ -627,14 +627,14 @@ try {
     }
 
     # Why: when the dispatcher self-update path invokes this script it passes an
-    # ULOOP_ARCHIVE_MANIFEST env whose "<digest>  <filename>" lines came from a
+    # TLOOP_ARCHIVE_MANIFEST env whose "<digest>  <filename>" lines came from a
     # Sigstore attestation bundle verified against the release commit SHA.
     # Enforcing the manifest entry stops a swapped archive from being blessed by
     # a compromised same-origin .sha256. Missing env must fail before archive
     # extraction because same-origin checksums are not authentication.
     $Manifest = $ResolvedArchiveManifest
     if ([string]::IsNullOrEmpty($Manifest)) {
-        $Manifest = [Environment]::GetEnvironmentVariable("ULOOP_ARCHIVE_MANIFEST")
+        $Manifest = [Environment]::GetEnvironmentVariable("TLOOP_ARCHIVE_MANIFEST")
     }
     if ([string]::IsNullOrEmpty($Manifest)) {
         throw "Attestation manifest is required"
@@ -654,26 +654,26 @@ try {
         throw "Attestation manifest hash mismatch for $AssetName"
     }
 
-    Write-Host "Extracting uloop dispatcher archive..."
+    Write-Host "Extracting tloop dispatcher archive..."
     Expand-UloopArchive -ArchivePath $ArchivePath -DestinationPath $TempDir
 
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 
-    # Why: earlier installs rename the then-running uloop.exe aside (see below);
+    # Why: earlier installs rename the then-running tloop.exe aside (see below);
     # those processes have exited by now, so reclaim the leftovers. A backup
     # whose process is still running stays locked and is skipped silently until
     # a later install can remove it.
-    Get-ChildItem -LiteralPath $InstallDir -Filter "uloop.exe.old-*" -File -ErrorAction SilentlyContinue |
+    Get-ChildItem -LiteralPath $InstallDir -Filter "tloop.exe.old-*" -File -ErrorAction SilentlyContinue |
         Remove-Item -Force -ErrorAction SilentlyContinue
 
-    $StagedUloopPath = Join-Path $InstallDir ("uloop-staged-" + [System.Guid]::NewGuid().ToString("N") + ".exe")
-    Copy-Item -Path (Join-Path $TempDir "uloop.exe") -Destination $StagedUloopPath -Force
+    $StagedUloopPath = Join-Path $InstallDir ("tloop-staged-" + [System.Guid]::NewGuid().ToString("N") + ".exe")
+    Copy-Item -Path (Join-Path $TempDir "tloop.exe") -Destination $StagedUloopPath -Force
     Assert-UloopVersionSucceeds -UloopPath $StagedUloopPath -Quiet
     $NativeInstallSupported = Test-UloopNativeInstallSupported -UloopPath $StagedUloopPath
 
     # Why: Windows locks the image file of a running executable against
-    # overwrite and delete but still allows rename. `uloop update` runs this
-    # script as a child of the running uloop.exe, so overwriting the target in
+    # overwrite and delete but still allows rename. `tloop update` runs this
+    # script as a child of the running tloop.exe, so overwriting the target in
     # place can never succeed there. Move the existing binary aside first; the
     # finally block restores it if the new binary was not placed.
     if (Test-Path -LiteralPath $FinalUloopPath) {
@@ -695,7 +695,7 @@ try {
 }
 finally {
     # Why: if the install failed after the old binary was moved aside, put it
-    # back so a failed update never leaves the user without a working uloop.
+    # back so a failed update never leaves the user without a working tloop.
     if ($ReplacedUloopBackupPath -and (Test-Path -LiteralPath $ReplacedUloopBackupPath) -and -not (Test-Path -LiteralPath $FinalUloopPath)) {
         Move-Item -LiteralPath $ReplacedUloopBackupPath -Destination $FinalUloopPath -Force
     }

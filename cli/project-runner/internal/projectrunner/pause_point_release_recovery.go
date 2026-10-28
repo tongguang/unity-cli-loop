@@ -16,7 +16,7 @@ import (
 
 const pausePointReleaseCodeOptimizationErrorCode = "PAUSE_POINT_RELEASE_CODE_OPTIMIZATION"
 
-const pausePointAutoDebugSwitchWarning = "Code Optimization was Release; switched to Debug and recompiled before arming the pause point. On every Editor restart the setting goes back to the 'Code Optimization On Startup' preference (Release unless that preference was changed), and each re-switch costs a full script recompile. Once the current task reaches a natural stopping point, suggest making Debug permanent: with the user's approval, run uloop set-code-optimization debug --startup (machine-wide: applies to every Unity project on this machine; only your project's C# script execution slows down, mainly during Play Mode - the Unity Editor itself is not slowed)."
+const pausePointAutoDebugSwitchWarning = "Code Optimization was Release; switched to Debug and recompiled before arming the pause point. On every Editor restart the setting goes back to the 'Code Optimization On Startup' preference (Release unless that preference was changed), and each re-switch costs a full script recompile. Once the current task reaches a natural stopping point, suggest making Debug permanent: with the user's approval, run tloop set-code-optimization debug --startup (machine-wide: applies to every Unity project on this machine; only your project's C# script execution slows down, mainly during Play Mode - the Unity Editor itself is not slowed)."
 
 const pausePointRecoveryCompileBusyRetryInterval = 2 * time.Second
 
@@ -199,7 +199,7 @@ func runFreshCompileForPausePointRecoveryDefault(
 // runFreshCompileForPausePointRecoveryWithDeps compiles for pause-point recovery. The compile the
 // Debug switch scheduled keeps Unity busy, so a send rejected as server_busy is sent again for as
 // long as the wait allows; a request Unity lost or rejected as busy is sent again the way
-// 'uloop compile' sends it again, under a new request ID.
+// 'tloop compile' sends it again, under a new request ID.
 func runFreshCompileForPausePointRecoveryWithDeps(
 	ctx context.Context,
 	connection unityipc.Connection,

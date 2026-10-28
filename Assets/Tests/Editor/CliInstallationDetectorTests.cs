@@ -20,17 +20,17 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that the settings UI reports the same CLI command the user's terminal runs.
             CliInstallationDetection packageOwnedDetection = new(
                 "3.0.0-beta.3",
-                "/Users/ExampleUser/.local/bin/uloop");
+                "/Users/ExampleUser/.local/bin/tloop");
             CliInstallationDetection shellDetection = new(
                 "2.1.0",
-                "/Users/ExampleUser/.npm-global/bin/uloop");
+                "/Users/ExampleUser/.npm-global/bin/tloop");
 
             CliInstallationDetection result = CliInstallationDetector.SelectPreferredDetection(
                 packageOwnedDetection,
                 shellDetection);
 
             Assert.That(result.Version, Is.EqualTo("2.1.0"));
-            Assert.That(result.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/uloop"));
+            Assert.That(result.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/tloop"));
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that package-owned installs still count when the shell cannot resolve uloop.
             CliInstallationDetection packageOwnedDetection = new(
                 "3.0.0-beta.3",
-                "/Users/ExampleUser/.local/bin/uloop");
+                "/Users/ExampleUser/.local/bin/tloop");
             CliInstallationDetection shellDetection = new(
                 null,
                 null);
@@ -49,7 +49,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 shellDetection);
 
             Assert.That(result.Version, Is.EqualTo("3.0.0-beta.3"));
-            Assert.That(result.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.local/bin/uloop"));
+            Assert.That(result.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.local/bin/tloop"));
         }
 
         [Test]
@@ -58,17 +58,17 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that a broken PATH command is surfaced instead of hidden by the package-owned binary.
             CliInstallationDetection packageOwnedDetection = new(
                 "3.0.0-beta.3",
-                "/Users/ExampleUser/.local/bin/uloop");
+                "/Users/ExampleUser/.local/bin/tloop");
             CliInstallationDetection shellDetection = new(
                 null,
-                "/Users/ExampleUser/.npm-global/bin/uloop");
+                "/Users/ExampleUser/.npm-global/bin/tloop");
 
             CliInstallationDetection result = CliInstallationDetector.SelectPreferredDetection(
                 packageOwnedDetection,
                 shellDetection);
 
             Assert.That(result.Version, Is.Null);
-            Assert.That(result.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/uloop"));
+            Assert.That(result.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/tloop"));
         }
 
         [Test]
@@ -77,17 +77,17 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that legacy CLI installs still surface as update candidates.
             CliInstallationDetection packageOwnedDetection = new(
                 null,
-                "/Users/ExampleUser/.local/bin/uloop");
+                "/Users/ExampleUser/.local/bin/tloop");
             CliInstallationDetection shellDetection = new(
                 "2.1.0",
-                "/Users/ExampleUser/.npm-global/bin/uloop");
+                "/Users/ExampleUser/.npm-global/bin/tloop");
 
             CliInstallationDetection result = CliInstallationDetector.SelectPreferredDetection(
                 packageOwnedDetection,
                 shellDetection);
 
             Assert.That(result.Version, Is.EqualTo("2.1.0"));
-            Assert.That(result.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/uloop"));
+            Assert.That(result.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/tloop"));
         }
 
         [Test]
@@ -96,7 +96,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that installed state does not depend on command path availability.
             CliInstallationDetection packageOwnedDetection = new(
                 "3.0.0-beta.3",
-                "/Users/ExampleUser/.local/bin/uloop");
+                "/Users/ExampleUser/.local/bin/tloop");
             CliInstallationDetection shellDetection = new(
                 "2.1.0",
                 null);
@@ -113,15 +113,15 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void BuildShellCliDetectionCommand_UsesShortVersionFlag()
         {
             // Verifies that shell detection asks the command itself for its terminal-visible version.
-            string command = CliShellInstallationProbe.BuildShellCliDetectionCommand("uloop");
+            string command = CliShellInstallationProbe.BuildShellCliDetectionCommand("tloop");
 
-            Assert.That(command, Does.Contain("command -v uloop"));
-            Assert.That(command, Does.Contain("uloop --version --json"));
-            Assert.That(command, Does.Contain("uloop_contract_status=$?"));
-            Assert.That(command, Does.Contain("uloop -v"));
-            Assert.That(command, Does.Contain("uloop_version_status=$?"));
-            Assert.That(command, Does.Contain("__ULOOP_CONTRACT_STATUS_START__"));
-            Assert.That(command, Does.Contain("__ULOOP_VERSION_STATUS_START__"));
+            Assert.That(command, Does.Contain("command -v tloop"));
+            Assert.That(command, Does.Contain("tloop --version --json"));
+            Assert.That(command, Does.Contain("tloop_contract_status=$?"));
+            Assert.That(command, Does.Contain("tloop -v"));
+            Assert.That(command, Does.Contain("tloop_version_status=$?"));
+            Assert.That(command, Does.Contain("__TLOOP_CONTRACT_STATUS_START__"));
+            Assert.That(command, Does.Contain("__TLOOP_VERSION_STATUS_START__"));
         }
 
         [Test]
@@ -129,12 +129,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that command syntax follows the actual shell process, not PATH setup support.
             string command = CliShellInstallationProbe.BuildShellCliDetectionCommandForShell(
-                "uloop",
+                "tloop",
                 "/opt/homebrew/bin/fish");
 
-            Assert.That(command, Does.Contain("set uloop_version_status $status"));
-            Assert.That(command, Does.Contain("set uloop_contract_status $status"));
-            Assert.That(command, Does.Not.Contain("uloop_version_status=$?"));
+            Assert.That(command, Does.Contain("set tloop_version_status $status"));
+            Assert.That(command, Does.Contain("set tloop_contract_status $status"));
+            Assert.That(command, Does.Not.Contain("tloop_version_status=$?"));
         }
 
         [Test]
@@ -142,84 +142,84 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that shell detection keeps terminal-visible path data as auxiliary UI context.
             string output = "banner\n"
-                            + "__ULOOP_PATH_START__\n"
-                            + "/Users/ExampleUser/.npm-global/bin/uloop\n"
-                            + "__ULOOP_PATH_END__\n"
-                            + "__ULOOP_CONTRACT_START__\n"
+                            + "__TLOOP_PATH_START__\n"
+                            + "/Users/ExampleUser/.npm-global/bin/tloop\n"
+                            + "__TLOOP_PATH_END__\n"
+                            + "__TLOOP_CONTRACT_START__\n"
                             + "unknown option: --json\n"
-                            + "__ULOOP_CONTRACT_END__\n"
-                            + "__ULOOP_CONTRACT_STATUS_START__\n"
+                            + "__TLOOP_CONTRACT_END__\n"
+                            + "__TLOOP_CONTRACT_STATUS_START__\n"
                             + "1\n"
-                            + "__ULOOP_CONTRACT_STATUS_END__\n"
-                            + "__ULOOP_VERSION_START__\n"
+                            + "__TLOOP_CONTRACT_STATUS_END__\n"
+                            + "__TLOOP_VERSION_START__\n"
                             + "2.1.1\n"
-                            + "__ULOOP_VERSION_END__\n"
-                            + "__ULOOP_VERSION_STATUS_START__\n"
+                            + "__TLOOP_VERSION_END__\n"
+                            + "__TLOOP_VERSION_STATUS_START__\n"
                             + "0\n"
-                            + "__ULOOP_VERSION_STATUS_END__\n";
+                            + "__TLOOP_VERSION_STATUS_END__\n";
 
             CliInstallationDetection detection =
                 CliShellInstallationProbe.ParseShellCliInstallationOutput(output);
 
             Assert.That(detection.Version, Is.EqualTo("2.1.1"));
             Assert.That(detection.IsDispatcher, Is.False);
-            Assert.That(detection.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/uloop"));
+            Assert.That(detection.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/tloop"));
         }
 
         [Test]
         public void ParseShellCliInstallationOutput_WhenLegacyCliJsonExists_ReturnsVersionWithoutProtocol()
         {
             // Verifies pre-dispatcher CLIs cannot satisfy the dispatcher setup contract.
-            string output = "__ULOOP_PATH_START__\n"
-                            + "/Users/ExampleUser/.npm-global/bin/uloop\n"
-                            + "__ULOOP_PATH_END__\n"
-                            + "__ULOOP_CONTRACT_START__\n"
+            string output = "__TLOOP_PATH_START__\n"
+                            + "/Users/ExampleUser/.npm-global/bin/tloop\n"
+                            + "__TLOOP_PATH_END__\n"
+                            + "__TLOOP_CONTRACT_START__\n"
                             + "{\"CliVersion\":\"3.0.0-beta.31\",\"ProtocolVersion\":1}\n"
-                            + "__ULOOP_CONTRACT_END__\n"
-                            + "__ULOOP_CONTRACT_STATUS_START__\n"
+                            + "__TLOOP_CONTRACT_END__\n"
+                            + "__TLOOP_CONTRACT_STATUS_START__\n"
                             + "0\n"
-                            + "__ULOOP_CONTRACT_STATUS_END__\n"
-                            + "__ULOOP_VERSION_START__\n"
+                            + "__TLOOP_CONTRACT_STATUS_END__\n"
+                            + "__TLOOP_VERSION_START__\n"
                             + "2.1.1\n"
-                            + "__ULOOP_VERSION_END__\n"
-                            + "__ULOOP_VERSION_STATUS_START__\n"
+                            + "__TLOOP_VERSION_END__\n"
+                            + "__TLOOP_VERSION_STATUS_START__\n"
                             + "0\n"
-                            + "__ULOOP_VERSION_STATUS_END__\n";
+                            + "__TLOOP_VERSION_STATUS_END__\n";
 
             CliInstallationDetection detection =
                 CliShellInstallationProbe.ParseShellCliInstallationOutput(output);
 
             Assert.That(detection.Version, Is.EqualTo("3.0.0-beta.31"));
             Assert.That(detection.IsDispatcher, Is.False);
-            Assert.That(detection.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/uloop"));
+            Assert.That(detection.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/tloop"));
         }
 
         [Test]
         public void ParseShellCliInstallationOutput_WhenDispatcherJsonExists_ReturnsDispatcherDetection()
         {
             // Verifies setup detection recognizes the dispatcher release exposed by global uloop.
-            string output = "__ULOOP_PATH_START__\n"
-                            + "/Users/ExampleUser/.local/bin/uloop\n"
-                            + "__ULOOP_PATH_END__\n"
-                            + "__ULOOP_CONTRACT_START__\n"
+            string output = "__TLOOP_PATH_START__\n"
+                            + "/Users/ExampleUser/.local/bin/tloop\n"
+                            + "__TLOOP_PATH_END__\n"
+                            + "__TLOOP_CONTRACT_START__\n"
                             + "{\"DispatcherVersion\":\"3.0.0\"}\n"
-                            + "__ULOOP_CONTRACT_END__\n"
-                            + "__ULOOP_CONTRACT_STATUS_START__\n"
+                            + "__TLOOP_CONTRACT_END__\n"
+                            + "__TLOOP_CONTRACT_STATUS_START__\n"
                             + "0\n"
-                            + "__ULOOP_CONTRACT_STATUS_END__\n"
-                            + "__ULOOP_VERSION_START__\n"
+                            + "__TLOOP_CONTRACT_STATUS_END__\n"
+                            + "__TLOOP_VERSION_START__\n"
                             + "3.0.0\n"
-                            + "__ULOOP_VERSION_END__\n"
-                            + "__ULOOP_VERSION_STATUS_START__\n"
+                            + "__TLOOP_VERSION_END__\n"
+                            + "__TLOOP_VERSION_STATUS_START__\n"
                             + "0\n"
-                            + "__ULOOP_VERSION_STATUS_END__\n";
+                            + "__TLOOP_VERSION_STATUS_END__\n";
 
             CliInstallationDetection detection =
                 CliShellInstallationProbe.ParseShellCliInstallationOutput(output);
 
             Assert.That(detection.Version, Is.EqualTo("3.0.0"));
             Assert.That(detection.IsDispatcher, Is.True);
-            Assert.That(detection.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.local/bin/uloop"));
+            Assert.That(detection.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.local/bin/tloop"));
         }
 
         [Test]
@@ -228,7 +228,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies old pre-dispatcher global CLIs cannot satisfy dispatcher path setup.
             CliInstallationDetection detection = new(
                 "3.0.0-beta.40",
-                "/Users/ExampleUser/.npm-global/bin/uloop");
+                "/Users/ExampleUser/.npm-global/bin/tloop");
 
             bool result = CliShellInstallationProbe.IsShellDetectionUsableForPathSetup(
                 detection,
@@ -243,41 +243,41 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void ParseShellCliInstallationOutput_WhenProtocolVersionIsOutsideIntRange_ReturnsVersionWithoutProtocol()
         {
             // Verifies oversized protocol metadata cannot break setup compatibility detection.
-            string output = "__ULOOP_PATH_START__\n"
-                            + "/tmp/uloop\n"
-                            + "__ULOOP_PATH_END__\n"
-                            + "__ULOOP_CONTRACT_START__\n"
+            string output = "__TLOOP_PATH_START__\n"
+                            + "/tmp/tloop\n"
+                            + "__TLOOP_PATH_END__\n"
+                            + "__TLOOP_CONTRACT_START__\n"
                             + "{\"CliVersion\":\"3.0.0-beta.31\",\"ProtocolVersion\":2147483648}\n"
-                            + "__ULOOP_CONTRACT_END__\n"
-                            + "__ULOOP_CONTRACT_STATUS_START__\n"
+                            + "__TLOOP_CONTRACT_END__\n"
+                            + "__TLOOP_CONTRACT_STATUS_START__\n"
                             + "0\n"
-                            + "__ULOOP_CONTRACT_STATUS_END__\n"
-                            + "__ULOOP_VERSION_START__\n"
+                            + "__TLOOP_CONTRACT_STATUS_END__\n"
+                            + "__TLOOP_VERSION_START__\n"
                             + "2.1.1\n"
-                            + "__ULOOP_VERSION_END__\n"
-                            + "__ULOOP_VERSION_STATUS_START__\n"
+                            + "__TLOOP_VERSION_END__\n"
+                            + "__TLOOP_VERSION_STATUS_START__\n"
                             + "0\n"
-                            + "__ULOOP_VERSION_STATUS_END__\n";
+                            + "__TLOOP_VERSION_STATUS_END__\n";
 
             CliInstallationDetection detection =
                 CliShellInstallationProbe.ParseShellCliInstallationOutput(output);
 
             Assert.That(detection.Version, Is.EqualTo("3.0.0-beta.31"));
-            Assert.That(detection.ExecutablePath, Is.EqualTo("/tmp/uloop"));
+            Assert.That(detection.ExecutablePath, Is.EqualTo("/tmp/tloop"));
         }
 
         [Test]
         public void ParseShellCliInstallationOutput_WhenOnlyVersionExists_ReturnsInstalledDetection()
         {
             // Verifies that installation state depends on version output, not path availability.
-            string output = "__ULOOP_PATH_START__\n"
-                            + "__ULOOP_PATH_END__\n"
-                            + "__ULOOP_VERSION_START__\n"
+            string output = "__TLOOP_PATH_START__\n"
+                            + "__TLOOP_PATH_END__\n"
+                            + "__TLOOP_VERSION_START__\n"
                             + "2.1.1\n"
-                            + "__ULOOP_VERSION_END__\n"
-                            + "__ULOOP_VERSION_STATUS_START__\n"
+                            + "__TLOOP_VERSION_END__\n"
+                            + "__TLOOP_VERSION_STATUS_START__\n"
                             + "0\n"
-                            + "__ULOOP_VERSION_STATUS_END__\n";
+                            + "__TLOOP_VERSION_STATUS_END__\n";
 
             CliInstallationDetection detection =
                 CliShellInstallationProbe.ParseShellCliInstallationOutput(output);
@@ -290,21 +290,21 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void ParseShellCliInstallationOutput_WhenVersionCommandFails_ReturnsPathWithoutVersion()
         {
             // Verifies that failed shell probes do not treat stdout usage text as a CLI version.
-            string output = "__ULOOP_PATH_START__\n"
-                            + "/Users/ExampleUser/.npm-global/bin/uloop\n"
-                            + "__ULOOP_PATH_END__\n"
-                            + "__ULOOP_VERSION_START__\n"
-                            + "usage: broken uloop\n"
-                            + "__ULOOP_VERSION_END__\n"
-                            + "__ULOOP_VERSION_STATUS_START__\n"
+            string output = "__TLOOP_PATH_START__\n"
+                            + "/Users/ExampleUser/.npm-global/bin/tloop\n"
+                            + "__TLOOP_PATH_END__\n"
+                            + "__TLOOP_VERSION_START__\n"
+                            + "usage: broken tloop\n"
+                            + "__TLOOP_VERSION_END__\n"
+                            + "__TLOOP_VERSION_STATUS_START__\n"
                             + "1\n"
-                            + "__ULOOP_VERSION_STATUS_END__\n";
+                            + "__TLOOP_VERSION_STATUS_END__\n";
 
             CliInstallationDetection detection =
                 CliShellInstallationProbe.ParseShellCliInstallationOutput(output);
 
             Assert.That(detection.Version, Is.Null);
-            Assert.That(detection.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/uloop"));
+            Assert.That(detection.ExecutablePath, Is.EqualTo("/Users/ExampleUser/.npm-global/bin/tloop"));
         }
 
         /// <summary>

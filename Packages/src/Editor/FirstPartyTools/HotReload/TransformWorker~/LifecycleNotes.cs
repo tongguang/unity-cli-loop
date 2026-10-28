@@ -38,7 +38,7 @@ internal static class LifecycleNotes
         "{0} is a one-shot lifecycle method; objects that already ran it will not run the "
         + "patched body until Unity calls it again. To run it on live objects now, set the "
         + "component's `enabled` to false and back to true (for example with "
-        + "`uloop execute-dynamic-code`): Unity calls OnDisable and then OnEnable. A method hot "
+        + "`tloop execute-dynamic-code`): Unity calls OnDisable and then OnEnable. A method hot "
         + "reload added or patched that calls it runs the patched body.";
 
     public static string SelectDirectFormat(string methodName)

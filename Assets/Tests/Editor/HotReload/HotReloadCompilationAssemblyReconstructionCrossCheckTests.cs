@@ -31,7 +31,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _directory = Path.Combine(Path.GetTempPath(), "uloop-compilation-list-cross-check-" + Guid.NewGuid().ToString("N"));
+            _directory = Path.Combine(Path.GetTempPath(), "tloop-compilation-list-cross-check-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_directory);
             _filePath = Path.Combine(_directory, "CompilationAssemblies.json");
         }

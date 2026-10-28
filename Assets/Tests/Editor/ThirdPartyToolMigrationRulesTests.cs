@@ -139,7 +139,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void MigrateCSharpSource_WhenLegacyToolApiIsUsed_RewritesToV3Contracts()
         {
             // Verifies that V2 custom tool source is rewritten to the V3 public contract names.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 namespace Samples
 {
@@ -352,7 +352,7 @@ public sealed class CurrentReferences
         {
             // Verifies that old attribute suffix syntax does not keep removed V3 attribute arguments.
             string source =
-                "using io.github.hatayama.uLoopMCP;\n" +
+                "using io.github.tongguang.tloop;\n" +
                 "[McpToolAttribute(Description = \"hello\")] public sealed class HelloTool {}";
 
             ThirdPartyToolMigrationContentResult result =
@@ -368,7 +368,7 @@ public sealed class CurrentReferences
         public void MigrateCSharpSource_WhenLegacyToolAttributeHasSupportedArguments_PreservesSupportedArguments()
         {
             // Verifies that migration drops removed metadata without changing supported tool visibility metadata.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "[McpTool(Description = \"hello\", DisplayDevelopmentOnly = true)] public sealed class HelloTool {}";
 
             ThirdPartyToolMigrationContentResult result =
@@ -383,7 +383,7 @@ public sealed class CurrentReferences
         public void MigrateCSharpSource_WhenLegacyToolAttributeDescriptionIsRawStringWithComma_DropsDescriptionArgument()
         {
             // Verifies that commas inside raw string literals do not split legacy attribute arguments.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "[McpTool(Description = \"\"\"\"say \"hi\", world\"\"\"\", DisplayDevelopmentOnly = true)] " +
                 "public sealed class HelloTool {}";
 
@@ -400,7 +400,7 @@ public sealed class CurrentReferences
         public void MigrateCSharpSource_WhenLegacyToolDescriptionInterpolatesCommaExpression_DropsDescriptionArgument()
         {
             // Verifies that commas inside interpolated-string expressions do not split legacy attribute arguments.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "[McpTool(Description = $\"{string.Join(\",\", values)}\", DisplayDevelopmentOnly = true)] " +
                 "public sealed class HelloTool {}";
 
@@ -417,7 +417,7 @@ public sealed class CurrentReferences
         public void MigrateCSharpSource_WhenLegacyToolAttributeCommentsContainCommas_PreservesSupportedArguments()
         {
             // Verifies that commas inside comments do not split legacy attribute arguments.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "[McpTool(Description = \"hello\" /*, block */\n" +
                 "    //, line\n" +
                 "    , DisplayDevelopmentOnly = true)] public sealed class HelloTool {}";
@@ -448,7 +448,7 @@ public sealed class CurrentReferences
         public void MigrateCSharpSource_WhenLegacyToolAttributeHasSecurityArgument_RewritesSecurityArgument()
         {
             // Verifies that supported security metadata keeps compiling after the enum rename.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "[McpTool(RequiredSecuritySetting = SecuritySettings.None)] public sealed class HelloTool {}";
 
             ThirdPartyToolMigrationContentResult result =
@@ -463,8 +463,8 @@ public sealed class CurrentReferences
         public void MigrateCSharpSource_WhenLegacyToolAttributeUsesSecurityAlias_KeepsAliasIdentifier()
         {
             // Verifies that aliases containing the old enum name are not rewritten as partial identifiers.
-            string source = @"using LegacySecuritySettings = io.github.hatayama.uLoopMCP.SecuritySettings;
-using io.github.hatayama.uLoopMCP;
+            string source = @"using LegacySecuritySettings = io.github.tongguang.tloop.SecuritySettings;
+using io.github.tongguang.tloop;
 
 [McpTool(RequiredSecuritySetting = LegacySecuritySettings.None)]
 public sealed class HelloTool {}";
@@ -484,7 +484,7 @@ public sealed class HelloTool {}";
         public void MigrateCSharpSource_WhenLegacyToolAttributeSharesAttributeList_RewritesOnlyLegacyToolEntry()
         {
             // Verifies that valid C# attribute lists migrate the tool attribute without dropping sibling attributes.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "[McpTool(Description = \"hello\"), System.Obsolete] public sealed class HelloTool {}";
 
             ThirdPartyToolMigrationContentResult result =
@@ -500,7 +500,7 @@ public sealed class HelloTool {}";
         public void MigrateCSharpSource_WhenLegacyToolDescriptionContainsBracket_RewritesAttribute()
         {
             // Verifies that description text cannot terminate the attribute-list scan early.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "[McpTool(Description = \"Use [foo]\")] public sealed class HelloTool {}";
 
             ThirdPartyToolMigrationContentResult result =
@@ -517,7 +517,7 @@ public sealed class HelloTool {}";
         {
             // Verifies that tools without a namespace import still receive a compilable V3 attribute.
             string source =
-                "[io.github.hatayama.uLoopMCP.McpToolAttribute(Description = \"hello\")] public sealed class HelloTool {}";
+                "[io.github.tongguang.tloop.McpToolAttribute(Description = \"hello\")] public sealed class HelloTool {}";
 
             ThirdPartyToolMigrationContentResult result =
                 ThirdPartyToolMigrationRules.MigrateCSharpSource(source);
@@ -534,7 +534,7 @@ public sealed class HelloTool {}";
         {
             // Verifies that global-qualified V2 attributes do not bypass argument cleanup.
             string source =
-                "[global::io.github.hatayama.uLoopMCP.McpTool(Description = \"hello\")] public sealed class HelloTool {}";
+                "[global::io.github.tongguang.tloop.McpTool(Description = \"hello\")] public sealed class HelloTool {}";
 
             ThirdPartyToolMigrationContentResult result =
                 ThirdPartyToolMigrationRules.MigrateCSharpSource(source);
@@ -550,7 +550,7 @@ public sealed class HelloTool {}";
         public void MigrateCSharpSource_WhenLegacyToolAttributeIsAliasQualified_RewritesAliasQualifiedAttribute()
         {
             // Verifies that namespace alias attribute shorthand migrates to a resolvable V3 attribute.
-            string source = @"using Old = io.github.hatayama.uLoopMCP;
+            string source = @"using Old = io.github.tongguang.tloop;
 
 [Old.McpTool(DisplayDevelopmentOnly = true)]
 public sealed class HelloTool {}";
@@ -568,7 +568,7 @@ public sealed class HelloTool {}";
         public void MigrateCSharpSource_WhenLegacyPublicHelpersAreUsed_RewritesHelperTypes()
         {
             // Verifies that migrated custom tools keep compiling when they override helper-driven schema behavior.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class HelloTool
 {
@@ -595,12 +595,12 @@ public sealed class HelloTool
         {
             // Verifies that legacy public constants references resolve to the V3 constants type.
             string source =
-                "using io.github.hatayama.uLoopMCP;\n" +
+                "using io.github.tongguang.tloop;\n" +
                 "\n" +
                 "public static class ToolConstants\n" +
                 "{\n" +
                 "    public const string Name = McpConstants.PROJECT_NAME;\n" +
-                "    public static string QualifiedName => io.github.hatayama.uLoopMCP.McpConstants.PROJECT_NAME;\n" +
+                "    public static string QualifiedName => io.github.tongguang.tloop.McpConstants.PROJECT_NAME;\n" +
                 "}";
 
             ThirdPartyToolMigrationContentResult result =
@@ -619,7 +619,7 @@ public sealed class HelloTool
             // Verifies that legacy frame waits migrate to the V3 frame waiter API.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
@@ -718,7 +718,7 @@ public sealed class ScreenshotTool
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
@@ -1014,7 +1014,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
@@ -1047,7 +1047,7 @@ public sealed class ScreenshotTool
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
@@ -1083,7 +1083,7 @@ public sealed class ScreenshotTool
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
@@ -1125,13 +1125,13 @@ public sealed class ScreenshotTool
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using Legacy = io.github.hatayama.uLoopMCP;
+using Legacy = io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
     public async Task<Texture2D> CaptureQualifiedAsync(EditorWindow window, CancellationToken ct)
     {
-        return await io.github.hatayama.uLoopMCP.EditorWindowCaptureUtility.CaptureWindowAsync(window, 1.0f, ct);
+        return await io.github.tongguang.tloop.EditorWindowCaptureUtility.CaptureWindowAsync(window, 1.0f, ct);
     }
 
     public async Task<Texture2D> CaptureAliasAsync(EditorWindow window, CancellationToken ct)
@@ -1159,7 +1159,7 @@ public sealed class ScreenshotTool
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
@@ -1185,7 +1185,7 @@ public sealed class ScreenshotTool
             string source = @"using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
@@ -1215,7 +1215,7 @@ public sealed class ScreenshotTool
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotTool
 {
@@ -1240,7 +1240,7 @@ public sealed class ScreenshotTool
         {
             // Verifies that screenshot helper types moved out of the public tool contract namespace are fully qualified.
             string source = @"using UnityEditor;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class ScreenshotHelper
 {
@@ -1401,7 +1401,7 @@ public sealed class UIElementInfo
             string source = @"using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class RenderingCapture
 {
@@ -1556,7 +1556,7 @@ public static class EditorWindowCaptureUtility
             string source = @"using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class RenderingCapture
 {
@@ -1583,7 +1583,7 @@ public sealed class RenderingCapture
             string source = @"using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class RenderingCapture
 {
@@ -1609,7 +1609,7 @@ public sealed class RenderingCapture
             // Verifies that TimerDelay named arguments keep compiling after the V3 cancellation token rename.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class DelayTool
 {
@@ -1636,7 +1636,7 @@ public sealed class DelayTool
             // Verifies that main-thread switch helpers moved to Application keep compiling after timing arguments were removed.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -1740,7 +1740,7 @@ public sealed class MainThreadTool
     public async Task RunAsync(CancellationToken ct)
     {
         await MainThreadSwitcher.SwitchToMainThread(
-            global::io.github.hatayama.uLoopMCP.PlayerLoopTiming.Update,
+            global::io.github.tongguang.tloop.PlayerLoopTiming.Update,
             ct);
     }
 }";
@@ -1761,7 +1761,7 @@ public sealed class MainThreadTool
             // Verifies that named cancellation tokens are preserved even when callers pass them before timing.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -1787,7 +1787,7 @@ public sealed class MainThreadTool
         {
             // Verifies that timing-only wrapper parameters do not leave V3 migration output uncompilable.
             string source = @"using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -1814,7 +1814,7 @@ public sealed class MainThreadTool
             // Verifies that ambiguous single-token switch calls keep cancellation-like arguments.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -1837,7 +1837,7 @@ public sealed class MainThreadTool
         {
             // Verifies that common single-token timing variables still migrate to the no-argument V3 call.
             string source = @"using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -1865,7 +1865,7 @@ public sealed class MainThreadTool
             // Verifies that rerunning migration cleans stale timing parameters after the switch call was already migrated.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 using io.github.hatayama.UnityCliLoop.Application;
 
 public sealed class MainThreadTool
@@ -1914,7 +1914,7 @@ public enum PlayerLoopTiming
         {
             // Verifies that removing a stale timing field does not leave its attributes attached to the next member.
             string source = @"using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -1945,7 +1945,7 @@ public sealed class MainThreadTool
         {
             // Verifies that bare main-thread switch calls are not rebound when the project owns the helper type.
             string source = @"using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -1976,7 +1976,7 @@ public static class MainThreadSwitcher
         {
             // Verifies that helper ownership discovered in a sibling file prevents rebinding bare calls.
             string source = @"using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -2012,7 +2012,7 @@ public sealed class MainThreadTool
             // Verifies that wrapper call sites stay aligned when a stale timing parameter is removed.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -2043,7 +2043,7 @@ public sealed class MainThreadTool
             // Verifies that callers omitting optional trailing parameters stay aligned after timing removal.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -2074,7 +2074,7 @@ public sealed class MainThreadTool
             // Verifies that lambda parameter lists are not treated as method declarations.
             string source = @"using System;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public enum PlayerLoopTiming
 {
@@ -2106,7 +2106,7 @@ public sealed class MainThreadTool
             // Verifies that generic wrapper call sites stay aligned after stale timing parameters are removed.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -2137,7 +2137,7 @@ public sealed class MainThreadTool
             // Verifies that caller rewrites target the migrated owner type instead of every same-name method.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public enum PlayerLoopTiming
 {
@@ -2188,7 +2188,7 @@ public sealed class MainThreadCaller
             // Verifies that caller rewrites distinguish migrated owner types across namespaces.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 namespace Migrated
 {
@@ -2240,7 +2240,7 @@ namespace Other
             // Verifies that qualified receivers are not reduced to the final identifier before matching.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 namespace Other
 {
@@ -2305,7 +2305,7 @@ namespace Migrated
             // Verifies that this-qualified fields still match migrated wrapper receiver types.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2340,7 +2340,7 @@ public sealed class MainThreadCaller
             // Verifies that type members declared after the call still match migrated wrapper receiver types.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2375,7 +2375,7 @@ public sealed class MainThreadCaller
             // Verifies that later properties are treated as type members, not out-of-scope locals.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2410,7 +2410,7 @@ public sealed class MainThreadCaller
             // Verifies that later local declarations are not treated as receiver declarations in scope.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2453,7 +2453,7 @@ public sealed class MainThreadCaller
             // Verifies that locals from previous methods do not shadow the actual receiver field.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2501,7 +2501,7 @@ public sealed class MainThreadCaller
             // Verifies that later method parameters are not treated as type member receiver declarations.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2548,7 +2548,7 @@ public sealed class MainThreadCaller
             // Verifies that using-imported receiver types match migrated wrapper signatures across namespaces.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 namespace Helpers
 {
@@ -2589,7 +2589,7 @@ namespace Tools
             // Verifies that declaration-shaped text in comments does not retarget caller rewrites.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MigratedWrapper
 {
@@ -2630,7 +2630,7 @@ public sealed class MainThreadCaller
             // Verifies that static wrapper calls inside the same namespace match the migrated owner type.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 namespace Tools
 {
@@ -2666,7 +2666,7 @@ namespace Tools
             // Verifies that namespace-qualified nested wrapper calls match the migrated owner type.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 namespace Tools
 {
@@ -2705,7 +2705,7 @@ namespace Tools
             // Verifies that nested wrapper caller rewrites do not cross namespace ownership.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 namespace Tools
 {
@@ -2758,7 +2758,7 @@ namespace Other
             // Verifies that var locals initialized with the migrated owner type keep wrapper call sites compiling.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2792,7 +2792,7 @@ public sealed class MainThreadCaller
             // Verifies that nested migrated owner types keep qualified wrapper call sites compiling.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 namespace Tools
 {
@@ -2831,7 +2831,7 @@ namespace Tools
             // Verifies that null-conditional calls stay aligned with migrated wrapper signatures.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2864,7 +2864,7 @@ public sealed class MainThreadCaller
             // Verifies that nullable wrapper references still match the migrated owner type.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2904,7 +2904,7 @@ public sealed class MainThreadCaller
             // Verifies that chained wrapper migrations remove timing parameters exposed by earlier caller rewrites.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2939,7 +2939,7 @@ public sealed class MainThreadWrapper
         public void MigrateCSharpSource_WhenLegacyTimingWrapperIsExpressionBodied_RemovesStaleTimingParameter()
         {
             // Verifies that expression-bodied main-thread wrappers do not keep the removed timing type.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -2962,7 +2962,7 @@ public sealed class MainThreadTool
         {
             // Verifies that constructor parameters are not removed without constructor call-site migration.
             string source = @"using System.Threading;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2996,7 +2996,7 @@ public sealed class MainThreadCaller
             // Verifies that timing-parameter cleanup only removes stale main-thread wrapper parameters.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public enum PlayerLoopTiming
 {
@@ -3030,7 +3030,7 @@ public sealed class MainThreadTool
             // Verifies that cleanup does not remove unused timing parameters from unrelated public methods.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -3057,7 +3057,7 @@ public sealed class MainThreadTool
             // Verifies that comments and strings do not make unrelated timing parameters look migratable.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -3087,7 +3087,7 @@ public sealed class MainThreadTool
             // Verifies that override signatures are not changed independently from their base contract.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public abstract class BaseTool
 {
@@ -3118,7 +3118,7 @@ public sealed class MainThreadTool : BaseTool
             // Verifies that interface implementations are not changed independently from their interface contract.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public interface IMainThreadTool
 {
@@ -3149,7 +3149,7 @@ public sealed class MainThreadTool : IMainThreadTool
             // Verifies that virtual signatures are not changed independently from derived overrides.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public class MainThreadTool
 {
@@ -3175,7 +3175,7 @@ public class MainThreadTool
             // Verifies that possible external interface implementations keep their public contract shape.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool : IMainThreadTool
 {
@@ -3201,7 +3201,7 @@ public sealed class MainThreadTool : IMainThreadTool
             // Verifies that unrelated helper methods named SwitchToMainThread do not justify dropping timing parameters.
             string source = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -3235,7 +3235,7 @@ public sealed class Helper
         public void MigrateCSharpSource_WhenLegacyRegistrarMetadataIsUsed_RewritesDomainMetadataType()
         {
             // Verifies that explicit registrar metadata declarations keep compiling after namespace migration.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ManualToolRegistration
 {
@@ -3258,7 +3258,7 @@ public static class ManualToolRegistration
         public void MigrateCSharpSource_WhenLegacyDomainHelpersAreUsed_RewritesDomainHelperTypes()
         {
             // Verifies that legacy helpers moved to Domain keep compiling after namespace migration.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolHelper
 {
@@ -3293,7 +3293,7 @@ public static class ToolHelper
         public void MigrateCSharpSource_WhenLegacyToolSettingsCatalogItemConstructorHasDescription_RemovesDescriptionArgument()
         {
             // Verifies that old settings catalog metadata keeps compiling after the V3 constructor signature change.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolSettingsCatalogProvider
 {
@@ -3316,7 +3316,7 @@ public static class ToolSettingsCatalogProvider
         public void MigrateCSharpSource_WhenLegacyDomainHelpersUseNamespaceAlias_RewritesDomainHelperTypes()
         {
             // Verifies that namespace aliases targeting V2 helpers do not survive as ToolContracts references.
-            string source = @"using Old = io.github.hatayama.uLoopMCP;
+            string source = @"using Old = io.github.tongguang.tloop;
 
 public static class ToolHelper
 {
@@ -3349,7 +3349,7 @@ public static class ToolHelper
         public void MigrateCSharpSource_WhenLegacyApiIsUsedInsideInterpolatedString_RewritesInterpolationCode()
         {
             // Verifies that code inside interpolation holes migrates while literal text stays inert.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolCountLabel
 {
@@ -3372,7 +3372,7 @@ public static class ToolCountLabel
         public void MigrateCSharpSource_WhenLegacyApiIsUsedInsideInterpolatedVerbatimString_RewritesInterpolationCode()
         {
             // Verifies that verbatim interpolation holes are treated as code.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolCountLabel
 {
@@ -3395,7 +3395,7 @@ public static class ToolCountLabel
         public void MigrateCSharpSource_WhenLegacyApiIsUsedInsideInterpolatedRawString_RewritesInterpolationCode()
         {
             // Verifies that raw interpolation holes are treated as code.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "\n" +
                 "public static class ToolCountLabel\n" +
                 "{\n" +
@@ -3418,7 +3418,7 @@ public static class ToolCountLabel
         public void MigrateCSharpSource_WhenLegacyApiIsUsedInsideMultiDollarRawString_RewritesInterpolationCode()
         {
             // Verifies that literal braces stay inert when multiple dollar signs are used.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "\n" +
                 "public static class ToolCountLabel\n" +
                 "{\n" +
@@ -3442,7 +3442,7 @@ public static class ToolCountLabel
         public void MigrateCSharpSource_WhenLegacyTextIsUsedInsideNestedInterpolatedStringLiteral_KeepsNestedLiteral()
         {
             // Verifies that string literals inside interpolation holes do not get rewritten as executable code.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "\n" +
                 "public static class ToolLabel\n" +
                 "{\n" +
@@ -3469,7 +3469,7 @@ public static class ToolCountLabel
         public void MigrateCSharpSource_WhenLegacyDomainMetadataIsUsedWithoutRegistrar_RewritesDomainMetadataType()
         {
             // Verifies that metadata helpers split away from registration code keep compiling after migration.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -3491,7 +3491,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyToolInfoConstructorHasDescription_RemovesDescriptionArgument()
         {
             // Verifies that old registrar metadata construction keeps compiling after the V3 ToolInfo signature change.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -3515,7 +3515,7 @@ public static class ToolMetadataProvider
         {
             // Verifies that commas inside raw string literals do not split legacy ToolInfo arguments.
             string source =
-                "using io.github.hatayama.uLoopMCP;\n" +
+                "using io.github.tongguang.tloop;\n" +
                 "\n" +
                 "public static class ToolMetadataProvider\n" +
                 "{\n" +
@@ -3538,7 +3538,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyToolInfoConstructorHasDevelopmentFlag_PreservesDevelopmentFlag()
         {
             // Verifies that old registrar metadata visibility keeps compiling after the V3 ToolInfo signature change.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -3561,7 +3561,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyToolInfoConstructorUsesDescriptionVariable_RemovesDescriptionArgument()
         {
             // Verifies that non-literal V2 description arguments do not survive into the V3 constructor call.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -3584,8 +3584,8 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyToolInfoConstructorUsesTypeAlias_RemovesDescriptionArgument()
         {
             // Verifies that constructor migration follows aliases that target the old ToolInfo type.
-            string source = @"using LegacyToolInfo = io.github.hatayama.uLoopMCP.ToolInfo;
-using io.github.hatayama.uLoopMCP;
+            string source = @"using LegacyToolInfo = io.github.tongguang.tloop.ToolInfo;
+using io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -3608,8 +3608,8 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyToolInfoConstructorUsesSameNameTypeAlias_KeepsAliasIdentifier()
         {
             // Verifies that unqualified type replacement does not rewrite the left side of using aliases.
-            string source = @"using ToolInfo = io.github.hatayama.uLoopMCP.ToolInfo;
-using io.github.hatayama.uLoopMCP;
+            string source = @"using ToolInfo = io.github.tongguang.tloop.ToolInfo;
+using io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -3634,7 +3634,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyToolInfoConstructorUsesNamedDescription_RemovesDescriptionArgument()
         {
             // Verifies that named V2 description arguments are removed without reordering supported arguments.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -3657,7 +3657,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenCurrentToolInfoConstructorExistsInMixedFile_KeepsConstructorArguments()
         {
             // Verifies that partially migrated metadata construction is not treated as the removed V2 signature.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 using io.github.hatayama.UnityCliLoop.Domain;
 
 public static class ToolMetadataProvider
@@ -3683,7 +3683,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenCurrentDomainUsingHasLegacyToolInfoConstructor_RemovesDescriptionArgument()
         {
             // Verifies that partially migrated files still remove the deleted V2 description argument.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 using io.github.hatayama.UnityCliLoop.Domain;
 
 public static class ToolMetadataProvider
@@ -3707,7 +3707,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenCurrentDomainUsingHasLegacyToolInfoDescriptionVariable_RemovesDescriptionArgument()
         {
             // Verifies that mixed partially migrated files do not keep the removed V2 description argument.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 using io.github.hatayama.UnityCliLoop.Domain;
 
 public static class ToolMetadataProvider
@@ -3731,7 +3731,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenCurrentToolInfoConstructorUsesArbitraryVariableNames_KeepsConstructorArguments()
         {
             // Verifies that current V3 metadata construction is not inferred from local variable names.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 using io.github.hatayama.UnityCliLoop.Domain;
 
 public static class ToolMetadataProvider
@@ -3756,7 +3756,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyFileHasMethodNameMatchingDomainType_KeepsIdentifier()
         {
             // Verifies that method names are not rewritten as migrated type references.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class ToolMetadataProvider
 {
@@ -3782,7 +3782,7 @@ public sealed class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyToolInfoConstructorUsesNamespaceAlias_RemovesDescriptionArgument()
         {
             // Verifies that aliased legacy metadata constructors migrate before namespace alias rewrites.
-            string source = @"using Old = io.github.hatayama.uLoopMCP;
+            string source = @"using Old = io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -3805,7 +3805,7 @@ public static class ToolMetadataProvider
         public void MigrateCSharpSource_WhenLegacyRegistrarIsUsedThroughNamespaceAlias_RewritesRegistrar()
         {
             // Verifies that namespace aliases do not create invalid qualified registrar names.
-            string source = @"using Old = io.github.hatayama.uLoopMCP;
+            string source = @"using Old = io.github.tongguang.tloop;
 
 public static class ManualToolRegistration
 {
@@ -3834,7 +3834,7 @@ public static class ManualToolRegistration
         public void MigrateCSharpSource_WhenQualifiedUnrelatedTypeNamesExist_KeepsQualifiedTypeNames()
         {
             // Verifies that migration does not rewrite unrelated project types behind another qualifier.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
 {
@@ -3863,7 +3863,7 @@ public sealed class HelloResponse : BaseToolResponse {}";
         public void MigrateCSharpSource_WhenLegacyFileHasUnrelatedToolInfoProperty_KeepsIdentifier()
         {
             // Verifies that metadata type migration does not rewrite member names.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
 {
@@ -3887,7 +3887,7 @@ public sealed class HelloResponse : BaseToolResponse {}";
         public void MigrateCSharpSource_WhenLegacyFileHasMemberNameMatchingLegacyContractType_KeepsIdentifier()
         {
             // Verifies that contract type migration does not rewrite member names.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
 {
@@ -3915,11 +3915,11 @@ public sealed class HelloResponse : BaseToolResponse {}";
         {
             // Verifies that qualified legacy namespace usage still migrates after qualified unrelated types are ignored.
             string source = @"public sealed class HelloTool :
-    io.github.hatayama.uLoopMCP.AbstractUnityTool<HelloSchema, HelloResponse>
+    io.github.tongguang.tloop.AbstractUnityTool<HelloSchema, HelloResponse>
 {
 }
 
-public sealed class HelloResponse : io.github.hatayama.uLoopMCP.BaseToolResponse {}";
+public sealed class HelloResponse : io.github.tongguang.tloop.BaseToolResponse {}";
 
             ThirdPartyToolMigrationContentResult result =
                 ThirdPartyToolMigrationRules.MigrateCSharpSource(source);
@@ -3975,7 +3975,7 @@ public sealed class HelloResponse : io.github.hatayama.uLoopMCP.BaseToolResponse
         public void MigrateCSharpSource_WhenLegacyFileDeclaresCustomToolManagerIdentifier_KeepsIdentifier()
         {
             // Verifies that registrar migration does not rewrite unrelated declaration identifiers.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class CustomToolManager
 {
@@ -4029,7 +4029,7 @@ public sealed class OtherTool
         public void MigrateCSharpSource_WhenLegacyNamespacePrefixExists_KeepsContent()
         {
             // Verifies that namespace matching does not treat prefixes as the V2 namespace.
-            string source = "using io.github.hatayama.uLoopMCPExtensions;";
+            string source = "using io.github.tongguang.tloopExtensions;";
 
             ThirdPartyToolMigrationContentResult result =
                 ThirdPartyToolMigrationRules.MigrateCSharpSource(source);
@@ -4438,7 +4438,7 @@ public sealed class OtherTool
         public void ContainsLegacyCSharpApi_WhenLegacyToolApiExists_ReturnsTrue()
         {
             // Verifies that migration detection is based on public custom tool API usage.
-            string source = "using io.github.hatayama.uLoopMCP;\n" +
+            string source = "using io.github.tongguang.tloop;\n" +
                 "[McpTool] public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse> {}";
 
             bool containsLegacyApi = ThirdPartyToolMigrationRules.ContainsLegacyCSharpApi(source);
@@ -4483,7 +4483,7 @@ public sealed class OtherTool
         public void ContainsMigrationCandidateText_WhenLegacyNamespaceExists_ReturnsTrue()
         {
             // Verifies that old custom tool API source still enters migration parsing.
-            string source = "using io.github.hatayama.uLoopMCP;";
+            string source = "using io.github.tongguang.tloop;";
 
             bool containsCandidateText = ThirdPartyToolMigrationRules.ContainsMigrationCandidateText(source);
 

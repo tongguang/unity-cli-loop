@@ -68,7 +68,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 return PausePointFailureResponse.Create(
                     captureSettingsError,
                     SourcePausePointConstants.ErrorCodeInvalidArgument,
-                    "Fix the rejected capture argument described in Message and re-run; uloop enable-pause-point --help lists the accepted values.");
+                    "Fix the rejected capture argument described in Message and re-run; tloop enable-pause-point --help lists the accepted values.");
             }
 
             string modeError = PausePointEnableValidation.ValidateEnableMode(parameters);

@@ -29,14 +29,14 @@ func DetectManagedInstall(executablePath string) ManagedInstall {
 		return ManagedInstall{
 			Kind:           ManagedInstallHomebrew,
 			DisplayName:    "Homebrew",
-			UpgradeCommand: "brew upgrade uloop",
+			UpgradeCommand: "brew upgrade tloop",
 		}
 	}
 	if IsWingetManagedPath(executablePath) {
 		return ManagedInstall{
 			Kind:           ManagedInstallWinget,
 			DisplayName:    "winget",
-			UpgradeCommand: "winget upgrade --id hatayama.uloop",
+			UpgradeCommand: "winget upgrade --id tongguang.tloop",
 		}
 	}
 	return ManagedInstall{}

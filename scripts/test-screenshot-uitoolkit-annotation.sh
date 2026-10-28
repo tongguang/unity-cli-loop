@@ -1,6 +1,6 @@
 #!/bin/sh
 # E2E verification that screenshot --annotate-elements lists UI Toolkit controls and that simulate-mouse-ui and
-# simulate-mouse-input press and drag them at the annotated points, using the uloop CLI against
+# simulate-mouse-input press and drag them at the annotated points, using the tloop CLI against
 # UIToolkitAnnotationDemoScene. Safe to run repeatedly: it stops PlayMode and restores the Game View size on
 # exit, and never saves the scene, so the listener and EventSystem changes made in PlayMode are discarded.
 
@@ -14,7 +14,7 @@ POLL_JSON="$TMP_DIR/poll.json"
 ORIGINAL_GAME_VIEW_WIDTH=""
 ORIGINAL_GAME_VIEW_HEIGHT=""
 PROJECT_PATH=""
-ULOOP_PATH="${ULOOP_BIN:-uloop}"
+TLOOP_PATH="${TLOOP_BIN:-tloop}"
 
 fail() {
     printf 'ERROR: %s\n' "$1" >&2
@@ -22,9 +22,9 @@ fail() {
 }
 
 cleanup() {
-    run_uloop control-play-mode --action Stop >/dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop >/dev/null 2>&1 || true
     if [ -n "${ORIGINAL_GAME_VIEW_WIDTH:-}" ] && [ -n "${ORIGINAL_GAME_VIEW_HEIGHT:-}" ]; then
-        run_uloop set-game-view-size \
+        run_tloop set-game-view-size \
             --width "$ORIGINAL_GAME_VIEW_WIDTH" \
             --height "$ORIGINAL_GAME_VIEW_HEIGHT" >/dev/null 2>&1 || true
     fi
@@ -38,13 +38,13 @@ while [ "$#" -gt 0 ]; do
             PROJECT_PATH=$2
             shift 2
             ;;
-        --uloop-path)
-            [ "$#" -ge 2 ] || fail "--uloop-path requires a value"
-            ULOOP_PATH=$2
+        --tloop-path)
+            [ "$#" -ge 2 ] || fail "--tloop-path requires a value"
+            TLOOP_PATH=$2
             shift 2
             ;;
         -h|--help)
-            printf 'Usage: sh scripts/test-screenshot-uitoolkit-annotation.sh [--project-path <path>] [--uloop-path <path>]\n'
+            printf 'Usage: sh scripts/test-screenshot-uitoolkit-annotation.sh [--project-path <path>] [--tloop-path <path>]\n'
             exit 0
             ;;
         *)
@@ -54,22 +54,22 @@ while [ "$#" -gt 0 ]; do
 done
 
 require_jq() {
-    command -v jq >/dev/null 2>&1 || fail "jq is required to parse uloop JSON responses"
+    command -v jq >/dev/null 2>&1 || fail "jq is required to parse tloop JSON responses"
 }
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        "$ULOOP_PATH" --project-path "$PROJECT_PATH" "$@"
+        "$TLOOP_PATH" --project-path "$PROJECT_PATH" "$@"
         return
     fi
 
-    "$ULOOP_PATH" "$@"
+    "$TLOOP_PATH" "$@"
 }
 
-run_uloop_json() {
-    if ! output=$(run_uloop "$@" 2>&1); then
+run_tloop_json() {
+    if ! output=$(run_tloop "$@" 2>&1); then
         printf '%s\n' "$output" >&2
-        fail "uloop $* failed"
+        fail "tloop $* failed"
     fi
 
     printf '%s\n' "$output"
@@ -103,7 +103,7 @@ assert_jq() {
 wait_unity_ready() {
     attempt=0
     while [ "$attempt" -lt 15 ]; do
-        if run_uloop get-logs --max-count 1 >/dev/null 2>&1; then
+        if run_tloop get-logs --max-count 1 >/dev/null 2>&1; then
             return
         fi
 
@@ -111,13 +111,13 @@ wait_unity_ready() {
         sleep 2
     done
 
-    fail "Unity did not respond to uloop"
+    fail "Unity did not respond to tloop"
 }
 
 wait_play_mode() {
     attempt=0
     while [ "$attempt" -lt 20 ]; do
-        json=$(run_uloop_json execute-dynamic-code --code 'using UnityEngine; return Application.isPlaying;')
+        json=$(run_tloop_json execute-dynamic-code --code 'using UnityEngine; return Application.isPlaying;')
         if printf '%s\n' "$json" | jq -e '.Success == true and .Result == "True"' >/dev/null; then
             return
         fi
@@ -132,7 +132,7 @@ wait_play_mode() {
 # Opening the scene in Single mode closes every loaded scene, so unsaved changes anywhere stop the run instead
 # of being discarded.
 initialize_demo_scene() {
-    run_uloop control-play-mode --action Stop >/dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop >/dev/null 2>&1 || true
 
     code="
 using UnityEditor.SceneManagement;
@@ -152,7 +152,7 @@ if (SceneManager.GetActiveScene().path != scenePath)
 return SceneManager.GetActiveScene().path;
 "
 
-    json=$(run_uloop_json execute-dynamic-code --code "$code")
+    json=$(run_tloop_json execute-dynamic-code --code "$code")
     assert_json_success "$json" "Load demo scene"
     scene=$(printf '%s\n' "$json" | jq -r '.Result')
     case "$scene" in
@@ -164,7 +164,7 @@ return SceneManager.GetActiveScene().path;
 }
 
 select_full_hd_game_view() {
-    json=$(run_uloop_json set-game-view-size --width 1920 --height 1080)
+    json=$(run_tloop_json set-game-view-size --width 1920 --height 1080)
     assert_json_success "$json" "Set Full HD Game View"
     ORIGINAL_GAME_VIEW_WIDTH=$(printf '%s\n' "$json" | jq -r '.PreviousWidth')
     ORIGINAL_GAME_VIEW_HEIGHT=$(printf '%s\n' "$json" | jq -r '.PreviousHeight')
@@ -177,7 +177,7 @@ select_full_hd_game_view() {
 wait_for_uitoolkit_play() {
     attempt=0
     while [ "$attempt" -lt 20 ]; do
-        run_uloop_json screenshot --capture-mode rendering --annotate-elements --elements-only >"$POLL_JSON"
+        run_tloop_json screenshot --capture-mode rendering --annotate-elements --elements-only >"$POLL_JSON"
         if jq -e '[.Screenshots[0].AnnotatedElements[]? | select(.UiSystem == "UIToolkit" and .Name == "play")] | length > 0' \
             "$POLL_JSON" >/dev/null; then
             return
@@ -206,7 +206,7 @@ assert_single_uitoolkit_element() {
 }
 
 verify_annotated_capture() {
-    run_uloop_json screenshot \
+    run_tloop_json screenshot \
         --capture-mode rendering \
         --annotate-elements \
         --output-directory "$TMP_DIR" >"$E1_JSON"
@@ -256,7 +256,7 @@ verify_annotated_capture() {
 
 # Compares the path set first so an element missing only from the elements-only capture is not overlooked.
 verify_elements_only_capture() {
-    run_uloop_json screenshot --capture-mode rendering --annotate-elements --elements-only >"$E2_JSON"
+    run_tloop_json screenshot --capture-mode rendering --annotate-elements --elements-only >"$E2_JSON"
     assert_jq "$E2_JSON" '.Success == true and .ScreenshotCount == 1' "Elements-only capture failed"
 
     paths_filter='[.Screenshots[0].AnnotatedElements[] | select(.UiSystem == "UIToolkit") | .Path] | sort'
@@ -279,7 +279,7 @@ verify_elements_only_capture() {
 
 get_click_count() {
     name=$1
-    json=$(run_uloop_json execute-dynamic-code --code "
+    json=$(run_tloop_json execute-dynamic-code --code "
 UIToolkitAnnotationDemo demo = UnityEngine.Object.FindObjectOfType<UIToolkitAnnotationDemo>();
 if (demo == null) { return \"ERROR: UIToolkitAnnotationDemo not found\"; }
 return demo.GetClickCount(\"$name\");
@@ -313,7 +313,7 @@ assert_response_field() {
 simulate_ui() {
     context=$1
     shift
-    json=$(run_uloop_json simulate-mouse-ui "$@")
+    json=$(run_tloop_json simulate-mouse-ui "$@")
     assert_json_success "$json" "$context"
     printf '%s\n' "$json"
 }
@@ -343,7 +343,7 @@ verify_ui_click() {
 verify_input_click() {
     before=$(get_click_count play)
 
-    json=$(run_uloop_json simulate-mouse-input --action Click \
+    json=$(run_tloop_json simulate-mouse-input --action Click \
         --x "$(annotated_field "$PLAY_SELECTOR" SimX)" --y "$(annotated_field "$PLAY_SELECTOR" SimY)")
     assert_json_success "$json" "simulate-mouse-input click on play"
     sleep 1
@@ -390,7 +390,7 @@ verify_long_press() {
 
 # The demo does not count uGUI clicks, so a listener added in PlayMode writes the count into the button label.
 verify_ugui_click() {
-    json=$(run_uloop_json execute-dynamic-code --code '
+    json=$(run_tloop_json execute-dynamic-code --code '
 using UnityEngine;
 using UnityEngine.UI;
 GameObject buttonObject = GameObject.Find("ugui-button");
@@ -410,7 +410,7 @@ return label.text;
         --x "$(annotated_field "$selector" SimX)" --y "$(annotated_field "$selector" SimY)")
     assert_response_field "$json" UiSystem "UGUI" "simulate-mouse-ui click on ugui-button"
 
-    json=$(run_uloop_json execute-dynamic-code --code '
+    json=$(run_tloop_json execute-dynamic-code --code '
 using UnityEngine;
 using UnityEngine.UI;
 return GameObject.Find("ugui-button").GetComponentInChildren<Text>().text;
@@ -420,7 +420,7 @@ return GameObject.Find("ugui-button").GetComponentInChildren<Text>().text;
 }
 
 get_slider_value() {
-    json=$(run_uloop_json execute-dynamic-code --code '
+    json=$(run_tloop_json execute-dynamic-code --code '
 UIToolkitAnnotationDemo demo = UnityEngine.Object.FindObjectOfType<UIToolkitAnnotationDemo>();
 if (demo == null) { return "ERROR: UIToolkitAnnotationDemo not found"; }
 return demo.GetSliderValue("volume").ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -477,7 +477,7 @@ verify_split_drag() {
 
 # Runs last: the EventSystem stays disabled until PlayMode stops on exit.
 verify_click_without_event_system() {
-    json=$(run_uloop_json execute-dynamic-code --code '
+    json=$(run_tloop_json execute-dynamic-code --code '
 using UnityEngine.EventSystems;
 if (EventSystem.current == null) { return "ERROR: no EventSystem"; }
 EventSystem.current.gameObject.SetActive(false);
@@ -511,7 +511,7 @@ printf '[2/14] Selecting Full HD Game View resolution...\n'
 select_full_hd_game_view
 
 printf '[3/14] Starting PlayMode and waiting for UI Toolkit controls...\n'
-run_uloop_json control-play-mode --action Play >/dev/null
+run_tloop_json control-play-mode --action Play >/dev/null
 wait_play_mode
 wait_for_uitoolkit_play
 

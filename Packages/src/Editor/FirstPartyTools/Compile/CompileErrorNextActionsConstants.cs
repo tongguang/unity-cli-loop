@@ -6,7 +6,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     internal static class CompileErrorNextActionsConstants
     {
         public const string PlayModeStopNextAction =
-            "Run 'uloop control-play-mode --action Stop' to leave Play Mode, then rerun 'uloop compile'.";
+            "Run 'tloop control-play-mode --action Stop' to leave Play Mode, then rerun 'tloop compile'.";
 
         public const string LanguageVersionPinnedNextActionFormat =
             "error {0}: the project's C# language version is pinned by the Unity Editor version, so raising the language version is not actionable here. Rewrite without the '{1}' feature so the code compiles under C# {2}.";
@@ -17,7 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             @"Feature '(?<feature>[^']+)' is not available in C# (?<version>[0-9]+(\.[0-9]+)?)";
 
         public const string MissingAssemblyReferenceNextActionFormat =
-            "error {0}: '{1}' is declared in {2}. Add the assembly to the failing script's .asmdef references and run 'uloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
+            "error {0}: '{1}' is declared in {2}. Add the assembly to the failing script's .asmdef references and run 'tloop compile' again. If the failing script has no .asmdef, the declaring assembly may have Auto Referenced disabled or its package may not be installed.";
 
         public const string MissingNamespacePattern =
             @"The type or namespace name '(?<inner>[^']+)' does not exist in the namespace '(?<outer>[^']+)'";
@@ -30,7 +30,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             @"The type or namespace name '(?<name>[^']+)' could not be found";
 
         public const string AssemblyDefinitionReferenceHintFormat =
-            "error {0}: '{1}' could not be found from a script under '{2}'. If that type lives in another assembly (for example the script was recently moved under a new asmdef), add the declaring assembly to that asmdef's references and run 'uloop compile' again; if the name is a typo, fix the name instead.";
+            "error {0}: '{1}' could not be found from a script under '{2}'. If that type lives in another assembly (for example the script was recently moved under a new asmdef), add the declaring assembly to that asmdef's references and run 'tloop compile' again; if the name is a typo, fix the name instead.";
 
         public const string SingleDeclaringAssemblyFormat = "assembly '{0}'";
 

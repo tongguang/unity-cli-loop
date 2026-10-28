@@ -8,7 +8,7 @@ import (
 	"github.com/hatayama/unity-cli-loop/common/tools"
 )
 
-// writeFixtureProject builds a Unity project whose Packages/src holds the uloop package, which is
+// writeFixtureProject builds a Unity project whose Packages/src holds the tloop package, which is
 // the layout ResolvePackageRoot recognizes for a locally embedded package.
 func writeFixtureProject(t *testing.T, skills map[string]string) string {
 	t.Helper()
@@ -18,11 +18,11 @@ func writeFixtureProject(t *testing.T, skills map[string]string) string {
 	if err := os.MkdirAll(packageRoot, 0o755); err != nil {
 		t.Fatalf("failed to create the package root: %v", err)
 	}
-	manifest := []byte(`{"name":"io.github.hatayama.uloopmcp"}`)
+	manifest := []byte(`{"name":"io.github.tongguang.tloop"}`)
 	if err := os.WriteFile(filepath.Join(packageRoot, "package.json"), manifest, 0o644); err != nil {
 		t.Fatalf("failed to write the package manifest: %v", err)
 	}
-	// Editor/FirstPartyTools is how ResolvePackageRoot recognizes a candidate as the uloop package,
+	// Editor/FirstPartyTools is how ResolvePackageRoot recognizes a candidate as the tloop package,
 	// so it exists in every install regardless of which skills this fixture writes.
 	if err := os.MkdirAll(filepath.Join(packageRoot, "Editor", "FirstPartyTools"), 0o755); err != nil {
 		t.Fatalf("failed to create the first-party tools directory: %v", err)
@@ -106,7 +106,7 @@ func TestApplyToCatalogLeavesUndocumentedCommandsAlone(t *testing.T) {
 	}
 }
 
-// Verifies a project with no uloop package installed keeps the catalog exactly as it was: a missing
+// Verifies a project with no tloop package installed keeps the catalog exactly as it was: a missing
 // skill must degrade the text, never the command.
 func TestApplyToCatalogFallsBackWhenNoPackageIsInstalled(t *testing.T) {
 	catalog := ApplyToCatalog(fixtureCatalog(), t.TempDir())

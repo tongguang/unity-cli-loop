@@ -90,7 +90,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             string directory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-pdb-compilation-info-" + Guid.NewGuid().ToString("N"));
+                "tloop-pdb-compilation-info-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);
             try
             {

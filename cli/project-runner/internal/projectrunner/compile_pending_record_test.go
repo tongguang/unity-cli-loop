@@ -10,7 +10,7 @@ import (
 	"github.com/hatayama/unity-cli-loop/common/tools"
 )
 
-// Verifies a pending compile record round-trips through the project .uloop path.
+// Verifies a pending compile record round-trips through the project .tloop path.
 func TestWriteReadCompilePendingRecordRoundTrip(t *testing.T) {
 	projectRoot := t.TempDir()
 	timedOutAt := time.Now().UTC().Truncate(time.Second)
@@ -119,13 +119,13 @@ func TestClearCompilePendingRecord(t *testing.T) {
 	clearCompilePendingRecord(projectRoot)
 }
 
-// Verifies pending-record paths join .uloop and the file name with OS separators.
+// Verifies pending-record paths join .tloop and the file name with OS separators.
 func TestCompilePendingRecordPathUsesOSSeparators(t *testing.T) {
 	projectRoot := filepath.FromSlash("/tmp/MyProject")
 	path := compilePendingRecordPath(projectRoot)
 	// Why literal FromSlash expected: building expected with the same Join helpers as the
 	// implementation would make this assertion tautological.
-	expected := filepath.FromSlash("/tmp/MyProject/.uloop/pending-compile-request.json")
+	expected := filepath.FromSlash("/tmp/MyProject/.tloop/pending-compile-request.json")
 	if path != expected {
 		t.Fatalf("path mismatch: got %q want %q", path, expected)
 	}

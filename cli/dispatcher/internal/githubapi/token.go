@@ -10,7 +10,7 @@ import (
 )
 
 // ghTokenTimeout bounds `gh auth token`: a locked keyring makes gh prompt for a
-// password, which would otherwise hang every uloop command that touches the
+// password, which would otherwise hang every tloop command that touches the
 // GitHub API.
 const ghTokenTimeout = 5 * time.Second
 
@@ -27,7 +27,7 @@ type TokenSource interface {
 
 // DefaultTokenSource is shared by every api.github.com caller in the dispatcher
 // so the gh CLI is consulted at most once per process, even though a single
-// `uloop update` resolves both the release list and a tag's commit SHA.
+// `tloop update` resolves both the release list and a tag's commit SHA.
 var DefaultTokenSource TokenSource = NewTokenResolver()
 
 // StaticTokenSource returns the same token on every call. Test-only: it lets
@@ -69,7 +69,7 @@ func runCommandOutput(ctx context.Context, name string, args ...string) ([]byte,
 
 // Resolve returns the token, or "" when none is available. A missing or
 // unauthenticated gh CLI is an expected condition rather than an error: the
-// caller simply falls back to an anonymous request, which is what uloop did
+// caller simply falls back to an anonymous request, which is what tloop did
 // before the gh CLI was consulted at all.
 func (r *TokenResolver) Resolve(ctx context.Context) string {
 	r.once.Do(func() {

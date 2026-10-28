@@ -817,11 +817,11 @@ func TestCompileWaitTimeoutError(t *testing.T) {
 		t.Fatalf("message mismatch: %#v", cliErr.Message)
 	}
 	expectedActions := []string{
-		"Run a light command such as `uloop get-logs --max-count 1` to check whether Unity is responsive before treating this as a freeze.",
-		"Unity keeps compiling and refuses other commands with UNITY_SERVER_BUSY until it finishes. Re-run `uloop compile`: it will reattach to the in-flight compile and wait for its result instead of starting a new one. That result covers the scripts as they were when that compile started, so if scripts changed since then, run `uloop compile` once more after it returns. The result stays retrievable for roughly 18 more minutes.",
+		"Run a light command such as `tloop get-logs --max-count 1` to check whether Unity is responsive before treating this as a freeze.",
+		"Unity keeps compiling and refuses other commands with UNITY_SERVER_BUSY until it finishes. Re-run `tloop compile`: it will reattach to the in-flight compile and wait for its result instead of starting a new one. That result covers the scripts as they were when that compile started, so if scripts changed since then, run `tloop compile` once more after it returns. The result stays retrievable for roughly 18 more minutes.",
 		clierrors.ApiUpdateConsentModalNextAction,
-		"Only if Unity does not respond to any command, restart it with `uloop launch -r`.",
-		"If repeated waits keep showing is_compiling=true with no progress, the Editor's compile pipeline may be stalled (for example by a modal dialog); restart Unity with 'uloop launch -r' and rerun 'uloop compile'.",
+		"Only if Unity does not respond to any command, restart it with `tloop launch -r`.",
+		"If repeated waits keep showing is_compiling=true with no progress, the Editor's compile pipeline may be stalled (for example by a modal dialog); restart Unity with 'tloop launch -r' and rerun 'tloop compile'.",
 	}
 	if len(cliErr.NextActions) != len(expectedActions) {
 		t.Fatalf("next actions mismatch: %#v", cliErr.NextActions)

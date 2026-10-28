@@ -10,7 +10,7 @@ import (
 
 func TestSkillDirCleanupHelpersTreatMissingDirectoryAsDone(t *testing.T) {
 	// Verifies cleanup of an already removed skill directory succeeds without creating anything.
-	missingDir := filepath.Join(t.TempDir(), "uloop-sample")
+	missingDir := filepath.Join(t.TempDir(), "tloop-sample")
 
 	if err := removeSkillDirWithIgnorableDebris(missingDir, nil); err != nil {
 		t.Fatalf("removeSkillDirWithIgnorableDebris failed: %v", err)
@@ -31,9 +31,9 @@ func TestSkillDirCleanupHelpersReportUnlistableDirectory(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("Windows reports listing a file differently from ENOTDIR.")
 	}
-	skillFile := filepath.Join(t.TempDir(), "uloop-sample")
+	skillFile := filepath.Join(t.TempDir(), "tloop-sample")
 	writeDispatcherTestFile(t, skillFile, "not a directory")
-	wantSuffix := "uloop-sample: not a directory"
+	wantSuffix := "tloop-sample: not a directory"
 
 	if err := removeSkillDirWithIgnorableDebris(skillFile, nil); err == nil || !strings.HasSuffix(err.Error(), wantSuffix) {
 		t.Fatalf("removeSkillDirWithIgnorableDebris: expected %q, got %v", wantSuffix, err)
@@ -96,7 +96,7 @@ func TestRemoveEntryOfWrongTypeReportsUninspectableOccupant(t *testing.T) {
 
 func TestRemoveStaleSyncArtifactsReportsUnremovableArtifact(t *testing.T) {
 	// Verifies a stale sync artifact that cannot be removed is reported instead of being counted as removed.
-	skillDir := filepath.Join(t.TempDir(), "uloop-sample")
+	skillDir := filepath.Join(t.TempDir(), "tloop-sample")
 	artifactDir := filepath.Join(skillDir, "references"+skillSyncBackupSuffix+"123")
 	writeDispatcherTestFile(t, filepath.Join(artifactDir, "note.md"), "note")
 	lockSkillsTestDirectory(t, artifactDir, 0o555)

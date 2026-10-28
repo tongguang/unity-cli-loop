@@ -100,7 +100,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             HotReloadIntroducedTypeArtifact artifact = new HotReloadIntroducedTypeArtifact(
                 typeof(HotReloadCoreFixture).Assembly,
-                "Library/UloopHotReload/IntroducedTypes/retained-type-peel.dll",
+                "Library/TloopHotReload/IntroducedTypes/retained-type-peel.dll",
                 null,
                 new[]
                 {

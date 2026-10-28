@@ -6,7 +6,7 @@ import (
 )
 
 const singleToolSkill = `---
-name: uloop-simulate-keyboard
+name: tloop-simulate-keyboard
 toolName: simulate-keyboard
 description: "Simulate keyboard input in PlayMode."
 ---
@@ -35,11 +35,11 @@ Prose after the table.
 `
 
 const multiToolSkill = `---
-name: uloop-pause-point
+name: tloop-pause-point
 description: "Pauses Unity playback at any source file:line."
 ---
 
-# uloop await-pause-point
+# tloop await-pause-point
 
 ## Parameters
 
@@ -170,11 +170,11 @@ func TestParseSkillToleratesAByteOrderMark(t *testing.T) {
 // documentation a tool with no parameters has.
 func TestParseSkillKeepsTheDescriptionOfATablelessSkill(t *testing.T) {
 	docs := ParseSkill(`---
-name: uloop-focus-window
+name: tloop-focus-window
 description: "Bring the Unity Editor window to front."
 ---
 
-# uloop focus-window
+# tloop focus-window
 `)
 
 	toolDocs, ok := docs["focus-window"]
@@ -193,7 +193,7 @@ description: "Bring the Unity Editor window to front."
 func TestParseSkillIgnoresASkillWithNoToolName(t *testing.T) {
 	docs := ParseSkill(`---
 name: some-unrelated-skill
-description: "Not a uloop tool skill."
+description: "Not a tloop tool skill."
 ---
 
 | Parameter | Type | Default | Description |

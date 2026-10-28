@@ -42,7 +42,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 return;
             }
 
-            string basePath = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "uloop-path-test"));
+            string basePath = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "tloop-path-test"));
             string path = basePath + Path.DirectorySeparatorChar +
                 new string('a', Math.Max(1, 260 - basePath.Length));
             Assert.That(path.Length, Is.GreaterThanOrEqualTo(260));

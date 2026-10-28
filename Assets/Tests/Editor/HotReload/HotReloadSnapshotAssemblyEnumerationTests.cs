@@ -33,7 +33,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             _snapshotRoot = HotReloadSourceSnapshotLayout.Root(_projectRoot);
             Directory.CreateDirectory(Path.Combine(_projectRoot, "Assets"));
             Directory.CreateDirectory(Path.Combine(_projectRoot, HotReloadConstants.ScriptAssembliesRelativeDirectory));
@@ -413,7 +413,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [Test]
         public void CaptureAssemblies_ForVirtualPlayerRoot_ReadsTheMainProjectsDllAndSnapshotsUnderThePlayer()
         {
-            string mainRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            string mainRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             try
             {
                 string scriptAssembliesDirectory = Path.Combine(mainRoot, "Library", "ScriptAssemblies");
@@ -437,7 +437,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     HotReloadSourceSnapshotLayout.AssemblyDirectory(playerRoot, "Fixture", mvid),
                     SourceRelativePath);
                 Assert.That(File.Exists(playerSnapshotSource), Is.True);
-                Assert.That(Directory.Exists(Path.Combine(mainRoot, "Library", "UloopHotReload")), Is.False);
+                Assert.That(Directory.Exists(Path.Combine(mainRoot, "Library", "TloopHotReload")), Is.False);
             }
             finally
             {

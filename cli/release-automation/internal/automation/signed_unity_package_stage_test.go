@@ -14,7 +14,7 @@ import (
 // signedUnityPackageSourceFiles is a package source tree with an asset and its .meta file beside
 // package.json.meta, and a skill under the tilde-suffixed CLI-only folder.
 var signedUnityPackageSourceFiles = map[string]string{
-	"package.json":        `{"name": "io.github.hatayama.uloopmcp", "version": "3.14.0"}`,
+	"package.json":        `{"name": "io.github.tongguang.tloop", "version": "3.14.0"}`,
 	"package.json.meta":   "fileFormatVersion: 2",
 	"Editor.meta":         "fileFormatVersion: 2",
 	"Editor/Tool.cs":      "class Tool {}",
@@ -96,7 +96,7 @@ func TestStageSignedUnityPackageRenamesValidTarball(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("exit code = %d, stderr = %s", code, stderr)
 	}
-	wantPath := filepath.Join(directory, "io.github.hatayama.uloopmcp-3.14.0.tgz")
+	wantPath := filepath.Join(directory, "io.github.tongguang.tloop-3.14.0.tgz")
 	if stdout != "archive="+wantPath+"\n" {
 		t.Fatalf("stdout = %q, want archive=%s", stdout, wantPath)
 	}
@@ -141,7 +141,7 @@ func TestStageSignedUnityPackageRejectsDefectiveTarballs(t *testing.T) {
 		},
 		{
 			name:    "manifest that is not JSON",
-			edit:    func(entries map[string]string) { entries["package/package.json"] = "name: io.github.hatayama.uloopmcp" },
+			edit:    func(entries map[string]string) { entries["package/package.json"] = "name: io.github.tongguang.tloop" },
 			wantErr: "parse package/package.json",
 		},
 		{

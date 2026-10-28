@@ -71,7 +71,7 @@ type editorStatusResponse struct {
 	SecondsSinceLastMainThreadTick float64 `json:"SecondsSinceLastMainThreadTick"`
 }
 
-// statusReport is what uloop status prints. Fields that do not apply to the state are left out.
+// statusReport is what tloop status prints. Fields that do not apply to the state are left out.
 type statusReport struct {
 	State                          string   `json:"State"`
 	Ready                          bool     `json:"Ready"`
@@ -114,7 +114,7 @@ func runStatusCommandWithDeps(
 		clierrors.WriteClassifiedError(stderr, &clierrors.ArgumentError{
 			Message:     "status takes no options: " + args[0],
 			Option:      args[0],
-			NextActions: []string{"Run `uloop status` with no options other than --project-path."},
+			NextActions: []string{"Run `tloop status` with no options other than --project-path."},
 		}, errorContext)
 		return 1
 	}
@@ -252,17 +252,17 @@ func reportFromUnreachableServer(
 	switch {
 	case errors.Is(lookupErr, unityprocess.ErrUnidentifiedUnityEditor):
 		report = newStatusReport(statusStateUnreachable,
-			"The uloop server is not accepting connections, and a running Unity Editor's command line "+
-				"does not name its project, so uloop cannot tell whether Unity is running for this project.")
+			"The tloop server is not accepting connections, and a running Unity Editor's command line "+
+				"does not name its project, so tloop cannot tell whether Unity is running for this project.")
 	case lookupErr != nil:
 		report = newStatusReport(statusStateUnreachable, fmt.Sprintf(
-			"The uloop server is not accepting connections, and the Unity process list could not be read: %s.",
+			"The tloop server is not accepting connections, and the Unity process list could not be read: %s.",
 			lookupErr.Error()))
 	case running:
 		report = newStatusReport(statusStateServerUnavailable,
-			"Unity is running for this project, but its uloop server is not accepting connections. "+
+			"Unity is running for this project, but its tloop server is not accepting connections. "+
 				"Unity is starting, reloading scripts, or was started in Safe Mode because of compile errors "+
-				"(uloop cannot run in Safe Mode).")
+				"(tloop cannot run in Safe Mode).")
 		report.UnityProcessRunning = &running
 	default:
 		report = notRunningStatusReport(projectRoot, probeErr)
@@ -272,7 +272,7 @@ func reportFromUnreachableServer(
 	return report
 }
 
-// notRunningStatusReport words NotRunning as uloop's not-running error does, so status and a failed
+// notRunningStatusReport words NotRunning as tloop's not-running error does, so status and a failed
 // command agree on whether the Editor shut down normally.
 func notRunningStatusReport(projectRoot string, probeErr error) statusReport {
 	notRunning := clicore.NewUnityNotRunningError(projectRoot, "", probeErr, false)
@@ -300,15 +300,15 @@ func reportFromEditorResponse(response editorStatusResponse) statusReport {
 	return report
 }
 
-// busyCancelNextActions offers uloop cancel only for a tool it can stop. Why the tool name and
-// not the request: status sees only the name, so run-tests and compile, which uloop cancel
+// busyCancelNextActions offers tloop cancel only for a tool it can stop. Why the tool name and
+// not the request: status sees only the name, so run-tests and compile, which tloop cancel
 // leaves running in some modes, never get a promise that may not hold.
 func busyCancelNextActions(response editorStatusResponse) []string {
 	if response.RunningToolElapsedSeconds == nil ||
 		!clierrors.ClientDisconnectCancelsRunningTool(response.RunningToolName) {
 		return nil
 	}
-	return []string{"If it does not finish, run `uloop cancel` to stop it."}
+	return []string{"If it does not finish, run `tloop cancel` to stop it."}
 }
 
 // classifyEditorState picks the state of an Editor that answered. The order is the contract: a
@@ -336,10 +336,10 @@ func classifyEditorState(response editorStatusResponse) string {
 func editorStateMessage(state string, response editorStatusResponse) string {
 	switch state {
 	case statusStateBusy:
-		return fmt.Sprintf("uloop %s has been running for %ds (%s).",
+		return fmt.Sprintf("tloop %s has been running for %ds (%s).",
 			response.RunningToolName, *response.RunningToolElapsedSeconds, response.RunningToolPhase)
 	case statusStateStarting:
-		return "The uloop server answered, but Unity has not reported its Editor state yet."
+		return "The tloop server answered, but Unity has not reported its Editor state yet."
 	case statusStateMainThreadBlocked:
 		return fmt.Sprintf(
 			"Unity's main thread has not run for %.1fs; a dialog, a long import, or running code is blocking it.",
@@ -364,11 +364,11 @@ func newStatusReport(state string, message string) statusReport {
 
 // statusNextActions returns an empty, non-nil list for Ready so the output prints [] there.
 func statusNextActions(state string) []string {
-	const runAgainShortly = "Run uloop status again in a few seconds."
+	const runAgainShortly = "Run tloop status again in a few seconds."
 	switch state {
 	case statusStateBusy:
 		return []string{
-			"Wait for the running command to finish, then run uloop status again.",
+			"Wait for the running command to finish, then run tloop status again.",
 			"Another command sent now is rejected as busy.",
 		}
 	case statusStateStarting, statusStateCompiling, statusStateImportingAssets:
@@ -377,23 +377,23 @@ func statusNextActions(state string) []string {
 		return []string{
 			"Look at the Unity Editor for a modal dialog.",
 			runAgainShortly,
-			"If it stays blocked for minutes, restart the Editor with uloop launch -r.",
+			"If it stays blocked for minutes, restart the Editor with tloop launch -r.",
 		}
 	case statusStateNotResponding:
 		return []string{
-			"Run uloop status again.",
-			"If this repeats, look at the Unity Editor or restart it with uloop launch -r.",
+			"Run tloop status again.",
+			"If this repeats, look at the Unity Editor or restart it with tloop launch -r.",
 		}
 	case statusStateServerUnavailable:
 		return []string{
-			"Run uloop status again in 5-10 seconds.",
+			"Run tloop status again in 5-10 seconds.",
 			"If it stays ServerUnavailable, look at the Unity Editor: a Safe Mode window means the compile errors must be fixed first.",
 		}
 	case statusStateNotRunning:
-		return []string{"Start it with uloop launch."}
+		return []string{"Start it with tloop launch."}
 	case statusStateUnreachable:
 		return []string{
-			"Run uloop status again.",
+			"Run tloop status again.",
 			"Check whether the Unity Editor for this project is open.",
 		}
 	default:

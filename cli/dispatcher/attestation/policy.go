@@ -3,7 +3,7 @@ package attestation
 // Release identity constants are exported so every component that authorizes a
 // dispatcher release applies the exact policy enforced by the runtime verifier.
 const (
-	ReleaseRepository                = "hatayama/unity-cli-loop"
+	ReleaseRepository                = "tongguang/unity-cli-loop"
 	DispatcherPublishWorkflowPath    = ".github/workflows/dispatcher-publish.yml"
 	ProjectRunnerPublishWorkflowPath = ".github/workflows/native-cli-publish.yml"
 	MainBranchRef                    = "refs/heads/main"

@@ -242,7 +242,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 result.ErrorMessage,
                 Does.Contain("'" + HotReloadRetainedArtifactFixture.ReferrerMetadataName + "'"));
             Assert.That(result.ErrorMessage, Does.Contain("in this same reload"));
-            Assert.That(result.ErrorMessage, Does.Contain("uloop compile"));
+            Assert.That(result.ErrorMessage, Does.Contain("tloop compile"));
         }
 
         private static string WithAddedMethod(string source)

@@ -5,8 +5,8 @@ import "strings"
 // enable-pause-point accepts six orchestration flags that exist only in the CLI: they are parsed
 // out of the argv before the Unity-side EnablePausePointSchema is consulted, so nothing in the
 // tool schema describes them. Both listings that document a tool's options — the dispatcher's
-// `--help` table and the project runner's `uloop list` output — therefore have to add them by
-// hand, and they drifted: `uloop list` documented all six while `--help` documented none.
+// `--help` table and the project runner's `tloop list` output — therefore have to add them by
+// hand, and they drifted: `tloop list` documented all six while `--help` documented none.
 // Defining them once here makes both listings read the same table.
 const (
 	PausePointEnableAwaitFlagName           = "await"
@@ -38,7 +38,7 @@ const (
 )
 
 // PausePointCLIOnlyOption describes one CLI-only pause-point flag in the shape both listings need:
-// `--help` renders FlagName/Type/Description, and `uloop list` additionally reports Type and Values
+// `--help` renders FlagName/Type/Description, and `tloop list` additionally reports Type and Values
 // as structured fields.
 type PausePointCLIOnlyOption struct {
 	FlagName    string
@@ -79,7 +79,7 @@ func PausePointEnableCLIOnlyOptions() []PausePointCLIOnlyOption {
 		{
 			FlagName:    PausePointTriggerFlagName,
 			Type:        "string",
-			Description: "Requires --await. Same as await-pause-point's --trigger: a uloop subcommand without the leading 'uloop', e.g. \"simulate-keyboard --action Press --key Space\"",
+			Description: "Requires --await. Same as await-pause-point's --trigger: a tloop subcommand without the leading 'tloop', e.g. \"simulate-keyboard --action Press --key Space\"",
 		},
 		{
 			FlagName:    PausePointResumePlayFlagName,
@@ -100,7 +100,7 @@ const (
 	pausePointCapturedVariablesDescription     = "How much of each captured variable to include in the response"
 	pausePointCapturedVariableNamesDescription = "Restrict CapturedVariables to these comma-separated names"
 	pausePointExpectDescription                = "Compare a captured variable against an expected value (repeatable; name=value)"
-	pausePointTriggerDescription               = "Runs a single uloop subcommand in-process right after arming/registration. Pass the subcommand without the leading 'uloop', e.g. \"simulate-keyboard --action Press --key Space\""
+	pausePointTriggerDescription               = "Runs a single tloop subcommand in-process right after arming/registration. Pass the subcommand without the leading 'tloop', e.g. \"simulate-keyboard --action Press --key Space\""
 	pausePointResumePlayDescription            = "After confirming the marker is armed, resume PlayMode if paused " +
 		"(before --trigger), so a paused-arm workflow can fire input in one call"
 )

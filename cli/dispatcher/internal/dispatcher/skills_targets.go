@@ -174,8 +174,8 @@ func isSkillDisabledByToolSettings(skill skillDefinition, disabledTools []string
 		return false
 	}
 	toolName := skill.toolName
-	if toolName == "" && strings.HasPrefix(skill.name, "uloop-") {
-		toolName = strings.TrimPrefix(skill.name, "uloop-")
+	if toolName == "" && strings.HasPrefix(skill.name, "tloop-") {
+		toolName = strings.TrimPrefix(skill.name, "tloop-")
 	}
 	if toolName == "" {
 		return false

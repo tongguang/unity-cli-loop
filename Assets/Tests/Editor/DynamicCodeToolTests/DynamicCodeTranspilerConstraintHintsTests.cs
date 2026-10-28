@@ -18,7 +18,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             (bool matched, string hint, string suggestion) = DynamicCodeTranspilerConstraintHints.TryBuildHint(
                 "CS8421",
-                "CS8421: A static local function cannot contain a reference to '__uloop_literal_0'.");
+                "CS8421: A static local function cannot contain a reference to '__tloop_literal_0'.");
 
             Assert.That(matched, Is.True);
             Assert.That(hint, Does.Contain("recognized static local function bodies"));
@@ -33,7 +33,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
         {
             (bool matched, string hint, string suggestion) = DynamicCodeTranspilerConstraintHints.TryBuildHint(
                 "CS8820",
-                "CS8820: A static anonymous function cannot contain a reference to '__uloop_literal_0'.");
+                "CS8820: A static anonymous function cannot contain a reference to '__tloop_literal_0'.");
 
             Assert.That(matched, Is.True);
             Assert.That(hint, Does.Contain("Static lambdas"));

@@ -24,7 +24,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     {
         /// <summary>
         /// Ensures a worker.dll matching the current worker source exists under
-        /// <c>Library/UloopHotReload/Worker/&lt;hash&gt;/</c> and returns that directory.
+        /// <c>Library/TloopHotReload/Worker/&lt;hash&gt;/</c> and returns that directory.
         /// </summary>
         public static async Task<TransformWorkerBootstrapResult> EnsureWorkerAsync(CancellationToken ct)
         {

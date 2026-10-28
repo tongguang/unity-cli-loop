@@ -81,12 +81,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         // The next steps an internal-member reason ends with, each after the sentence before it.
         private const string QualifyTheBareNameAdvice =
-            " Qualify the bare name with 'this.' or the type name, or run 'uloop compile'.";
+            " Qualify the bare name with 'this.' or the type name, or run 'tloop compile'.";
 
         private const string MoveTheUseOutAdvice =
-            " Move the use out of the lambda, local function or query, or run 'uloop compile'.";
+            " Move the use out of the lambda, local function or query, or run 'tloop compile'.";
 
-        private const string CompileOnlyAdvice = " Run 'uloop compile'.";
+        private const string CompileOnlyAdvice = " Run 'tloop compile'.";
         private const string InternalMemberOfATypeOfAnotherAssembly =
             "global::io.github.hatayama.UnityCliLoop.FirstPartyTools.PausePointCapturedVariable.FromSnapshot(null).Name.Length";
 

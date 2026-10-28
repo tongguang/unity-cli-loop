@@ -200,7 +200,7 @@ jobs:
             echo "Unsupported release ref ${event_ref}." >&2
             exit 1
           fi
-          if [ "${release_tag}" != "uloop-project-runner-v${version}" ]; then
+          if [ "${release_tag}" != "tloop-project-runner-v${version}" ]; then
             echo "Release tag does not match the resolved version." >&2
             exit 1
           fi

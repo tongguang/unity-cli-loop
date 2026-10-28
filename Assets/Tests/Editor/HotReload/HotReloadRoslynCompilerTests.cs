@@ -216,7 +216,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string workDirectory = Path.Combine(
                 projectRoot,
                 "Library",
-                "UloopHotReload",
+                "TloopHotReload",
                 "RoslynCompilerTests",
                 Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(workDirectory);

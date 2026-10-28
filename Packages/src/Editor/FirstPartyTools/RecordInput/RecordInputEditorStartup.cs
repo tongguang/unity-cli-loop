@@ -1,4 +1,4 @@
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 {
     // Keeps recording state recovery inside the Recordings window module.

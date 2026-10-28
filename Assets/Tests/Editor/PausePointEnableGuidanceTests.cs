@@ -53,7 +53,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             "io.github.hatayama.UnityCliLoop.Tests.PausePointToolsFixtures.EnableBySourceLocationFixture.Add(System.Int32,System.Int32)";
 
         private const string ExpectedArmingNextActionForJump =
-            "Run the code path so the marker can hit, then read the outcome with: uloop pause-point-status --id \"jump\". To block until it hits without a trigger command (e.g. waiting for physics or a multi-step action): uloop await-pause-point --id \"jump\" --timeout-seconds <n>. To arm, trigger, and collect in one call: uloop enable-pause-point --await --resume-play --trigger \"<uloop subcommand without the leading 'uloop', e.g. simulate-keyboard --action Press --key Space>\".";
+            "Run the code path so the marker can hit, then read the outcome with: tloop pause-point-status --id \"jump\". To block until it hits without a trigger command (e.g. waiting for physics or a multi-step action): tloop await-pause-point --id \"jump\" --timeout-seconds <n>. To arm, trigger, and collect in one call: tloop enable-pause-point --await --resume-play --trigger \"<tloop subcommand without the leading 'tloop', e.g. simulate-keyboard --action Press --key Space>\".";
 
         private const string ExpectedRearmDiscardWarningGeneration1 =
             "Generation 1 of this pause point had already hit; this re-arm discarded its CapturedVariables and CapturedVariableHistory. Read results with pause-point-status before re-arming when you need them.";
@@ -103,7 +103,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Keep the deprecated placeholder split so repository searches for its contiguous spelling
             // report only real regressions in user-facing guidance.
-            const string deprecatedPlaceholder = "<uloop " + "command>";
+            const string deprecatedPlaceholder = "<tloop " + "command>";
             string action = PausePointEnableWarnings.ResolveSuccessEnableRecommendedNextAction(
                 string.Empty,
                 "jump");
@@ -123,7 +123,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 string.Empty,
                 "jump");
 
-            Assert.That(action, Does.Contain("uloop await-pause-point --id \"jump\" --timeout-seconds"));
+            Assert.That(action, Does.Contain("tloop await-pause-point --id \"jump\" --timeout-seconds"));
             Assert.That(
                 action.IndexOf("await-pause-point", StringComparison.Ordinal),
                 Is.LessThan(action.IndexOf("--trigger", StringComparison.Ordinal)),
@@ -137,7 +137,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void ResolveSuccessEnableRecommendedNextAction_WhenExistingIsNonEmpty_KeepsExisting()
         {
             const string existing =
-                "Verify ResolvedLineText is the statement you intended. If it is not, run 'uloop compile' "
+                "Verify ResolvedLineText is the statement you intended. If it is not, run 'tloop compile' "
                 + "and re-enable the pause point.";
 
             string action = PausePointEnableWarnings.ResolveSuccessEnableRecommendedNextAction(
@@ -189,15 +189,15 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Is.True,
                 response.ErrorCode + " / " + response.Message);
             string expected =
-                "Run the code path so the marker can hit, then read the outcome with: uloop pause-point-status --id \""
+                "Run the code path so the marker can hit, then read the outcome with: tloop pause-point-status --id \""
                 + FixtureFilePath
                 + ":"
                 + FixtureStatementLine
-                + "\". To block until it hits without a trigger command (e.g. waiting for physics or a multi-step action): uloop await-pause-point --id \""
+                + "\". To block until it hits without a trigger command (e.g. waiting for physics or a multi-step action): tloop await-pause-point --id \""
                 + FixtureFilePath
                 + ":"
                 + FixtureStatementLine
-                + "\" --timeout-seconds <n>. To arm, trigger, and collect in one call: uloop enable-pause-point --await --resume-play --trigger \"<uloop subcommand without the leading 'uloop', e.g. simulate-keyboard --action Press --key Space>\".";
+                + "\" --timeout-seconds <n>. To arm, trigger, and collect in one call: tloop enable-pause-point --await --resume-play --trigger \"<tloop subcommand without the leading 'tloop', e.g. simulate-keyboard --action Press --key Space>\".";
             Assert.That(response.RecommendedNextAction, Is.EqualTo(expected));
             string json = JsonConvert.SerializeObject(
                 response,
@@ -601,7 +601,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     response.Message,
                     Is.EqualTo(
                         "Line 10 is inside 'Ns.Owner.AddedStep()', which hot reload added; pause points "
-                        + "cannot be armed inside added methods until 'uloop compile', so it was refused "
+                        + "cannot be armed inside added methods until 'tloop compile', so it was refused "
                         + "instead of arming another method."));
                 Assert.That(
                     response.RecommendedNextAction,
@@ -738,7 +738,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                             "PausePointEnableGuidanceTests.PdbUnavailableProbe",
                             IntroducedTypeRequestedLine)));
                 Assert.That(response.Message, Does.Not.Contain("introduced without a compile"));
-                Assert.That(response.RecommendedNextAction, Does.Contain("uloop compile"));
+                Assert.That(response.RecommendedNextAction, Does.Contain("tloop compile"));
             }
         }
 
@@ -1531,7 +1531,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                             SourcePausePointConstants.HotReloadPatchedMethodPdbUnavailableWarningFormat,
                             "PausePointEnableGuidanceTests.PdbUnavailableProbe",
                             requestedLine)));
-                Assert.That(response.RecommendedNextAction, Does.Contain("uloop compile"));
+                Assert.That(response.RecommendedNextAction, Does.Contain("tloop compile"));
                 Assert.That(response.Message, Does.Contain("cannot be placed on the running code"));
             }
         }

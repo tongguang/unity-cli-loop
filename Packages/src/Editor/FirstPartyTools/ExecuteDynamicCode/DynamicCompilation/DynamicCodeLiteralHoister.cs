@@ -10,7 +10,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal static class DynamicCodeLiteralHoister
     {
-        internal const string LiteralParameterPrefix = "__uloop_literal_";
+        internal const string LiteralParameterPrefix = "__tloop_literal_";
 
         public static HoistedLiteralRewriteResult Rewrite(string source)
         {

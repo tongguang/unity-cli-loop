@@ -70,7 +70,7 @@ func TestRunListOptionBoundaries(t *testing.T) {
 		"    \"ProjectRoot\": \"/project\",\n" +
 		"    \"Command\": \"list\",\n" +
 		"    \"NextActions\": [\n" +
-		"      \"Run \x60uloop list --help\x60 to inspect supported options.\"\n" +
+		"      \"Run \x60tloop list --help\x60 to inspect supported options.\"\n" +
 		"    ],\n" +
 		"    \"Details\": {\n" +
 		"      \"Option\": \"--names=true\"\n" +
@@ -88,7 +88,7 @@ func TestRunListOptionBoundaries(t *testing.T) {
 		"    \"ProjectRoot\": \"/project\",\n" +
 		"    \"Command\": \"list\",\n" +
 		"    \"NextActions\": [\n" +
-		"      \"Run \x60uloop list --help\x60 to inspect supported options.\"\n" +
+		"      \"Run \x60tloop list --help\x60 to inspect supported options.\"\n" +
 		"    ],\n" +
 		"    \"Details\": {\n" +
 		"      \"Option\": \"marker\"\n" +

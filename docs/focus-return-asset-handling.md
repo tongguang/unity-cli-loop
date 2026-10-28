@@ -3,7 +3,7 @@
 The Unity package runs a preflight on `EditorApplication.focusChanged(true)`. The preflight
 exists so that files replaced outside Unity while it was unfocused — a `git checkout`, a
 revert, an agent editing a Scene file — do not surface as native "changed on disk" dialogs
-that block `uloop` commands. Implementation: `ExternalSceneChangeTracker.ResolveForFocusReturn`
+that block `tloop` commands. Implementation: `ExternalSceneChangeTracker.ResolveForFocusReturn`
 and `ExternalPrefabStageChangeTracker` under `Packages/src/Editor/FirstPartyTools/Compile/`.
 
 ## What the preflight does, per open asset
@@ -74,7 +74,7 @@ Through 3.2.1 the package called `AssetDatabase.DisallowAutoRefresh` on focus lo
 it only after the preflight ran. That hold is what caused issue #2575: Unity evaluates its own
 focus-return Auto Refresh while the hold is still active, skips it, and does not reschedule it
 after `AllowAutoRefresh`, so `.cs` files added or edited outside Unity stayed unimported until
-an explicit `uloop compile`.
+an explicit `tloop compile`.
 
 A/B checks on Unity 2022.3.62f3 and 6000.3.15f1 showed the same Editor order every time:
 native refresh (import) → C# `EditorApplication.focusChanged(true)` (preflight) → Unity's
@@ -87,23 +87,23 @@ version-specific workaround over holding Auto Refresh for every Editor.
 
 A different hold exists for live hot-reload patches. `HotReloadAutoRefreshHold` calls
 `DisallowAutoRefresh` only while `HotReloadPatcher.ActiveChangeCount > 0`, so a
-`uloop focus-window` cannot import edited `.cs` files and stop Play Mode. The hold is
+`tloop focus-window` cannot import edited `.cs` files and stop Play Mode. The hold is
 released when the ledger returns to 0 (revert-all, a run that clears the last patch,
 compile, or domain reload). Release then calls `AssetDatabase.Refresh` when the Editor is
 focused and not playing; during Play the refresh is deferred to the next focus return or
-`uloop compile`. Explicit `AssetDatabase.Refresh` from `uloop compile` still runs while
+`tloop compile`. Explicit `AssetDatabase.Refresh` from `tloop compile` still runs while
 the hold is active.
 
 ## Related but separate paths
 
-- `uloop compile` runs the same fingerprint comparison before compiling (`ExternalSceneChangeResolver`).
+- `tloop compile` runs the same fingerprint comparison before compiling (`ExternalSceneChangeResolver`).
   There, a dirty Scene that changed externally is reported and never overwritten; clean changed
   Scenes are reloaded, and dirty Scenes are saved first only when a reload of the whole Scene
   setup is required. `--stop-on-external-scene-changes` turns the reload into a hard stop.
   The compile preflight imports those changed Scene assets synchronously before reloading them.
   Reloading first leaves the loaded Scene tied to the stale import, so the following
   `AssetDatabase.Refresh` raises Unity's "modified externally" dialog.
-- `uloop run-tests` saves unsaved Scene and Prefab Stage changes before starting by default,
-  and `uloop control-play-mode --action Play --unsaved-changes save` does so on request (its
+- `tloop run-tests` saves unsaved Scene and Prefab Stage changes before starting by default,
+  and `tloop control-play-mode --action Play --unsaved-changes save` does so on request (its
   default `keep` saves nothing); that is an explicit, documented step in those tools, not part
   of focus return.

@@ -37,30 +37,30 @@ write_checksum() {
   )
 }
 
-write_executable "$PAYLOAD_DIR/uloop-project-runner" "real"
+write_executable "$PAYLOAD_DIR/tloop-project-runner" "real"
 
-tar -czf "$RELEASE_DIR/uloop-project-runner-darwin-amd64.tar.gz" -C "$PAYLOAD_DIR" ./uloop-project-runner
-tar -czf "$RELEASE_DIR/uloop-project-runner-darwin-arm64.tar.gz" -C "$PAYLOAD_DIR" ./uloop-project-runner
-tar -czf "$RELEASE_DIR/uloop-project-runner-linux-amd64.tar.gz" -C "$PAYLOAD_DIR" ./uloop-project-runner
-write_checksum "uloop-project-runner-darwin-amd64.tar.gz"
-write_checksum "uloop-project-runner-darwin-arm64.tar.gz"
-write_checksum "uloop-project-runner-linux-amd64.tar.gz"
+tar -czf "$RELEASE_DIR/tloop-project-runner-darwin-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner
+tar -czf "$RELEASE_DIR/tloop-project-runner-darwin-arm64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner
+tar -czf "$RELEASE_DIR/tloop-project-runner-linux-amd64.tar.gz" -C "$PAYLOAD_DIR" ./tloop-project-runner
+write_checksum "tloop-project-runner-darwin-amd64.tar.gz"
+write_checksum "tloop-project-runner-darwin-arm64.tar.gz"
+write_checksum "tloop-project-runner-linux-amd64.tar.gz"
 
 if ! command -v zip >/dev/null 2>&1; then
   echo "zip is required to test native CLI release asset verification" >&2
   exit 1
 fi
 
-write_executable "$PAYLOAD_DIR/uloop-project-runner.exe" "real"
+write_executable "$PAYLOAD_DIR/tloop-project-runner.exe" "real"
 (
   cd "$PAYLOAD_DIR"
-  zip -q "$RELEASE_DIR/uloop-project-runner-windows-amd64.zip" uloop-project-runner.exe
+  zip -q "$RELEASE_DIR/tloop-project-runner-windows-amd64.zip" tloop-project-runner.exe
 )
-write_checksum "uloop-project-runner-windows-amd64.zip"
+write_checksum "tloop-project-runner-windows-amd64.zip"
 
 "$ROOT_DIR/scripts/verify-native-cli-release-assets.sh" "$RELEASE_DIR"
 
-LINUX_ARCHIVE="uloop-project-runner-linux-amd64.tar.gz"
+LINUX_ARCHIVE="tloop-project-runner-linux-amd64.tar.gz"
 
 fail() {
   echo "$1" >&2

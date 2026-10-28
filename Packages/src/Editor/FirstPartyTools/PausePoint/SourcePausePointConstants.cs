@@ -69,7 +69,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string HarmonyDynamicMethodDeclaringType = "MonoMod.Utils.DynamicMethodDefinition";
         public const string HarmonyPatchNameSuffix = "_Patch";
 
-        public const string HarmonyId = "io.github.hatayama.uloop.source-pause-point";
+        public const string HarmonyId = "io.github.tongguang.tloop.source-pause-point";
         public const string BurstCompileAttributeFullName = "Unity.Burst.BurstCompileAttribute";
 
         // A heuristic threshold, not a guarantee: Mono's JIT inlining decision depends on far more
@@ -251,10 +251,10 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // to re-switch after restart rather than only once.
         public const string ReleaseCodeOptimizationRecommendedNextAction =
             "Automatic Debug switch and recompile did not succeed. Confirm Code Optimization is Debug "
-            + "(the bug icon in the main toolbar), run uloop compile, then retry enable-pause-point. "
+            + "(the bug icon in the main toolbar), run tloop compile, then retry enable-pause-point. "
             + "Note: the Debug setting reverts to the 'Code Optimization On Startup' preference "
-            + "whenever the Editor restarts, including uloop launch -r. "
-            + "To make Unity start in Debug permanently, run: uloop set-code-optimization debug --startup "
+            + "whenever the Editor restarts, including tloop launch -r. "
+            + "To make Unity start in Debug permanently, run: tloop set-code-optimization debug --startup "
             + "(machine-wide: applies to every Unity project on this machine; only your project's C# script "
             + "execution slows down, mainly during Play Mode - the Unity Editor itself is not slowed).";
 
@@ -269,7 +269,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string ResolveFailedRecommendedNextAction =
             "Check that --file is the project-relative path Unity shows (Assets/... or Packages/<package-id>/...) "
             + "and that --line is on or after an executable statement inside a method body. After a code edit "
-            + "or a Code Optimization switch, run uloop compile and retry. See the pause-point skill's "
+            + "or a Code Optimization switch, run tloop compile and retry. See the pause-point skill's "
             + "troubleshooting reference for specific failure patterns.";
 
         // Why a second next action: on the edited-file path the file was already found in a compiled
@@ -277,7 +277,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // caller's. Compile helps only when the wanted statement was added after the last compile.
         public const string ResolveFailedEditedFileRecommendedNextAction =
             "Pass --line on an executable statement inside a method body, using the line numbers of the "
-            + "file on disk. If that statement was added after the last compile, run 'uloop compile' "
+            + "file on disk. If that statement was added after the last compile, run 'tloop compile' "
             + "first, then retry.";
 
         // Why a clause put before the line advice: a --method that names no method in the file fails
@@ -316,9 +316,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             + "reload has patched.";
 
         public const string IntroducedTypeResolveFailureNextAction =
-            "Edit the target method body and run 'uloop hot-reload --files <this file>' so the method "
+            "Edit the target method body and run 'tloop hot-reload --files <this file>' so the method "
             + "is reported Patched, then enable the pause point again on a line inside that method. "
-            + "Or run 'uloop compile' to compile the type and use the normal path.";
+            + "Or run 'tloop compile' to compile the type and use the normal path.";
 
         // Why a refusal of its own: an added method exists only in the hot reload shim, which
         // pause-point cannot arm, and the compiled code has no counterpart for it. Without
@@ -326,7 +326,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Format: requested line, added method name.
         public const string AddedMethodResolveFailureMessageFormat =
             "Line {0} is inside '{1}', which hot reload added; pause points cannot be armed inside "
-            + "added methods until 'uloop compile', so it was refused instead of arming another method.";
+            + "added methods until 'tloop compile', so it was refused instead of arming another method.";
 
         // Why a variant: when the requested line has no statement and the next statement is the
         // one inside the added method, "Line {0} is inside" would place the requested line in a
@@ -334,7 +334,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string AddedMethodNextStatementResolveFailureMessageFormat =
             "Line {0} has no compiled statement of its own, and the next statement, line {1}, is "
             + "inside '{2}', which hot reload added; pause points cannot be armed inside added "
-            + "methods until 'uloop compile', so it was refused instead of arming another method.";
+            + "methods until 'tloop compile', so it was refused instead of arming another method.";
 
         // Why refuse rather than remap: the running patch maps lines of the source it was compiled
         // from, which is not kept, so a marker placed now would stop at another statement than the
@@ -346,11 +346,11 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             + "different statement than the one shown.";
 
         public const string PatchedSourceChangedOnDiskHint =
-            "Run 'uloop hot-reload' on the file again (fix any compile error first) or revert the edit, "
+            "Run 'tloop hot-reload' on the file again (fix any compile error first) or revert the edit, "
             + "then enable the pause point.";
 
         public const string AddedMethodResolveFailureNextAction =
-            "Run 'uloop compile', then enable the pause point on this line again.";
+            "Run 'tloop compile', then enable the pause point on this line again.";
 
         // Format: method filter, requested line.
         public const string NoMethodNamedWithSequencePointMessageFormat =
@@ -359,11 +359,11 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Auto-retarget failure reasons surfaced on status Warning / SuppressedByHotReloadReason.
         public const string RetargetOntoHotReloadFailedReason =
             "The marker's line no longer resolves inside the hot-reload patched body; it will not fire "
-            + "until the patch is reverted, the line exists again, or 'uloop compile' runs.";
+            + "until the patch is reverted, the line exists again, or 'tloop compile' runs.";
 
         public const string RestoreAfterHotReloadRevertFailedReason =
             "Instrumentation could not be restored after the hot-reload patch was reverted; the line "
-            + "no longer resolves in the compiled assembly. Re-enable the marker after 'uloop compile'.";
+            + "no longer resolves in the compiled assembly. Re-enable the marker after 'tloop compile'.";
 
         // Why name only the edited body: --line is an edited-file line, so the edited range of
         // the patched method is the one place the caller can move the line to and still pause
@@ -393,10 +393,10 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string HotReloadPatchedMethodWithoutSpanRefusalMessageFormat =
             "Line {0} of the edited file resolves to a statement inside '{1}', which hot reload "
             + "patched, so the compiled body no longer runs. Pass --line inside the method's edited "
-            + "body, or run 'uloop compile' and retry.";
+            + "body, or run 'tloop compile' and retry.";
 
         public const string HotReloadPatchedMethodWithoutSpanRefusalNextAction =
-            "Pass --line inside the patched method's edited body, or run 'uloop compile' and retry.";
+            "Pass --line inside the patched method's edited body, or run 'tloop compile' and retry.";
 
         // Why name the row: the method's Methods[] row in the last hot reload response gives the
         // Reason that reload did not apply it, which is what the caller has to change before a
@@ -414,8 +414,8 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string HotReloadLeftBehindFailedVerb = "could not apply";
 
         public const string HotReloadLeftBehindMethodRefusalNextAction =
-            "Change what that Reason names and run 'uloop hot-reload' on the file again, or run "
-            + "'uloop compile'; then retry with the same --line.";
+            "Change what that Reason names and run 'tloop hot-reload' on the file again, or run "
+            + "'tloop compile'; then retry with the same --line.";
 
         // Why only compile: the last reload read the file as it is and left no row unapplied, so
         // reloading the same contents leaves the earlier body running. Format: requested line,
@@ -427,7 +427,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             + "in it.";
 
         public const string HotReloadEarlierPatchRefusalNextAction =
-            "Run 'uloop compile', then retry with the same --line.";
+            "Run 'tloop compile', then retry with the same --line.";
 
         // Why the rows and a reload: the last reload read the file as it is and left no row for
         // the method, but the rows it did leave name what kept the file from being applied, and
@@ -440,8 +440,8 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             + "Methods[] rows unapplied: {2}.";
 
         public const string HotReloadEarlierPatchLeftRowsRefusalNextAction =
-            "Change what those rows' Reasons name and run 'uloop hot-reload' on the file again, or run "
-            + "'uloop compile'; then retry with the same --line.";
+            "Change what those rows' Reasons name and run 'tloop hot-reload' on the file again, or run "
+            + "'tloop compile'; then retry with the same --line.";
 
         public const string NearbyCompiledMethodsPrefix =
             " Nearby methods in the last compiled source: ";
@@ -458,11 +458,11 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // to the line, and arming the compiled body would pause code that no longer runs.
         public const string HotReloadPatchedMethodPdbUnavailableWarningFormat =
             "--line {1} falls inside hot-reload patched method '{0}', but this patch has no debug "
-            + "symbols, so a pause point cannot be placed on the running code. Run 'uloop compile' "
+            + "symbols, so a pause point cannot be placed on the running code. Run 'tloop compile' "
             + "and re-enable.";
 
         public const string HotReloadPatchedMethodPdbUnavailableNextAction =
-            "Run 'uloop compile' and re-enable the pause point.";
+            "Run 'tloop compile' and re-enable the pause point.";
 
         // Format: resolved method display name, requested line, edited start line, edited end line.
         public const string HotReloadRetargetedToEditedFileWarningFormat =
@@ -477,16 +477,16 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Format: declaring type name, added-field count, comma-separated simple field names.
         public const string HotReloadAddedFieldsNotCapturedWarningFormat =
             "Hot reload added {1} field(s) to '{0}' ({2}); they never appear in CapturedVariables, "
-            + "and naming them as members in 'uloop execute-dynamic-code' fails with CS1061 "
+            + "and naming them as members in 'tloop execute-dynamic-code' fails with CS1061 "
             + "because it compiles against the compiled assembly. Read one there with "
             + "HotReloadAddedFieldWiring.TryReadInstanceField (TryReadStaticField for a static "
-            + "field); references/added-field-wiring.md in the uloop-hot-reload skill shows how.";
+            + "field); references/added-field-wiring.md in the tloop-hot-reload skill shows how.";
 
         // Why fill on success: a successful enable currently leaves RecommendedNextAction empty,
         // so agents arm a marker and then stall instead of running the path or using --await.
         // Format: marker id.
         public const string EnableSuccessArmingRecommendedNextActionFormat =
-            "Run the code path so the marker can hit, then read the outcome with: uloop pause-point-status --id \"{0}\". To block until it hits without a trigger command (e.g. waiting for physics or a multi-step action): uloop await-pause-point --id \"{0}\" --timeout-seconds <n>. To arm, trigger, and collect in one call: uloop enable-pause-point --await --resume-play --trigger \"<uloop subcommand without the leading 'uloop', e.g. simulate-keyboard --action Press --key Space>\".";
+            "Run the code path so the marker can hit, then read the outcome with: tloop pause-point-status --id \"{0}\". To block until it hits without a trigger command (e.g. waiting for physics or a multi-step action): tloop await-pause-point --id \"{0}\" --timeout-seconds <n>. To arm, trigger, and collect in one call: tloop enable-pause-point --await --resume-play --trigger \"<tloop subcommand without the leading 'tloop', e.g. simulate-keyboard --action Press --key Space>\".";
 
         // Why warn: Registry.Enable replaces the entry and drops CapturedVariables,
         // CapturedVariableHistory, and hit snapshots. The raw capture holder is kept on purpose.
@@ -525,7 +525,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             "Line {0} of '{1}' resolves to the compiled statement '{2}', which no longer exists at that place in the edited file (removed or changed after the last compile).";
 
         public const string LineNotCompiledRecommendedNextAction =
-            "Run 'uloop hot-reload' (a pause point inside a hot-reload patched method arms the edited code) or 'uloop compile', then retry with the same --line. To arm compiled code instead, pass --line for a statement that is unchanged since the last compile.";
+            "Run 'tloop hot-reload' (a pause point inside a hot-reload patched method arms the edited code) or 'tloop compile', then retry with the same --line. To arm compiled code instead, pass --line for a statement that is unchanged since the last compile.";
 
         // Why say what the last reload did: once it read the file as it is on disk, hot reloading
         // the same contents again gives the same result, so the shared "hot-reload or compile"
@@ -540,13 +540,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
         public const string LineNotCompiledLatestReloadLeftRowsRecommendedNextAction =
             "If one of those rows covers this line (its method holds the line, or it is a '(file)' "
-            + "row), change what that row's Reason names and run 'uloop hot-reload' again; otherwise, "
-            + "or to run the edited code as written, run 'uloop compile'. Then retry with the same "
+            + "row), change what that row's Reason names and run 'tloop hot-reload' again; otherwise, "
+            + "or to run the edited code as written, run 'tloop compile'. Then retry with the same "
             + "--line. To arm compiled code instead, pass --line for a statement that is unchanged "
             + "since the last compile.";
 
         public const string LineNotCompiledLatestReloadAppliedAllRecommendedNextAction =
-            "Run 'uloop compile', then retry with the same --line. To arm compiled code instead, pass "
+            "Run 'tloop compile', then retry with the same --line. To arm compiled code instead, pass "
             + "--line for a statement that is unchanged since the last compile.";
 
         // Why a next action of its own: hot reload and compile do not change how many lines the
@@ -560,6 +560,6 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // against, and refusing would make pause points unusable in files such as package sources.
         // Format: file, requested line.
         public const string NoVerifiedSnapshotLineBasisWarningFormat =
-            "No verified source snapshot exists for '{0}', so --line {1} was resolved against the last compiled source and ResolvedLine is a compiled line number. Run 'uloop compile' to refresh the snapshot.";
+            "No verified source snapshot exists for '{0}', so --line {1} was resolved against the last compiled source and ResolvedLine is a compiled line number. Run 'tloop compile' to refresh the snapshot.";
     }
 }

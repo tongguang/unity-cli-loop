@@ -8,7 +8,7 @@ an artifact assembly the domain loads and keeps, and the bodies of the same relo
 Top-level, non-nested, non-partial, non-generic, declared `public`, `internal`, or without an
 access modifier, and one of: class (including `static` helper classes), struct, enum, interface.
 An `internal` or modifier-less declaration is compiled as `public` in its artifact, so the
-edited bodies of the reload and `uloop execute-dynamic-code` snippets can name it; the source
+edited bodies of the reload and `tloop execute-dynamic-code` snippets can name it; the source
 and its fingerprint keep the modifier as written, so changing it later is a declaration change.
 
 Everything else is refused. The declaration is simply not introduced, the rest of the reload
@@ -17,13 +17,13 @@ continues, and `Warnings` carries `<file>: <reason>: <type>` where the reason is
 `Generic introduced type requires a compile` · `Partial introduced type requires a compile` ·
 `Record introduced type requires a compile` · `File-local introduced type requires a compile` ·
 `Ref-like introduced type requires a compile` · `Unsafe introduced type requires a compile` ·
-`Unity object introduced type requires a compile` · `Serializable introduced type requires a compile` ·
+`Tuanjie object introduced type requires a compile` · `Serializable introduced type requires a compile` ·
 `Module initializer introduced type requires a compile` · `Delegate introduced type requires a compile` ·
 `Unsupported introduced type requires a compile` ·
 `Nested type requires a compile` · `Nested declaration inside an introduced type requires a compile` ·
 `Internal override in an introduced type requires a compile`
 
-On Unity 2022.3 and 6000.3 the bundled compiler (Roslyn 4.3.1) predates `file` types, so a `file`
+On Tuanjie 2022.3 and 6000.3 the bundled compiler (Roslyn 4.3.1) predates `file` types, so a `file`
 declaration fails to parse instead of being refused. A top-level `private` or `protected`
 declaration is not repaired: the artifact compile fails on it.
 
@@ -46,12 +46,12 @@ inlined, before any type of the artifact becomes active.
   or retained base member is refused (`Internal override in an introduced type requires a
   compile`); it compiles only when the base is introduced in the same reload.
 - Internals look public to this compile, so it can accept what a regular compile rejects (a
-  `public` member exposing an `internal` type). `uloop compile` is the real check.
+  `public` member exposing an `internal` type). `tloop compile` is the real check.
 - Body edits of, and members added to, an introduced `internal` or modifier-less type end as on
   a `public` introduced type, and what other types add that names it stays applied. A lambda,
   local function, or query expression that uses a compiled `internal` type is `Skipped` on both.
 - A member another type adds cannot use a non-public member of an introduced type until
-  `uloop compile`. It is `Skipped` on every reload: with `Added members of other types cannot
+  `tloop compile`. It is `Skipped` on every reload: with `Added members of other types cannot
   use '…', a non-public member of a type hot reload introduced` when the reload edits that type,
   and as a body that could not be bound otherwise. A property counts by the accessor the use
   calls: reading one whose setter is `internal` stays applied, and writing it is `Skipped` naming
@@ -59,7 +59,7 @@ inlined, before any type of the artifact becomes active.
 
 When an edited body in the same run names a refused type, its shim compile fails with CS0246,
 CS0234, or CS0426, or with CS0103 or CS0117 when the body reads a static member of it. That `Failed` row's `Reason` then ends with a note that quotes the refusal
-and says `uloop compile` clears it.
+and says `tloop compile` clears it.
 
 These conditions produce a `Failed` row in `IntroducedTypes` instead, and a `Failed` row makes
 `Success` false and leaves every file that shares an assembly with the refused declaration
@@ -84,7 +84,7 @@ apply, and patches from earlier reloads stay active:
   fields and properties added to the type keep it as well and are applied as `Added` rows.
   A struct is the exception: its method bodies are `Skipped` ("Struct (value type) methods are
   skipped…") on an introduced struct as on a compiled one, so a struct body edit needs
-  `uloop compile`.
+  `tloop compile`.
 - `Failed` — refused; see the table above.
 - `ActiveIntroducedTypeTotal` counts the types the domain holds after the run, whatever the
   methods did. Type rows never count toward `PatchedTotal`, `ActivePatchTotal`,
@@ -98,7 +98,7 @@ apply, and patches from earlier reloads stay active:
 An introduced type is identified by its original assembly name plus its metadata name, and that
 pair names one implementation for the rest of the domain's life. A changed declaration of an
 already-introduced type is therefore `Failed`, not a replacement, and deleting the declaration
-does not unload it either. Only `uloop compile` gets a changed or removed declaration into the
+does not unload it either. Only `tloop compile` gets a changed or removed declaration into the
 Editor.
 
 An edit to an introduced type is also refused when that type appears in the member signatures
@@ -106,7 +106,7 @@ of another type that an earlier reload retained and this edit leaves unchanged, 
 change would split the type between the retained assembly and this edit. The refusal names that
 type. Editing it in the same reload (a method body change is enough) lets both bind from this
 edit, so the run applies; passing its file without editing it changes nothing. Otherwise run
-`uloop compile`.
+`tloop compile`.
 
 The same split refuses a change to an introduced type when a new file in the same reload
 introduces a type naming it in its signatures: the new type is compiled against the loaded
@@ -119,15 +119,15 @@ same reload does not help while the new type is still being introduced.
 The two steps do not apply when the changed type's file holds only what earlier reloads already
 applied and this reload changes nothing in it, for example when the file comes back in only
 because the new file uses it. The new type is still compiled against the definition the first
-reload loaded, so no order of reloads joins the two, and the refusal says so: run `uloop compile`,
+reload loaded, so no order of reloads joins the two, and the refusal says so: run `tloop compile`,
 or name the type only inside method bodies of the new type rather than in its signatures. When a
 retained type also names it in its signatures, the refusal names that type too, and moving the
 use into the new type's bodies works only if the same reload also edits the retained type.
 
 `--revert-all` reverts patches and added members but cannot unload an introduced type; the
 response says how many stayed. Auto Refresh stays held while any introduced type is active —
-`uloop compile` always releases it, `--revert-all` only when no introduced type remains.
-With Domain Reload enabled on Play entry (the default for projects created before Unity 6.6), entering Play Mode reloads the domain and
+`tloop compile` always releases it, `--revert-all` only when no introduced type remains.
+With Domain Reload enabled on Play entry (the default for projects created before Tuanjie 6.6), entering Play Mode reloads the domain and
 discards the types with the patches; they are counted in `DroppedByPlayModeEntryCount` until a
 later apply re-introduces them. With Enter Play Mode Options set to disable Domain Reload, the
 active changes and the introduced types survive Play entry and nothing is recorded as dropped.
@@ -157,7 +157,7 @@ CS0117) with a hint saying where such a call works. So does a call to an additio
 assembly, or in a file that changed since it was last applied and is not passed. A subscription
 to an added event the added-field store cannot hold (custom `add`/`remove` accessors, or a
 delegate type not visible outside the assembly) fails the same way wherever it is written, even
-in a method; only `uloop compile` makes it bind.
+in a method; only `tloop compile` makes it bind.
 
 - When this reload does not patch a stubbed body (a generic method, or a method of a struct, is
   `Skipped`), no type of that artifact is introduced: the stubbed type's row reads `Not
@@ -165,7 +165,7 @@ in a method; only `uloop compile` makes it bind.
   fail with it, and nothing of that assembly's files is applied.
 - Another type the same reload introduces cannot name such a type in its member signatures. The
   run is refused with `Introduced type '<type>' calls members that a hot reload added, so its
-  method bodies run through hot reload patches, …`; run `uloop compile`, or name the type only
+  method bodies run through hot reload patches, …`; run `tloop compile`, or name the type only
   inside that other type's method bodies. Two types that both call additions this way may name
   each other.
 - After `--revert-all`, or when the reload that introduces the type fails to apply one of those
@@ -173,17 +173,17 @@ in a method; only `uloop compile` makes it bind.
   `InvalidOperationException` naming the file to reload; reloading that file patches the body in
   again.
 
-## Still needs `uloop compile`
+## Still needs `tloop compile`
 
 Any refused shape above; use of the type from another assembly, from a file that is neither
 passed to this reload nor already hot-reloaded; anything
-that reaches the type through Unity (serialization, `[SerializeField]`, Inspector,
+that reaches the type through Tuanjie (serialization, `[SerializeField]`, Inspector,
 `AddComponent`, `CreateInstance`, message discovery); a method body edit of an introduced
 struct, which is `Skipped` like any struct method; a call to a member hot reload *added* from a
 new type's body that is not an ordinary method or get-only property, or to an addition this
 reload does not hold (see "Calling members hot reload adds"); an added method that passes a type declared from source in this reload to a
 member of an earlier introduced type whose signature was bound to the compiled copy, which is
-`Skipped` naming both types; and any new or changed `.asmdef` / `.asmref`. A snippet run by `uloop execute-dynamic-code` is
+`Skipped` naming both types; and any new or changed `.asmdef` / `.asmref`. A snippet run by `tloop execute-dynamic-code` is
 the exception: every active artifact is referenced by that compilation, so the snippet can name an
 introduced type directly by its full name. When such a snippet still fails on the name, the
 diagnostic's `Hint` names the type and how to spell it.
@@ -193,9 +193,9 @@ diagnostic's `Hint` names the type and how to spell it.
 When `--files` is omitted or empty, a source is selected only when its compilation assembly has
 a snapshot directory and that source has its own snapshot file. A missing per-file snapshot is
 left out rather than guessed as changed. A file that has never been compiled therefore has no
-snapshot and is never selected automatically — pass it with `--files`, or run `uloop compile` to
-establish a complete baseline. A script under a brand-new `.asmdef` still needs `uloop compile`
-first, because Unity has to create the assembly before a reload can target it.
+snapshot and is never selected automatically — pass it with `--files`, or run `tloop compile` to
+establish a complete baseline. A script under a brand-new `.asmdef` still needs `tloop compile`
+first, because Tuanjie has to create the assembly before a reload can target it.
 
 One exception: when the Play Mode domain reload discards types that hot reload had introduced,
 the files that declare them are remembered. The next reload without `--files` selects them again

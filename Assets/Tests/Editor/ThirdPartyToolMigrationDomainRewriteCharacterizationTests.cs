@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Pins the CSharpRules orchestration entry for a bare legacy registrar reference.
             string source =
-                "using io.github.hatayama.uLoopMCP;\n" +
+                "using io.github.tongguang.tloop;\n" +
                 "public class Sample {\n" +
                 "  public void Run() { CustomToolManager.Register(); }\n" +
                 "}\n";
@@ -65,7 +65,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 "using UnityEngine;\n" +
                 "public class Sample {\n" +
                 "  public async Task<Texture2D> Run(EditorWindow window, System.Threading.CancellationToken ct) {\n" +
-                "    return await io.github.hatayama.uLoopMCP.EditorWindowCaptureUtility.CaptureWindowAsync(window, 1.0f, ct);\n" +
+                "    return await io.github.tongguang.tloop.EditorWindowCaptureUtility.CaptureWindowAsync(window, 1.0f, ct);\n" +
                 "  }\n" +
                 "}\n";
 
@@ -82,7 +82,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             Assert.That(replacementCount, Is.GreaterThan(0));
             Assert.That(content, Does.Contain("CaptureWindow"));
-            Assert.That(content, Does.Not.Contain("io.github.hatayama.uLoopMCP.EditorWindowCaptureUtility"));
+            Assert.That(content, Does.Not.Contain("io.github.tongguang.tloop.EditorWindowCaptureUtility"));
         }
 
         [Test]
@@ -185,7 +185,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Pins the full orchestration: BaseToolResponse rename and hiding Success removal happen together for V2 sources.
             string source =
-                "using io.github.hatayama.uLoopMCP;\n" +
+                "using io.github.tongguang.tloop;\n" +
                 "\n" +
                 "public sealed class LegacyResponse : BaseToolResponse\n" +
                 "{\n" +

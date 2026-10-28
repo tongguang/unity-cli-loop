@@ -11,7 +11,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
     /// </summary>
     public sealed class CodeAnalysisPluginImporterTests
     {
-        private const string PackageRootPath = "Packages/io.github.hatayama.uloopmcp";
+        private const string PackageRootPath = "Packages/io.github.tongguang.tloop";
         private const string CodeAnalysisPluginRootPath =
             PackageRootPath + "/Editor/FirstPartyTools/ExecuteDynamicCode/Plugins/CodeAnalysis";
         private const int ComImageFlagsStrongNameSigned = 0x8;

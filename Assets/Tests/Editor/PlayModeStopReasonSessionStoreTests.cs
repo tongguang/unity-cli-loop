@@ -90,11 +90,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             PlayModeStopReasonSessionStore.ConfirmPending("2026-01-05T00:00:00.0000000Z");
 
             Assert.That(
-                SessionState.GetString("io.github.hatayama.uloopmcp.playModeStopReason.reason", string.Empty),
+                SessionState.GetString("io.github.tongguang.tloop.playModeStopReason.reason", string.Empty),
                 Is.EqualTo("cli-control-play-mode"));
             Assert.That(
                 SessionState.GetString(
-                    "io.github.hatayama.uloopmcp.playModeStopReason.stoppedAtUtc",
+                    "io.github.tongguang.tloop.playModeStopReason.stoppedAtUtc",
                     string.Empty),
                 Is.EqualTo("2026-01-05T00:00:00.0000000Z"));
         }
@@ -106,10 +106,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void TryReadConfirmed_WhenSessionStateSeededWithLiteralKeys_ReturnsThoseValues()
         {
             SessionState.SetString(
-                "io.github.hatayama.uloopmcp.playModeStopReason.reason",
+                "io.github.tongguang.tloop.playModeStopReason.reason",
                 "script-compilation");
             SessionState.SetString(
-                "io.github.hatayama.uloopmcp.playModeStopReason.stoppedAtUtc",
+                "io.github.tongguang.tloop.playModeStopReason.stoppedAtUtc",
                 "2026-01-06T00:00:00.0000000Z");
 
             PlayModeStopReasonRecord record = PlayModeStopReasonSessionStore.TryReadConfirmed();

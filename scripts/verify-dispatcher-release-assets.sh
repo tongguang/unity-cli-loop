@@ -7,14 +7,14 @@ install.sh
 install.sh.sha256
 install.ps1
 install.ps1.sha256
-uloop-dispatcher-darwin-amd64.tar.gz
-uloop-dispatcher-darwin-amd64.tar.gz.sha256
-uloop-dispatcher-darwin-arm64.tar.gz
-uloop-dispatcher-darwin-arm64.tar.gz.sha256
-uloop-dispatcher-linux-amd64.tar.gz
-uloop-dispatcher-linux-amd64.tar.gz.sha256
-uloop-dispatcher-windows-amd64.zip
-uloop-dispatcher-windows-amd64.zip.sha256
+tloop-dispatcher-darwin-amd64.tar.gz
+tloop-dispatcher-darwin-amd64.tar.gz.sha256
+tloop-dispatcher-darwin-arm64.tar.gz
+tloop-dispatcher-darwin-arm64.tar.gz.sha256
+tloop-dispatcher-linux-amd64.tar.gz
+tloop-dispatcher-linux-amd64.tar.gz.sha256
+tloop-dispatcher-windows-amd64.zip
+tloop-dispatcher-windows-amd64.zip.sha256
 "
 
 if [ "${1:-}" = "--list" ]; then
@@ -104,16 +104,16 @@ for asset_name in $EXPECTED_ASSETS; do
   require_file "$asset_name"
 done
 
-verify_checksum "uloop-dispatcher-darwin-amd64.tar.gz"
-verify_checksum "uloop-dispatcher-darwin-arm64.tar.gz"
-verify_checksum "uloop-dispatcher-linux-amd64.tar.gz"
-verify_checksum "uloop-dispatcher-windows-amd64.zip"
+verify_checksum "tloop-dispatcher-darwin-amd64.tar.gz"
+verify_checksum "tloop-dispatcher-darwin-arm64.tar.gz"
+verify_checksum "tloop-dispatcher-linux-amd64.tar.gz"
+verify_checksum "tloop-dispatcher-windows-amd64.zip"
 verify_checksum "install.sh"
 verify_checksum "install.ps1"
 
-require_tar_entry "uloop-dispatcher-darwin-amd64.tar.gz" "uloop"
-require_tar_entry "uloop-dispatcher-darwin-arm64.tar.gz" "uloop"
-require_tar_entry "uloop-dispatcher-linux-amd64.tar.gz" "uloop"
-require_zip_entry "uloop-dispatcher-windows-amd64.zip" "uloop.exe"
+require_tar_entry "tloop-dispatcher-darwin-amd64.tar.gz" "tloop"
+require_tar_entry "tloop-dispatcher-darwin-arm64.tar.gz" "tloop"
+require_tar_entry "tloop-dispatcher-linux-amd64.tar.gz" "tloop"
+require_zip_entry "tloop-dispatcher-windows-amd64.zip" "tloop.exe"
 
 echo "Dispatcher release assets are complete."

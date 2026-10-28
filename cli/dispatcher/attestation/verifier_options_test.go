@@ -61,7 +61,7 @@ func decodeVerificationResult(t *testing.T, raw string) *verify.VerificationResu
 func TestExtractVerifiedSubjects(t *testing.T) {
 	t.Run("keeps sha256 subjects only", func(t *testing.T) {
 		result := decodeVerificationResult(t, `{"statement":{"subject":[
-			{"name":"uloop.tar.gz","digest":{"sha256":"abc123"}},
+			{"name":"tloop.tar.gz","digest":{"sha256":"abc123"}},
 			{"name":"sha512-only","digest":{"sha512":"def456"}},
 			{"name":"empty-sha256","digest":{"sha256":""}}
 		]}}`)
@@ -71,7 +71,7 @@ func TestExtractVerifiedSubjects(t *testing.T) {
 		if err != nil {
 			t.Fatalf("extractVerifiedSubjects failed: %v", err)
 		}
-		if len(subjects) != 1 || subjects["uloop.tar.gz"] != "abc123" {
+		if len(subjects) != 1 || subjects["tloop.tar.gz"] != "abc123" {
 			t.Fatalf("subjects = %#v", subjects)
 		}
 	})

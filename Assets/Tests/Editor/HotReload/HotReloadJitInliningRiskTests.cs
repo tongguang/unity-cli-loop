@@ -87,7 +87,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 warning,
                 Does.EndWith(
-                    " If 'uloop hot-reload --status' shows the method's InvocationCount increasing afterwards, the calls you exercised are reaching the patched body and this warning did not apply to them."));
+                    " If 'tloop hot-reload --status' shows the method's InvocationCount increasing afterwards, the calls you exercised are reaching the patched body and this warning did not apply to them."));
         }
     }
 }

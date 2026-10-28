@@ -181,7 +181,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string directory = Path.Combine(
                 Path.GetFullPath(Path.Combine(UnityEngine.Application.dataPath, "..")),
                 "Library",
-                "UloopHotReload",
+                "TloopHotReload",
                 "ResolverFixtures",
                 Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);

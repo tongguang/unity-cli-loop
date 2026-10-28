@@ -39,7 +39,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         public async Task PrepareIntroducedTypes_EmitsSupportedTypesAndPerFileDiagnostics()
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string directory = Path.Combine(projectRoot, "Library", "UloopHotReload", "TestSources", "IntroducedTypes");
+            string directory = Path.Combine(projectRoot, "Library", "TloopHotReload", "TestSources", "IntroducedTypes");
             Directory.CreateDirectory(directory);
             string firstSourcePath = Path.Combine(directory, "First.cs");
             string secondSourcePath = Path.Combine(directory, "Second.cs");

@@ -50,7 +50,7 @@ func TestMain(m *testing.M) {
 
 func runTestMain(m *testing.M) int {
 	if runtime.GOOS == "windows" {
-		buildDir, err := os.MkdirTemp("", "uloop-mockcli-")
+		buildDir, err := os.MkdirTemp("", "tloop-mockcli-")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to create mockcli build directory: %v\n", err)
 			return 1

@@ -2,7 +2,7 @@
 
 English | [日本語](tools_ja.md)
 
-Detailed descriptions of the tools built into Unity CLI Loop. For the big picture and the design philosophy, see the [README](../../../README.md).
+Detailed descriptions of the tools built into Tuanjie CLI Loop. For the big picture and the design philosophy, see the [README](../../../README.md).
 
 ## Development Loop Tools
 
@@ -54,7 +54,7 @@ Applies the method bodies of edited `.cs` files directly to the running Editor (
 
 Adding new methods and fields is also supported (added members are visible only to edited code in the same file). Adding new types, or members referenced from other files, requires `compile`. Methods that cannot be applied are reported per method as `Skipped` / `Failed`, and one failing method does not stop the rest from applying.
 
-Requiring no prior setup is another distinguishing point. Some existing hot-reload approaches require tagging target methods with an attribute ahead of time and compiling them in, or limit which kinds of methods can be targeted. uloop's hot reload needs none of that preparation and applies to any method of an already-running PlayMode after the fact. Beyond method-body edits, it can also apply changes to local variable types and to method signatures such as return types and parameters.
+Requiring no prior setup is another distinguishing point. Some existing hot-reload approaches require tagging target methods with an attribute ahead of time and compiling them in, or limit which kinds of methods can be targeted. tloop's hot reload needs none of that preparation and applies to any method of an already-running PlayMode after the fact. Beyond method-body edits, it can also apply changes to local variable types and to method signatures such as return types and parameters.
 
 ### 5. pause-point - Pause at Any Line and Read Variables Without Editing Code
 Pauses PlayMode at any source `file:line` without editing source or recompiling. It patches the already-compiled method directly, so it can be armed in the middle of a PlayMode session.
@@ -94,12 +94,12 @@ Retrieve objects and examine component parameters. Also retrieve information abo
 
 ### 8. get-hierarchy - Analyze Scene Structure
 Retrieve information about the currently active Hierarchy in nested JSON format. Works at runtime as well.
-**Automatic File Export**: Retrieved hierarchy data is always saved as JSON in `{project_root}/.uloop/outputs/HierarchyResults/` directory. The response only returns the file path, minimizing token consumption even for large datasets.
-**Selection Mode**: Use `uloop get-hierarchy --use-selection` to get hierarchy starting from currently selected GameObject(s) in Unity Editor. Supports multiple selection - when parent and child are both selected, only the parent is used as root to avoid duplicate traversal.
+**Automatic File Export**: Retrieved hierarchy data is always saved as JSON in `{project_root}/.tloop/outputs/HierarchyResults/` directory. The response only returns the file path, minimizing token consumption even for large datasets.
+**Selection Mode**: Use `tloop get-hierarchy --use-selection` to get hierarchy starting from currently selected GameObject(s) in Unity Editor. Supports multiple selection - when parent and child are both selected, only the parent is used as root to avoid duplicate traversal.
 ```text
 → Understand parent-child relationships between GameObjects, discover and fix structural issues
 → Regardless of scene size, hierarchy data is saved to a file and the path is returned instead of raw JSON
-→ uloop get-hierarchy --use-selection
+→ tloop get-hierarchy --use-selection
 → Get hierarchy of currently selected GameObjects without specifying paths manually
 ```
 
@@ -115,7 +115,7 @@ Supports three matching modes: `exact` (default), `prefix`, and `contains` - all
 Use `CaptureMode: rendering` to capture the Game View's rendering output directly instead of the EditorWindow's appearance. This is for grabbing the in-game picture during PlayMode without the Editor's window chrome or scaling getting in the way.
 Add `AnnotateRaycastGrid: true` to overlay a coordinate grid on the captured image, which makes it easier for an AI looking at the image to pick coordinates to pass to `simulate-mouse-input`.
 
-Use `uloop set-game-view-size --width 1920 --height 1080` to pin a custom Game View resolution. Do this when you want the coordinate space of `CaptureMode: rendering` to stay stable across runs (run it without arguments to read the current resolution).
+Use `tloop set-game-view-size --width 1920 --height 1080` to pin a custom Game View resolution. Do this when you want the coordinate space of `CaptureMode: rendering` to stay stable across runs (run it without arguments to read the current resolution).
 ```text
 → screenshot (WindowName: "Console")
 → Save Console window state as PNG
@@ -123,17 +123,17 @@ Use `uloop set-game-view-size --width 1920 --height 1080` to pin a custom Game V
 ```
 
 ### 11. record-video - Record the Game View During Play Mode
-Use `uloop record-video` to record the Game View while Play Mode runs. `start` returns immediately so other commands can run during capture; `stop` finalizes an MP4 (WebM on Linux) under `.uloop/outputs/Videos/`:
+Use `tloop record-video` to record the Game View while Play Mode runs. `start` returns immediately so other commands can run during capture; `stop` finalizes an MP4 (WebM on Linux) under `.tloop/outputs/Videos/`:
 ```text
-uloop record-video --action start
-uloop simulate-keyboard --key W --duration 2
-uloop record-video --action stop
+tloop record-video --action start
+tloop simulate-keyboard --key W --duration 2
+tloop record-video --action stop
 ```
 
 ### 12. control-play-mode - Control Play Mode
 Control Unity Editor's Play Mode. Supports three actions: Play (start/resume), Stop, and Pause.
 
-Use `uloop game-view-mode --to Simulator` before playing when the game must be checked in a device frame: it replaces the current Game view tab with the Device Simulator in place (the same as the Game / Simulator dropdown) and rotates the simulated device to match the Game view's orientation as far as Player Settings allow. `--to GameView` switches back, and running it without arguments reports which view is showing. `--device "iPhone 12"` shows that device (and implies `--to Simulator`); `--list-devices` lists the names the project offers. The play state is never changed.
+Use `tloop game-view-mode --to Simulator` before playing when the game must be checked in a device frame: it replaces the current Game view tab with the Device Simulator in place (the same as the Game / Simulator dropdown) and rotates the simulated device to match the Game view's orientation as far as Player Settings allow. `--to GameView` switches back, and running it without arguments reports which view is showing. `--device "iPhone 12"` shows that device (and implies `--to Simulator`); `--list-devices` lists the names the project offers. The play state is never changed.
 ```text
 → control-play-mode (Action: Play)
 → Start Play Mode to verify game behavior
@@ -207,7 +207,7 @@ Supports 3 actions: Press (one-shot tap or timed hold), KeyDown (hold key down),
 ```
 
 ### 17. replay-input - Replay Recorded Input During PlayMode
-Replay recorded keyboard and mouse input during PlayMode. Loads a JSON recording and injects input frame-by-frame via Input System. Supports looping and progress monitoring. This tool is available only when the Input System package is installed. Create recording files first in the Unity Editor from **Window > Unity CLI Loop > Recordings** using **Start Recording** and **Stop Recording**. There is no CLI command for recording input.
+Replay recorded keyboard and mouse input during PlayMode. Loads a JSON recording and injects input frame-by-frame via Input System. Supports looping and progress monitoring. This tool is available only when the Input System package is installed. Create recording files first in the Unity Editor from **Window > Tuanjie CLI Loop > Recordings** using **Start Recording** and **Stop Recording**. There is no CLI command for recording input.
 
 ```text
 → replay-input (Action: start)
@@ -223,4 +223,4 @@ sh scripts/run-posix-e2e.sh --project-path /path/to/unity-project
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run-windows-e2e.ps1
 ```
 
-`run-posix-e2e.sh` uses the built native CLI binary by default, passes an explicit `--project-path` to every `uloop` invocation, and runs CLI recovery/readiness, simulate-mouse UI coverage, and UI Toolkit screenshot annotation and click coverage in one sequence (skip the last with `--skip-uitoolkit-annotation`). To verify `replay-input` against a JSON created in the Recordings window, run `verify-replay-via-cli.sh` separately.
+`run-posix-e2e.sh` uses the built native CLI binary by default, passes an explicit `--project-path` to every `tloop` invocation, and runs CLI recovery/readiness, simulate-mouse UI coverage, and UI Toolkit screenshot annotation and click coverage in one sequence (skip the last with `--skip-uitoolkit-annotation`). To verify `replay-input` against a JSON created in the Recordings window, run `verify-replay-via-cli.sh` separately.

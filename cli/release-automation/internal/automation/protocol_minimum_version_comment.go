@@ -73,7 +73,7 @@ func RunProtocolMinimumVersionComment(ctx context.Context, stdout io.Writer, std
 }
 
 func protocolMinimumVersionCommentConfigFromEnvironment() (protocolMinimumVersionCommentConfig, error) {
-	repositoryRoot := os.Getenv("ULOOP_REPOSITORY_ROOT")
+	repositoryRoot := os.Getenv("TLOOP_REPOSITORY_ROOT")
 	if repositoryRoot == "" {
 		workingDirectory, err := os.Getwd()
 		if err != nil {
@@ -235,7 +235,7 @@ func protocolMinimumVersionJQString(value string) string {
 }
 
 func writeProtocolMinimumVersionBodyFile(body string) (string, func(), error) {
-	bodyFile, err := os.CreateTemp("", "uloop-protocol-minimum-version-warning-*.json")
+	bodyFile, err := os.CreateTemp("", "tloop-protocol-minimum-version-warning-*.json")
 	if err != nil {
 		return "", func() {}, fmt.Errorf("failed to create comment body file: %w", err)
 	}

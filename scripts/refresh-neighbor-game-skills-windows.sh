@@ -1,7 +1,7 @@
 #!/bin/sh
-# Development helper for refreshing generated uloop skill files in sibling Unity projects.
+# Development helper for refreshing generated tloop skill files in sibling Unity projects.
 # This is not an installed agent skill or a runtime command. It exists to support local
-# uloop development by resetting each target Git repository, quitting each target
+# tloop development by resetting each target Git repository, quitting each target
 # Unity Editor, regenerating Claude/Agents skill copies, committing those generated
 # files locally, removing Library after Unity has stopped, relaunching each project,
 # and opening the sample scene.
@@ -12,7 +12,7 @@ expected_project_count=3
 default_project_names="cli-loop-block-kuzushi cli-loop-minecraft cli-loop-tetris"
 sample_scene_path="Assets/Scenes/SampleScene.unity"
 dry_run=0
-uloop_root="${ULOOP_ROOT:-}"
+tloop_root="${TLOOP_ROOT:-}"
 project_file="$(mktemp "${TMPDIR:-/tmp}/${skill_name}.projects.XXXXXX")"
 
 host_os=unsupported
@@ -57,15 +57,15 @@ trap 'on_signal 143' TERM
 usage() {
     cat <<'USAGE'
 Usage:
-  refresh-neighbor-game-skills.sh [--dry-run] [--uloop-root PATH] [--project PATH ...]
+  refresh-neighbor-game-skills.sh [--dry-run] [--tloop-root PATH] [--project PATH ...]
 
 Workflow for each target Unity project:
   0. Reset Git state to HEAD and remove untracked files
   1. Quit Unity if running
-  2. Install uloop skills for Claude and Agents
+  2. Install tloop skills for Claude and Agents
   3. Commit generated skill changes without pushing
   4. Remove Library
-  5. Launch Unity with the local uloop launch command
+  5. Launch Unity with the local tloop launch command
   6. Open Assets/Scenes/SampleScene.unity
 USAGE
 }
@@ -175,7 +175,7 @@ assert_unity_stopped() {
 
     case "$host_os" in
         windows|wsl)
-            run_uloop_project "$project" launch --quit >/dev/null
+            run_tloop_project "$project" launch --quit >/dev/null
             return 0
             ;;
     esac
@@ -210,9 +210,9 @@ parse_args() {
                 dry_run=1
                 shift
                 ;;
-            --uloop-root)
-                [ "$#" -ge 2 ] || fail "--uloop-root requires a path"
-                uloop_root=$2
+            --tloop-root)
+                [ "$#" -ge 2 ] || fail "--tloop-root requires a path"
+                tloop_root=$2
                 shift 2
                 ;;
             --project)
@@ -231,7 +231,7 @@ parse_args() {
     done
 }
 
-uloop_binary_for_root() {
+tloop_binary_for_root() {
     candidate=$1
     case "$host_os" in
         darwin)
@@ -239,31 +239,31 @@ uloop_binary_for_root() {
             if [ "$(uname -m)" = "x86_64" ] || [ "$(uname -m)" = "amd64" ]; then
                 arch=amd64
             fi
-            printf '%s\n' "$candidate/dist/darwin-$arch/uloop"
+            printf '%s\n' "$candidate/dist/darwin-$arch/tloop"
             ;;
         windows|wsl)
-            printf '%s\n' "$candidate/dist/windows-amd64/uloop.exe"
+            printf '%s\n' "$candidate/dist/windows-amd64/tloop.exe"
             ;;
         *)
-            fail "unsupported host OS for local uloop binary: $host_os"
+            fail "unsupported host OS for local tloop binary: $host_os"
             ;;
     esac
 }
 
-has_local_uloop() {
+has_local_tloop() {
     candidate=$1
-    candidate_uloop_bin=$(uloop_binary_for_root "$candidate")
+    candidate_tloop_bin=$(tloop_binary_for_root "$candidate")
     case "$host_os" in
         windows|wsl)
-            [ -f "$candidate_uloop_bin" ]
+            [ -f "$candidate_tloop_bin" ]
             ;;
         *)
-            [ -x "$candidate_uloop_bin" ]
+            [ -x "$candidate_tloop_bin" ]
             ;;
     esac
 }
 
-to_uloop_project_path() {
+to_tloop_project_path() {
     project=$1
     case "$host_os" in
         wsl)
@@ -283,13 +283,13 @@ to_uloop_project_path() {
     esac
 }
 
-run_uloop_project() {
+run_tloop_project() {
     project=$1
     shift
-    native_project=$(to_uloop_project_path "$project")
+    native_project=$(to_tloop_project_path "$project")
 
     if [ "$dry_run" -eq 1 ]; then
-        printf '[dry-run] MSYS_NO_PATHCONV=1 %s --project-path %s' "$uloop_bin" "$native_project"
+        printf '[dry-run] MSYS_NO_PATHCONV=1 %s --project-path %s' "$tloop_bin" "$native_project"
         for arg in "$@"; do
             printf ' %s' "$arg"
         done
@@ -297,14 +297,14 @@ run_uloop_project() {
         return 0
     fi
 
-    MSYS_NO_PATHCONV=1 "$uloop_bin" --project-path "$native_project" "$@" </dev/null
+    MSYS_NO_PATHCONV=1 "$tloop_bin" --project-path "$native_project" "$@" </dev/null
 }
 
-invoke_uloop_project() {
+invoke_tloop_project() {
     project=$1
     shift
-    native_project=$(to_uloop_project_path "$project")
-    MSYS_NO_PATHCONV=1 "$uloop_bin" --project-path "$native_project" "$@" </dev/null
+    native_project=$(to_tloop_project_path "$project")
+    MSYS_NO_PATHCONV=1 "$tloop_bin" --project-path "$native_project" "$@" </dev/null
 }
 
 run_for_projects_parallel() {
@@ -330,21 +330,21 @@ run_for_projects_parallel() {
     [ "$failed" -eq 0 ] || fail "parallel phase failed: $worker"
 }
 
-resolve_uloop_root() {
-    if [ -n "$uloop_root" ]; then
-        [ -d "$uloop_root" ] || fail "--uloop-root does not exist: $uloop_root"
-        uloop_root=$(cd "$uloop_root" && pwd -P)
-        has_local_uloop "$uloop_root" || fail "local uloop binary not found under --uloop-root"
+resolve_tloop_root() {
+    if [ -n "$tloop_root" ]; then
+        [ -d "$tloop_root" ] || fail "--tloop-root does not exist: $tloop_root"
+        tloop_root=$(cd "$tloop_root" && pwd -P)
+        has_local_tloop "$tloop_root" || fail "local tloop binary not found under --tloop-root"
         return 0
     fi
 
     current_git_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
-    if [ -n "$current_git_root" ] && has_local_uloop "$current_git_root"; then
-        uloop_root=$current_git_root
+    if [ -n "$current_git_root" ] && has_local_tloop "$current_git_root"; then
+        tloop_root=$current_git_root
         return 0
     fi
 
-    fail "run from the uloop checkout or pass --uloop-root"
+    fail "run from the tloop checkout or pass --tloop-root"
 }
 
 discover_projects() {
@@ -352,7 +352,7 @@ discover_projects() {
         return 0
     fi
 
-    parent_dir=$(dirname "$uloop_root")
+    parent_dir=$(dirname "$tloop_root")
     for project_name in $default_project_names; do
         candidate="$parent_dir/$project_name"
         [ -d "$candidate" ] || continue
@@ -413,8 +413,8 @@ quit_unity() {
 
     case "$host_os" in
         windows|wsl)
-            log "Quitting Unity with local uloop: $project"
-            run_uloop_project "$project" launch --quit
+            log "Quitting Unity with local tloop: $project"
+            run_tloop_project "$project" launch --quit
             return 0
             ;;
     esac
@@ -450,7 +450,7 @@ quit_unity() {
 
 install_skills() {
     project=$1
-    run_uloop_project "$project" skills install --claude --agents
+    run_tloop_project "$project" skills install --claude --agents
 }
 
 commit_generated_skills() {
@@ -458,7 +458,7 @@ commit_generated_skills() {
     if [ "$dry_run" -eq 1 ]; then
         run git -C "$project" add -A -- .claude/skills .agents/skills
         run git -C "$project" diff --cached --quiet -- .claude/skills .agents/skills
-        log "[dry-run] git -C $project commit -m 'Update generated uloop skills'"
+        log "[dry-run] git -C $project commit -m 'Update generated tloop skills'"
         return 0
     fi
 
@@ -482,16 +482,16 @@ commit_generated_skill_changes() {
         commit_email=$(git -C "$project" config user.email 2>/dev/null || true)
     fi
     if [ -z "$commit_name" ]; then
-        commit_name=$(git -C "$uloop_root" config user.name 2>/dev/null || true)
+        commit_name=$(git -C "$tloop_root" config user.name 2>/dev/null || true)
     fi
     if [ -z "$commit_email" ]; then
-        commit_email=$(git -C "$uloop_root" config user.email 2>/dev/null || true)
+        commit_email=$(git -C "$tloop_root" config user.email 2>/dev/null || true)
     fi
     if [ -z "$commit_name" ]; then
         commit_name="uLoop Automation"
     fi
     if [ -z "$commit_email" ]; then
-        commit_email="uloop@example.invalid"
+        commit_email="tloop@example.invalid"
     fi
 
     GIT_AUTHOR_NAME="$commit_name" \
@@ -501,7 +501,7 @@ commit_generated_skill_changes() {
         git -C "$project" \
         -c user.name="$commit_name" \
         -c user.email="$commit_email" \
-        commit -m "Update generated uloop skills"
+        commit -m "Update generated tloop skills"
 }
 
 remove_library() {
@@ -519,7 +519,7 @@ launch_project() {
     max_attempts=3
 
     while [ "$attempt" -le "$max_attempts" ]; do
-        if run_uloop_project "$project" launch; then
+        if run_tloop_project "$project" launch; then
             return 0
         fi
 
@@ -539,12 +539,12 @@ wait_for_unity_ready() {
     elapsed_seconds=0
 
     if [ "$dry_run" -eq 1 ]; then
-        log "[dry-run] wait until Unity responds to uloop for $project"
+        log "[dry-run] wait until Unity responds to tloop for $project"
         return 0
     fi
 
     while [ "$elapsed_seconds" -lt "$timeout_seconds" ]; do
-        if invoke_uloop_project "$project" get-logs --max-count 1 >/dev/null 2>&1; then
+        if invoke_tloop_project "$project" get-logs --max-count 1 >/dev/null 2>&1; then
             return 0
         fi
 
@@ -573,12 +573,12 @@ if (SceneManager.GetActiveScene().path != scenePath)
 return SceneManager.GetActiveScene().path;
 "
     if [ "$dry_run" -eq 1 ]; then
-        run_uloop_project "$project" execute-dynamic-code --code "$code"
+        run_tloop_project "$project" execute-dynamic-code --code "$code"
         return 0
     fi
 
     response=''
-    if ! response=$(invoke_uloop_project "$project" execute-dynamic-code --code "$code"); then
+    if ! response=$(invoke_tloop_project "$project" execute-dynamic-code --code "$code"); then
         [ -z "$response" ] || printf '%s\n' "$response" >&2
         fail "failed to execute sample scene open command: $project"
     fi
@@ -618,14 +618,14 @@ exit 1
 }
 
 parse_args "$@"
-resolve_uloop_root
+resolve_tloop_root
 discover_projects
 assert_project_count
 
-uloop_bin=$(uloop_binary_for_root "$uloop_root")
-[ -f "$uloop_bin" ] || fail "local uloop binary not found: $uloop_bin"
+tloop_bin=$(tloop_binary_for_root "$tloop_root")
+[ -f "$tloop_bin" ] || fail "local tloop binary not found: $tloop_bin"
 
-log "Using uloop: $uloop_bin"
+log "Using tloop: $tloop_bin"
 log "Host OS: $host_os"
 log "Target projects:"
 while IFS= read -r project; do

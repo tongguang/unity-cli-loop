@@ -2,7 +2,7 @@
   "tools": [
     {
       "name": "compile",
-      "description": "Compile the Unity project and report errors/warnings. Use after C# edits; to try edits in the running Editor without a domain reload, use hot-reload.",
+      "description": "Compile the Tuanjie project and report errors/warnings. Use after C# edits; to try edits in the running Editor without a domain reload, use hot-reload.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -22,7 +22,7 @@
           },
           "TimeoutSeconds": {
             "type": "integer",
-            "description": "Maximum seconds the CLI waits for the compile to finish before returning COMPILE_WAIT_TIMEOUT (default 600). Values above 1200 exceed the Unity-side result retention window (20 minutes) and weaken post-timeout recovery.",
+            "description": "Maximum seconds the CLI waits for the compile to finish before returning COMPILE_WAIT_TIMEOUT (default 600). Values above 1200 exceed the Tuanjie-side result retention window (20 minutes) and weaken post-timeout recovery.",
             "default": 600
           }
         }
@@ -30,7 +30,7 @@
     },
     {
       "name": "get-logs",
-      "description": "Read current Unity Console entries from a running Editor. Use during bug investigation after compile, tests, PlayMode, dynamic code, or immediately after `uloop-pause-point`.",
+      "description": "Read current Tuanjie Console entries from a running Editor. Use during bug investigation after compile, tests, PlayMode, dynamic code, or immediately after `tloop-pause-point`.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -72,7 +72,7 @@
     },
     {
       "name": "run-tests",
-      "description": "Run Unity Test Runner and report detailed results. Use for EditMode/PlayMode tests or failure diagnosis; for runtime behavior the tests do not exercise, use pause-point (trace) or record-video.",
+      "description": "Run Tuanjie Test Runner and report detailed results. Use for EditMode/PlayMode tests or failure diagnosis; for runtime behavior the tests do not exercise, use pause-point (trace) or record-video.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -131,7 +131,7 @@
     },
     {
       "name": "clear-console",
-      "description": "Clear Unity Console entries. Use before compile, tests, or debugging when stale logs would hide the current result.",
+      "description": "Clear Tuanjie Console entries. Use before compile, tests, or debugging when stale logs would hide the current result.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -144,7 +144,7 @@
     },
     {
       "name": "focus-window",
-      "description": "Bring the Unity Editor window to front. Use when Unity must be visible for visual checks or user-facing interaction.",
+      "description": "Bring the Tuanjie Editor window to front. Use when Tuanjie must be visible for visual checks or user-facing interaction.",
       "inputSchema": {
         "type": "object",
         "properties": {}
@@ -152,7 +152,7 @@
     },
     {
       "name": "get-hierarchy",
-      "description": "Get the Unity scene hierarchy as a structured tree. Use for parent-child structure, descendants, roots, or subtrees under objects the user currently selected.",
+      "description": "Get the Tuanjie scene hierarchy as a structured tree. Use for parent-child structure, descendants, roots, or subtrees under objects the user currently selected.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -194,7 +194,7 @@
     },
     {
       "name": "find-game-objects",
-      "description": "Find or inspect Unity GameObjects, especially objects the user currently selected in the Hierarchy. Use for details, components, tags, layers, or name/path searches.",
+      "description": "Find or inspect Tuanjie GameObjects, especially objects the user currently selected in the Hierarchy. Use for details, components, tags, layers, or name/path searches.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -247,7 +247,7 @@
     },
     {
       "name": "screenshot",
-      "description": "Capture Unity Editor windows or Game View rendering as PNG. Use for visual checks, debugging, documentation, or annotated UI element coordinates. A screenshot is one frame; for flicker, stutter, one-frame glitches, or anything that changes between frames, use record-video.",
+      "description": "Capture Tuanjie Editor windows or Game View rendering as PNG. Use for visual checks, debugging, documentation, or annotated UI element coordinates. A screenshot is one frame; for flicker, stutter, one-frame glitches, or anything that changes between frames, use record-video.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -273,7 +273,7 @@
           },
           "OutputDirectory": {
             "type": "string",
-            "description": "Output directory path for saving screenshots. When empty, uses default path (.uloop/outputs/Screenshots/). Accepts absolute paths.",
+            "description": "Output directory path for saving screenshots. When empty, uses default path (.tloop/outputs/Screenshots/). Accepts absolute paths.",
             "default": ""
           },
           "CaptureMode": {
@@ -322,7 +322,7 @@
     },
     {
       "name": "execute-dynamic-code",
-      "description": "Execute C# with Unity APIs when existing uloop tools cannot inspect or edit enough. Use for reachable scene/component state, scene/prefab/menu automation, and PlayMode checks",
+      "description": "Execute C# with Tuanjie APIs when existing tloop tools cannot inspect or edit enough. Use for reachable scene/component state, scene/prefab/menu automation, and PlayMode checks",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -341,7 +341,7 @@
           },
           "WaitForDomainReload": {
             "type": "boolean",
-            "description": "Wait for Domain Reload recovery after snippets that intentionally trigger Unity script reload or import work. Omit for normal inspection and editor-state workflows.",
+            "description": "Wait for Domain Reload recovery after snippets that intentionally trigger Tuanjie script reload or import work. Omit for normal inspection and editor-state workflows.",
             "default": false
           },
           "YieldToForegroundRequests": {
@@ -353,7 +353,7 @@
     },
     {
       "name": "control-play-mode",
-      "description": "Control Unity Editor Play Mode. Use to Play (or Resume, its alias), Stop, Pause, or Step Play Mode, or query Status without side effects, for runtime behavior checks and frame inspection.",
+      "description": "Control Tuanjie Editor Play Mode. Use to Play (or Resume, its alias), Stop, Pause, or Step Play Mode, or query Status without side effects, for runtime behavior checks and frame inspection.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -390,7 +390,7 @@
     },
     {
       "name": "enable-pause-point",
-      "description": "Enable a pause point so Unity pauses when that code path is reached, either by a named UloopPausePoint.Pause marker (Id) or by resolving a source file and line (File+Line)",
+      "description": "Enable a pause point so Tuanjie pauses when that code path is reached, either by a named UloopPausePoint.Pause marker (Id) or by resolving a source file and line (File+Line)",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -689,7 +689,7 @@
     },
     {
       "name": "simulate-keyboard",
-      "description": "Simulate keyboard input in PlayMode through Unity Input System. Use for key presses, holds (via Press --duration or KeyDown/KeyUp), releases, and game controls such as WASD or Space. Requires the Input System package (com.unity.inputsystem).",
+      "description": "Simulate keyboard input in PlayMode through Tuanjie Input System. Use for key presses, holds (via Press --duration or KeyDown/KeyUp), releases, and game controls such as WASD or Space. Requires the Input System package (com.unity.inputsystem).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -734,7 +734,7 @@
           },
           "InputPath": {
             "type": "string",
-            "description": "Path to the recording JSON. When empty, auto-detects the latest recording in .uloop/outputs/InputRecordings/",
+            "description": "Path to the recording JSON. When empty, auto-detects the latest recording in .tloop/outputs/InputRecordings/",
             "default": ""
           },
           "ShowOverlay": {
@@ -752,7 +752,7 @@
     },
     {
       "name": "set-game-view-size",
-      "description": "Set or inspect the Unity Game View custom rendering resolution.",
+      "description": "Set or inspect the Tuanjie Game View custom rendering resolution.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -800,7 +800,7 @@
         "properties": {
           "Files": {
             "type": "array",
-            "description": "Project-relative .cs paths to hot-reload (method bodies, added members, and new top-level types). When omitted or empty on apply, selects compiled snapshot sources only — those whose bytes changed since the last compile snapshot, capped at 50 changed files per assembly with a warning when the cap trims the list; a file that has never been compiled is never selected and must be passed explicitly, except an introduced type's file after Play Mode entry or --revert-all, which is selected again; run uloop compile first when no snapshot exists, or pass explicit paths when no changed source is found",
+            "description": "Project-relative .cs paths to hot-reload (method bodies, added members, and new top-level types). When omitted or empty on apply, selects compiled snapshot sources only — those whose bytes changed since the last compile snapshot, capped at 50 changed files per assembly with a warning when the cap trims the list; a file that has never been compiled is never selected and must be passed explicitly, except an introduced type's file after Play Mode entry or --revert-all, which is selected again; run tloop compile first when no snapshot exists, or pass explicit paths when no changed source is found",
             "items": {
               "type": "string"
             }
@@ -820,7 +820,7 @@
               "on",
               "off"
             ],
-            "description": "When edits stay unapplied (Skipped/Failed methods, Failed types; a re-bound sibling's Skipped rows and uncompared bodyless members aside), run uloop compile in this command: auto only in Edit Mode (never stops a Play session), on always unless Unity holds compiles until Play ends, off never. The response's CompileFallback says which; when the compile ran, Compile carries its result and Success is the compile's.",
+            "description": "When edits stay unapplied (Skipped/Failed methods, Failed types; a re-bound sibling's Skipped rows and uncompared bodyless members aside), run tloop compile in this command: auto only in Edit Mode (never stops a Play session), on always unless Tuanjie holds compiles until Play ends, off never. The response's CompileFallback says which; when the compile ran, Compile carries its result and Success is the compile's.",
             "default": "auto"
           }
         }
@@ -828,7 +828,7 @@
     },
     {
       "name": "record-video",
-      "description": "Record the Game View or any Editor window to .mp4/.webm and get back what you can read without watching it: a sheet of up to 32 consecutive frames around the trigger (or around the biggest change when there is no trigger), a timeline sheet, and per-frame change numbers. Use for flicker, stutter, one-frame glitches, fades, cut-ins, transitions, effect order, or anything one screenshot cannot show. One shot: --seconds N --trigger '<uloop command>'.",
+      "description": "Record the Game View or any Editor window to .mp4/.webm and get back what you can read without watching it: a sheet of up to 32 consecutive frames around the trigger (or around the biggest change when there is no trigger), a timeline sheet, and per-frame change numbers. Use for flicker, stutter, one-frame glitches, fades, cut-ins, transitions, effect order, or anything one screenshot cannot show. One shot: --seconds N --trigger '<tloop command>'.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -870,7 +870,7 @@
           },
           "OutputPath": {
             "type": "string",
-            "description": "Output file path. Empty uses .uloop/outputs/Videos/gameview_<yyyyMMdd_HHmmss_fff>.mp4 (.webm on Linux). Extension must be .mp4 (H.264) or .webm (VP8). Linux rejects .mp4. Used by start only."
+            "description": "Output file path. Empty uses .tloop/outputs/Videos/gameview_<yyyyMMdd_HHmmss_fff>.mp4 (.webm on Linux). Extension must be .mp4 (H.264) or .webm (VP8). Linux rejects .mp4. Used by start only."
           },
           "ResolutionScale": {
             "type": "number",

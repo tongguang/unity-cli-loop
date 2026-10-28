@@ -15,7 +15,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     /// </summary>
     public sealed class HotReloadWarmUpTargetLedgerTests
     {
-        private const string Header = "uloop-hot-reload-warm-up-targets 1";
+        private const string Header = "tloop-hot-reload-warm-up-targets 1";
 
         // Why a fixed past time: a write within the file system's timestamp resolution of the
         // previous one could leave the write time unchanged and hide a rewrite.
@@ -26,7 +26,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-warm-up-ledger-" + Guid.NewGuid().ToString("N"));
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-warm-up-ledger-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_projectRoot);
         }
 
@@ -120,7 +120,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [Test]
         public void Read_WithAnotherHeader_ReturnsNoNames()
         {
-            WriteLedger("uloop-hot-reload-warm-up-targets 2\nA\n");
+            WriteLedger("tloop-hot-reload-warm-up-targets 2\nA\n");
 
             Assert.That(HotReloadWarmUpTargetLedger.Read(_projectRoot), Is.Empty);
         }

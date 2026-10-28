@@ -18,7 +18,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         private const string NameNotInContextErrorCode = "CS0103";
 
         private const string CompileSuggestion =
-            "Run 'uloop compile' when the type is final, then reference it as an ordinary compiled type";
+            "Run 'tloop compile' when the type is final, then reference it as an ordinary compiled type";
 
         /// <summary>
         /// Builds the hint and suggestions for a diagnostic that names an active introduced type.
@@ -144,7 +144,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         {
             if (matches.Count == 1)
             {
-                return $"'{name}' is a hot-reload introduced type ({ToSourceName(matches[0])}), and the assembly holding it is referenced by this compilation while it stays active, so the name is what did not resolve. {DescribeHowToName(matches[0])}. Members that hot reload added to it are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'uloop compile' to make it a compiled type.";
+                return $"'{name}' is a hot-reload introduced type ({ToSourceName(matches[0])}), and the assembly holding it is referenced by this compilation while it stays active, so the name is what did not resolve. {DescribeHowToName(matches[0])}. Members that hot reload added to it are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'tloop compile' to make it a compiled type.";
             }
 
             List<string> sourceNames = new List<string>();
@@ -154,7 +154,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             }
 
             string candidateList = string.Join(", ", sourceNames);
-            return $"'{name}' matches these hot-reload introduced types: {candidateList}. The assembly holding each one is referenced by this compilation while it stays active, so pick the one you mean and write its full name as spelled here. Members that hot reload added to them are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'uloop compile' to make it a compiled type.";
+            return $"'{name}' matches these hot-reload introduced types: {candidateList}. The assembly holding each one is referenced by this compilation while it stays active, so pick the one you mean and write its full name as spelled here. Members that hot reload added to them are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'tloop compile' to make it a compiled type.";
         }
 
         private static List<string> BuildSuggestions(List<string> matches)

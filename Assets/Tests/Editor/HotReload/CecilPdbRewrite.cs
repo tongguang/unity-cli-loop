@@ -21,7 +21,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         // count and lost a document, which every case that uses it relies on.
         internal static string RewriteIntoNewDirectoryLosingDocuments(string projectRoot, string assemblyName)
         {
-            string directory = Path.Combine(Path.GetTempPath(), "uloop-cecil-pdb-rewrite-" + Guid.NewGuid().ToString("N"));
+            string directory = Path.Combine(Path.GetTempPath(), "tloop-cecil-pdb-rewrite-" + Guid.NewGuid().ToString("N"));
             string dllPath = Path.Combine(directory, HotReloadConstants.ScriptAssembliesRelativeDirectory, assemblyName + ".dll");
             Directory.CreateDirectory(Path.GetDirectoryName(dllPath));
             Rewrite(projectRoot, assemblyName, directory, dllPath);

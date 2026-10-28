@@ -7,7 +7,7 @@ Returns JSON with:
 - `Success`: Whether the operation succeeded
 - `Message`: Status message
 - `Action`: Echoes which action was executed (`Click`, `LongPress`, `MoveDelta`, `SmoothDelta`, or `Scroll`); unused for `--dry-run`
-- `Warning` (string, optional): Set when an input callback removed an Input System state monitor while the mouse input was being applied (for example, a `performed` callback that disables its own action map). uloop suppressed the Input System's internal `Assertion failed` log for it; the input itself was delivered, but other actions bound to the same control may have missed it.
+- `Warning` (string, optional): Set when an input callback removed an Input System state monitor while the mouse input was being applied (for example, a `performed` callback that disables its own action map). tloop suppressed the Input System's internal `Assertion failed` log for it; the input itself was delivered, but other actions bound to the same control may have missed it.
 - `Button`: Which button was used (nullable string; populated for `Click` / `LongPress`, null otherwise)
 - `PositionX` / `PositionY`: Target top-left Game View coordinates (nullable float; populated for `Click` / `LongPress`)
 - `CameraName` / `CameraPath`: Camera that `Camera.main` resolved to for `--dry-run` (reported on both hit and no-hit). When a `No physics hit` result looks wrong, check these first — another camera carrying the `MainCamera` tag can silently win `Camera.main` resolution
@@ -29,14 +29,14 @@ Verify visual outcome with a follow-up screenshot.
 ## Coordinate System
 
 - `--x` / `--y` use **top-left Game View coordinates**.
-- Raw image pixels from `uloop screenshot --capture-mode rendering` must be converted with `ScreenshotToInputFormula`.
+- Raw image pixels from `tloop screenshot --capture-mode rendering` must be converted with `ScreenshotToInputFormula`.
 - `AnnotatedElements[].SimX/SimY` can be passed directly to this tool. For UI Toolkit entries (`UiSystem` `UIToolkit`), a `Click` reaches the control only when the scene has an EventSystem with an Input System UI input module; without one, nothing receives the click. `simulate-mouse-ui` reaches them without an EventSystem.
-- Do not flip Y in the caller. The tool converts internally for Unity Input System:
+- Do not flip Y in the caller. The tool converts internally for Tuanjie Input System:
 
 ```text
 unity_x = input_x
 unity_y = gameViewHeight - input_y
 ```
 
-- `Mouse.current.position` uses bottom-left Unity coordinates, so the value read inside Unity may show the converted Y.
+- `Mouse.current.position` uses bottom-left Tuanjie coordinates, so the value read inside Tuanjie may show the converted Y.
 - Device Simulator play view is supported. Prefer rendering-mode screenshots for coordinates; they match the simulated device resolution, not Simulator chrome scale.

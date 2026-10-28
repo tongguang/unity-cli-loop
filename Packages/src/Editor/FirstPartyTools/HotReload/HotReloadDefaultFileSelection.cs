@@ -137,7 +137,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                         HotReloadValidationErrorCodes.FilesRequired,
                         new[]
                         {
-                            "Run 'uloop compile' to create source snapshots.",
+                            "Run 'tloop compile' to create source snapshots.",
                             HotReloadConstants.PassExplicitFilesNextAction
                         }),
                     isDefaultSelection: true);
@@ -157,7 +157,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                         HotReloadValidationErrorCodes.NoChangedFiles,
                         new[]
                         {
-                            "Save the edited .cs files to disk, then run 'uloop hot-reload' again.",
+                            "Save the edited .cs files to disk, then run 'tloop hot-reload' again.",
                             HotReloadConstants.PassExplicitFilesNextAction
                         }),
                     isDefaultSelection: true);

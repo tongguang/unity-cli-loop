@@ -83,7 +83,7 @@ func TestSendWrapsDialFailureInConnectionAttemptError(t *testing.T) {
 	if attemptErr.ProjectRoot != "<PROJECT_ROOT>" || attemptErr.Endpoint != endpoint.Address {
 		t.Fatalf("connection attempt fields mismatch: %#v", attemptErr)
 	}
-	expectedMessage := "the Unity CLI Loop server is not reachable for this project: " + attemptErr.Cause.Error()
+	expectedMessage := "the Tuanjie CLI Loop server is not reachable for this project: " + attemptErr.Cause.Error()
 	if err.Error() != expectedMessage {
 		t.Fatalf("message mismatch: got %q want %q", err.Error(), expectedMessage)
 	}
@@ -338,7 +338,7 @@ func TestIsDeadlineExpiryClassifiesTimeoutErrors(t *testing.T) {
 // network on Unix, and a pipe name nothing listens on for Windows, whose dialer always opens a pipe.
 func unreachableTestEndpoint() Endpoint {
 	if runtime.GOOS == "windows" {
-		return Endpoint{Network: "pipe", Address: `\\.\pipe\uloop-test-unreachable-endpoint`}
+		return Endpoint{Network: "pipe", Address: `\\.\pipe\tloop-test-unreachable-endpoint`}
 	}
 	return Endpoint{Network: "bogus-network", Address: "<ENDPOINT_ADDRESS>"}
 }

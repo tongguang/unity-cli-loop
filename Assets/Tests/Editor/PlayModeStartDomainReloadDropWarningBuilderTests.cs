@@ -75,7 +75,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 warning,
                 Is.EqualTo(
-                    "Entering Play Mode triggers a domain reload that will discard 2 active hot-reload change(s). The new session runs the last compiled assemblies, so hot-reloaded edits that were never compiled are not in effect — run `uloop compile` before Play to keep them, or re-apply `uloop hot-reload` after Play Mode starts."));
+                    "Entering Play Mode triggers a domain reload that will discard 2 active hot-reload change(s). The new session runs the last compiled assemblies, so hot-reloaded edits that were never compiled are not in effect — run `tloop compile` before Play to keep them, or re-apply `tloop hot-reload` after Play Mode starts."));
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 warning,
                 Is.EqualTo(
-                    "Entering Play Mode triggers a domain reload that will discard 2 active hot-reload change(s) and 3 enabled pause point(s). The new session runs the last compiled assemblies, so hot-reloaded edits that were never compiled are not in effect — run `uloop compile` before Play to keep them, or re-apply `uloop hot-reload` and re-enable pause points after Play Mode starts."));
+                    "Entering Play Mode triggers a domain reload that will discard 2 active hot-reload change(s) and 3 enabled pause point(s). The new session runs the last compiled assemblies, so hot-reloaded edits that were never compiled are not in effect — run `tloop compile` before Play to keep them, or re-apply `tloop hot-reload` and re-enable pause points after Play Mode starts."));
         }
 
         /// <summary>

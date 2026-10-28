@@ -975,7 +975,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string directory = Path.Combine(
                 projectRoot,
                 "Library",
-                "UloopHotReload",
+                "TloopHotReload",
                 "TestSources",
                 "IntroducedTypeBinding",
                 name);

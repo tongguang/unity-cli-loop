@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke test real uloop launch behavior through a pseudo terminal."""
+"""Smoke test real tloop launch behavior through a pseudo terminal."""
 
 import argparse
 import os
@@ -94,23 +94,23 @@ def terminate_process_group(pid: int) -> None:
 
 
 def assert_normal_launch(project_path: str, timeout: float) -> None:
-    exit_code, output, elapsed, status = run_pty(["uloop", "launch"], project_path, timeout)
+    exit_code, output, elapsed, status = run_pty(["tloop", "launch"], project_path, timeout)
     print(f"normal launch: status={status} code={exit_code} elapsed={elapsed:.1f}s")
 
     if status != "exited" or exit_code != 0:
         print(output)
-        raise AssertionError("uloop launch did not finish successfully")
+        raise AssertionError("tloop launch did not finish successfully")
     if "Waiting for Unity to finish starting" not in output:
-        raise AssertionError("uloop launch did not render the startup spinner")
+        raise AssertionError("tloop launch did not render the startup spinner")
     if not output.endswith("\r\x1b[K\r\n"):
         print(repr(output[-300:]))
-        raise AssertionError("uloop launch did not clear the spinner line before exit")
+        raise AssertionError("tloop launch did not clear the spinner line before exit")
 
 
 def assert_dynamic_code(project_path: str, expected: str, timeout: float) -> None:
     result = run_command(
         [
-            "uloop",
+            "tloop",
             "execute-dynamic-code",
             "--project-path",
             project_path,
@@ -127,7 +127,7 @@ def assert_dynamic_code(project_path: str, expected: str, timeout: float) -> Non
 
 def assert_interrupt_keeps_unity_alive(project_path: str, timeout: float) -> None:
     exit_code, output, elapsed, status = run_pty(
-        ["uloop", "launch"],
+        ["tloop", "launch"],
         project_path,
         timeout,
         interrupt_after=2.0,
@@ -135,13 +135,13 @@ def assert_interrupt_keeps_unity_alive(project_path: str, timeout: float) -> Non
     print(f"interrupted launch: status={status} code={exit_code} elapsed={elapsed:.1f}s")
     if status != "exited":
         print(output)
-        raise AssertionError("interrupted uloop launch did not exit")
+        raise AssertionError("interrupted tloop launch did not exit")
 
     for attempt in range(1, 31):
         try:
             result = run_command(
                 [
-                    "uloop",
+                    "tloop",
                     "execute-dynamic-code",
                     "--project-path",
                     project_path,
@@ -165,7 +165,7 @@ def assert_interrupt_keeps_unity_alive(project_path: str, timeout: float) -> Non
 
 
 def quit_unity(project_path: str) -> None:
-    result = run_command(["uloop", "launch", "-q"], project_path, 30)
+    result = run_command(["tloop", "launch", "-q"], project_path, 30)
     print(result.stdout)
     if result.returncode != 0:
         raise AssertionError("failed to quit Unity before smoke test")
@@ -189,7 +189,7 @@ def main() -> int:
     quit_unity(project_path)
     assert_interrupt_keeps_unity_alive(project_path, args.timeout)
 
-    print("uloop launch smoke test passed")
+    print("tloop launch smoke test passed")
     return 0
 
 

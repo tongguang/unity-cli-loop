@@ -63,7 +63,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             string directory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-pdb-document-table-" + Guid.NewGuid().ToString("N"));
+                "tloop-pdb-document-table-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);
             try
             {
@@ -89,7 +89,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             string directory = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-pdb-document-table-" + Guid.NewGuid().ToString("N"));
+                "tloop-pdb-document-table-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(directory);
             try
             {

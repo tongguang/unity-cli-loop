@@ -23,7 +23,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             {
                 ThirdPartyToolMigrationWizardWindow.PrepareForOpen(
                     window,
-                    "Unity CLI Loop Migration",
+                    "Tuanjie CLI Loop Migration",
                     new Rect(12f, 34f, 360f, 220f),
                     shouldRefreshAfterCreateGui: true);
 
@@ -47,7 +47,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             {
                 ThirdPartyToolMigrationWizardWindow.PrepareForOpen(
                     window,
-                    "Unity CLI Loop Migration",
+                    "Tuanjie CLI Loop Migration",
                     new Rect(12f, 34f, 360f, 220f),
                     shouldRefreshAfterCreateGui: true);
 
@@ -73,7 +73,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             {
                 ThirdPartyToolMigrationWizardWindow.PrepareForOpen(
                     window,
-                    "Unity CLI Loop Migration",
+                    "Tuanjie CLI Loop Migration",
                     new Rect(12f, 34f, 360f, 220f),
                     shouldRefreshAfterCreateGui: false);
 
@@ -208,7 +208,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Verifies that the wizard provides a copyable prompt for asking an AI agent to run the skill.
             string prompt = ThirdPartyToolMigrationWizardWindow.GetMigrationSkillPromptText();
 
-            Assert.That(prompt, Does.Contain("v3-cli-invocation-migration"));
+            Assert.That(prompt, Does.Contain("tloop-v3-cli-invocation-migration"));
             Assert.That(prompt, Does.Contain("SKILL.md, Markdown, POSIX shell scripts, and PowerShell scripts"));
             Assert.That(prompt, Does.Contain("Do not change C# snippets"));
             Assert.That(prompt, Does.Not.Contain("JSON output fields"));
@@ -537,7 +537,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
                 ThirdPartyToolMigrationWizardWindow.PrepareForOpen(
                     window,
-                    "Unity CLI Loop Migration",
+                    "Tuanjie CLI Loop Migration",
                     position,
                     true);
 
@@ -545,7 +545,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 SerializedProperty refreshProperty =
                     serializedWindow.FindProperty("_shouldRefreshAfterCreateGui");
 
-                Assert.That(window.titleContent.text, Is.EqualTo("Unity CLI Loop Migration"));
+                Assert.That(window.titleContent.text, Is.EqualTo("Tuanjie CLI Loop Migration"));
                 Assert.That(window.position, Is.EqualTo(position));
                 Assert.That(window.minSize, Is.EqualTo(new Vector2(360f, 120f)));
                 Assert.That(refreshProperty, Is.Not.Null);
@@ -569,7 +569,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
                 ThirdPartyToolMigrationWizardWindow.PrepareForOpen(
                     window,
-                    "Unity CLI Loop Migration",
+                    "Tuanjie CLI Loop Migration",
                     position,
                     false);
 
@@ -577,7 +577,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 SerializedProperty refreshProperty =
                     serializedWindow.FindProperty("_shouldRefreshAfterCreateGui");
 
-                Assert.That(window.titleContent.text, Is.EqualTo("Unity CLI Loop Migration"));
+                Assert.That(window.titleContent.text, Is.EqualTo("Tuanjie CLI Loop Migration"));
                 Assert.That(window.position, Is.EqualTo(position));
                 Assert.That(window.minSize, Is.EqualTo(new Vector2(360f, 120f)));
                 Assert.That(refreshProperty, Is.Not.Null);

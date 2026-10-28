@@ -17,14 +17,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string content =
                 "---\n" +
-                "name:   'uloop-compile'   \n" +
+                "name:   'tloop-compile'   \n" +
                 "toolName:   \"compile\"   \n" +
                 "description:   'Compile the project.'   \n" +
                 "---\n";
 
             Assert.That(
                 SkillSourceFrontmatterReader.ParseNameFromFrontmatter(content),
-                Is.EqualTo("uloop-compile"));
+                Is.EqualTo("tloop-compile"));
             Assert.That(
                 SkillSourceFrontmatterReader.ParseToolNameFromFrontmatter(content),
                 Is.EqualTo("compile"));
@@ -75,7 +75,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ParseFrontmatterFields_WhenFrontmatterIsMissing_ReturnNull()
         {
-            string content = "name: uloop-compile\ntoolName: compile\ndescription: Compile.\n";
+            string content = "name: tloop-compile\ntoolName: compile\ndescription: Compile.\n";
 
             Assert.That(SkillSourceFrontmatterReader.ParseToolNameFromFrontmatter(content), Is.Null);
             Assert.That(SkillSourceFrontmatterReader.ParseNameFromFrontmatter(content), Is.Null);
@@ -115,8 +115,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// <summary>
         /// Verifies that without a toolName field the skill name decides the match, even when the directory name would match.
         /// </summary>
-        [TestCase("uloop-compile", "other-directory", true)]
-        [TestCase("uloop-get-logs", "uloop-compile", false)]
+        [TestCase("tloop-compile", "other-directory", true)]
+        [TestCase("tloop-get-logs", "tloop-compile", false)]
         public void SkillContentMatchesTool_WhenOnlyNameIsDeclared_UsesSkillName(
             string skillName,
             string directoryName,
@@ -133,7 +133,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// <summary>
         /// Verifies that content without frontmatter matches a tool only through the uloop- prefixed directory name.
         /// </summary>
-        [TestCase("uloop-compile", true)]
+        [TestCase("tloop-compile", true)]
         [TestCase("compile", false)]
         public void SkillContentMatchesTool_WhenFrontmatterIsMissing_UsesDirectoryName(string directoryName, bool expected)
         {
@@ -150,7 +150,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void GetToolNameFromSkillContent_WhenToolNameIsDeclared_ReturnsToolName()
         {
-            string content = "---\nname: uloop-get-logs\ntoolName: compile\n---\n";
+            string content = "---\nname: tloop-get-logs\ntoolName: compile\n---\n";
 
             Assert.That(SkillSourceFrontmatterReader.GetToolNameFromSkillContent(content), Is.EqualTo("compile"));
         }

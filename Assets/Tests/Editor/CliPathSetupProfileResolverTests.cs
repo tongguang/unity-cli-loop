@@ -209,11 +209,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 null,
                 "/opt/zsh-config",
                 null,
-                "/opt/uloop/bin",
+                "/opt/tloop/bin",
                 path => false);
 
-            Assert.That(plan.ProfileInstallDirectory, Is.EqualTo("/opt/uloop/bin"));
-            Assert.That(plan.ConfigurationLine, Is.EqualTo("export PATH=\"/opt/uloop/bin:$PATH\""));
+            Assert.That(plan.ProfileInstallDirectory, Is.EqualTo("/opt/tloop/bin"));
+            Assert.That(plan.ConfigurationLine, Is.EqualTo("export PATH=\"/opt/tloop/bin:$PATH\""));
         }
 
         /// <summary>

@@ -195,7 +195,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 NoArgs,
                 "Has no body, so there is nothing to patch. It could not be compared with the compiled source, "
                 + "so a change to its default values, attributes or parameter names cannot be detected; "
-                + "run 'uloop compile' only if you made one.");
+                + "run 'tloop compile' only if you made one.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformBaseMemberCall,
                 NoArgs,
@@ -229,48 +229,48 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 new[] { "Assets/Scripts/Presenter.Other.cs" },
                 "Another part of this partial type changed since the last compile "
                 + "(Assets/Scripts/Presenter.Other.cs), so hot reload cannot bind this method against the "
-                + "compiled type. Pass that file with --files too, or run 'uloop compile'.");
+                + "compiled type. Pass that file with --files too, or run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformPartialOtherPartsUnverified,
                 NoArgs,
                 "The other parts of this partial type could not be checked against the last compile "
                 + "(no source snapshot for the assembly, or too many changed files to scan), so hot reload "
-                + "cannot bind this method against the compiled type. Run 'uloop compile'.");
+                + "cannot bind this method against the compiled type. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformPartialBodyUnbound,
                 new[] { "CS0103: The name '_generated' does not exist in the current context" },
                 "CS0103: The name '_generated' does not exist in the current context. None of this partial "
                 + "type's source files known to hot reload declares that name: a part generated at compile "
                 + "time is not visible to it, and a file added since the last compile must be passed with "
-                + "--files. Otherwise run 'uloop compile'.");
+                + "--files. Otherwise run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformUnpassedInternalMemberOutOfReach,
                 new[] { "CS0117: 'Host' does not contain a definition for 'Value'", "'Host'", "'Value'" },
                 "'Value' is internal to 'Host', whose source this reload was not given (CS0117: 'Host' does not "
-                + "contain a definition for 'Value'). " + UnpassedInternalMemberRule + "Run 'uloop compile'.");
+                + "contain a definition for 'Value'). " + UnpassedInternalMemberRule + "Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformUnpassedInternalMemberBareName,
                 new[] { "CS0103: The name 'Value' does not exist in the current context", "'Host'", "'Value'" },
                 "'Value' is internal to 'Host', whose source this reload was not given (CS0103: The name 'Value' "
                 + "does not exist in the current context). " + UnpassedInternalMemberRule
-                + "Qualify the bare name with 'this.' or the type name, or run 'uloop compile'.");
+                + "Qualify the bare name with 'this.' or the type name, or run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformUnpassedInternalMemberInsideClosure,
                 new[] { "CS0117: 'Host' does not contain a definition for 'Value'", "'Host'", "'Value'" },
                 "'Value' is internal to 'Host', whose source this reload was not given (CS0117: 'Host' does not "
                 + "contain a definition for 'Value'). " + UnpassedInternalMemberRule
-                + "Move the use out of the lambda, local function or query, or run 'uloop compile'.");
+                + "Move the use out of the lambda, local function or query, or run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformStructHost,
                 NoArgs,
                 "Struct (value type) methods are skipped; byref instance transplant is unverified. "
                 + "Leave the struct's methods as they are and put the new logic at the call site or in a "
-                + "non-struct helper, or run 'uloop compile' to change the struct.");
+                + "non-struct helper, or run 'tloop compile' to change the struct.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformGenericMethodOrType,
                 NoArgs,
                 "Generic methods and methods inside generic types cannot be safely patched with Harmony. "
-                + "Run 'uloop compile'.");
+                + "Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformExplicitInterfaceImplementation,
                 NoArgs,
@@ -281,73 +281,73 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 "This file was brought back to re-bind its active patches, but this method's body no longer "
                 + "binds here (CS1061: 'Host' does not contain a definition for 'Hit'): it uses a member of "
                 + "'Host' that this reload was not given the source of. Any earlier patch of this method stays "
-                + "active. Pass 'Assets/Host.cs' to --files together with this file, or run 'uloop compile'.");
+                + "active. Pass 'Assets/Host.cs' to --files together with this file, or run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformSiblingBodyUnbound,
                 new[] { "CS0103: The name 'Missing' does not exist" },
                 "This file was brought back to re-bind its active patches, but this method's body no longer "
                 + "binds here (CS0103: The name 'Missing' does not exist), so it is skipped rather than failed; "
                 + "any earlier patch of it stays active. Pass the file that declares the missing name to --files "
-                + "together with this file, or run 'uloop compile'.");
+                + "together with this file, or run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodVirtualOrAbstract,
                 NoArgs,
                 "Added virtual, override, or abstract methods are skipped; the loaded type has no vtable slot. "
-                + "Run 'uloop compile' to add the method.");
+                + "Run 'tloop compile' to add the method.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodGeneric,
                 NoArgs,
                 "Added generic methods are skipped; hot reload cannot emit a typed shim for them. "
-                + "Run 'uloop compile'.");
+                + "Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodSignatureTypeUnresolved,
                 new[] { "Missing<T>" },
                 "The method signature names a type the hot-reload compilation could not resolve "
                 + "('Missing<T>'), so hot reload cannot tell whether this method already exists "
                 + "in the compiled assembly. If the type is declared in another file of this edit, pass "
-                + "that file with --files too; otherwise run 'uloop compile'.");
+                + "that file with --files too; otherwise run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodMethodGroupReference,
                 new[] { "Helper", " (such as 'a => Helper(a)')" },
                 "Methods that capture the added method 'Helper' as a method group or delegate are "
                 + "skipped; the shim signature does not match. A call is rewritten, so wrapping the "
                 + "method group in a lambda that calls it (such as 'a => Helper(a)') keeps hot "
-                + "reloading; otherwise run 'uloop compile'.");
+                + "reloading; otherwise run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodMethodGroupSubscription,
                 new[] { "Helper", " (such as 'a => Helper(a)')" },
                 "Subscribing the added method 'Helper' as a method group is skipped; the shim "
                 + "signature does not match. Subscribe a lambda that calls it instead (such as "
                 + "'a => Helper(a)'); to remove it later, keep that lambda in an added field and use "
-                + "'-=' with the same field. Otherwise run 'uloop compile'.");
+                + "'-=' with the same field. Otherwise run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodMethodGroupUnsubscription,
                 new[] { "Helper" },
                 "Removing the added method 'Helper' as a method group with '-=' is skipped; the shim "
                 + "signature does not match, and a lambda there would remove a different delegate. "
                 + "Subscribe through a delegate kept in an added field and '-=' that same field, or "
-                + "run 'uloop compile'.");
+                + "run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodConditionalAccess,
                 NoArgs,
                 "Added-method calls through conditional access are skipped; there is no rewrite shape. "
-                + "Run 'uloop compile'.");
+                + "Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodUnavailableAddedCall,
                 new[] { "Outer.Inner.Ping()" },
                 "Calls the added method 'Outer.Inner.Ping()', which this reload skipped; the Skipped row "
-                + "for that member names the fix. Apply it and rerun; run 'uloop compile' only if that "
+                + "for that member names the fix. Apply it and rerun; run 'tloop compile' only if that "
                 + "row asks for it.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodTypeNotIntroduced,
                 NoArgs,
                 "Declared on a type that is not in the compiled assembly and was not introduced by this "
-                + "run. Run 'uloop compile'; when the file's introduced-type diagnostics name this type, "
+                + "run. Run 'tloop compile'; when the file's introduced-type diagnostics name this type, "
                 + "that line gives the reason it was not introduced.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodInterfaceMember,
                 NoArgs,
-                "Interface members are not patchable. Run 'uloop compile'.");
+                "Interface members are not patchable. Run 'tloop compile'.");
             yield return DetailCase(
                 HotReloadWorkerReasonCode.AddedMethodInaccessibleAccessNoRewrite,
                 NoArgs,
@@ -355,13 +355,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 "Added methods whose bodies access private/internal members are skipped when the access "
                 + "has no accessor rewrite (the added method JIT-compiles normally and fails accessibility "
                 + "checks). Accessor rewrite unavailable: " + GenericMethodFragment
-                + " Run 'uloop compile' to keep the code as written.");
+                + " Run 'tloop compile' to keep the code as written.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodNotForwardedUnityMessageNeedsCompile,
                 new[] { "OnEnable" },
                 "The added 'OnEnable' is a Unity message that hot reload does not forward (Awake, "
                 + "OnEnable, OnDisable, OnDestroy, and the editor-only messages), so no rewrite of its "
-                + "body would make the engine call it. Run 'uloop compile' to have Unity invoke it.");
+                + "body would make the engine call it. Run 'tloop compile' to have Unity invoke it.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodBodyUnbound,
                 new[] { "CS1503: Argument 1: cannot convert" },
@@ -369,8 +369,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 + "(CS1503: Argument 1: cannot convert); hot reload cannot verify a member it cannot bind, "
                 + "so it is skipped. If the name is declared in a new file, pass that file to --files too "
                 + "(new files are not selected automatically). If the name is generated at compile time, "
-                + "for example by a source generator, hot reload cannot see it: run 'uloop compile'. "
-                + "Also run 'uloop compile' if it still does not bind.");
+                + "for example by a source generator, hot reload cannot see it: run 'tloop compile'. "
+                + "Also run 'tloop compile' if it still does not bind.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedMethodBodyBindsCompiledSignature,
                 new[] { "CS1503: Argument 1: cannot convert", "'Example.Payload'", "'Example.Registry'", "'Assets/Registry.cs'" },
@@ -391,12 +391,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 new[] { "Example.Helper.Secret()" },
                 "Added members of other types cannot use 'Example.Helper.Secret()', a non-public member of "
                 + "a type hot reload introduced: only the reloads that edit that type can bind it, so the "
-                + "member would be applied on some reloads and dropped on others. Run 'uloop compile'.");
+                + "member would be applied on some reloads and dropped on others. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldStructHost,
                 NoArgs,
                 "Added fields on struct types are skipped; the store requires a reference-type instance. "
-                + "Run 'uloop compile' to add the field.");
+                + "Run 'tloop compile' to add the field.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldInitializerNotLiteralOrExternalStatic,
                 new[] { "_cache" },
@@ -406,150 +406,150 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 + "instead - an added field without an initializer applies without compiling and starts "
                 + "at default(T); for a reference type, guard the assignment with "
                 + "'if (_field == null) { _field = ...; }' ('??=' is not rewritable). "
-                + "Or run 'uloop compile'.");
+                + "Or run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldFieldTypeNotExternallyVisible,
                 NoArgs,
-                "Added field type is not visible to the shim assembly. Run 'uloop compile'.");
+                "Added field type is not visible to the shim assembly. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldFieldTypeUnresolved,
                 new[] { "Missing" },
-                "Added field type 'Missing' could not be resolved; check for a missing using directive or a typo, fix the declaration, and rerun. If the type is declared in a new file, pass that file to --files too (new files are not selected automatically); run 'uloop compile' only if it still does not resolve.");
+                "Added field type 'Missing' could not be resolved; check for a missing using directive or a typo, fix the declaration, and rerun. If the type is declared in a new file, pass that file to --files too (new files are not selected automatically); run 'tloop compile' only if it still does not resolve.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldIncrementNotNumeric,
                 NoArgs,
                 "Increment or decrement of an added field is skipped unless the type is a numeric "
-                + "primitive or enum. Run 'uloop compile'.");
+                + "primitive or enum. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldRefOutIn,
                 NoArgs,
-                "Added fields cannot be passed by ref, out, or in. Run 'uloop compile'.");
+                "Added fields cannot be passed by ref, out, or in. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldConsumedWrite,
                 NoArgs,
                 "The value of an assignment to an added field is consumed; the store write returns void. "
-                + "Run 'uloop compile'.");
+                + "Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldDoubleEvalReceiver,
                 NoArgs,
                 "Assignment to an added field or event would evaluate a receiver with possible side effects twice. "
-                + "Run 'uloop compile'.");
+                + "Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldDeconstructionTarget,
                 NoArgs,
                 "Deconstruction assignment to an added field is skipped; the store write cannot stand as a "
                 + "deconstruction target. Assign the field in its own statement 'F = value;', which the "
-                + "store rewrite handles. Run 'uloop compile'.");
+                + "store rewrite handles. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldValueTypeMemberWrite,
                 NoArgs,
                 "Writes to members of an added value-type field, and instance method calls on that field, "
                 + "cannot be rewritten. Copy the field into a local, change the local, and assign the whole "
-                + "value back. Run 'uloop compile'.");
+                + "value back. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldUnavailableAddedField,
                 new[] { "_score" },
-                "Uses added field '_score' in a way hot reload cannot emit. Run 'uloop compile'.");
+                "Uses added field '_score' in a way hot reload cannot emit. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldCoalesceAssignment,
                 new[] { "_score" },
                 "'??=' on added field '_score' cannot be rewritten. "
-                + "Write 'if (_score == null) { _score = ...; }' instead, or run 'uloop compile'.");
+                + "Write 'if (_score == null) { _score = ...; }' instead, or run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldFieldTypeChanged,
                 new[] { "_score" },
-                "Field '_score' has a different type in the compiled assembly. Run 'uloop compile'.");
+                "Field '_score' has a different type in the compiled assembly. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldFieldModifiersChanged,
                 new[] { "_score" },
-                "Field '_score' changed its static or const modifier in the compiled assembly. Run 'uloop compile'.");
+                "Field '_score' changed its static or const modifier in the compiled assembly. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldMemberKindChanged,
                 new[] { "_score" },
-                "Field '_score' is declared as a property or an event in the compiled assembly. Run 'uloop compile'.");
+                "Field '_score' is declared as a property or an event in the compiled assembly. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertySetOnly,
                 NoArgs,
                 "Added properties with only a setter are skipped; the shim requires a getter identity. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyVirtualOrAbstract,
                 NoArgs,
                 "Added virtual, override, abstract, or interface properties are skipped; the loaded type has no vtable slot. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyExplicitInterface,
                 NoArgs,
                 "Added explicit interface properties are skipped; the compiled type has no interface member slot. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyInitAccessor,
                 NoArgs,
                 "Added properties with init accessors are skipped; the shim cannot preserve initialization-only assignment. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyPropertyPattern,
                 NoArgs,
                 "Property patterns that match an added property are skipped; a pattern member name cannot "
-                + "be replaced by an accessor shim call. Run 'uloop compile' to add the property.");
+                + "be replaced by an accessor shim call. Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyGenericHostType,
                 NoArgs,
                 "Added properties on generic types are skipped; one accessor identity and one store entry "
-                + "cannot stand for every closed instantiation. Run 'uloop compile' to add the property.");
+                + "cannot stand for every closed instantiation. Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyStructHost,
                 NoArgs,
                 "Added properties on struct types are skipped; the shim requires a reference-type instance. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyValueTypeUnresolved,
                 new[] { "Missing" },
                 "Added property type 'Missing' could not be resolved; check for a missing using directive or a typo, "
-                + "fix the declaration, and rerun. If the type is declared in a new file, pass that file to --files too (new files are not selected automatically); run 'uloop compile' only if it still does not resolve.");
+                + "fix the declaration, and rerun. If the type is declared in a new file, pass that file to --files too (new files are not selected automatically); run 'tloop compile' only if it still does not resolve.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyValueTypeNotExternallyVisible,
                 NoArgs,
-                "Added property type is not visible to the shim assembly. Run 'uloop compile' to add the property.");
+                "Added property type is not visible to the shim assembly. Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyCompoundAssignment,
                 NoArgs,
                 "Compound assignment, increment, and decrement of an added property are skipped; the accessor shim cannot preserve the operation. "
                 + "Rewrite it as a plain assignment statement ('X = X + 1;') to keep hot reloading. "
-                + "Run 'uloop compile' to keep the code as written.");
+                + "Run 'tloop compile' to keep the code as written.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyConsumedWrite,
                 NoArgs,
                 "The value of an assignment to an added property is consumed; the setter shim returns void. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyNameofReference,
                 NoArgs,
                 "References to added properties inside nameof are skipped; the member does not exist in the compiled assembly. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyObjectInitializer,
                 NoArgs,
                 "Object initializers that assign added properties are skipped; the setter shim cannot rewrite the initializer. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyDeconstructionTarget,
                 NoArgs,
                 "Deconstruction assignment to an added property is skipped; the setter shim cannot stand as a "
-                + "deconstruction target. Run 'uloop compile' to add the property.");
+                + "deconstruction target. Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyConditionalAccess,
                 NoArgs,
                 "Conditional access to added properties is skipped; there is no rewrite shape. "
-                + "Run 'uloop compile' to add the property.");
+                + "Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyRefOutIn,
                 NoArgs,
-                "Added properties cannot be passed by ref, out, or in. Run 'uloop compile' to add the property.");
+                "Added properties cannot be passed by ref, out, or in. Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyUnavailableAddedProperty,
                 NoArgs,
-                "Uses an added property that hot reload cannot emit. Run 'uloop compile'.");
+                "Uses an added property that hot reload cannot emit. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyAccessorExcludedFromReload,
                 new[] { "Doubled" },
@@ -558,62 +558,62 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyCompiledMemberKindChanged,
                 new[] { "Score" },
-                "Property 'Score' is declared as a field or an event in the compiled assembly. Run 'uloop compile'.");
+                "Property 'Score' is declared as a field or an event in the compiled assembly. Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedPropertyInitializerNotEmittable,
                 NoArgs,
-                "Added property initializer cannot run in the shim lambda. Run 'uloop compile' to add the property.");
+                "Added property initializer cannot run in the shim lambda. Run 'tloop compile' to add the property.");
             yield return Case(
                 HotReloadWorkerReasonCode.UnsupportedMemberExplicitAccessor,
                 NoArgs,
                 "Property setter, init, or indexer accessors are skipped; "
-                + "run 'uloop compile' to apply accessor edits.");
+                + "run 'tloop compile' to apply accessor edits.");
             yield return Case(
                 HotReloadWorkerReasonCode.UnsupportedMemberUnsupportedKind,
                 NoArgs,
                 "Constructors, operators, and event accessors are skipped; "
-                + "run 'uloop compile' to apply these edits.");
+                + "run 'tloop compile' to apply these edits.");
             yield return Case(
                 HotReloadWorkerReasonCode.EventCustomAccessor,
                 NoArgs,
                 "Methods that raise or read an event with custom add/remove accessors are skipped; "
-                + "there is no backing field for the shim to reach. Use uloop compile.");
+                + "there is no backing field for the shim to reach. Use tloop compile.");
             yield return Case(
                 HotReloadWorkerReasonCode.EventNoBackingField,
                 NoArgs,
                 "Methods that raise or read an abstract, extern, or interface event are skipped; "
-                + "there is no backing field for the shim to reach. Use uloop compile.");
+                + "there is no backing field for the shim to reach. Use tloop compile.");
             yield return Case(
                 HotReloadWorkerReasonCode.EventDelegateTypeNotVisible,
                 NoArgs,
                 "Methods that raise or read an event whose delegate type is not visible from an external "
-                + "assembly are skipped; the shim cannot name the accessor field type. Use uloop compile.");
+                + "assembly are skipped; the shim cannot name the accessor field type. Use tloop compile.");
             yield return Case(
                 HotReloadWorkerReasonCode.EventAddedInThisEdit,
                 NoArgs,
                 "Methods that raise a field-like event added in this edit are skipped; "
-                + "the compiled assembly has no backing field yet. Use uloop compile.");
+                + "the compiled assembly has no backing field yet. Use tloop compile.");
             yield return Case(
                 HotReloadWorkerReasonCode.EventSubscriptionToAddedEvent,
                 new[] { "Ns.Publisher.Changed" },
                 "Subscribes to the event 'Ns.Publisher.Changed', which this edit adds; the compiled "
-                + "assembly has no such event yet, so the subscription cannot bind until 'uloop compile'.");
+                + "assembly has no such event yet, so the subscription cannot bind until 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.EventNameof,
                 NoArgs,
                 "Methods that name a field-like event inside nameof are skipped; the shim is a different "
-                + "type and cannot keep the bare event name. Use uloop compile.");
+                + "type and cannot keep the bare event name. Use tloop compile.");
             yield return Case(
                 HotReloadWorkerReasonCode.EventConditionalReceiver,
                 NoArgs,
                 "Methods that raise or read a field-like event through a conditional receiver "
                 + "('a?.E') are skipped; the shim cannot name the conditional receiver as the accessor "
-                + "call's argument. Use uloop compile.");
+                + "call's argument. Use tloop compile.");
             yield return Case(
                 HotReloadWorkerReasonCode.EventPassedByRef,
                 NoArgs,
                 "Methods that pass a field-like event by ref/out/in are skipped; the shim reads the "
-                + "event through an accessor call, which cannot be passed by reference. Use uloop compile.");
+                + "event through an accessor call, which cannot be passed by reference. Use tloop compile.");
             yield return DetailCase(
                 HotReloadWorkerReasonCode.EventAccessorRewriteUnavailable,
                 NoArgs,
@@ -765,7 +765,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 new[] { "Helper", " (such as 'a => Helper(a)')" },
                 "inaccessible method group 'Helper' on the right of '+=' has no accessor rewrite "
                 + "shape. If compiled code removes it with '-= Helper', a lambda here would stay "
-                + "subscribed after that removal, so run 'uloop compile' instead; otherwise wrapping "
+                + "subscribed after that removal, so run 'tloop compile' instead; otherwise wrapping "
                 + "the method group in a lambda that calls it (such as 'a => Helper(a)') keeps hot "
                 + "reloading.");
             yield return Case(
@@ -882,7 +882,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 new[] { "Host.Added()" },
                 "Calls the added method 'Host.Added()', which this reload did not apply; the caller was left unpatched. "
                 + "That method's own row gives the reason: fix its compile error when it Failed, or the failure "
-                + "elsewhere in its file when it was Skipped, and reload again, or run 'uloop compile'.");
+                + "elsewhere in its file when it was Skipped, and reload again, or run 'tloop compile'.");
         }
 
         /// <summary>
@@ -923,8 +923,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 + "The property body was refused because: ";
             Assert.That(compiledSignature, Does.StartWith(expectedStart));
             Assert.That(carriedIn, Does.StartWith(expectedStart));
-            Assert.That(compiledSignature, Does.Not.Contain("uloop compile"));
-            Assert.That(carriedIn, Does.Not.Contain("uloop compile"));
+            Assert.That(compiledSignature, Does.Not.Contain("tloop compile"));
+            Assert.That(carriedIn, Does.Not.Contain("tloop compile"));
         }
 
         /// <summary>
@@ -944,7 +944,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(
                 rendered,
                 Does.StartWith(
-                    "Uses an added property that hot reload cannot emit. Run 'uloop compile'. "
+                    "Uses an added property that hot reload cannot emit. Run 'tloop compile'. "
                     + "The property body was refused because: "));
             Assert.That(rendered, Does.Not.Contain("accessor names the step"));
         }

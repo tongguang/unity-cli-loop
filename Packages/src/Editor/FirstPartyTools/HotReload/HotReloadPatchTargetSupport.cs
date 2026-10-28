@@ -209,7 +209,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         }
 
         // Why Path.Combine then GetFullPath: Unity Assembly.sourceFiles are project-relative
-        // (slash-separated). The worker cwd is Library/UloopHotReload/Worker/<hash>/, so it
+        // (slash-separated). The worker cwd is Library/TloopHotReload/Worker/<hash>/, so it
         // can only open absolute paths. Normalization matches HotReloadSourceSnapshotCopier.
         internal static string[] BuildAssemblySourcePaths(string projectRoot, string[] sourceFiles)
         {

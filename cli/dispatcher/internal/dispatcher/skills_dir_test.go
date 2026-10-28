@@ -83,7 +83,7 @@ func TestParseSkillsOptionsRejectsDirWithGlobalOrTargets(t *testing.T) {
 // requiring target flags and without printing target guidance.
 func TestRunSkillsSubcommandDirInstallInstallsFlatLayout(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -106,11 +106,11 @@ func TestRunSkillsSubcommandDirInstallInstallsFlatLayout(t *testing.T) {
 	if !strings.Contains(stdout.String(), destinationDir) {
 		t.Fatalf("dir install output should show the destination:\n%s", stdout.String())
 	}
-	installedSkill := filepath.Join(destinationDir, "uloop-sample", "SKILL.md")
+	installedSkill := filepath.Join(destinationDir, "tloop-sample", "SKILL.md")
 	if _, err := os.Stat(installedSkill); err != nil {
 		t.Fatalf("skill file was not installed: %v", err)
 	}
-	installedReference := filepath.Join(destinationDir, "uloop-sample", "references", "note.md")
+	installedReference := filepath.Join(destinationDir, "tloop-sample", "references", "note.md")
 	if _, err := os.Stat(installedReference); err != nil {
 		t.Fatalf("reference file was not installed: %v", err)
 	}
@@ -120,9 +120,9 @@ func TestRunSkillsSubcommandDirInstallInstallsFlatLayout(t *testing.T) {
 // foreign files such as apm.yml untouched, and drops stale reference files.
 func TestRunSkillsDirInstallPreservesForeignFiles(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	writeRawSkillFile(t, installedDir, "outdated content\n")
 	if err := os.WriteFile(filepath.Join(installedDir, "apm.yml"), []byte("name: foreign\n"), 0o644); err != nil {
 		t.Fatalf("failed to write foreign file: %v", err)
@@ -167,14 +167,14 @@ func TestRunSkillsDirInstallPreservesForeignFiles(t *testing.T) {
 // outdated, while a stale file inside a source-owned directory does.
 func TestGetDirSkillStatusIgnoresForeignFiles(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.WriteFile(filepath.Join(installedDir, "apm.yml"), []byte("name: foreign\n"), 0o644); err != nil {
 		t.Fatalf("failed to write foreign file: %v", err)
 	}
@@ -203,8 +203,8 @@ func TestGetDirSkillStatusIgnoresForeignFiles(t *testing.T) {
 // directory when foreign files remain, and removes it when it becomes empty.
 func TestRunSkillsDirUninstallRemovesOnlyOwnedFiles(t *testing.T) {
 	root := t.TempDir()
-	skillWithForeign := writeDirModeSkillSource(t, root, "uloop-with-foreign")
-	skillClean := writeDirModeSkillSource(t, root, "uloop-clean")
+	skillWithForeign := writeDirModeSkillSource(t, root, "tloop-with-foreign")
+	skillClean := writeDirModeSkillSource(t, root, "tloop-clean")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -212,7 +212,7 @@ func TestRunSkillsDirUninstallRemovesOnlyOwnedFiles(t *testing.T) {
 	if code := runSkillsDirInstall(destinationDir, skills, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	foreignPath := filepath.Join(destinationDir, "uloop-with-foreign", "apm.yml")
+	foreignPath := filepath.Join(destinationDir, "tloop-with-foreign", "apm.yml")
 	if err := os.WriteFile(foreignPath, []byte("name: foreign\n"), 0o644); err != nil {
 		t.Fatalf("failed to write foreign file: %v", err)
 	}
@@ -226,13 +226,13 @@ func TestRunSkillsDirUninstallRemovesOnlyOwnedFiles(t *testing.T) {
 	if !strings.Contains(stdout.String(), "Removed: 2") {
 		t.Fatalf("uninstall should report removed skills:\n%s", stdout.String())
 	}
-	if _, err := os.Stat(filepath.Join(destinationDir, "uloop-with-foreign", "SKILL.md")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(destinationDir, "tloop-with-foreign", "SKILL.md")); !os.IsNotExist(err) {
 		t.Fatalf("owned skill file should be removed, stat err=%v", err)
 	}
 	if _, err := os.Stat(foreignPath); err != nil {
 		t.Fatalf("foreign file should survive uninstall: %v", err)
 	}
-	if _, err := os.Stat(filepath.Join(destinationDir, "uloop-clean")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(destinationDir, "tloop-clean")); !os.IsNotExist(err) {
 		t.Fatalf("emptied skill directory should be removed, stat err=%v", err)
 	}
 }
@@ -242,14 +242,14 @@ func TestRunSkillsDirUninstallRemovesOnlyOwnedFiles(t *testing.T) {
 // uninstall agree on the partially removed state.
 func TestGetDirSkillStatusReportsOrphanedOwnedFilesAsOutdated(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.Remove(filepath.Join(installedDir, "SKILL.md")); err != nil {
 		t.Fatalf("failed to remove installed skill file: %v", err)
 	}
@@ -279,12 +279,12 @@ func TestGetDirSkillStatusReportsOrphanedOwnedFilesAsOutdated(t *testing.T) {
 // uninstall preserves the file and reports the skill as not found.
 func TestRunSkillsDirInstallRejectsFileOccupyingSkillName(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	if err := os.MkdirAll(destinationDir, 0o755); err != nil {
 		t.Fatalf("failed to create destination: %v", err)
 	}
-	occupyingFile := filepath.Join(destinationDir, "uloop-sample")
+	occupyingFile := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.WriteFile(occupyingFile, []byte("foreign\n"), 0o644); err != nil {
 		t.Fatalf("failed to write occupying file: %v", err)
 	}
@@ -322,12 +322,12 @@ func TestRunSkillsDirDoesNotFollowSymlinkAtSkillName(t *testing.T) {
 		t.Skip("symlink creation requires elevated privileges on Windows")
 	}
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	if err := os.MkdirAll(destinationDir, 0o755); err != nil {
 		t.Fatalf("failed to create destination: %v", err)
 	}
-	curatedDir := filepath.Join(root, "curated", "uloop-sample")
+	curatedDir := filepath.Join(root, "curated", "tloop-sample")
 	curatedFile := filepath.Join(curatedDir, "SKILL.md")
 	if err := os.MkdirAll(curatedDir, 0o755); err != nil {
 		t.Fatalf("failed to create curated dir: %v", err)
@@ -337,11 +337,11 @@ func TestRunSkillsDirDoesNotFollowSymlinkAtSkillName(t *testing.T) {
 	}
 	// An artifact-named entry inside the symlink target guards against cleanup
 	// reading through the symlink and deleting outside the store.
-	curatedArtifact := filepath.Join(curatedDir, "SKILL.md.uloop-tmp-1234")
+	curatedArtifact := filepath.Join(curatedDir, "SKILL.md.tloop-tmp-1234")
 	if err := os.WriteFile(curatedArtifact, []byte("theirs\n"), 0o644); err != nil {
 		t.Fatalf("failed to write curated artifact-named file: %v", err)
 	}
-	if err := os.Symlink(curatedDir, filepath.Join(destinationDir, "uloop-sample")); err != nil {
+	if err := os.Symlink(curatedDir, filepath.Join(destinationDir, "tloop-sample")); err != nil {
 		t.Fatalf("failed to create symlink: %v", err)
 	}
 	stdout := &bytes.Buffer{}
@@ -373,7 +373,7 @@ func TestRunSkillsDirDoesNotFollowSymlinkAtSkillName(t *testing.T) {
 // a raw ENOTDIR and bogus not-installed statuses.
 func TestRunSkillsDirSubcommandRejectsFileDestination(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationPath := filepath.Join(root, "apm-skills")
 	if err := os.WriteFile(destinationPath, []byte("not a directory\n"), 0o644); err != nil {
 		t.Fatalf("failed to write destination file: %v", err)
@@ -395,9 +395,9 @@ func TestRunSkillsDirSubcommandRejectsFileDestination(t *testing.T) {
 // name in place when nothing owned was found inside it.
 func TestRunSkillsDirUninstallPreservesEmptyForeignDir(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
-	scaffoldDir := filepath.Join(destinationDir, "uloop-sample")
+	scaffoldDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.MkdirAll(scaffoldDir, 0o755); err != nil {
 		t.Fatalf("failed to create scaffold dir: %v", err)
 	}
@@ -421,16 +421,16 @@ func TestRunSkillsDirUninstallPreservesEmptyForeignDir(t *testing.T) {
 // cleaned up by install and uninstall instead of lingering as foreign files.
 func TestRunSkillsDirCleansStaleSyncArtifacts(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
-	staleTemp := filepath.Join(installedDir, "SKILL.md.uloop-tmp-1234")
-	staleBackup := filepath.Join(installedDir, "references.uloop-backup-5678")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
+	staleTemp := filepath.Join(installedDir, "SKILL.md.tloop-tmp-1234")
+	staleBackup := filepath.Join(installedDir, "references.tloop-backup-5678")
 	if err := os.WriteFile(staleTemp, []byte("partial\n"), 0o644); err != nil {
 		t.Fatalf("failed to write stale temp file: %v", err)
 	}
@@ -463,18 +463,18 @@ func TestRunSkillsDirCleansStaleSyncArtifacts(t *testing.T) {
 
 // Tests that a leftover artifact minted for an entry the current skill source
 // no longer owns (a renamed or dropped directory) is still cleaned up: the
-// uloop namespace marker alone identifies the debris.
+// tloop namespace marker alone identifies the debris.
 func TestRunSkillsDirCleansArtifactsOfFormerlyOwnedEntries(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
-	formerBackup := filepath.Join(installedDir, "docs.uloop-backup-1234")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
+	formerBackup := filepath.Join(installedDir, "docs.tloop-backup-1234")
 	if err := os.MkdirAll(formerBackup, 0o755); err != nil {
 		t.Fatalf("failed to create former-entry backup dir: %v", err)
 	}
@@ -493,14 +493,14 @@ func TestRunSkillsDirCleansArtifactsOfFormerlyOwnedEntries(t *testing.T) {
 // the directory when genuinely foreign content is also present.
 func TestRunSkillsDirUninstallRemovesIgnorableDebrisWithSkillDir(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.WriteFile(filepath.Join(installedDir, ".DS_Store"), []byte("junk"), 0o644); err != nil {
 		t.Fatalf("failed to write debris file: %v", err)
 	}
@@ -534,25 +534,25 @@ func TestRunSkillsDirUninstallRemovesIgnorableDebrisWithSkillDir(t *testing.T) {
 }
 
 // Tests that user files whose names merely resemble sync artifacts (temp or
-// backup naming without the uloop namespace marker, digit-suffixed dated
+// backup naming without the tloop namespace marker, digit-suffixed dated
 // backups included) are preserved as foreign by install and uninstall instead
-// of being deleted as uloop debris.
+// of being deleted as tloop debris.
 func TestRunSkillsDirPreservesHumanNamedArtifactLookalikes(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	manualBackup := filepath.Join(installedDir, "references.backup-manual")
 	datedBackup := filepath.Join(installedDir, "references.backup-20240115")
 	draftNote := filepath.Join(installedDir, "SKILL.md.tmp-notes")
 	// Carries the artifact marker but a human-chosen tail: only the all-digit
 	// tails that os.CreateTemp/MkdirTemp mint may be cleaned up.
-	markerLookalike := filepath.Join(installedDir, "my-archive.uloop-tmp-keepme")
+	markerLookalike := filepath.Join(installedDir, "my-archive.tloop-tmp-keepme")
 	if err := os.MkdirAll(manualBackup, 0o755); err != nil {
 		t.Fatalf("failed to create manual backup dir: %v", err)
 	}
@@ -604,14 +604,14 @@ func TestRunSkillsDirPreservesHumanNamedArtifactLookalikes(t *testing.T) {
 // with a raw rename error or silently corrupting the store.
 func TestRunSkillsDirInstallReplacesWrongTypeEntryAtOwnedName(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedReferences := filepath.Join(destinationDir, "uloop-sample", "references")
+	installedReferences := filepath.Join(destinationDir, "tloop-sample", "references")
 	if err := os.RemoveAll(installedReferences); err != nil {
 		t.Fatalf("failed to remove installed references: %v", err)
 	}
@@ -639,14 +639,14 @@ func TestRunSkillsDirInstallReplacesSymlinkAtOwnedNameWithoutFollowing(t *testin
 		t.Skip("symlink creation requires elevated privileges on Windows")
 	}
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedReferences := filepath.Join(destinationDir, "uloop-sample", "references")
+	installedReferences := filepath.Join(destinationDir, "tloop-sample", "references")
 	if err := os.RemoveAll(installedReferences); err != nil {
 		t.Fatalf("failed to remove installed references: %v", err)
 	}
@@ -696,14 +696,14 @@ func TestRunSkillsDirUninstallRemovesDanglingSymlink(t *testing.T) {
 		t.Skip("symlink creation requires elevated privileges on Windows")
 	}
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	referencesPath := filepath.Join(installedDir, "references")
 	if err := os.RemoveAll(referencesPath); err != nil {
 		t.Fatalf("failed to remove references dir: %v", err)
@@ -730,14 +730,14 @@ func TestRunSkillsDirUninstallRemovesDanglingSymlink(t *testing.T) {
 // SKILL.md was removed, instead of reporting the skill as not found.
 func TestRunSkillsDirUninstallRemovesOrphanedOwnedFiles(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.Remove(filepath.Join(installedDir, "SKILL.md")); err != nil {
 		t.Fatalf("failed to remove installed skill file: %v", err)
 	}
@@ -759,7 +759,7 @@ func TestRunSkillsDirUninstallRemovesOrphanedOwnedFiles(t *testing.T) {
 // Tests that dir-mode uninstall counts skills that were never installed.
 func TestRunSkillsDirUninstallCountsMissingSkills(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -777,8 +777,8 @@ func TestRunSkillsDirUninstallCountsMissingSkills(t *testing.T) {
 // Tests that dir-mode list shows the destination and per-skill statuses.
 func TestRunSkillsDirListShowsStatuses(t *testing.T) {
 	root := t.TempDir()
-	installedSkill := writeDirModeSkillSource(t, root, "uloop-installed")
-	missingSkill := writeDirModeSkillSource(t, root, "uloop-missing")
+	installedSkill := writeDirModeSkillSource(t, root, "tloop-installed")
+	missingSkill := writeDirModeSkillSource(t, root, "tloop-missing")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -796,10 +796,10 @@ func TestRunSkillsDirListShowsStatuses(t *testing.T) {
 	if !strings.Contains(output, destinationDir) {
 		t.Fatalf("list should show the destination:\n%s", output)
 	}
-	if !strings.Contains(output, "uloop-installed (installed)") {
+	if !strings.Contains(output, "tloop-installed (installed)") {
 		t.Fatalf("list should show installed status:\n%s", output)
 	}
-	if !strings.Contains(output, "uloop-missing (not installed)") {
+	if !strings.Contains(output, "tloop-missing (not installed)") {
 		t.Fatalf("list should show not installed status:\n%s", output)
 	}
 }
@@ -844,13 +844,13 @@ func TestPrintSkillsSubcommandHelpShowsDirOptionForStandardSubcommands(t *testin
 }
 
 // Tests that a hand-authored directory using a skill's name and an owned entry
-// name, in a store uloop never installed into, is preserved: uninstall reports
+// name, in a store tloop never installed into, is preserved: uninstall reports
 // not found and install blocks the skill instead of replacing the content.
 func TestRunSkillsDirPreservesNeverInstalledOwnedNames(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
-	handAuthoredDir := filepath.Join(destinationDir, "uloop-sample", "references")
+	handAuthoredDir := filepath.Join(destinationDir, "tloop-sample", "references")
 	if err := os.MkdirAll(handAuthoredDir, 0o755); err != nil {
 		t.Fatalf("failed to create hand-authored dir: %v", err)
 	}
@@ -858,7 +858,7 @@ func TestRunSkillsDirPreservesNeverInstalledOwnedNames(t *testing.T) {
 	if err := os.WriteFile(userNotes, []byte("my curated notes\n"), 0o644); err != nil {
 		t.Fatalf("failed to write user notes: %v", err)
 	}
-	manifest := filepath.Join(destinationDir, "uloop-sample", "package.json")
+	manifest := filepath.Join(destinationDir, "tloop-sample", "package.json")
 	if err := os.WriteFile(manifest, []byte("{}\n"), 0o644); err != nil {
 		t.Fatalf("failed to write manifest: %v", err)
 	}
@@ -885,7 +885,7 @@ func TestRunSkillsDirPreservesNeverInstalledOwnedNames(t *testing.T) {
 		t.Fatalf("install onto never-installed owned names should report a failure: code=%d", code)
 	}
 	if !strings.Contains(stderr.String(), "cannot confirm it installed") {
-		t.Fatalf("error should state the content is not a confirmed uloop install:\n%s", stderr.String())
+		t.Fatalf("error should state the content is not a confirmed tloop install:\n%s", stderr.String())
 	}
 	if !strings.Contains(stdout.String(), "Blocked: 1") || !strings.Contains(stdout.String(), "Installed: 0") {
 		t.Fatalf("summary should count the skill as blocked:\n%s", stdout.String())
@@ -893,7 +893,7 @@ func TestRunSkillsDirPreservesNeverInstalledOwnedNames(t *testing.T) {
 	if _, err := os.Stat(userNotes); err != nil {
 		t.Fatalf("hand-authored notes must survive install: %v", err)
 	}
-	if _, err := os.Stat(filepath.Join(destinationDir, "uloop-sample", "SKILL.md")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(destinationDir, "tloop-sample", "SKILL.md")); !os.IsNotExist(err) {
 		t.Fatalf("blocked skill must not be written, stat err=%v", err)
 	}
 }
@@ -903,13 +903,13 @@ func TestRunSkillsDirPreservesNeverInstalledOwnedNames(t *testing.T) {
 // SKILL_STORE_CONFLICT envelope callers parse (SafeToRetry, BlockedCount).
 func TestRunSkillsDirInstallContinuesPastBlockedSkill(t *testing.T) {
 	root := t.TempDir()
-	blockedSkill := writeDirModeSkillSource(t, root, "uloop-blocked")
-	healthySkill := writeDirModeSkillSource(t, root, "uloop-healthy")
+	blockedSkill := writeDirModeSkillSource(t, root, "tloop-blocked")
+	healthySkill := writeDirModeSkillSource(t, root, "tloop-healthy")
 	destinationDir := filepath.Join(root, "apm-skills")
 	if err := os.MkdirAll(destinationDir, 0o755); err != nil {
 		t.Fatalf("failed to create destination: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(destinationDir, "uloop-blocked"), []byte("foreign\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(destinationDir, "tloop-blocked"), []byte("foreign\n"), 0o644); err != nil {
 		t.Fatalf("failed to write occupying file: %v", err)
 	}
 	stdout := &bytes.Buffer{}
@@ -923,7 +923,7 @@ func TestRunSkillsDirInstallContinuesPastBlockedSkill(t *testing.T) {
 	if !strings.Contains(stdout.String(), "Installed: 1") || !strings.Contains(stdout.String(), "Blocked: 1") {
 		t.Fatalf("summary should show the healthy skill installed and the conflict counted:\n%s", stdout.String())
 	}
-	if _, err := os.Stat(filepath.Join(destinationDir, "uloop-healthy", "SKILL.md")); err != nil {
+	if _, err := os.Stat(filepath.Join(destinationDir, "tloop-healthy", "SKILL.md")); err != nil {
 		t.Fatalf("the healthy skill should still be installed: %v", err)
 	}
 	if !strings.Contains(stderr.String(), "cannot manage skill") {
@@ -948,15 +948,15 @@ func TestRunSkillsDirInstallContinuesPastBlockedSkill(t *testing.T) {
 // completes the listing instead of aborting midway.
 func TestRunSkillsDirListReportsConflict(t *testing.T) {
 	root := t.TempDir()
-	blockedSkill := writeDirModeSkillSource(t, root, "uloop-blocked")
-	installedSkill := writeDirModeSkillSource(t, root, "uloop-installed")
+	blockedSkill := writeDirModeSkillSource(t, root, "tloop-blocked")
+	installedSkill := writeDirModeSkillSource(t, root, "tloop-installed")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{installedSkill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if err := os.WriteFile(filepath.Join(destinationDir, "uloop-blocked"), []byte("foreign\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(destinationDir, "tloop-blocked"), []byte("foreign\n"), 0o644); err != nil {
 		t.Fatalf("failed to write occupying file: %v", err)
 	}
 
@@ -967,13 +967,13 @@ func TestRunSkillsDirListReportsConflict(t *testing.T) {
 		t.Fatalf("dir list failed: code=%d stderr=%s", code, stderr.String())
 	}
 	output := stdout.String()
-	if !strings.Contains(output, "uloop-blocked (conflict)") {
+	if !strings.Contains(output, "tloop-blocked (conflict)") {
 		t.Fatalf("list should show the conflict status:\n%s", output)
 	}
 	if !strings.Contains(output, "exists but is not a directory") {
 		t.Fatalf("list should print the conflict reason under the status row:\n%s", output)
 	}
-	if !strings.Contains(output, "uloop-installed (installed)") {
+	if !strings.Contains(output, "tloop-installed (installed)") {
 		t.Fatalf("list should keep reporting the skills after a conflict:\n%s", output)
 	}
 	if !strings.Contains(output, "Total: 2 skills") {
@@ -986,9 +986,9 @@ func TestRunSkillsDirListReportsConflict(t *testing.T) {
 // case-insensitive ones (where a path probe would resolve it) included.
 func TestRunSkillsDirUninstallPreservesCaseVariantSkillFile(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
-	skillDir := filepath.Join(destinationDir, "uloop-sample")
+	skillDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.MkdirAll(skillDir, 0o755); err != nil {
 		t.Fatalf("failed to create skill dir: %v", err)
 	}
@@ -1019,14 +1019,14 @@ func TestRunSkillsDirUninstallPreservesCaseVariantSkillFile(t *testing.T) {
 // platforms so store behavior does not depend on where it is synced.
 func TestRunSkillsDirInstallBlocksCaseVariantOwnedEntry(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.Rename(filepath.Join(installedDir, "references"), filepath.Join(installedDir, "References")); err != nil {
 		t.Fatalf("failed to rename references dir: %v", err)
 	}
@@ -1053,14 +1053,14 @@ func TestRunSkillsDirDetectsBrokenOwnedEntryAsOutdated(t *testing.T) {
 		t.Skip("symlink creation requires elevated privileges on Windows")
 	}
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	notePath := filepath.Join(destinationDir, "uloop-sample", "references", "note.md")
+	notePath := filepath.Join(destinationDir, "tloop-sample", "references", "note.md")
 	if err := os.Remove(notePath); err != nil {
 		t.Fatalf("failed to remove reference: %v", err)
 	}
@@ -1090,7 +1090,7 @@ func TestRunSkillsDirDetectsBrokenOwnedEntryAsOutdated(t *testing.T) {
 }
 
 // Tests that passing --output-dir more than once is rejected instead of
-// silently letting the last destination win, matching `uloop install --dir`.
+// silently letting the last destination win, matching `tloop install --dir`.
 func TestParseSkillsOptionsRejectsDuplicateOutputDir(t *testing.T) {
 	if _, err := parseSkillsOptions([]string{"--output-dir", "/first", "--output-dir", "/second"}); err == nil {
 		t.Fatal("expected error for repeated --output-dir")
@@ -1132,9 +1132,9 @@ func TestPosixStyleOutputDirError(t *testing.T) {
 // preserves the directory, uniformly on every filesystem.
 func TestRunSkillsDirRejectsCaseVariantSkillDirectory(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
-	variantDir := filepath.Join(destinationDir, "Uloop-Sample")
+	variantDir := filepath.Join(destinationDir, "Tloop-Sample")
 	if err := os.MkdirAll(filepath.Join(variantDir, "references"), 0o755); err != nil {
 		t.Fatalf("failed to create case-variant dir: %v", err)
 	}
@@ -1152,7 +1152,7 @@ func TestRunSkillsDirRejectsCaseVariantSkillDirectory(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("dir list failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop-sample (conflict)") {
+	if !strings.Contains(stdout.String(), "tloop-sample (conflict)") {
 		t.Fatalf("a case-variant store directory should read as a conflict:\n%s", stdout.String())
 	}
 
@@ -1185,18 +1185,18 @@ func TestRunSkillsDirRejectsCaseVariantSkillDirectory(t *testing.T) {
 // and uninstall does not delete the drifted content.
 func TestRunSkillsDirReportsDriftedOrphanAsRecoverableConflict(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.Remove(filepath.Join(installedDir, "SKILL.md")); err != nil {
 		t.Fatalf("failed to remove installed skill file: %v", err)
 	}
-	// Simulates a uloop upgrade between the partial removal and the next run.
+	// Simulates a tloop upgrade between the partial removal and the next run.
 	if err := os.WriteFile(filepath.Join(skill.sourceDirectory, "references", "note.md"), []byte("note v2\n"), 0o644); err != nil {
 		t.Fatalf("failed to update source reference: %v", err)
 	}
@@ -1230,8 +1230,8 @@ func TestRunSkillsDirReportsDriftedOrphanAsRecoverableConflict(t *testing.T) {
 // name is preserved instead of being claimed and removed.
 func TestRunSkillsDirEmptyOwnedDirGrantsNoEvidence(t *testing.T) {
 	root := t.TempDir()
-	sourceDir := filepath.Join(root, "source", "uloop-sample", "Skill")
-	content := "---\nname: uloop-sample\n---\n\n# uloop-sample\n"
+	sourceDir := filepath.Join(root, "source", "tloop-sample", "Skill")
+	content := "---\nname: tloop-sample\n---\n\n# tloop-sample\n"
 	writeSkillFile(t, sourceDir, content)
 	// The owned directory contains only skipped names, so the comparable set
 	// is empty on the source side.
@@ -1241,9 +1241,9 @@ func TestRunSkillsDirEmptyOwnedDirGrantsNoEvidence(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(sourceDir, "references", "note.md.meta"), []byte("meta\n"), 0o644); err != nil {
 		t.Fatalf("failed to write skipped source file: %v", err)
 	}
-	skill := skillDefinition{name: "uloop-sample", content: []byte(content), sourceDirectory: sourceDir}
+	skill := skillDefinition{name: "tloop-sample", content: []byte(content), sourceDirectory: sourceDir}
 	destinationDir := filepath.Join(root, "apm-skills")
-	userDir := filepath.Join(destinationDir, "uloop-sample")
+	userDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.MkdirAll(filepath.Join(userDir, "references"), 0o755); err != nil {
 		t.Fatalf("failed to create user dir: %v", err)
 	}
@@ -1275,12 +1275,12 @@ func TestRunSkillsDirEmptyOwnedDirGrantsNoEvidence(t *testing.T) {
 // directory or the user's files.
 func TestRunSkillsDirEmptyOwnedFileGrantsNoEvidence(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	if err := os.WriteFile(filepath.Join(skill.sourceDirectory, "notes.md"), []byte{}, 0o644); err != nil {
 		t.Fatalf("failed to write empty source file: %v", err)
 	}
 	destinationDir := filepath.Join(root, "apm-skills")
-	storeDir := filepath.Join(destinationDir, "uloop-sample")
+	storeDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.MkdirAll(storeDir, 0o755); err != nil {
 		t.Fatalf("failed to create store skill dir: %v", err)
 	}
@@ -1319,7 +1319,7 @@ func TestRunSkillsDirHandlesSymlinkedSourceReference(t *testing.T) {
 		t.Skip("symlink creation requires elevated privileges on Windows")
 	}
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	sharedFile := filepath.Join(root, "shared.md")
 	if err := os.WriteFile(sharedFile, []byte("shared\n"), 0o644); err != nil {
 		t.Fatalf("failed to write shared file: %v", err)
@@ -1340,23 +1340,23 @@ func TestRunSkillsDirHandlesSymlinkedSourceReference(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("dir list failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop-sample (installed)") {
+	if !strings.Contains(stdout.String(), "tloop-sample (installed)") {
 		t.Fatalf("a symlinked source reference should not wedge the status:\n%s", stdout.String())
 	}
 }
 
 // Tests that uninstall in a directory without install evidence removes only
-// uloop's own artifacts: a user's .meta file neither authorizes deleting the
+// tloop's own artifacts: a user's .meta file neither authorizes deleting the
 // directory nor is deleted itself.
 func TestRunSkillsDirUninstallKeepsNoEvidenceDirWithUserMeta(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
-	skillDir := filepath.Join(destinationDir, "uloop-sample")
+	skillDir := filepath.Join(destinationDir, "tloop-sample")
 	if err := os.MkdirAll(skillDir, 0o755); err != nil {
 		t.Fatalf("failed to create skill dir: %v", err)
 	}
-	artifact := filepath.Join(skillDir, "leftover.uloop-backup-1234")
+	artifact := filepath.Join(skillDir, "leftover.tloop-backup-1234")
 	if err := os.WriteFile(artifact, []byte("partial\n"), 0o644); err != nil {
 		t.Fatalf("failed to write artifact: %v", err)
 	}
@@ -1373,7 +1373,7 @@ func TestRunSkillsDirUninstallKeepsNoEvidenceDirWithUserMeta(t *testing.T) {
 		t.Fatalf("dir uninstall failed: code=%d stderr=%s", code, stderr.String())
 	}
 	if _, err := os.Stat(artifact); !os.IsNotExist(err) {
-		t.Fatalf("uloop's artifact should be cleaned, stat err=%v", err)
+		t.Fatalf("tloop's artifact should be cleaned, stat err=%v", err)
 	}
 	if _, err := os.Stat(userMeta); err != nil {
 		t.Fatalf("the user's .meta file must survive: %v", err)
@@ -1388,15 +1388,15 @@ func TestRunSkillsDirUninstallKeepsNoEvidenceDirWithUserMeta(t *testing.T) {
 // data file.
 func TestRunSkillsDirUninstallDistinguishesMetaDebrisFromUserMeta(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
-	// Unity mints .meta stubs for the entries uloop installed; those are
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
+	// Unity mints .meta stubs for the entries tloop installed; those are
 	// debris, while dataset.meta is the user's own data file.
 	if err := os.WriteFile(filepath.Join(installedDir, "references.meta"), []byte("guid: 1\n"), 0o644); err != nil {
 		t.Fatalf("failed to write owned-entry meta stub: %v", err)
@@ -1428,14 +1428,14 @@ func TestRunSkillsDirUninstallDistinguishesMetaDebrisFromUserMeta(t *testing.T) 
 // directory, its contents, and the skill directory itself survive.
 func TestRunSkillsDirUninstallPreservesUserDirectoryNamedAsDebris(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	destinationDir := filepath.Join(root, "apm-skills")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("setup install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	installedDir := filepath.Join(destinationDir, "uloop-sample")
+	installedDir := filepath.Join(destinationDir, "tloop-sample")
 	userDebrisDir := filepath.Join(installedDir, "references.meta")
 	if err := os.MkdirAll(userDebrisDir, 0o755); err != nil {
 		t.Fatalf("failed to create user debris-named dir: %v", err)
@@ -1478,8 +1478,8 @@ func TestParseSkillsOptionsRejectsWhitespaceOutputDir(t *testing.T) {
 // treat that live managed name as leftover debris and skip the skill.
 func TestRunSkillsDirInstallPreservesSourceOwnedArtifactNamedFile(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
-	artifactNamedFile := filepath.Join(skill.sourceDirectory, "data.uloop-tmp-123")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
+	artifactNamedFile := filepath.Join(skill.sourceDirectory, "data.tloop-tmp-123")
 	if err := os.WriteFile(artifactNamedFile, []byte("owned payload\n"), 0o644); err != nil {
 		t.Fatalf("failed to write source-owned artifact-named file: %v", err)
 	}
@@ -1490,7 +1490,7 @@ func TestRunSkillsDirInstallPreservesSourceOwnedArtifactNamedFile(t *testing.T) 
 	if code := runSkillsDirInstall(destinationDir, []skillDefinition{skill}, nil, stdout, stderr); code != 0 {
 		t.Fatalf("first dir install failed: code=%d stderr=%s", code, stderr.String())
 	}
-	storeFile := filepath.Join(destinationDir, "uloop-sample", "data.uloop-tmp-123")
+	storeFile := filepath.Join(destinationDir, "tloop-sample", "data.tloop-tmp-123")
 	firstContent, err := os.ReadFile(storeFile)
 	if err != nil {
 		t.Fatalf("first install should copy the source-owned artifact-named file: %v", err)
@@ -1520,7 +1520,7 @@ func TestRunSkillsDirSubcommandRejectsOutputDirSymlinkedIntoSkillSource(t *testi
 		t.Skip("symlink creation requires elevated privileges on Windows")
 	}
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	nestedStore := filepath.Join(skill.sourceDirectory, "nested-store")
 	if err := os.MkdirAll(nestedStore, 0o755); err != nil {
 		t.Fatalf("failed to create nested store: %v", err)
@@ -1529,7 +1529,7 @@ func TestRunSkillsDirSubcommandRejectsOutputDirSymlinkedIntoSkillSource(t *testi
 	if err := os.Symlink(nestedStore, storeLink); err != nil {
 		t.Fatalf("failed to create symlink: %v", err)
 	}
-	installedInsideSource := filepath.Join(skill.sourceDirectory, "nested-store", "uloop-sample")
+	installedInsideSource := filepath.Join(skill.sourceDirectory, "nested-store", "tloop-sample")
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -1562,7 +1562,7 @@ func TestRunSkillsDirSubcommandRejectsOutputDirSymlinkedIntoSkillSource(t *testi
 // install can create a destination that WalkDir would then re-enter.
 func TestRunSkillsDirSubcommandRejectsOutputDirInsideSkillSource(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	outputDir := filepath.Join(skill.sourceDirectory, "nested-store")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -1585,7 +1585,7 @@ func TestRunSkillsDirSubcommandRejectsOutputDirInsideSkillSource(t *testing.T) {
 	if _, err := os.Stat(outputDir); !os.IsNotExist(err) {
 		t.Fatalf("install must not create a directory inside the skill source, stat err=%v", err)
 	}
-	if _, err := os.Stat(filepath.Join(skill.sourceDirectory, "uloop-sample")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(skill.sourceDirectory, "tloop-sample")); !os.IsNotExist(err) {
 		t.Fatalf("install must not create a skill directory inside the source, stat err=%v", err)
 	}
 }
@@ -1594,7 +1594,7 @@ func TestRunSkillsDirSubcommandRejectsOutputDirInsideSkillSource(t *testing.T) {
 // the same way as the reverse containment.
 func TestRunSkillsDirSubcommandRejectsOutputDirContainingSkillSource(t *testing.T) {
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
@@ -1606,7 +1606,7 @@ func TestRunSkillsDirSubcommandRejectsOutputDirContainingSkillSource(t *testing.
 	if !strings.Contains(stderr.String(), skillsOutputDirFlagName) {
 		t.Fatalf("error should name --output-dir:\n%s", stderr.String())
 	}
-	if _, err := os.Stat(filepath.Join(root, "uloop-sample")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "tloop-sample")); !os.IsNotExist(err) {
 		t.Fatalf("install must not create a skill directory in the overlapping dest, stat err=%v", err)
 	}
 }
@@ -1641,7 +1641,7 @@ func TestSyncSkillDirectoryPreservingForeignFilesCopiesSourceWithoutSkillFile(t 
 	sourceDir := filepath.Join(t.TempDir(), "Skill")
 	writeDispatcherTestFile(t, filepath.Join(sourceDir, "references", "note.md"), "note")
 	writeDispatcherTestFile(t, filepath.Join(sourceDir, "references.meta"), "meta")
-	destinationDir := filepath.Join(t.TempDir(), "uloop-sample")
+	destinationDir := filepath.Join(t.TempDir(), "tloop-sample")
 
 	if err := syncSkillDirectoryPreservingForeignFiles(sourceDir, destinationDir); err != nil {
 		t.Fatalf("sync failed: %v", err)
@@ -1680,7 +1680,7 @@ func TestSyncSkillDirectoryPreservingForeignFilesReportsFailures(t *testing.T) {
 		},
 		{
 			name:        "destination not writable",
-			wantMessage: filepath.Join("uloop-sample", "SKILL.md.uloop-tmp-"),
+			wantMessage: filepath.Join("tloop-sample", "SKILL.md.tloop-tmp-"),
 			setup: func(t *testing.T, sourceDir string, destinationDir string) string {
 				lockSkillsTestDirectory(t, destinationDir, 0o555)
 				return sourceDir
@@ -1691,7 +1691,7 @@ func TestSyncSkillDirectoryPreservingForeignFilesReportsFailures(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			sourceDir := filepath.Join(t.TempDir(), "Skill")
 			writeSkillFile(t, sourceDir, sampleSkillContent)
-			destinationDir := filepath.Join(t.TempDir(), "uloop-sample")
+			destinationDir := filepath.Join(t.TempDir(), "tloop-sample")
 			effectiveSource := testCase.setup(t, sourceDir, destinationDir)
 
 			err := syncSkillDirectoryPreservingForeignFiles(effectiveSource, destinationDir)
@@ -1712,7 +1712,7 @@ func TestSyncSkillDirectoryPreservingForeignFilesReportsUncreatableDestination(t
 	sourceDir := filepath.Join(t.TempDir(), "Skill")
 	writeSkillFile(t, sourceDir, sampleSkillContent)
 
-	if err := syncSkillDirectoryPreservingForeignFiles(sourceDir, filepath.Join(parentFile, "uloop-sample")); err == nil || !strings.HasPrefix(err.Error(), "mkdir "+parentFile) {
+	if err := syncSkillDirectoryPreservingForeignFiles(sourceDir, filepath.Join(parentFile, "tloop-sample")); err == nil || !strings.HasPrefix(err.Error(), "mkdir "+parentFile) {
 		t.Fatalf("expected a destination failure, got %v", err)
 	}
 }
@@ -1721,7 +1721,7 @@ func TestRunSkillsDirCommandsReportStoreThatIsAFile(t *testing.T) {
 	// Verifies dir-mode install and uninstall exit with code 1 and name the store when it is a regular file.
 	skipDispatcherTestOnWindows(t, "Windows reports a path below a file as not found, so the store reads as empty instead of failing.")
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	storeFile := filepath.Join(root, "store-file")
 	writeDispatcherTestFile(t, storeFile, "not a directory")
 
@@ -1753,10 +1753,10 @@ func TestRunSkillsDirCommandsReportStoreThatIsAFile(t *testing.T) {
 func TestRunSkillsDirCommandsReportUnreadableSkill(t *testing.T) {
 	// Verifies dir-mode install, list, and uninstall exit with code 1 when an installed skill cannot be read.
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	lockedStore := filepath.Join(root, "locked-store")
-	lockSkillsTestDirectory(t, filepath.Join(lockedStore, "uloop-sample"), 0o300)
-	wantMessage := filepath.Join("locked-store", "uloop-sample") + ": permission denied"
+	lockSkillsTestDirectory(t, filepath.Join(lockedStore, "tloop-sample"), 0o300)
+	wantMessage := filepath.Join("locked-store", "tloop-sample") + ": permission denied"
 
 	cases := []struct {
 		name string
@@ -1785,12 +1785,12 @@ func TestRunSkillsDirCommandsReportUnreadableSkill(t *testing.T) {
 func TestRunSkillsDirCommandsReportMissingSource(t *testing.T) {
 	// Verifies dir-mode install and uninstall stop when the skill source cannot be listed, leaving the store untouched.
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	store := filepath.Join(root, "store")
 	if code := runSkillsDirInstall(store, []skillDefinition{skill}, nil, &bytes.Buffer{}, &bytes.Buffer{}); code != 0 {
 		t.Fatalf("setup install failed: %d", code)
 	}
-	skill.content = []byte("---\nname: uloop-sample\n---\n\n# changed\n")
+	skill.content = []byte("---\nname: tloop-sample\n---\n\n# changed\n")
 	if err := os.RemoveAll(skill.sourceDirectory); err != nil {
 		t.Fatalf("failed to remove source: %v", err)
 	}
@@ -1808,27 +1808,27 @@ func TestRunSkillsDirCommandsReportMissingSource(t *testing.T) {
 		envelope := decodeDispatcherTestEnvelope(t, stderr.String())
 		errorObject, _ := envelope["Error"].(map[string]any)
 		message, _ := errorObject["Message"].(string)
-		if code != 1 || !strings.Contains(message, filepath.Join("uloop-sample", "Skill")+": ") {
+		if code != 1 || !strings.Contains(message, filepath.Join("tloop-sample", "Skill")+": ") {
 			t.Fatalf("expected the missing source error: code=%d stderr=%s", code, stderr.String())
 		}
 	}
-	assertFileContent(t, filepath.Join(store, "uloop-sample", "references", "note.md"), "note\n")
+	assertFileContent(t, filepath.Join(store, "tloop-sample", "references", "note.md"), "note\n")
 }
 
 func TestRunSkillsDirUninstallReportsBlockedRemoval(t *testing.T) {
 	// Verifies uninstall exits with code 1 when an owned directory cannot be removed.
 	root := t.TempDir()
-	skill := writeDirModeSkillSource(t, root, "uloop-sample")
+	skill := writeDirModeSkillSource(t, root, "tloop-sample")
 	store := filepath.Join(root, "store")
 	if code := runSkillsDirInstall(store, []skillDefinition{skill}, nil, &bytes.Buffer{}, &bytes.Buffer{}); code != 0 {
 		t.Fatalf("setup install failed: %d", code)
 	}
-	lockSkillsTestDirectory(t, filepath.Join(store, "uloop-sample", "references"), 0o555)
+	lockSkillsTestDirectory(t, filepath.Join(store, "tloop-sample", "references"), 0o555)
 	var stderr bytes.Buffer
 
 	code := runSkillsDirUninstall(store, []skillDefinition{skill}, &bytes.Buffer{}, &stderr)
 
-	if code != 1 || !strings.Contains(stderr.String(), "unlinkat "+filepath.Join(store, "uloop-sample", "references", "note.md")) {
+	if code != 1 || !strings.Contains(stderr.String(), "unlinkat "+filepath.Join(store, "tloop-sample", "references", "note.md")) {
 		t.Fatalf("expected an error: code=%d stderr=%s", code, stderr.String())
 	}
 }

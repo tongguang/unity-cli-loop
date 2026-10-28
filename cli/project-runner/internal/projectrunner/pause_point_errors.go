@@ -166,11 +166,11 @@ func pausePointTriggerRejectionAwaitAction(id string, triggerResult *pausePointT
 	if pausePointTriggerRejectedBeforeExecution(triggerResult) {
 		return fmt.Sprintf(
 			"The marker is still armed, so you can also wait on it directly: "+
-				"uloop await-pause-point --id %q --trigger \"<corrected trigger command>\"", id)
+				"tloop await-pause-point --id %q --trigger \"<corrected trigger command>\"", id)
 	}
 	return fmt.Sprintf(
 		"The marker is still armed, so once the precondition holds you can wait on it directly: "+
-			"uloop await-pause-point --id %q --trigger \"<the same trigger command>\"", id)
+			"tloop await-pause-point --id %q --trigger \"<the same trigger command>\"", id)
 }
 
 // pausePointTriggerRejectionRecoveryAction picks the recovery step that matches where the rejection
@@ -178,9 +178,9 @@ func pausePointTriggerRejectionAwaitAction(id string, triggerResult *pausePointT
 // advice would send the caller looking for a typo in a value that was already correct.
 func pausePointTriggerRejectionRecoveryAction(triggerResult *pausePointTriggerResult) string {
 	if pausePointTriggerRejectedBeforeExecution(triggerResult) {
-		return "For an INVALID_ARGUMENT rejection, check the rejected value against the triggered command's own --help; for UNKNOWN_COMMAND, the first token must be a uloop subcommand name written without the leading 'uloop'."
+		return "For an INVALID_ARGUMENT rejection, check the rejected value against the triggered command's own --help; for UNKNOWN_COMMAND, the first token must be a tloop subcommand name written without the leading 'tloop'."
 	}
-	return "Fix the precondition named in the trigger message (for example enter Play Mode with 'uloop control-play-mode --action Play'), then run the same enable-pause-point command again."
+	return "Fix the precondition named in the trigger message (for example enter Play Mode with 'tloop control-play-mode --action Play'), then run the same enable-pause-point command again."
 }
 
 const (
@@ -222,12 +222,12 @@ const (
 		"(1) the method is a physics/message callback or is called from one on a GameObject that existed before enable — recreate the GameObject or embed UloopPausePoint.Pause; " +
 		"(2) the method was already bound into a delegate/event before enable — the pre-bound invocation path bypasses the patch; " +
 		"(3) the method ran but exited on an earlier branch (for example a guard rejected the action because game state had already moved on) — arm a second marker on the early-return line to see which path ran. " +
-		"(4) the enable response reported LineBasis 'LastCompiledSource' (no verified source snapshot for the file), so the armed line is a compiled line number that may not match the editor — check ResolvedMethod, or run 'uloop compile' and re-enable." +
-		" For patterns (1) and (2), hot-reloading a temporary log line into the method (`uloop hot-reload`) and re-triggering gives a one-way check: the log appearing proves the body ran even though the marker missed. The log staying absent proves nothing — the same cached dispatch can bypass the hot-reload patch too."
+		"(4) the enable response reported LineBasis 'LastCompiledSource' (no verified source snapshot for the file), so the armed line is a compiled line number that may not match the editor — check ResolvedMethod, or run 'tloop compile' and re-enable." +
+		" For patterns (1) and (2), hot-reloading a temporary log line into the method (`tloop hot-reload`) and re-triggering gives a one-way check: the log appearing proves the body ran even though the marker missed. The log staying absent proves nothing — the same cached dispatch can bypass the hot-reload patch too."
 
 	// pausePointHintSuppressedByHotReload short-circuits every other timeout diagnosis:
 	// a suppressed marker cannot fire no matter what the caller does in PlayMode.
-	pausePointHintSuppressedByHotReload = "The marker's method is hot-reload patched and the marker could not be re-targeted onto the patched body. Revert the patch with 'uloop hot-reload --revert-all' or run 'uloop compile', then re-enable the marker."
+	pausePointHintSuppressedByHotReload = "The marker's method is hot-reload patched and the marker could not be re-targeted onto the patched body. Revert the patch with 'tloop hot-reload --revert-all' or run 'tloop compile', then re-enable the marker."
 )
 
 // pausePointSuppressedByHotReloadHint returns Unity's reason alone when present: both
@@ -350,11 +350,11 @@ func pausePointStateError(
 }
 
 func pausePointStateNextActions(id string, response pausePointStatusResponse) []string {
-	rearmAction := "Run `uloop enable-pause-point --id <marker-id>` before waiting."
+	rearmAction := "Run `tloop enable-pause-point --id <marker-id>` before waiting."
 	confirmAction := "Confirm the code path calls `UloopPausePoint.Pause(\"<marker-id>\")` with the same id."
 	if path, line, ok := parsePausePointFileLineID(id); ok {
 		rearmAction = fmt.Sprintf(
-			"Re-arm it with uloop enable-pause-point --file %q --line %d before waiting.", path, line)
+			"Re-arm it with tloop enable-pause-point --file %q --line %d before waiting.", path, line)
 		confirmAction = fmt.Sprintf(
 			"Confirm the code path executes line %d of %s while the marker is armed.", line, path)
 	}

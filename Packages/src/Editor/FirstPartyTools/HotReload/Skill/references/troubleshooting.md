@@ -2,7 +2,7 @@
 
 ## Reading `--status` and `InvocationCount`
 
-`uloop hot-reload --status` lists the methods whose bodies are currently replaced and the
+`tloop hot-reload --status` lists the methods whose bodies are currently replaced and the
 members hot reload added, without applying or reverting anything. It cannot be combined
 with `--files` or `--revert-all`. Patches are static Editor state, so the answer is authoritative: after
 a domain reload it reports zero patched methods, which is exactly when an
@@ -19,26 +19,26 @@ way, from a counter of the member's own: an unchanged reload's `AlreadyActive` r
 carries that count, and re-applying the member — by editing it, or by re-applying its file
 with an edited file of the same assembly — starts the count over at zero. Compiled code
 cannot call an added member, so the count stays 0 until a hot-reloaded body that calls it
-runs, or, for a forwarded Unity message, until the hot-reload proxy delivers the message in
+runs, or, for a forwarded Tuanjie message, until the hot-reload proxy delivers the message in
 Play Mode; `Reason` says so while the count is 0. An added iterator counts when its
 enumeration starts rather than when it is called.
 
-While Unity is paused — including while a pause-point hit holds the game — the player loop
+While Tuanjie is paused — including while a pause-point hit holds the game — the player loop
 does not advance, so game-driven calls stop and the count freezes; calls you make yourself (for
-example through `uloop execute-dynamic-code`) still increment it. A frozen count during a
+example through `tloop execute-dynamic-code`) still increment it. A frozen count during a
 pause only means game-driven calls are not running; it says nothing about whether call
 sites reach the patch. Resume first
-(`uloop control-play-mode --action Resume`, or clear the owning pause point), drive the
+(`tloop control-play-mode --action Resume`, or clear the owning pause point), drive the
 game, and only then read `InvocationCount` as a reachability signal.
 
 ## When a Patch Reports `Patched` but Behavior Does Not Change
 
-Run `uloop get-logs` first. An exception thrown inside the patched body, or an
+Run `tloop get-logs` first. An exception thrown inside the patched body, or an
 error logged while the reload applied, appears there immediately and explains
 "Patched but no visible change" faster than any marker-based digging.
 
 `Patched` means the method body was replaced, not that the method ran. Before suspecting
-the patch, confirm the method is actually reached: arm `uloop enable-pause-point --mode
+the patch, confirm the method is actually reached: arm `tloop enable-pause-point --mode
 trace` on a line inside the edited method body — it resolves against the patched body
 directly (see [pause-point-interaction.md](pause-point-interaction.md)) — drive the game, and check the hit
 count: zero hits usually means the calling path never reached the method, which no patch
@@ -48,11 +48,11 @@ and use the log-line fallback in [pause-point-interaction.md](pause-point-intera
 suspected early-return line. The other known cause is JIT inlining, which the response flags
 with a single aggregated warning listing the at-risk methods: `[AggressiveInlining]` methods
 always, tiny bodies only when the Editor's Code Optimization mode is Release (the default
-Debug mode does not inline them). If `uloop hot-reload --status` shows the method's
+Debug mode does not inline them). If `tloop hot-reload --status` shows the method's
 `InvocationCount` increasing, the calls you exercised are reaching the patched body and the
 warning did not apply to them — call sites you have not exercised may still run inlined old
 code. Take both readings while the code is actually being driven — PlayMode running, or your own
-`uloop execute-dynamic-code` invocation for Editor-assembly methods; a count frozen during
+`tloop execute-dynamic-code` invocation for Editor-assembly methods; a count frozen during
 a pause is not evidence either way.
 
 ## Stack Traces From Patched Methods
@@ -68,12 +68,12 @@ a method a reload added (`Added` rows); the topmost of them names the failing st
 
 When no shim frame sits above the `_Patch<n>` frame, the failing statement is in that
 patched body, or in a call it made that left no frame of its own. Arm
-`uloop enable-pause-point --file <edited file> --line <N> --mode trace` on lines inside the
+`tloop enable-pause-point --file <edited file> --line <N> --mode trace` on lines inside the
 edited body — such a line arms the patched body directly (see
 [pause-point-interaction.md](pause-point-interaction.md)) — drive the code again, and read
-the hits with `uloop pause-point-status`: the failing statement sits at or after the last
+the hits with `tloop pause-point-status`: the failing statement sits at or after the last
 marked line that records a hit, and before the first one that records none. A line inside
-an added method cannot hold a pause point until `uloop compile`, so mark the line that
+an added method cannot hold a pause point until `tloop compile`, so mark the line that
 calls it instead.
 
 ## When Earlier Patches Still Call an Added Member That Is Gone
@@ -88,5 +88,5 @@ with `<Member>` in the signature the caller was applied against.
 
 The line comes back on every reload that includes the caller's file or the member's file,
 and stops once the caller applies again: fix what the caller's row reported and reload its
-file together with the member's file, or run `uloop compile`. A reload that includes neither
+file together with the member's file, or run `tloop compile`. A reload that includes neither
 file does not repeat it.

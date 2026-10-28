@@ -202,7 +202,7 @@ func TestRunDispatcherCommandHelpDoesNotRequireProjectPin(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("dispatcher command help failed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !bytes.Contains(stdout.Bytes(), []byte("uloop compile")) {
+	if !bytes.Contains(stdout.Bytes(), []byte("tloop compile")) {
 		t.Fatalf("compile help output mismatch: %s", stdout.String())
 	}
 }
@@ -273,7 +273,7 @@ func TestRunDispatcherLaunchOptionsDoNotRequireProjectPin(t *testing.T) {
 }
 
 func TestRunDispatcherVersionUsesDispatcherVersion(t *testing.T) {
-	// Verifies `uloop --version` reports the dispatcher release version instead of the project runner version.
+	// Verifies `tloop --version` reports the dispatcher release version instead of the project runner version.
 	t.Chdir(t.TempDir())
 
 	var stdout bytes.Buffer
@@ -289,7 +289,7 @@ func TestRunDispatcherVersionUsesDispatcherVersion(t *testing.T) {
 }
 
 func TestRunDispatcherVersionSubcommandMatchesFlagVersion(t *testing.T) {
-	// Verifies `uloop version` returns the same text as `uloop --version`.
+	// Verifies `tloop version` returns the same text as `tloop --version`.
 	t.Chdir(t.TempDir())
 
 	var flagStdout bytes.Buffer
@@ -306,7 +306,7 @@ func TestRunDispatcherVersionSubcommandMatchesFlagVersion(t *testing.T) {
 }
 
 func TestRunDispatcherVersionSubcommandJSONMatchesFlagVersionJSON(t *testing.T) {
-	// Verifies `uloop version --json` returns the same JSON as `uloop --version --json`.
+	// Verifies `tloop version --json` returns the same JSON as `tloop --version --json`.
 	t.Chdir(t.TempDir())
 
 	var flagStdout bytes.Buffer
@@ -323,7 +323,7 @@ func TestRunDispatcherVersionSubcommandJSONMatchesFlagVersionJSON(t *testing.T) 
 }
 
 func TestRunDispatcherVersionSubcommandReportsTrailingUnknownOption(t *testing.T) {
-	// Verifies `uloop version --json extra` reports the trailing argument, not --json itself.
+	// Verifies `tloop version --json extra` reports the trailing argument, not --json itself.
 	t.Chdir(t.TempDir())
 
 	var stdout bytes.Buffer
@@ -336,7 +336,7 @@ func TestRunDispatcherVersionSubcommandReportsTrailingUnknownOption(t *testing.T
 	if !strings.Contains(stderr.String(), "Unknown version option: extra") {
 		t.Fatalf("stderr should report trailing option extra: %s", stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "uloop version --help") {
+	if !strings.Contains(stderr.String(), "tloop version --help") {
 		t.Fatalf("stderr should guide users to version --help: %s", stderr.String())
 	}
 }
@@ -355,7 +355,7 @@ func TestResolveDispatcherRealCLIRejectsInvalidProjectRunnerVersion(t *testing.T
 func TestResolveDispatcherRealCLIUsesProjectRunnerPathOverrideWithoutDownloading(t *testing.T) {
 	// Verifies the dev escape-hatch env var returns the local binary and skips pin/cache/download entirely.
 	overrideDir := t.TempDir()
-	overridePath := filepath.Join(overrideDir, "uloop-project-runner")
+	overridePath := filepath.Join(overrideDir, "tloop-project-runner")
 	if err := os.WriteFile(overridePath, []byte("#!/bin/sh\n"), 0o755); err != nil {
 		t.Fatalf("failed to write override binary: %v", err)
 	}
@@ -376,7 +376,7 @@ func TestResolveDispatcherRealCLIUsesProjectRunnerPathOverrideWithoutDownloading
 
 func TestResolveDispatcherRealCLIRejectsMissingProjectRunnerPathOverride(t *testing.T) {
 	// Verifies a clear error is returned when the override env var points at a missing file.
-	t.Setenv(nativepath.ProjectRunnerPathEnvName, filepath.Join(t.TempDir(), "missing-uloop-project-runner"))
+	t.Setenv(nativepath.ProjectRunnerPathEnvName, filepath.Join(t.TempDir(), "missing-tloop-project-runner"))
 	t.Setenv(nativepath.CacheDirEnvName, t.TempDir())
 
 	_, err := resolveDispatcherRealCLI(context.Background(), dispatcherPin{ProjectRunnerVersion: "1.0.0"}, io.Discard)
@@ -420,7 +420,7 @@ func TestEnforceDispatcherFreshnessRequiresManualUpdateWhenSelfUpdateDisabled(t 
 	if !bytes.Contains(stderr.Bytes(), []byte(clierrors.ErrorCodeCLIUpdateRequired)) {
 		t.Fatalf("freshness output mismatch: %s", stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "Run `uloop update` and retry the command.") {
+	if !strings.Contains(stderr.String(), "Run `tloop update` and retry the command.") {
 		t.Fatalf("expected self-update NextActions guidance in stderr, got: %s", stderr.String())
 	}
 }
@@ -432,7 +432,7 @@ func TestEnforceDispatcherFreshnessRequiresBrewUpgradeWhenHomebrewManagedAndUpda
 		resolveUpdateExecutablePathFunc = previousResolver
 	}()
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/opt/homebrew/Cellar/uloop/3.0.0/bin/uloop", nil
+		return "/opt/homebrew/Cellar/tloop/3.0.0/bin/tloop", nil
 	}
 	deps := defaultDispatcherRunDeps()
 	deps.runUpdate = func(context.Context) (bool, error) {
@@ -450,7 +450,7 @@ func TestEnforceDispatcherFreshnessRequiresBrewUpgradeWhenHomebrewManagedAndUpda
 	if !handled || code != 1 {
 		t.Fatalf("freshness result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	expectedNextAction := "Run `brew upgrade uloop` and retry the command."
+	expectedNextAction := "Run `brew upgrade tloop` and retry the command."
 	if !bytes.Contains(stderr.Bytes(), []byte(expectedNextAction)) {
 		t.Fatalf("expected NextActions brew upgrade guidance in stderr, got: %s", stderr.String())
 	}
@@ -466,7 +466,7 @@ func TestEnforceDispatcherFreshnessRequiresWingetUpgradeWhenWingetManagedAndUpda
 		resolveUpdateExecutablePathFunc = previousResolver
 	}()
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return `C:\Program Files\WinGet\Links\uloop.exe`, nil
+		return `C:\Program Files\WinGet\Links\tloop.exe`, nil
 	}
 	deps := defaultDispatcherRunDeps()
 	deps.runUpdate = func(context.Context) (bool, error) {
@@ -484,10 +484,10 @@ func TestEnforceDispatcherFreshnessRequiresWingetUpgradeWhenWingetManagedAndUpda
 	if !handled || code != 1 {
 		t.Fatalf("freshness result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "This uloop install is managed by winget. Run `winget upgrade --id hatayama.uloop` to update.") {
+	if !strings.Contains(stderr.String(), "This tloop install is managed by winget. Run `winget upgrade --id tongguang.tloop` to update.") {
 		t.Fatalf("expected winget-managed reason in stderr, got: %s", stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "Run `winget upgrade --id hatayama.uloop` and retry the command.") {
+	if !strings.Contains(stderr.String(), "Run `winget upgrade --id tongguang.tloop` and retry the command.") {
 		t.Fatalf("expected winget NextActions guidance in stderr, got: %s", stderr.String())
 	}
 }
@@ -500,7 +500,7 @@ func TestEnforceDispatcherFreshnessSkipsOptionalUpdateWhenWingetManaged(t *testi
 		resolveUpdateExecutablePathFunc = previousResolver
 	}()
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return `C:\Program Files\WinGet\Links\uloop.exe`, nil
+		return `C:\Program Files\WinGet\Links\tloop.exe`, nil
 	}
 	deps := defaultDispatcherRunDeps()
 	deps.runUpdate = func(context.Context) (bool, error) {
@@ -528,7 +528,7 @@ func TestEnforceDispatcherFreshnessSkipsOptionalUpdateWhenHomebrewManaged(t *tes
 		resolveUpdateExecutablePathFunc = previousResolver
 	}()
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/opt/homebrew/Cellar/uloop/3.0.0/bin/uloop", nil
+		return "/opt/homebrew/Cellar/tloop/3.0.0/bin/tloop", nil
 	}
 	deps := defaultDispatcherRunDeps()
 	deps.runUpdate = func(context.Context) (bool, error) {
@@ -615,7 +615,7 @@ func TestEnforceDispatcherFreshnessReportsOptionalUpdateVersionChange(t *testing
 	if handled || code != 0 {
 		t.Fatalf("freshness result mismatch: handled=%t code=%d", handled, code)
 	}
-	expected := "uloop: dispatcher updated from " + dispatcherVersion + " to 9.9.9"
+	expected := "tloop: dispatcher updated from " + dispatcherVersion + " to 9.9.9"
 	if !bytes.Contains(stderr.Bytes(), []byte(expected)) {
 		t.Fatalf("freshness output mismatch: %s", stderr.String())
 	}
@@ -663,7 +663,7 @@ func TestEnforceDispatcherFreshnessSkipsInstallerWhenOptionalTargetIsCurrent(t *
 		return options, nil
 	}
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/tmp/uloop", nil
+		return "/tmp/tloop", nil
 	}
 	deps := defaultDispatcherRunDeps()
 	checkedAt := time.Date(2026, time.August, 27, 12, 0, 0, 0, time.UTC)
@@ -719,7 +719,7 @@ func TestEnforceDispatcherFreshnessRunsInstallerWhenOptionalTargetIsNewer(t *tes
 		return options, nil
 	}
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/tmp/uloop", nil
+		return "/tmp/tloop", nil
 	}
 	deps := defaultDispatcherRunDeps()
 	deps.runUpdate = func(ctx context.Context) (bool, error) {
@@ -804,7 +804,7 @@ func TestRequiredDispatcherFreshnessStillRequiresRetryWhenUpdateWasSkipped(t *te
 	if !handled || code != 1 {
 		t.Fatalf("required freshness result mismatch: handled=%t code=%d stderr=%s", handled, code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "Retry the same uloop command.") {
+	if !strings.Contains(stderr.String(), "Retry the same tloop command.") {
 		t.Fatalf("required freshness retry guidance missing: %s", stderr.String())
 	}
 }
@@ -861,27 +861,27 @@ func TestDecideDispatcherFreshnessPlansUpdatePaths(t *testing.T) {
 			updateDue:          true,
 			expectedAction:     dispatcherFreshnessManualUpdateRequired,
 			expectedReason:     dispatcherFreshnessReasonSelfUpdateDisabled,
-			expectedNextAction: "Run `uloop update` and retry the command.",
+			expectedNextAction: "Run `tloop update` and retry the command.",
 		},
 		{
 			name:               "required update homebrew managed",
 			minimumVersion:     "999.0.0",
 			currentVersion:     dispatcherVersion,
-			managedInstall:     update.DetectManagedInstall("/opt/homebrew/Cellar/uloop/3.1.0/bin/uloop"),
+			managedInstall:     update.DetectManagedInstall("/opt/homebrew/Cellar/tloop/3.1.0/bin/tloop"),
 			updateDue:          true,
 			expectedAction:     dispatcherFreshnessManualUpdateRequired,
-			expectedReason:     "This uloop install is managed by Homebrew. Run `brew upgrade uloop` to update.",
-			expectedNextAction: "Run `brew upgrade uloop` and retry the command.",
+			expectedReason:     "This tloop install is managed by Homebrew. Run `brew upgrade tloop` to update.",
+			expectedNextAction: "Run `brew upgrade tloop` and retry the command.",
 		},
 		{
 			name:               "required update winget managed",
 			minimumVersion:     "999.0.0",
 			currentVersion:     dispatcherVersion,
-			managedInstall:     update.DetectManagedInstall(`C:\Program Files\WinGet\Links\uloop.exe`),
+			managedInstall:     update.DetectManagedInstall(`C:\Program Files\WinGet\Links\tloop.exe`),
 			updateDue:          true,
 			expectedAction:     dispatcherFreshnessManualUpdateRequired,
-			expectedReason:     "This uloop install is managed by winget. Run `winget upgrade --id hatayama.uloop` to update.",
-			expectedNextAction: "Run `winget upgrade --id hatayama.uloop` and retry the command.",
+			expectedReason:     "This tloop install is managed by winget. Run `winget upgrade --id tongguang.tloop` to update.",
+			expectedNextAction: "Run `winget upgrade --id tongguang.tloop` and retry the command.",
 		},
 		{
 			name:           "required update runs immediately",
@@ -901,7 +901,7 @@ func TestDecideDispatcherFreshnessPlansUpdatePaths(t *testing.T) {
 			name:           "optional homebrew skip",
 			minimumVersion: dispatcherVersion,
 			currentVersion: dispatcherVersion,
-			managedInstall: update.DetectManagedInstall("/opt/homebrew/Cellar/uloop/3.1.0/bin/uloop"),
+			managedInstall: update.DetectManagedInstall("/opt/homebrew/Cellar/tloop/3.1.0/bin/tloop"),
 			updateDue:      true,
 			expectedAction: dispatcherFreshnessNoop,
 		},
@@ -961,7 +961,7 @@ func stubDispatcherUpdateHooks(t *testing.T, updatedVersion string) (dispatcherR
 	// Why: keep freshness update tests off os.Executable so a Cellar-hosted binary cannot
 	// trip the Homebrew guard and hide a real auto-update regression.
 	resolveUpdateExecutablePathFunc = func() (string, error) {
-		return "/Users/someone/.local/bin/uloop", nil
+		return "/Users/someone/.local/bin/tloop", nil
 	}
 	return deps, func() {
 		dispatcherReadInstalledVersion = previousReader
@@ -972,11 +972,11 @@ func stubDispatcherUpdateHooks(t *testing.T, updatedVersion string) (dispatcherR
 func TestExtractDispatcherRealCLIFromTarRequiresProjectRunnerAsset(t *testing.T) {
 	// Verifies project runner release archives extract the project runner binary.
 	tempDir := t.TempDir()
-	archivePath := filepath.Join(tempDir, "uloop-project-runner-darwin-arm64.tar.gz")
+	archivePath := filepath.Join(tempDir, "tloop-project-runner-darwin-arm64.tar.gz")
 	writeDispatcherTarGzArchive(t, archivePath, []dispatcherArchiveTestEntry{
-		{Name: "uloop-project-runner", Content: "real"},
+		{Name: "tloop-project-runner", Content: "real"},
 	})
-	destinationPath := filepath.Join(tempDir, "uloop-project-runner")
+	destinationPath := filepath.Join(tempDir, "tloop-project-runner")
 
 	err := extractDispatcherRealCLI(archivePath, filepath.Base(archivePath), destinationPath, "darwin")
 	if err != nil {
@@ -988,11 +988,11 @@ func TestExtractDispatcherRealCLIFromTarRequiresProjectRunnerAsset(t *testing.T)
 func TestExtractDispatcherRealCLIFromZipRequiresProjectRunnerAsset(t *testing.T) {
 	// Verifies Windows project runner release archives extract the project runner binary.
 	tempDir := t.TempDir()
-	archivePath := filepath.Join(tempDir, "uloop-project-runner-windows-amd64.zip")
+	archivePath := filepath.Join(tempDir, "tloop-project-runner-windows-amd64.zip")
 	writeDispatcherZipArchive(t, archivePath, []dispatcherArchiveTestEntry{
-		{Name: "uloop-project-runner.exe", Content: "real"},
+		{Name: "tloop-project-runner.exe", Content: "real"},
 	})
-	destinationPath := filepath.Join(tempDir, "uloop-project-runner.exe")
+	destinationPath := filepath.Join(tempDir, "tloop-project-runner.exe")
 
 	err := extractDispatcherRealCLI(archivePath, filepath.Base(archivePath), destinationPath, "windows")
 	if err != nil {
@@ -1011,9 +1011,9 @@ func TestDispatcherHTTPClientHasDownloadTimeout(t *testing.T) {
 func TestDownloadDispatcherRealCLIWritesDownloadStatus(t *testing.T) {
 	// Verifies cache misses tell callers that dispatcher is downloading the pinned project runner.
 	tempDir := t.TempDir()
-	archivePath := filepath.Join(tempDir, "uloop-project-runner-darwin-arm64.tar.gz")
+	archivePath := filepath.Join(tempDir, "tloop-project-runner-darwin-arm64.tar.gz")
 	writeDispatcherTarGzArchive(t, archivePath, []dispatcherArchiveTestEntry{
-		{Name: "uloop-project-runner", Content: "real"},
+		{Name: "tloop-project-runner", Content: "real"},
 	})
 	archiveContent, err := os.ReadFile(archivePath)
 	if err != nil {
@@ -1030,11 +1030,11 @@ func TestDownloadDispatcherRealCLIWritesDownloadStatus(t *testing.T) {
 		Transport: dispatcherRoundTripFunc(func(request *http.Request) (*http.Response, error) {
 			content := []byte{}
 			statusCode := http.StatusNotFound
-			if strings.HasSuffix(request.URL.Path, "/uloop-project-runner-darwin-arm64.tar.gz") {
+			if strings.HasSuffix(request.URL.Path, "/tloop-project-runner-darwin-arm64.tar.gz") {
 				content = archiveContent
 				statusCode = http.StatusOK
 			}
-			if strings.HasSuffix(request.URL.Path, "/uloop-project-runner-darwin-arm64.tar.gz.sha256") {
+			if strings.HasSuffix(request.URL.Path, "/tloop-project-runner-darwin-arm64.tar.gz.sha256") {
 				content = checksumContent
 				statusCode = http.StatusOK
 			}
@@ -1059,7 +1059,7 @@ func TestDownloadDispatcherRealCLIWritesDownloadStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("downloadDispatcherRealCLIForPin failed: %v", err)
 	}
-	expectedStatus := "uloop: downloading pinned project runner 3.0.0-beta.88 for darwin-arm64...\n"
+	expectedStatus := "tloop: downloading pinned project runner 3.0.0-beta.88 for darwin-arm64...\n"
 	if stderr.String() != expectedStatus {
 		t.Fatalf("download status mismatch: %q", stderr.String())
 	}
@@ -1070,9 +1070,9 @@ func TestDownloadDispatcherRealCLIWritesDownloadStatus(t *testing.T) {
 func TestDownloadDispatcherRealCLIFailsClosedOnAttestationError(t *testing.T) {
 	// Verifies pinned project runners are rejected when the attestation verifier reports a mismatch, so a compromised release cannot install a runner even if its .sha256 lines up.
 	tempDir := t.TempDir()
-	archivePath := filepath.Join(tempDir, "uloop-project-runner-darwin-arm64.tar.gz")
+	archivePath := filepath.Join(tempDir, "tloop-project-runner-darwin-arm64.tar.gz")
 	writeDispatcherTarGzArchive(t, archivePath, []dispatcherArchiveTestEntry{
-		{Name: "uloop-project-runner", Content: "real"},
+		{Name: "tloop-project-runner", Content: "real"},
 	})
 	archiveContent, err := os.ReadFile(archivePath)
 	if err != nil {
@@ -1089,11 +1089,11 @@ func TestDownloadDispatcherRealCLIFailsClosedOnAttestationError(t *testing.T) {
 		Transport: dispatcherRoundTripFunc(func(request *http.Request) (*http.Response, error) {
 			content := []byte{}
 			statusCode := http.StatusNotFound
-			if strings.HasSuffix(request.URL.Path, "/uloop-project-runner-darwin-arm64.tar.gz") {
+			if strings.HasSuffix(request.URL.Path, "/tloop-project-runner-darwin-arm64.tar.gz") {
 				content = archiveContent
 				statusCode = http.StatusOK
 			}
-			if strings.HasSuffix(request.URL.Path, "/uloop-project-runner-darwin-arm64.tar.gz.sha256") {
+			if strings.HasSuffix(request.URL.Path, "/tloop-project-runner-darwin-arm64.tar.gz.sha256") {
 				content = checksumContent
 				statusCode = http.StatusOK
 			}
@@ -1121,11 +1121,11 @@ func TestDownloadDispatcherRealCLIFailsClosedOnAttestationError(t *testing.T) {
 }
 
 func TestDownloadDispatcherRealCLIPassesRunnerIdentityToAttestation(t *testing.T) {
-	// Verifies the runner-publish workflow SAN and the project runner release tag are what get sent to the attestation hook (Fable 5 review — SAN must match .github/workflows/native-cli-publish.yml, tag must be uloop-project-runner-v<version>).
+	// Verifies the runner-publish workflow SAN and the project runner release tag are what get sent to the attestation hook (Fable 5 review — SAN must match .github/workflows/native-cli-publish.yml, tag must be tloop-project-runner-v<version>).
 	tempDir := t.TempDir()
-	archivePath := filepath.Join(tempDir, "uloop-project-runner-darwin-arm64.tar.gz")
+	archivePath := filepath.Join(tempDir, "tloop-project-runner-darwin-arm64.tar.gz")
 	writeDispatcherTarGzArchive(t, archivePath, []dispatcherArchiveTestEntry{
-		{Name: "uloop-project-runner", Content: "real"},
+		{Name: "tloop-project-runner", Content: "real"},
 	})
 	archiveContent, err := os.ReadFile(archivePath)
 	if err != nil {
@@ -1142,11 +1142,11 @@ func TestDownloadDispatcherRealCLIPassesRunnerIdentityToAttestation(t *testing.T
 		Transport: dispatcherRoundTripFunc(func(request *http.Request) (*http.Response, error) {
 			content := []byte{}
 			statusCode := http.StatusNotFound
-			if strings.HasSuffix(request.URL.Path, "/uloop-project-runner-darwin-arm64.tar.gz") {
+			if strings.HasSuffix(request.URL.Path, "/tloop-project-runner-darwin-arm64.tar.gz") {
 				content = archiveContent
 				statusCode = http.StatusOK
 			}
-			if strings.HasSuffix(request.URL.Path, "/uloop-project-runner-darwin-arm64.tar.gz.sha256") {
+			if strings.HasSuffix(request.URL.Path, "/tloop-project-runner-darwin-arm64.tar.gz.sha256") {
 				content = checksumContent
 				statusCode = http.StatusOK
 			}
@@ -1182,10 +1182,10 @@ func TestDownloadDispatcherRealCLIPassesRunnerIdentityToAttestation(t *testing.T
 		&stderr); err != nil {
 		t.Fatalf("downloadDispatcherRealCLIForPin failed: %v", err)
 	}
-	if seenReleaseTag != "uloop-project-runner-v3.0.0-beta.88" {
+	if seenReleaseTag != "tloop-project-runner-v3.0.0-beta.88" {
 		t.Fatalf("attestation hook received wrong release tag: %s", seenReleaseTag)
 	}
-	if !strings.HasSuffix(seenAssetURL, "/uloop-project-runner-v3.0.0-beta.88/uloop-project-runner-darwin-arm64.tar.gz") {
+	if !strings.HasSuffix(seenAssetURL, "/tloop-project-runner-v3.0.0-beta.88/tloop-project-runner-darwin-arm64.tar.gz") {
 		t.Fatalf("attestation hook received wrong asset URL: %s", seenAssetURL)
 	}
 	if seenWorkflowPath != attestationRunnerPublishWorkflowPath {
@@ -1491,7 +1491,7 @@ func TestRunDispatcherMissingPinEmitsPinResolutionGuidance(t *testing.T) {
 		t.Fatalf("expected non-zero exit when pin is missing, stderr=%s", stderr.String())
 	}
 	stderrText := stderr.String()
-	if !strings.Contains(stderrText, "Could not resolve the required uloop project runner") {
+	if !strings.Contains(stderrText, "Could not resolve the required tloop project runner") {
 		t.Fatalf("expected pin resolution error message, got: %s", stderrText)
 	}
 	if !strings.Contains(stderrText, "project-runner-pin.json") {
@@ -1505,7 +1505,7 @@ func TestDispatcherReleaseAssetNameForLinuxAmd64(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dispatcherReleaseAssetName failed: %v", err)
 	}
-	if assetName != "uloop-project-runner-linux-amd64.tar.gz" {
+	if assetName != "tloop-project-runner-linux-amd64.tar.gz" {
 		t.Fatalf("asset name mismatch: %s", assetName)
 	}
 }

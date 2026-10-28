@@ -14,17 +14,17 @@ import (
 
 const (
 	protocolMinimumVersionFile    = "Packages/src/Editor/Domain/CliConstants.cs"
-	protocolMinimumVersionMarker  = "<!-- uloop-protocol-minimum-version-warning -->"
-	projectRunnerReleaseTagPrefix = "uloop-project-runner-v"
+	protocolMinimumVersionMarker  = "<!-- tloop-protocol-minimum-version-warning -->"
+	projectRunnerReleaseTagPrefix = "tloop-project-runner-v"
 )
 
 var requiredMinimumProjectRunnerAssets = []string{
-	"uloop-project-runner-darwin-amd64.tar.gz",
-	"uloop-project-runner-darwin-amd64.tar.gz.sha256",
-	"uloop-project-runner-darwin-arm64.tar.gz",
-	"uloop-project-runner-darwin-arm64.tar.gz.sha256",
-	"uloop-project-runner-windows-amd64.zip",
-	"uloop-project-runner-windows-amd64.zip.sha256",
+	"tloop-project-runner-darwin-amd64.tar.gz",
+	"tloop-project-runner-darwin-amd64.tar.gz.sha256",
+	"tloop-project-runner-darwin-arm64.tar.gz",
+	"tloop-project-runner-darwin-arm64.tar.gz.sha256",
+	"tloop-project-runner-windows-amd64.zip",
+	"tloop-project-runner-windows-amd64.zip.sha256",
 }
 
 type minimumProjectRunnerRelease struct {

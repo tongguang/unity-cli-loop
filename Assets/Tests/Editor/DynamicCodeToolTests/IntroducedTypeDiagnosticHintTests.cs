@@ -12,7 +12,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
     public sealed class IntroducedTypeDiagnosticHintTests
     {
         private const string SingleMatchHint =
-            "'Widget' is a hot-reload introduced type (Example.Widget), and the assembly holding it is referenced by this compilation while it stays active, so the name is what did not resolve. Write it as Example.Widget, or add a using for its namespace. Members that hot reload added to it are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'uloop compile' to make it a compiled type.";
+            "'Widget' is a hot-reload introduced type (Example.Widget), and the assembly holding it is referenced by this compilation while it stays active, so the name is what did not resolve. Write it as Example.Widget, or add a using for its namespace. Members that hot reload added to it are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'tloop compile' to make it a compiled type.";
 
         private const string SingleMatchNamingSuggestion =
             "Write it as Example.Widget, or add a using for its namespace";
@@ -21,7 +21,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
             "Locate the type with AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).First(t => t.FullName == \"Example.Widget\") and drive it through reflection";
 
         private const string CompileSuggestion =
-            "Run 'uloop compile' when the type is final, then reference it as an ordinary compiled type";
+            "Run 'tloop compile' when the type is final, then reference it as an ordinary compiled type";
 
         /// <summary>
         /// Verifies a CS0246 whose type name is an active introduced type gets the introduced-type
@@ -85,7 +85,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
             Assert.That(
                 hint,
                 Is.EqualTo(
-"'Widget' is a hot-reload introduced type (Example.Outer.Widget), and the assembly holding it is referenced by this compilation while it stays active, so the name is what did not resolve. Write it as Example.Outer.Widget; a using does not bring the simple name of a nested type into scope. Members that hot reload added to it are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'uloop compile' to make it a compiled type."));
+"'Widget' is a hot-reload introduced type (Example.Outer.Widget), and the assembly holding it is referenced by this compilation while it stays active, so the name is what did not resolve. Write it as Example.Outer.Widget; a using does not bring the simple name of a nested type into scope. Members that hot reload added to it are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'tloop compile' to make it a compiled type."));
             Assert.That(
                 suggestions,
                 Is.EqualTo(new[]
@@ -284,7 +284,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
             Assert.That(
                 hint,
                 Is.EqualTo(
-"'Widget' matches these hot-reload introduced types: Example.Widget, Other.Widget. The assembly holding each one is referenced by this compilation while it stays active, so pick the one you mean and write its full name as spelled here. Members that hot reload added to them are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'uloop compile' to make it a compiled type."));
+"'Widget' matches these hot-reload introduced types: Example.Widget, Other.Widget. The assembly holding each one is referenced by this compilation while it stays active, so pick the one you mean and write its full name as spelled here. Members that hot reload added to them are separate: those are not visible here at all, and not through reflection either; only code edited in the same reload sees them. If the name still does not resolve, reach the type through reflection (AppDomain.CurrentDomain.GetAssemblies), or run 'tloop compile' to make it a compiled type."));
             Assert.That(
                 suggestions,
                 Is.EqualTo(new[]

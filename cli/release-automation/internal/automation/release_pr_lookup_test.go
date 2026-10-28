@@ -63,7 +63,7 @@ func TestFindReleasePRCheckPullRequestsWithRetryStopsOnInterruptedWait(t *testin
 // Verifies the Unity package release pull request is moved to the front while every other pull request keeps its listed order, including the combined branch and a listing without a package pull request.
 func TestOrderReleasePRsForChecks(t *testing.T) {
 	const prefix = "release-please--branches--main--components--"
-	runner := releasePullRequest{Number: 1, HeadRefName: prefix + "uloop-project-runner"}
+	runner := releasePullRequest{Number: 1, HeadRefName: prefix + "tloop-project-runner"}
 	dispatcher := releasePullRequest{Number: 2, HeadRefName: prefix + "dispatcher"}
 	unityPackage := releasePullRequest{Number: 3, HeadRefName: prefix + "unity-package"}
 	combined := releasePullRequest{Number: 4, HeadRefName: "release-please--branches--main"}

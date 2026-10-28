@@ -13,8 +13,8 @@ import (
 // and run URL, plus the fixed explanation trailer.
 func TestBuildPendingApprovalIssueBodyListsEachRunAndExplanation(t *testing.T) {
 	runs := []pendingApprovalRun{
-		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/hatayama/unity-cli-loop/actions/runs/1"},
-		{WorkflowName: "dispatcher-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/hatayama/unity-cli-loop/actions/runs/2"},
+		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/tongguang/unity-cli-loop/actions/runs/1"},
+		{WorkflowName: "dispatcher-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/tongguang/unity-cli-loop/actions/runs/2"},
 	}
 
 	body := buildPendingApprovalIssueBody(runs)
@@ -23,8 +23,8 @@ func TestBuildPendingApprovalIssueBodyListsEachRunAndExplanation(t *testing.T) {
 	assertNotifyPendingReleaseApprovalsContains(t, body, "dispatcher-publish")
 	assertNotifyPendingReleaseApprovalsContains(t, body, "v3-beta")
 	assertNotifyPendingReleaseApprovalsContains(t, body, "cli-release")
-	assertNotifyPendingReleaseApprovalsContains(t, body, "https://github.com/hatayama/unity-cli-loop/actions/runs/1")
-	assertNotifyPendingReleaseApprovalsContains(t, body, "https://github.com/hatayama/unity-cli-loop/actions/runs/2")
+	assertNotifyPendingReleaseApprovalsContains(t, body, "https://github.com/tongguang/unity-cli-loop/actions/runs/1")
+	assertNotifyPendingReleaseApprovalsContains(t, body, "https://github.com/tongguang/unity-cli-loop/actions/runs/2")
 	assertNotifyPendingReleaseApprovalsContains(t, body, "Approve the pending deployment(s)")
 }
 
@@ -33,7 +33,7 @@ func TestBuildPendingApprovalIssueBodyListsEachRunAndExplanation(t *testing.T) {
 // guarantee the reconcile loop relies on to avoid pointless issue updates.
 func TestBuildPendingApprovalIssueBodyIsDeterministic(t *testing.T) {
 	runs := []pendingApprovalRun{
-		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/hatayama/unity-cli-loop/actions/runs/1"},
+		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/tongguang/unity-cli-loop/actions/runs/1"},
 	}
 
 	first := buildPendingApprovalIssueBody(runs)
@@ -58,7 +58,7 @@ func TestPlanNotifyPendingReleaseApprovalsNoRunsNoIssueIsNoop(t *testing.T) {
 // plan is to create a new issue with the generated body.
 func TestPlanNotifyPendingReleaseApprovalsRunsWithoutIssueCreates(t *testing.T) {
 	runs := []pendingApprovalRun{
-		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/hatayama/unity-cli-loop/actions/runs/1"},
+		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/tongguang/unity-cli-loop/actions/runs/1"},
 	}
 
 	plan := planNotifyPendingReleaseApprovals(runs, nil)
@@ -74,7 +74,7 @@ func TestPlanNotifyPendingReleaseApprovalsRunsWithoutIssueCreates(t *testing.T) 
 // plan is a no-op so the issue is not rewritten on every 15-minute tick.
 func TestPlanNotifyPendingReleaseApprovalsUnchangedRunsIsNoop(t *testing.T) {
 	runs := []pendingApprovalRun{
-		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/hatayama/unity-cli-loop/actions/runs/1"},
+		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/tongguang/unity-cli-loop/actions/runs/1"},
 	}
 	existing := &existingPendingApprovalIssue{Number: 42, Body: buildPendingApprovalIssueBody(runs)}
 
@@ -90,11 +90,11 @@ func TestPlanNotifyPendingReleaseApprovalsUnchangedRunsIsNoop(t *testing.T) {
 // the existing issue in place rather than creating a duplicate.
 func TestPlanNotifyPendingReleaseApprovalsChangedRunsUpdates(t *testing.T) {
 	oldRuns := []pendingApprovalRun{
-		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/hatayama/unity-cli-loop/actions/runs/1"},
+		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/tongguang/unity-cli-loop/actions/runs/1"},
 	}
 	newRuns := []pendingApprovalRun{
-		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/hatayama/unity-cli-loop/actions/runs/1"},
-		{WorkflowName: "dispatcher-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/hatayama/unity-cli-loop/actions/runs/2"},
+		{WorkflowName: "native-cli-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/tongguang/unity-cli-loop/actions/runs/1"},
+		{WorkflowName: "dispatcher-publish", HeadBranch: "v3-beta", Environment: "cli-release", URL: "https://github.com/tongguang/unity-cli-loop/actions/runs/2"},
 	}
 	existing := &existingPendingApprovalIssue{Number: 42, Body: buildPendingApprovalIssueBody(oldRuns)}
 

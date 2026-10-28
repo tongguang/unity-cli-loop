@@ -14,7 +14,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void MigrateCSharpSource_WhenProjectDefinesSecuritySettings_KeepsProjectTypeUsages()
         {
             // Verifies a project-owned SecuritySettings type is not rewritten to the V3 security setting type.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class SecuritySettings
 {
@@ -42,7 +42,7 @@ public sealed class SettingsFactory
         public void MigrateCSharpSource_WhenProjectDefinesServiceResult_KeepsProjectTypeUsages()
         {
             // Verifies a project-owned ServiceResult type is not rewritten to the ToolContracts type.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class ServiceResult
 {
@@ -72,7 +72,7 @@ public sealed class ResultFactory
         public void MigrateCSharpSource_WhenProjectDefinesToolInfo_KeepsProjectTypeUsages()
         {
             // Verifies a project-owned ToolInfo type is not rewritten to the ToolContracts type.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class ToolInfo
 {
@@ -102,7 +102,7 @@ public sealed class ToolInfoFactory
         public void MigrateCSharpSourceForLegacyAssembly_WhenAssemblyDeclaresSecuritySettings_KeepsProjectTypeUsages()
         {
             // Verifies sibling-file ownership of SecuritySettings also blocks bare reference rewrites.
-            string source = @"using io.github.hatayama.uLoopMCP;
+            string source = @"using io.github.tongguang.tloop;
 
 public sealed class SettingsFactory
 {

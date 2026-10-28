@@ -19,7 +19,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUpTemporaryRoot()
         {
-            _temporaryRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _temporaryRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_temporaryRoot);
         }
 
@@ -40,16 +40,16 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string targetRoot = Path.Combine(_temporaryRoot, ".claude");
             string managedSkillsRoot = SkillInstallLayout.GetManagedSkillsRoot(targetRoot);
-            WriteTextFile(Path.Combine(managedSkillsRoot, "uloop-compile", "SKILL.md"), "skill");
+            WriteTextFile(Path.Combine(managedSkillsRoot, "tloop-compile", "SKILL.md"), "skill");
             WriteTextFile(Path.Combine(managedSkillsRoot, "notes.txt"), "user notes");
 
             SkillTargetInstaller.DeleteSkillDirectoryIfExists(
                 targetRoot,
-                "uloop-compile",
+                "tloop-compile",
                 groupSkillsUnderUnityCliLoop: true,
                 CancellationToken.None);
 
-            Assert.That(Directory.Exists(Path.Combine(managedSkillsRoot, "uloop-compile")), Is.False);
+            Assert.That(Directory.Exists(Path.Combine(managedSkillsRoot, "tloop-compile")), Is.False);
             Assert.That(File.ReadAllText(Path.Combine(managedSkillsRoot, "notes.txt")), Is.EqualTo("user notes"));
         }
 
@@ -61,19 +61,19 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string targetRoot = Path.Combine(_temporaryRoot, ".claude");
             string managedSkillsRoot = SkillInstallLayout.GetManagedSkillsRoot(targetRoot);
-            WriteTextFile(Path.Combine(managedSkillsRoot, "uloop-compile", "SKILL.md"), "skill");
-            Directory.CreateDirectory(Path.Combine(managedSkillsRoot, "uloop-empty", "nested"));
-            WriteTextFile(Path.Combine(managedSkillsRoot, "uloop-other", "SKILL.md"), "other skill");
+            WriteTextFile(Path.Combine(managedSkillsRoot, "tloop-compile", "SKILL.md"), "skill");
+            Directory.CreateDirectory(Path.Combine(managedSkillsRoot, "tloop-empty", "nested"));
+            WriteTextFile(Path.Combine(managedSkillsRoot, "tloop-other", "SKILL.md"), "other skill");
 
             SkillTargetInstaller.DeleteSkillDirectoryIfExists(
                 targetRoot,
-                "uloop-compile",
+                "tloop-compile",
                 groupSkillsUnderUnityCliLoop: true,
                 CancellationToken.None);
 
-            Assert.That(Directory.Exists(Path.Combine(managedSkillsRoot, "uloop-compile")), Is.False);
-            Assert.That(Directory.Exists(Path.Combine(managedSkillsRoot, "uloop-empty")), Is.False);
-            Assert.That(File.Exists(Path.Combine(managedSkillsRoot, "uloop-other", "SKILL.md")), Is.True);
+            Assert.That(Directory.Exists(Path.Combine(managedSkillsRoot, "tloop-compile")), Is.False);
+            Assert.That(Directory.Exists(Path.Combine(managedSkillsRoot, "tloop-empty")), Is.False);
+            Assert.That(File.Exists(Path.Combine(managedSkillsRoot, "tloop-other", "SKILL.md")), Is.True);
         }
 
         private static void WriteTextFile(string path, string content)

@@ -67,14 +67,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             RecordVideoSchema parameters = new RecordVideoSchema
             {
                 Action = RecordVideoAction.start,
-                WindowName = "NoSuchWindow-uloop-test"
+                WindowName = "NoSuchWindow-tloop-test"
             };
 
             RecordVideoResponse response = await useCase.ExecuteAsync(parameters, CancellationToken.None);
 
             Assert.That(response.Success, Is.False);
             Assert.That(response.IsRecording, Is.False);
-            Assert.That(response.Message, Does.StartWith("Window 'NoSuchWindow-uloop-test' not found"));
+            Assert.That(response.Message, Does.StartWith("Window 'NoSuchWindow-tloop-test' not found"));
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             RecordVideoSchema parameters = new RecordVideoSchema
             {
                 Action = RecordVideoAction.start,
-                WindowName = "NoSuchWindow-uloop-test"
+                WindowName = "NoSuchWindow-tloop-test"
             };
 
             RecordVideoResponse response = await useCase.ExecuteAsync(parameters, CancellationToken.None);

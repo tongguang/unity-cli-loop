@@ -284,7 +284,7 @@ func TestRebuildSourcesRejectsARecordedSourceNoAsmrefAttachesAnyMore(t *testing.
 	if err == nil {
 		t.Fatal("expected a source no assembly reference attaches any more to be rejected")
 	}
-	if !strings.Contains(err.Error(), "uloop compile") {
+	if !strings.Contains(err.Error(), "tloop compile") {
 		t.Errorf("the error should tell the user how to recover, got: %v", err)
 	}
 }
@@ -328,7 +328,7 @@ func TestRebuildSourcesRejectsAnAssemblyDefinitionMovedWithoutChangingItsTimesta
 	if err == nil {
 		t.Fatal("expected a moved assembly definition to be rejected")
 	}
-	if !strings.Contains(err.Error(), "uloop compile") {
+	if !strings.Contains(err.Error(), "tloop compile") {
 		t.Errorf("the error should tell the user how to recover, got: %v", err)
 	}
 }
@@ -379,7 +379,7 @@ func TestRebuildSourcesRejectsAnAssemblyDefinitionThatLeftItsRecordedSources(t *
 	if err == nil {
 		t.Fatal("expected an assembly definition that left its recorded sources to be rejected")
 	}
-	if !strings.Contains(err.Error(), "uloop compile") {
+	if !strings.Contains(err.Error(), "tloop compile") {
 		t.Errorf("the error should tell the user how to recover, got: %v", err)
 	}
 }

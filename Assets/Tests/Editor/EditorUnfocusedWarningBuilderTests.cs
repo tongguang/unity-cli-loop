@@ -24,7 +24,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 warning,
                 Is.EqualTo(
-                    "Keyboard input was queued while the Unity Editor was unfocused, so the press edge was not observed. Run `uloop focus-window` before retrying; queued input may be delivered all at once when the Editor regains focus."));
+                    "Keyboard input was queued while the Unity Editor was unfocused, so the press edge was not observed. Run `tloop focus-window` before retrying; queued input may be delivered all at once when the Editor regains focus."));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 warning,
                 Is.EqualTo(
-                    "Keyboard input was queued while the Unity Editor was unfocused, so the press edge was not observed. Run `uloop focus-window` before retrying; queued input may be delivered all at once when the Editor regains focus."));
+                    "Keyboard input was queued while the Unity Editor was unfocused, so the press edge was not observed. Run `tloop focus-window` before retrying; queued input may be delivered all at once when the Editor regains focus."));
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 hint,
                 Is.EqualTo(
-                    "The Unity Editor is unfocused while Play Mode is running, so Play Mode progress may be throttled. Run `uloop focus-window`, or use the `pause-point --await`/`--trigger` flow instead of polling for progress."));
+                    "The Unity Editor is unfocused while Play Mode is running, so Play Mode progress may be throttled. Run `tloop focus-window`, or use the `pause-point --await`/`--trigger` flow instead of polling for progress."));
         }
 
         /// <summary>

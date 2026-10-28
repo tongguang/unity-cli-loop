@@ -1,4 +1,4 @@
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 #nullable enable
 using System;
 using System.Collections;
@@ -531,7 +531,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.PlayMode
             SimulateKeyboardOverlayState.ShowPress("Space");
 
             GameObject? canvasPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Packages/io.github.hatayama.uloopmcp/Runtime/Common/InputVisualizationCanvas.prefab");
+                "Packages/io.github.tongguang.tloop/Runtime/Common/InputVisualizationCanvas.prefab");
             Debug.Assert(canvasPrefab != null, "InputVisualizationCanvas prefab must exist");
             Object.Instantiate(canvasPrefab!);
 

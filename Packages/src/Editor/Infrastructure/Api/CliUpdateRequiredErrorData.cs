@@ -24,7 +24,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
             string currentCliVersion,
             int? currentProtocolVersion,
             int requiredProtocolVersion,
-            string updateCommand) : base("Install matching uloop CLI and Unity package versions, then retry the original command.")
+            string updateCommand) : base("Install matching tloop CLI and Unity package versions, then retry the original command.")
         {
             this.currentCliVersion = string.IsNullOrWhiteSpace(currentCliVersion) ? null : currentCliVersion;
             this.currentProtocolVersion = currentProtocolVersion;

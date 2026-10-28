@@ -109,7 +109,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // root cannot be read, and the per-process worker directory already lives beside this one.
         internal static string ResolveCacheRoot()
         {
-            return Path.Combine(Path.GetTempPath(), "UnityCliLoopCompilation", "RoslynWorkerCache");
+            return Path.Combine(Path.GetTempPath(), "TuanjieCliLoopCompilation", "RoslynWorkerCache");
         }
 
         internal static string ResolveCachedAssemblyPath(string cacheRoot, string cacheKey)

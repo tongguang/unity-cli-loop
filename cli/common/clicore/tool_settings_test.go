@@ -8,7 +8,7 @@ import (
 	"github.com/hatayama/unity-cli-loop/common/clitest"
 )
 
-// Verifies that disabled tools are read from .uloop/settings.tools.json and that a missing, blank,
+// Verifies that disabled tools are read from .tloop/settings.tools.json and that a missing, blank,
 // unparsable, mistyped, or field-less settings file yields an empty list rather than a partial one.
 func TestLoadDisabledTools(t *testing.T) {
 	cases := []struct {
@@ -27,7 +27,7 @@ func TestLoadDisabledTools(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			projectRoot := t.TempDir()
 			if testCase.content != nil {
-				clitest.WriteProjectFile(t, projectRoot, filepath.Join(uloopSettingsDir, toolSettingsFile), *testCase.content)
+				clitest.WriteProjectFile(t, projectRoot, filepath.Join(tloopSettingsDir, toolSettingsFile), *testCase.content)
 			}
 
 			actual := LoadDisabledTools(projectRoot)

@@ -1,17 +1,17 @@
 ---
-name: uloop-get-project-info
-description: "Get Unity project information via uloop CLI. Use when you need to: (1) Check Unity Editor version, (2) Get project settings and platform info, (3) Retrieve project metadata for diagnostics."
+name: tloop-get-project-info
+description: "Get Tuanjie project information via tloop CLI. Use when you need to: (1) Check Tuanjie Editor version, (2) Get project settings and platform info, (3) Retrieve project metadata for diagnostics."
 internal: true
 ---
 
-# uloop get-project-info
+# tloop get-project-info
 
-Get detailed Unity project information.
+Get detailed Tuanjie project information.
 
 ## Usage
 
 ```bash
-uloop get-project-info
+tloop get-project-info
 ```
 
 ## Parameters
@@ -22,7 +22,7 @@ None.
 
 Returns JSON with project information:
 
-- Unity version
+- Tuanjie version
 - Project name
 - Platform settings
 - Build target

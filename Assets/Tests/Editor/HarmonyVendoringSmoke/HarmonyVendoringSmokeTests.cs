@@ -11,7 +11,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     /// </summary>
     public class HarmonyVendoringSmokeTests
     {
-        private const string HarmonyId = "io.github.hatayama.uloop.harmony-vendoring-smoke-test";
+        private const string HarmonyId = "io.github.tongguang.tloop.harmony-vendoring-smoke-test";
 
         private static class PatchTarget
         {

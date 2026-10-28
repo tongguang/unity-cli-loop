@@ -47,7 +47,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         // added-field store to a compile, the only step that makes that subscription bind.
         private const string StorelessEventHintCore =
             "A subscription to an added event the added-field store cannot hold (custom add/remove "
-            + "accessors, or a delegate type not visible outside the assembly) needs 'uloop compile' "
+            + "accessors, or a delegate type not visible outside the assembly) needs 'tloop compile' "
             + "wherever it is written.";
 
         private const string StorelessEventName = "AddedWithAccessors";

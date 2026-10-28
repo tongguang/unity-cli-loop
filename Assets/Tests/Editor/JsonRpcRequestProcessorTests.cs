@@ -91,11 +91,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             JObject error = (JObject)JObject.Parse(await responseTask)["error"];
             Assert.That(error, Is.Not.Null);
-            Assert.That(error.Value<string>("message"), Is.EqualTo("'cancel-target-tool' was cancelled by uloop cancel."));
+            Assert.That(error.Value<string>("message"), Is.EqualTo("'cancel-target-tool' was cancelled by tloop cancel."));
             JObject data = (JObject)error["data"];
             Assert.That(data.Value<string>("type"), Is.EqualTo("tool_cancelled"));
             Assert.That(data.Value<string>("runningToolName"), Is.EqualTo("cancel-target-tool"));
-            Assert.That(data.Value<string>("message"), Is.EqualTo("'cancel-target-tool' was cancelled by uloop cancel."));
+            Assert.That(data.Value<string>("message"), Is.EqualTo("'cancel-target-tool' was cancelled by tloop cancel."));
             UnityEngine.TestTools.LogAssert.NoUnexpectedReceived();
         }
 

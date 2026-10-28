@@ -306,7 +306,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(_dialogs.MessageTitles, Is.EqualTo(new List<string> { "Installation Failed" }));
             Assert.That(
                 _dialogs.Messages,
-                Is.EqualTo(new List<string> { "Failed to install uLoop CLI.\n\n<INSTALL_ERROR>\n\n<MANUAL_COMMAND>" }));
+                Is.EqualTo(new List<string> { "Failed to install tloop CLI.\n\n<INSTALL_ERROR>\n\n<MANUAL_COMMAND>" }));
             Assert.That(_dialogs.CliPathSetupCount, Is.EqualTo(0));
             Assert.That(_refreshAllSectionsCalls, Is.EqualTo(new List<bool> { true }));
         }
@@ -326,7 +326,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             Assert.That(
                 _dialogs.Messages,
-                Is.EqualTo(new List<string> { "Failed to install uLoop CLI.\n\n<INSTALL_ERROR>\n\n<COMMAND_ERROR>" }));
+                Is.EqualTo(new List<string> { "Failed to install tloop CLI.\n\n<INSTALL_ERROR>\n\n<COMMAND_ERROR>" }));
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(_dialogs.MessageTitles, Is.EqualTo(new List<string> { "Uninstallation Failed" }));
             Assert.That(
                 _dialogs.Messages,
-                Is.EqualTo(new List<string> { "Failed to uninstall uloop CLI.\n\n<UNINSTALL_ERROR>" }));
+                Is.EqualTo(new List<string> { "Failed to uninstall tloop CLI.\n\n<UNINSTALL_ERROR>" }));
             Assert.That(_refreshAllSectionsCalls, Is.EqualTo(new List<bool> { true }));
         }
 

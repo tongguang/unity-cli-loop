@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-const defaultRunHelperEnv = "ULOOP_COMPILECHECK_DEFAULT_RUN_HELPER"
+const defaultRunHelperEnv = "TLOOP_COMPILECHECK_DEFAULT_RUN_HELPER"
 
 // writeFakeEditor lays out a minimal macOS-shaped Editor with a bundled compiler and returns its
 // executable path. Nothing in it can run; it only has to resolve.

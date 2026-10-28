@@ -17,7 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ContainsLegacyRegistrarReference_WhenReferenceIsFullyQualified_ReturnsTrueWithoutBareMigration()
         {
-            const string source = "io.github.hatayama.uLoopMCP.CustomToolManager.RegisterCustomTool(tool);";
+            const string source = "io.github.tongguang.tloop.CustomToolManager.RegisterCustomTool(tool);";
 
             bool contains = ThirdPartyToolMigrationDomainDetectionRules.ContainsLegacyRegistrarReference(
                 source,
@@ -65,7 +65,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ContainsLegacyRegistrarDomainReturnReference_WhenCallIsFullyQualified_ReturnsTrueWithoutBareMigration()
         {
-            const string source = "var tools = io.github.hatayama.uLoopMCP.CustomToolManager.GetRegisteredCustomTools();";
+            const string source = "var tools = io.github.tongguang.tloop.CustomToolManager.GetRegisteredCustomTools();";
 
             bool contains = ThirdPartyToolMigrationDomainDetectionRules.ContainsLegacyRegistrarDomainReturnReference(
                 source,

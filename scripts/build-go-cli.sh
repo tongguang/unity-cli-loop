@@ -64,11 +64,11 @@ fi
 generate_windows_resources "$DISPATCHER_DIR" "$DISPATCHER_DIR/cmd/dispatcher" "$DISPATCHER_VERSION"
 generate_windows_resources "$RUNNER_DIR" "$RUNNER_DIR/cmd/project-runner" "$PROJECT_RUNNER_VERSION"
 
-build_binary darwin arm64 uloop "$DISPATCHER_DIR" ./cmd/dispatcher
-build_binary darwin arm64 uloop-project-runner "$RUNNER_DIR" ./cmd/project-runner
-build_binary darwin amd64 uloop "$DISPATCHER_DIR" ./cmd/dispatcher
-build_binary darwin amd64 uloop-project-runner "$RUNNER_DIR" ./cmd/project-runner
-build_binary windows amd64 uloop "$DISPATCHER_DIR" ./cmd/dispatcher
-build_binary windows amd64 uloop-project-runner "$RUNNER_DIR" ./cmd/project-runner
-build_binary linux amd64 uloop "$DISPATCHER_DIR" ./cmd/dispatcher
-build_binary linux amd64 uloop-project-runner "$RUNNER_DIR" ./cmd/project-runner
+build_binary darwin arm64 tloop "$DISPATCHER_DIR" ./cmd/dispatcher
+build_binary darwin arm64 tloop-project-runner "$RUNNER_DIR" ./cmd/project-runner
+build_binary darwin amd64 tloop "$DISPATCHER_DIR" ./cmd/dispatcher
+build_binary darwin amd64 tloop-project-runner "$RUNNER_DIR" ./cmd/project-runner
+build_binary windows amd64 tloop "$DISPATCHER_DIR" ./cmd/dispatcher
+build_binary windows amd64 tloop-project-runner "$RUNNER_DIR" ./cmd/project-runner
+build_binary linux amd64 tloop "$DISPATCHER_DIR" ./cmd/dispatcher
+build_binary linux amd64 tloop-project-runner "$RUNNER_DIR" ./cmd/project-runner

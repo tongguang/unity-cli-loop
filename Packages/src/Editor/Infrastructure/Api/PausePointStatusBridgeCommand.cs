@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
         private const string MinimumRemainingSecondsParamName = "MinimumRemainingSeconds";
         private const string EmptyListMessage = "No pause points are registered.";
         private const string EmptyListNextAction =
-            "Enable one with 'uloop enable-pause-point --id <marker-id>' or '--file <project-relative path> --line <line>'.";
+            "Enable one with 'tloop enable-pause-point --id <marker-id>' or '--file <project-relative path> --line <line>'.";
         private const string NonEmptyListNextAction =
             "Pass --id <marker-id> to inspect one pause point in detail.";
 

@@ -37,7 +37,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 resolved[0].Reason,
                 Is.EqualTo(
                     Fact + " Pass '" + RegistryPath + "' and '" + ExtraPath + "' to this reload as well so both "
-                    + "bind to the same type; run 'uloop compile' only if it still does not bind."));
+                    + "bind to the same type; run 'tloop compile' only if it still does not bind."));
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 resolved[0].Reason,
                 Is.EqualTo(
                     Fact + " '" + RegistryPath + "' is already in this reload, so passing it again does not "
-                    + "help; run 'uloop compile'."));
+                    + "help; run 'tloop compile'."));
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 resolved[0].Reason,
                 Does.EndWith(
                     " Pass the file that declares 'Game.Registry' to this reload as well so both bind to the "
-                    + "same type; run 'uloop compile' only if it still does not bind."));
+                    + "same type; run 'tloop compile' only if it still does not bind."));
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 resolved[0].Reason,
                 Is.EqualTo(
                     Fact + " To hot reload it without a compile, leave '" + KindPath + "' out of --files and "
-                    + "rerun (the edit in '" + KindPath + "' waits for the next compile); or run 'uloop compile'."));
+                    + "rerun (the edit in '" + KindPath + "' waits for the next compile); or run 'tloop compile'."));
             Assert.That(resolved[0].Reason, Does.Not.Contain("undo"));
         }
 
@@ -307,7 +307,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 resolved[0].Reason,
                 Is.EqualTo(
                     Fact + " '" + KindPath + "' also holds patches this or an earlier reload applied, so it "
-                    + "cannot be left out; run 'uloop compile'."));
+                    + "cannot be left out; run 'tloop compile'."));
         }
 
         private static HotReloadSkippedNextStepResolver Resolver(Dictionary<string, HotReloadCarriedInState> states)
@@ -328,7 +328,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             return "To hot reload it without a compile, undo the edit in '" + path + "', leave '" + path
                 + "' out of --files, and rerun: '" + path + "' is carried in again while its source matches "
-                + "what an earlier reload was given. Or run 'uloop compile'.";
+                + "what an earlier reload was given. Or run 'tloop compile'.";
         }
 
         private static HotReloadMethodOutcome CompiledSignatureRow(string sourceType, params string[] declaringFiles)

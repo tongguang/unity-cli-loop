@@ -1,7 +1,7 @@
 InstallDir='{{INSTALL_DIR}}'
-ExpectedUloopPath='{{EXPECTED_ULOOP_PATH}}'
-PathBlockStart="# >>> uloop PATH >>>"
-PathBlockEnd="# <<< uloop PATH <<<"
+ExpectedUloopPath='{{EXPECTED_TLOOP_PATH}}'
+PathBlockStart="# >>> tloop PATH >>>"
+PathBlockEnd="# <<< tloop PATH <<<"
 
 normalize_path() {
     printf '%s' "$1" | sed 's:/*$::'
@@ -131,7 +131,7 @@ write_path_block() {
         fi
     fi
 
-    tmp_path=$(mktemp "$profile_dir/.uloop_path.XXXXXX" 2>/dev/null || true)
+    tmp_path=$(mktemp "$profile_dir/.tloop_path.XXXXXX" 2>/dev/null || true)
     if [ -z "$tmp_path" ]; then
         echo "Could not create a temporary file for PATH setup." >&2
         return 1
@@ -192,10 +192,10 @@ configure_shell_path() {
     esac
 }
 
-infer_npm_prefix_from_uloop_path() {
+infer_npm_prefix_from_tloop_path() {
     command_path=$1
     case "$command_path" in
-        */bin/uloop|*/bin/uloop.exe)
+        */bin/tloop|*/bin/tloop.exe)
             bin_dir=${command_path%/*}
             echo "${bin_dir%/bin}"
             ;;
@@ -205,7 +205,7 @@ infer_npm_prefix_from_uloop_path() {
     esac
 }
 
-is_legacy_npm_uloop_path() {
+is_legacy_npm_tloop_path() {
     command_path=$1
     if [ -z "$command_path" ]; then
         return 1
@@ -216,31 +216,31 @@ is_legacy_npm_uloop_path() {
     if [ -L "$command_path" ]; then
         link_target=$(readlink "$command_path" 2>/dev/null || true)
         case "$link_target" in
-            *node_modules/uloop-cli*|*node_modules\\uloop-cli*) return 0 ;;
+            *node_modules/tloop-cli*|*node_modules\\tloop-cli*) return 0 ;;
         esac
     fi
-    if [ -f "$command_path" ] && grep -F "node_modules/uloop-cli" "$command_path" >/dev/null 2>&1; then
+    if [ -f "$command_path" ] && grep -F "node_modules/tloop-cli" "$command_path" >/dev/null 2>&1; then
         return 0
     fi
     return 1
 }
 
 try_remove_legacy_npm_package() {
-    legacy_uloop=$1
+    legacy_tloop=$1
     legacy_prefix=""
-    if ! is_legacy_npm_uloop_path "$legacy_uloop"; then
+    if ! is_legacy_npm_tloop_path "$legacy_tloop"; then
         return
     fi
-    legacy_prefix=$(infer_npm_prefix_from_uloop_path "$legacy_uloop")
+    legacy_prefix=$(infer_npm_prefix_from_tloop_path "$legacy_tloop")
     if [ -z "$legacy_prefix" ]; then
         return
     fi
     if ! command -v npm >/dev/null 2>&1; then
         return
     fi
-    if npm uninstall -g --prefix "$legacy_prefix" uloop-cli; then
-        if ! is_legacy_npm_uloop_path "$legacy_uloop"; then
-            echo "Removed legacy npm package: uloop-cli"
+    if npm uninstall -g --prefix "$legacy_prefix" tloop-cli; then
+        if ! is_legacy_npm_tloop_path "$legacy_tloop"; then
+            echo "Removed legacy npm package: tloop-cli"
             return
         fi
     fi
@@ -252,27 +252,27 @@ try_remove_default_legacy_npm_package() {
     fi
     default_prefix=$(npm prefix -g 2>/dev/null || true)
     if [ -n "$default_prefix" ]; then
-        default_uloop_path="$default_prefix/bin/uloop"
-        if [ "$(normalize_path "$default_uloop_path")" = "$(normalize_path "$ExpectedUloopPath")" ]; then
+        default_tloop_path="$default_prefix/bin/tloop"
+        if [ "$(normalize_path "$default_tloop_path")" = "$(normalize_path "$ExpectedUloopPath")" ]; then
             return
         fi
     fi
-    npm uninstall -g uloop-cli >/dev/null 2>&1 || true
+    npm uninstall -g tloop-cli >/dev/null 2>&1 || true
 }
 
 configure_legacy_cleanup() {
-    legacy_uloop=$(command -v uloop 2>/dev/null || true)
-    try_remove_legacy_npm_package "$legacy_uloop"
+    legacy_tloop=$(command -v tloop 2>/dev/null || true)
+    try_remove_legacy_npm_package "$legacy_tloop"
     try_remove_default_legacy_npm_package
 }
 
 report_path_shadowing() {
-    resolved_uloop=$(command -v uloop 2>/dev/null || true)
-    if [ -z "$resolved_uloop" ] || [ "$resolved_uloop" = "$ExpectedUloopPath" ]; then
+    resolved_tloop=$(command -v tloop 2>/dev/null || true)
+    if [ -z "$resolved_tloop" ] || [ "$resolved_tloop" = "$ExpectedUloopPath" ]; then
         return
     fi
-    echo "Installed uloop to $ExpectedUloopPath, but PATH resolves uloop to:"
-    echo "  $resolved_uloop"
+    echo "Installed tloop to $ExpectedUloopPath, but PATH resolves tloop to:"
+    echo "  $resolved_tloop"
     echo "Move $InstallDir earlier in PATH, or remove the legacy installation if it owns that command."
 }
 

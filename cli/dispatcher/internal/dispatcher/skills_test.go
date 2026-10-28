@@ -17,14 +17,14 @@ import (
 // Tests that CLI-only skill discovery excludes skills marked as internal.
 func TestCollectSkillDefinitionsIncludesCliOnlyAndSkipsInternal(t *testing.T) {
 	projectRoot := t.TempDir()
-	writeTestSkill(t, projectRoot, "Packages/src/Editor/CliOnlyTools~/uloop-launch/Skill", `---
-name: uloop-launch
+	writeTestSkill(t, projectRoot, "Packages/src/Editor/CliOnlyTools~/tloop-launch/Skill", `---
+name: tloop-launch
 ---
 
-# uloop launch
+# tloop launch
 `)
-	writeTestSkill(t, projectRoot, "Packages/src/Editor/CliOnlyTools~/uloop-internal/Skill", `---
-name: uloop-internal
+	writeTestSkill(t, projectRoot, "Packages/src/Editor/CliOnlyTools~/tloop-internal/Skill", `---
+name: tloop-internal
 internal: true
 ---
 
@@ -39,7 +39,7 @@ internal: true
 	if len(skills) != 1 {
 		t.Fatalf("skill count mismatch: %#v", skills)
 	}
-	if skills[0].name != "uloop-launch" {
+	if skills[0].name != "tloop-launch" {
 		t.Fatalf("skill name mismatch: %s", skills[0].name)
 	}
 }
@@ -48,7 +48,7 @@ func TestCollectSkillDefinitionsSkipsSingleQuotedInternalSkill(t *testing.T) {
 	// Verifies YAML single quotes do not expose internal skills.
 	projectRoot := t.TempDir()
 	writeTestSkill(t, projectRoot, "Assets/Editor/InternalTool/Skill", `---
-name: uloop-internal-tool
+name: tloop-internal-tool
 internal: 'true'
 ---
 
@@ -68,38 +68,38 @@ internal: 'true'
 func TestCollectSkillDefinitionsIncludesProjectAndPackageRoots(t *testing.T) {
 	projectRoot := t.TempDir()
 	writeTestSkill(t, projectRoot, "Packages/src/Editor/FirstPartyTools/Compile/Skill", `---
-name: uloop-compile
+name: tloop-compile
 ---
 
 # package
 `)
-	writeTestSkill(t, projectRoot, "Packages/src/Editor/CliOnlyTools~/uloop-launch/Skill", `---
-name: uloop-launch
+	writeTestSkill(t, projectRoot, "Packages/src/Editor/CliOnlyTools~/tloop-launch/Skill", `---
+name: tloop-launch
 ---
 
 # cli-only
 `)
 	writeTestSkill(t, projectRoot, "Assets/Editor/CustomTools/Hello/Skill", `---
-name: uloop-hello
+name: tloop-hello
 ---
 
 # project
 `)
 	writeTestSkill(t, projectRoot, "Assets/Editor/DirectTool", `---
-name: uloop-direct
+name: tloop-direct
 ---
 
 # direct project
 `)
 	writeTestSkill(t, projectRoot, "Packages/local-package/Editor/LocalTool/Skill", `---
-name: uloop-local-package
+name: tloop-local-package
 ---
 
 # local package
 `)
 	manifestLocalPackageRoot := filepath.Join(t.TempDir(), "manifest-local-package")
 	writeSkillFile(t, filepath.Join(manifestLocalPackageRoot, "Editor", "ManifestLocalTool", "Skill"), `---
-name: uloop-manifest-local-package
+name: tloop-manifest-local-package
 ---
 
 # manifest local package
@@ -109,7 +109,7 @@ name: uloop-manifest-local-package
 		projectRoot,
 		`{"dependencies":{"com.example.cached":"1.0.0","com.example.manifest-local":"file:`+filepath.ToSlash(manifestLocalPackageRoot)+`"}}`)
 	writeTestSkill(t, projectRoot, "Library/PackageCache/com.example.cached@1.0.0/Editor/CachedTool/Skill", `---
-name: uloop-cached-package
+name: tloop-cached-package
 ---
 
 # cached package
@@ -122,13 +122,13 @@ name: uloop-cached-package
 
 	actualNames := skillNames(skills)
 	expectedNames := []string{
-		"uloop-cached-package",
-		"uloop-compile",
-		"uloop-direct",
-		"uloop-hello",
-		"uloop-launch",
-		"uloop-local-package",
-		"uloop-manifest-local-package",
+		"tloop-cached-package",
+		"tloop-compile",
+		"tloop-direct",
+		"tloop-hello",
+		"tloop-launch",
+		"tloop-local-package",
+		"tloop-manifest-local-package",
 	}
 	if !reflect.DeepEqual(actualNames, expectedNames) {
 		t.Fatalf("skill names mismatch:\nactual:   %#v\nexpected: %#v", actualNames, expectedNames)
@@ -138,8 +138,8 @@ name: uloop-cached-package
 // Tests that the temporary V3 migration skill stays out of normal skill discovery.
 func TestCollectSkillDefinitionsSkipsV3MigrationSkill(t *testing.T) {
 	projectRoot := t.TempDir()
-	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/v3-cli-invocation-migration/Skill", `---
-name: v3-cli-invocation-migration
+	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill", `---
+name: tloop-v3-cli-invocation-migration
 ---
 
 # temporary migration
@@ -159,8 +159,8 @@ name: v3-cli-invocation-migration
 func TestCollectV3MigrationSkillDefinitionReadsTemporarySkill(t *testing.T) {
 	projectRoot := t.TempDir()
 	writePackageRootMarker(t, projectRoot)
-	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/v3-cli-invocation-migration/Skill", `---
-name: v3-cli-invocation-migration
+	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill", `---
+name: tloop-v3-cli-invocation-migration
 ---
 
 # temporary migration
@@ -172,7 +172,7 @@ name: v3-cli-invocation-migration
 	}
 
 	actualNames := skillNames(skills)
-	expectedNames := []string{"v3-cli-invocation-migration"}
+	expectedNames := []string{"tloop-v3-cli-invocation-migration"}
 	if !reflect.DeepEqual(actualNames, expectedNames) {
 		t.Fatalf("skill names mismatch:\nactual:   %#v\nexpected: %#v", actualNames, expectedNames)
 	}
@@ -182,7 +182,7 @@ name: v3-cli-invocation-migration
 func TestCollectV3MigrationSkillDefinitionRejectsUnexpectedName(t *testing.T) {
 	projectRoot := t.TempDir()
 	writePackageRootMarker(t, projectRoot)
-	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/v3-cli-invocation-migration/Skill", `---
+	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill", `---
 name: other-migration-skill
 ---
 
@@ -207,13 +207,13 @@ func TestCollectV3MigrationSkillDefinitionReadsManifestFilePackage(t *testing.T)
 	if err := os.MkdirAll(markerPath, 0o755); err != nil {
 		t.Fatalf("failed to create marker path: %v", err)
 	}
-	writeManifest(t, projectRoot, `{"dependencies":{"io.github.hatayama.uloopmcp":"file:`+filepath.ToSlash(packageRoot)+`"}}`)
+	writeManifest(t, projectRoot, `{"dependencies":{"io.github.tongguang.tloop":"file:`+filepath.ToSlash(packageRoot)+`"}}`)
 	writeSkillFile(t, filepath.Join(
 		packageRoot,
 		"TemporarySkills~",
-		"v3-cli-invocation-migration",
+		"tloop-v3-cli-invocation-migration",
 		"Skill"), `---
-name: v3-cli-invocation-migration
+name: tloop-v3-cli-invocation-migration
 ---
 
 # temporary migration
@@ -225,7 +225,7 @@ name: v3-cli-invocation-migration
 	}
 
 	actualNames := skillNames(skills)
-	expectedNames := []string{"v3-cli-invocation-migration"}
+	expectedNames := []string{"tloop-v3-cli-invocation-migration"}
 	if !reflect.DeepEqual(actualNames, expectedNames) {
 		t.Fatalf("skill names mismatch:\nactual:   %#v\nexpected: %#v", actualNames, expectedNames)
 	}
@@ -235,25 +235,25 @@ name: v3-cli-invocation-migration
 func TestCollectSkillDefinitionsUsesUnitySideSourcePrecedence(t *testing.T) {
 	projectRoot := t.TempDir()
 	writeTestSkill(t, projectRoot, "Packages/src/Editor/FirstPartyTools/Compile/Skill", `---
-name: uloop-launch
+name: tloop-launch
 ---
 
 # package launch
 `)
 	writeTestSkill(t, projectRoot, "Packages/src/Editor/FirstPartyTools/ProjectDuplicate/Skill", `---
-name: uloop-project
+name: tloop-project
 ---
 
 # package project
 `)
-	writeTestSkill(t, projectRoot, "Packages/src/Editor/CliOnlyTools~/uloop-launch/Skill", `---
-name: uloop-launch
+	writeTestSkill(t, projectRoot, "Packages/src/Editor/CliOnlyTools~/tloop-launch/Skill", `---
+name: tloop-launch
 ---
 
 # cli-only launch
 `)
 	writeTestSkill(t, projectRoot, "Assets/Editor/ProjectDuplicate/Skill", `---
-name: uloop-project
+name: tloop-project
 ---
 
 # asset project
@@ -264,8 +264,8 @@ name: uloop-project
 		t.Fatalf("collectSkillDefinitions failed: %v", err)
 	}
 
-	assertSkillContentContains(t, skills, "uloop-launch", "# cli-only launch")
-	assertSkillContentContains(t, skills, "uloop-project", "# asset project")
+	assertSkillContentContains(t, skills, "tloop-launch", "# cli-only launch")
+	assertSkillContentContains(t, skills, "tloop-project", "# asset project")
 }
 
 // Tests that direct SKILL.md files without a frontmatter name use their own directory name.
@@ -294,7 +294,7 @@ func TestInstallAndUninstallSkillsForTarget(t *testing.T) {
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
 	writeSkillFile(t, sourceDir, `---
-name: uloop-sample
+name: tloop-sample
 ---
 
 # sample
@@ -310,7 +310,7 @@ name: uloop-sample
 	}
 
 	skill := skillDefinition{
-		name:            "uloop-sample",
+		name:            "tloop-sample",
 		content:         []byte("sample"),
 		sourceDirectory: sourceDir,
 	}
@@ -324,7 +324,7 @@ name: uloop-sample
 		t.Fatalf("install result mismatch: %#v", result)
 	}
 
-	installedDir := filepath.Join(projectRoot, ".claude", "skills", "unity-cli-loop", "uloop-sample")
+	installedDir := filepath.Join(projectRoot, ".claude", "skills", "tuanjie-cli-loop", "tloop-sample")
 	if _, err := os.Stat(filepath.Join(installedDir, "SKILL.md")); err != nil {
 		t.Fatalf("skill file was not installed: %v", err)
 	}
@@ -345,7 +345,7 @@ name: uloop-sample
 func TestSkillStatusIgnoresCRLFLineEndings(t *testing.T) {
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
-	writeSkillFile(t, sourceDir, "---\nname: uloop-sample\n---\n\n# sample\n")
+	writeSkillFile(t, sourceDir, "---\nname: tloop-sample\n---\n\n# sample\n")
 	referencesDir := filepath.Join(sourceDir, "references")
 	if err := os.MkdirAll(referencesDir, 0o755); err != nil {
 		t.Fatalf("failed to create references: %v", err)
@@ -355,12 +355,12 @@ func TestSkillStatusIgnoresCRLFLineEndings(t *testing.T) {
 	}
 
 	skill := skillDefinition{
-		name:            "uloop-sample",
-		content:         []byte("---\nname: uloop-sample\n---\n\n# sample\n"),
+		name:            "tloop-sample",
+		content:         []byte("---\nname: tloop-sample\n---\n\n# sample\n"),
 		sourceDirectory: sourceDir,
 	}
-	installedDir := filepath.Join(projectRoot, ".claude", "skills", managedSkillsDir, "uloop-sample")
-	writeRawSkillFile(t, installedDir, "---\r\nname: uloop-sample\r\n---\r\n\r\n# sample\r\n")
+	installedDir := filepath.Join(projectRoot, ".claude", "skills", managedSkillsDir, "tloop-sample")
+	writeRawSkillFile(t, installedDir, "---\r\nname: tloop-sample\r\n---\r\n\r\n# sample\r\n")
 	if err := os.MkdirAll(filepath.Join(installedDir, "references"), 0o755); err != nil {
 		t.Fatalf("failed to create installed references: %v", err)
 	}
@@ -413,14 +413,14 @@ func TestSkillStatusIgnoresGitkeepFiles(t *testing.T) {
 // identical installed copy, so each caller only has to add the one file under test.
 func setUpInstalledSampleSkill(t *testing.T) (string, skillDefinition, string) {
 	t.Helper()
-	const skillFileContent = "---\nname: uloop-sample\n---\n\n# sample\n"
+	const skillFileContent = "---\nname: tloop-sample\n---\n\n# sample\n"
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
 	writeSkillFile(t, sourceDir, skillFileContent)
 	writeSkillDirectoryFile(t, sourceDir, filepath.Join("references", "note.md"), "note\n")
 
 	skill := skillDefinition{
-		name:            "uloop-sample",
+		name:            "tloop-sample",
 		content:         []byte(skillFileContent),
 		sourceDirectory: sourceDir,
 	}
@@ -459,7 +459,7 @@ func assertSkillStatus(t *testing.T, baseDir string, skill skillDefinition, expe
 func TestSkillStatusReturnsStatErrors(t *testing.T) {
 	projectRoot := t.TempDir()
 	baseDir := filepath.Join(projectRoot, ".claude", "skills")
-	skill := skillDefinition{name: "uloop-sample"}
+	skill := skillDefinition{name: "tloop-sample"}
 
 	_, err := getSkillStatusWithStat(
 		baseDir,
@@ -479,7 +479,7 @@ func TestSkillStatusReturnsStatErrors(t *testing.T) {
 func TestInstallSkillsNormalizesCRLFLineEndings(t *testing.T) {
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
-	writeSkillFile(t, sourceDir, "---\r\nname: uloop-sample\r\n---\r\n\r\n# sample\r\n")
+	writeSkillFile(t, sourceDir, "---\r\nname: tloop-sample\r\n---\r\n\r\n# sample\r\n")
 	referencesDir := filepath.Join(sourceDir, "references")
 	if err := os.MkdirAll(referencesDir, 0o755); err != nil {
 		t.Fatalf("failed to create references: %v", err)
@@ -489,8 +489,8 @@ func TestInstallSkillsNormalizesCRLFLineEndings(t *testing.T) {
 	}
 
 	skill := skillDefinition{
-		name:            "uloop-sample",
-		content:         []byte("---\r\nname: uloop-sample\r\n---\r\n\r\n# sample\r\n"),
+		name:            "tloop-sample",
+		content:         []byte("---\r\nname: tloop-sample\r\n---\r\n\r\n# sample\r\n"),
 		sourceDirectory: sourceDir,
 	}
 
@@ -507,7 +507,7 @@ func TestInstallSkillsNormalizesCRLFLineEndings(t *testing.T) {
 		".claude",
 		"skills",
 		managedSkillsDir,
-		"uloop-sample",
+		"tloop-sample",
 		"references",
 		"note.md")
 	content, err := os.ReadFile(installedReferencePath)
@@ -536,14 +536,14 @@ func TestInstallSkillsForTargetRemovesDisabledAndDeprecatedSkills(t *testing.T) 
 	projectRoot := t.TempDir()
 	enabledSourceDir := filepath.Join(projectRoot, "source", "Enabled", "Skill")
 	writeSkillFile(t, enabledSourceDir, `---
-name: uloop-enabled-skill
+name: tloop-enabled-skill
 ---
 
 # enabled
 `)
 	disabledSourceDir := filepath.Join(projectRoot, "source", "Disabled", "Skill")
 	writeSkillFile(t, disabledSourceDir, `---
-name: uloop-disabled-skill
+name: tloop-disabled-skill
 ---
 
 # disabled
@@ -552,25 +552,25 @@ name: uloop-disabled-skill
 
 	target := targetConfigs["claude"]
 	skillsRoot := filepath.Join(projectRoot, target.projectDir, "skills")
-	disabledFlatDir := filepath.Join(skillsRoot, "uloop-disabled-skill")
-	disabledGroupedDir := filepath.Join(skillsRoot, managedSkillsDir, "uloop-disabled-skill")
-	deprecatedFlatDir := filepath.Join(skillsRoot, "uloop-capture-window")
-	deprecatedGroupedDir := filepath.Join(skillsRoot, managedSkillsDir, "uloop-capture-window")
-	writeSkillFile(t, disabledFlatDir, "---\nname: uloop-disabled-skill\n---\n")
-	writeSkillFile(t, disabledGroupedDir, "---\nname: uloop-disabled-skill\n---\n")
-	writeSkillFile(t, deprecatedFlatDir, "---\nname: uloop-capture-window\n---\n")
-	writeSkillFile(t, deprecatedGroupedDir, "---\nname: uloop-capture-window\n---\n")
+	disabledFlatDir := filepath.Join(skillsRoot, "tloop-disabled-skill")
+	disabledGroupedDir := filepath.Join(skillsRoot, managedSkillsDir, "tloop-disabled-skill")
+	deprecatedFlatDir := filepath.Join(skillsRoot, "tloop-capture-window")
+	deprecatedGroupedDir := filepath.Join(skillsRoot, managedSkillsDir, "tloop-capture-window")
+	writeSkillFile(t, disabledFlatDir, "---\nname: tloop-disabled-skill\n---\n")
+	writeSkillFile(t, disabledGroupedDir, "---\nname: tloop-disabled-skill\n---\n")
+	writeSkillFile(t, deprecatedFlatDir, "---\nname: tloop-capture-window\n---\n")
+	writeSkillFile(t, deprecatedGroupedDir, "---\nname: tloop-capture-window\n---\n")
 
 	result, err := installSkillsForTarget(projectRoot, projectRoot, target, []skillDefinition{
 		{
-			name:            "uloop-enabled-skill",
-			content:         []byte("---\nname: uloop-enabled-skill\n---\n\n# enabled\n"),
+			name:            "tloop-enabled-skill",
+			content:         []byte("---\nname: tloop-enabled-skill\n---\n\n# enabled\n"),
 			sourceDirectory: enabledSourceDir,
 		},
 		{
-			name:            "uloop-disabled-skill",
+			name:            "tloop-disabled-skill",
 			toolName:        "disabled-skill",
-			content:         []byte("---\nname: uloop-disabled-skill\n---\n\n# disabled\n"),
+			content:         []byte("---\nname: tloop-disabled-skill\n---\n\n# disabled\n"),
 			sourceDirectory: disabledSourceDir,
 		},
 	}, false, true)
@@ -581,7 +581,7 @@ name: uloop-disabled-skill
 		t.Fatalf("install result mismatch: %#v", result)
 	}
 
-	enabledDir := filepath.Join(skillsRoot, managedSkillsDir, "uloop-enabled-skill")
+	enabledDir := filepath.Join(skillsRoot, managedSkillsDir, "tloop-enabled-skill")
 	for _, missingDir := range []string{disabledFlatDir, disabledGroupedDir, deprecatedFlatDir, deprecatedGroupedDir} {
 		if _, err := os.Stat(missingDir); err == nil {
 			t.Fatalf("stale skill should be removed: %s", missingDir)
@@ -593,9 +593,9 @@ name: uloop-disabled-skill
 }
 
 // Verifies that installing skills removes each retired skill from both layouts: the Record Input
-// skill, whose tool was retired, and the Cancel skill, whose command the uloop-status skill now documents.
+// skill, whose tool was retired, and the Cancel skill, whose command the tloop-status skill now documents.
 func TestInstallSkillsForTargetRemovesRetiredSkill(t *testing.T) {
-	for _, skillName := range []string{"uloop-record-input", "uloop-cancel"} {
+	for _, skillName := range []string{"tloop-record-input", "tloop-cancel"} {
 		t.Run(skillName, func(t *testing.T) {
 			projectRoot := t.TempDir()
 			target := targetConfigs["claude"]
@@ -626,7 +626,7 @@ func TestInstallSkillsForTargetMigratesLegacyFlatSkillToGroupedLayout(t *testing
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
 	skillContent := `---
-name: uloop-sample
+name: tloop-sample
 ---
 
 # sample
@@ -634,7 +634,7 @@ name: uloop-sample
 	writeSkillFile(t, sourceDir, skillContent)
 
 	skill := skillDefinition{
-		name:            "uloop-sample",
+		name:            "tloop-sample",
 		content:         []byte(strings.ReplaceAll(skillContent, "\r\n", "\n")),
 		sourceDirectory: sourceDir,
 	}
@@ -667,15 +667,15 @@ func TestInstallSkillsForTargetRemovesGroupedSkillWhenInstallingFlatLayout(t *te
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
 	writeSkillFile(t, sourceDir, `---
-name: uloop-sample
+name: tloop-sample
 ---
 
 # sample
 `)
 
 	skill := skillDefinition{
-		name:            "uloop-sample",
-		content:         []byte("---\nname: uloop-sample\n---\n\n# sample\n"),
+		name:            "tloop-sample",
+		content:         []byte("---\nname: tloop-sample\n---\n\n# sample\n"),
 		sourceDirectory: sourceDir,
 	}
 	target := targetConfigs["claude"]
@@ -707,15 +707,15 @@ func TestRunSkillsInstallDefaultsToFlatLayout(t *testing.T) {
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
 	writeSkillFile(t, sourceDir, `---
-name: uloop-sample
+name: tloop-sample
 ---
 
 # sample
 `)
 
 	skill := skillDefinition{
-		name:            "uloop-sample",
-		content:         []byte("---\nname: uloop-sample\n---\n\n# sample\n"),
+		name:            "tloop-sample",
+		content:         []byte("---\nname: tloop-sample\n---\n\n# sample\n"),
 		sourceDirectory: sourceDir,
 	}
 	target := targetConfigs["claude"]
@@ -748,8 +748,8 @@ name: uloop-sample
 func TestRunSkillsListDefaultsToFlatLayout(t *testing.T) {
 	projectRoot := t.TempDir()
 	skill := skillDefinition{
-		name:    "uloop-sample",
-		content: []byte("---\nname: uloop-sample\n---\n\n# sample\n"),
+		name:    "tloop-sample",
+		content: []byte("---\nname: tloop-sample\n---\n\n# sample\n"),
 	}
 	target := targetConfigs["claude"]
 	baseDir, err := getSkillsBaseDir(projectRoot, target, false)
@@ -768,7 +768,7 @@ func TestRunSkillsListDefaultsToFlatLayout(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("list should succeed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop-sample (installed)") {
+	if !strings.Contains(stdout.String(), "tloop-sample (installed)") {
 		t.Fatalf("flat skill should be reported as installed: %s", stdout.String())
 	}
 }
@@ -778,9 +778,9 @@ func TestRunSkillsListReportsSkillOfDisabledToolAsDisabled(t *testing.T) {
 	projectRoot := t.TempDir()
 	writeToolSettings(t, projectRoot, `{"disabledTools":["disabled-skill"]}`)
 	skill := skillDefinition{
-		name:     "uloop-disabled-skill",
+		name:     "tloop-disabled-skill",
 		toolName: "disabled-skill",
-		content:  []byte("---\nname: uloop-disabled-skill\n---\n"),
+		content:  []byte("---\nname: tloop-disabled-skill\n---\n"),
 	}
 	options := skillCommandOptions{
 		targets: []skillTarget{targetConfigs["claude"]},
@@ -793,7 +793,7 @@ func TestRunSkillsListReportsSkillOfDisabledToolAsDisabled(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("list should succeed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop-disabled-skill (disabled)") {
+	if !strings.Contains(stdout.String(), "tloop-disabled-skill (disabled)") {
 		t.Fatalf("skill of a disabled tool should be reported as disabled: %s", stdout.String())
 	}
 }
@@ -803,9 +803,9 @@ func TestRunSkillsListReportsSkillOfEnabledToolAsNotInstalled(t *testing.T) {
 	projectRoot := t.TempDir()
 	writeToolSettings(t, projectRoot, `{"disabledTools":["other-skill"]}`)
 	skill := skillDefinition{
-		name:     "uloop-enabled-skill",
+		name:     "tloop-enabled-skill",
 		toolName: "enabled-skill",
-		content:  []byte("---\nname: uloop-enabled-skill\n---\n"),
+		content:  []byte("---\nname: tloop-enabled-skill\n---\n"),
 	}
 	options := skillCommandOptions{
 		targets: []skillTarget{targetConfigs["claude"]},
@@ -818,7 +818,7 @@ func TestRunSkillsListReportsSkillOfEnabledToolAsNotInstalled(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("list should succeed: code=%d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), "uloop-enabled-skill (not installed)") {
+	if !strings.Contains(stdout.String(), "tloop-enabled-skill (not installed)") {
 		t.Fatalf("skill of an enabled tool should stay not installed: %s", stdout.String())
 	}
 }
@@ -827,7 +827,7 @@ func TestRunSkillsListReportsSkillOfEnabledToolAsNotInstalled(t *testing.T) {
 func TestRunSkillsUninstallDefaultsToFlatLayout(t *testing.T) {
 	projectRoot := t.TempDir()
 	skill := skillDefinition{
-		name:    "uloop-sample",
+		name:    "tloop-sample",
 		content: []byte("sample"),
 	}
 	target := targetConfigs["claude"]
@@ -863,14 +863,14 @@ func TestUninstallSkillsForTargetUsesSelectedLayoutOnly(t *testing.T) {
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
 	writeSkillFile(t, sourceDir, `---
-name: uloop-sample
+name: tloop-sample
 ---
 
 # sample
 `)
 
 	skill := skillDefinition{
-		name:            "uloop-sample",
+		name:            "tloop-sample",
 		content:         []byte("sample"),
 		sourceDirectory: sourceDir,
 	}
@@ -907,8 +907,8 @@ func TestUninstallSkillsForTargetRemovesDeprecatedSkillsFromSelectedLayoutOnly(t
 	if err != nil {
 		t.Fatalf("getSkillsBaseDir failed: %v", err)
 	}
-	groupedDeprecatedDir := getPreferredSkillDir(baseDir, "uloop-capture-window", true)
-	flatDeprecatedDir := getPreferredSkillDir(baseDir, "uloop-capture-window", false)
+	groupedDeprecatedDir := getPreferredSkillDir(baseDir, "tloop-capture-window", true)
+	flatDeprecatedDir := getPreferredSkillDir(baseDir, "tloop-capture-window", false)
 	writeSkillFile(t, groupedDeprecatedDir, "# grouped deprecated\n")
 	writeSkillFile(t, flatDeprecatedDir, "# flat deprecated\n")
 
@@ -1050,21 +1050,21 @@ func TestTryHandleSkillsRequestRejectsUnknownSubcommandWithoutProject(t *testing
 	}
 }
 
-// Tests that install refreshes targets that already hold uloop skills even when
+// Tests that install refreshes targets that already hold tloop skills even when
 // they were not requested, because stale per-agent copies (e.g. .codex) have
 // repeatedly misled agents with retired flags.
 func TestRunSkillsInstallAutoRefreshesPreviouslyInstalledTargets(t *testing.T) {
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
 	writeSkillFile(t, sourceDir, `---
-name: uloop-sample
+name: tloop-sample
 ---
 
 # new content
 `)
 	skill := skillDefinition{
-		name:            "uloop-sample",
-		content:         []byte("---\nname: uloop-sample\n---\n\n# new content\n"),
+		name:            "tloop-sample",
+		content:         []byte("---\nname: tloop-sample\n---\n\n# new content\n"),
 		sourceDirectory: sourceDir,
 	}
 
@@ -1074,7 +1074,7 @@ name: uloop-sample
 		t.Fatalf("getSkillsBaseDir failed: %v", err)
 	}
 	staleDir := getPreferredSkillDir(codexBaseDir, skill.name, false)
-	writeSkillFile(t, staleDir, "---\nname: uloop-sample\n---\n\n# stale content\n")
+	writeSkillFile(t, staleDir, "---\nname: tloop-sample\n---\n\n# stale content\n")
 
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
@@ -1102,14 +1102,14 @@ func TestRunSkillsInstallLeavesUninstalledTargetsUntouched(t *testing.T) {
 	projectRoot := t.TempDir()
 	sourceDir := filepath.Join(projectRoot, "source", "Skill")
 	writeSkillFile(t, sourceDir, `---
-name: uloop-sample
+name: tloop-sample
 ---
 
 # sample
 `)
 	skill := skillDefinition{
-		name:            "uloop-sample",
-		content:         []byte("---\nname: uloop-sample\n---\n\n# sample\n"),
+		name:            "tloop-sample",
+		content:         []byte("---\nname: tloop-sample\n---\n\n# sample\n"),
 		sourceDirectory: sourceDir,
 	}
 
@@ -1130,19 +1130,19 @@ name: uloop-sample
 func TestRunV3MigrationSkillInstallAndUninstall(t *testing.T) {
 	projectRoot := t.TempDir()
 	writePackageRootMarker(t, projectRoot)
-	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/v3-cli-invocation-migration/Skill", `---
-name: v3-cli-invocation-migration
+	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill", `---
+name: tloop-v3-cli-invocation-migration
 ---
 
 # temporary migration
 `)
 	if err := os.MkdirAll(
-		filepath.Join(projectRoot, "Packages", "src", "TemporarySkills~", "v3-cli-invocation-migration", "Skill", "references"),
+		filepath.Join(projectRoot, "Packages", "src", "TemporarySkills~", "tloop-v3-cli-invocation-migration", "Skill", "references"),
 		0o755); err != nil {
 		t.Fatalf("failed to create reference dir: %v", err)
 	}
 	if err := os.WriteFile(
-		filepath.Join(projectRoot, "Packages", "src", "TemporarySkills~", "v3-cli-invocation-migration", "Skill", "references", "first-party-v2-to-v3.md"),
+		filepath.Join(projectRoot, "Packages", "src", "TemporarySkills~", "tloop-v3-cli-invocation-migration", "Skill", "references", "first-party-v2-to-v3.md"),
 		[]byte("# reference\n"),
 		0o644); err != nil {
 		t.Fatalf("failed to write reference: %v", err)
@@ -1154,7 +1154,7 @@ name: v3-cli-invocation-migration
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	options := skillCommandOptions{targets: []skillTarget{targetConfigs["codex"]}}
-	installedDir := filepath.Join(projectRoot, ".codex", "skills", "v3-cli-invocation-migration")
+	installedDir := filepath.Join(projectRoot, ".codex", "skills", "tloop-v3-cli-invocation-migration")
 	if err := os.MkdirAll(filepath.Join(installedDir, "scripts"), 0o755); err != nil {
 		t.Fatalf("failed to create stale script dir: %v", err)
 	}
@@ -1176,8 +1176,8 @@ name: v3-cli-invocation-migration
 	if _, err := os.Stat(filepath.Join(installedDir, "scripts", "detect.sh")); !os.IsNotExist(err) {
 		t.Fatalf("stale migration skill script should be removed: %v", err)
 	}
-	unrelatedSkillDir := filepath.Join(projectRoot, ".codex", "skills", "uloop-compile")
-	writeSkillFile(t, unrelatedSkillDir, "---\nname: uloop-compile\n---\n")
+	unrelatedSkillDir := filepath.Join(projectRoot, ".codex", "skills", "tloop-compile")
+	writeSkillFile(t, unrelatedSkillDir, "---\nname: tloop-compile\n---\n")
 
 	uninstallCode := runV3MigrationSkillUninstall(projectRoot, options, stdout, stderr)
 
@@ -1204,7 +1204,7 @@ func TestTryHandleSkillsRequestUninstallV3MigrationWithoutPackageSource(t *testi
 	})
 
 	installedDir := filepath.Join(homeDir, ".codex", "skills", v3MigrationSkillName)
-	writeSkillFile(t, installedDir, "---\nname: v3-cli-invocation-migration\n---\n")
+	writeSkillFile(t, installedDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 
@@ -1234,8 +1234,8 @@ func TestRunV3MigrationSkillUninstallRemovesAlternateLayout(t *testing.T) {
 	}
 	flatDir := getPreferredSkillDir(baseDir, v3MigrationSkillName, false)
 	groupedDir := getPreferredSkillDir(baseDir, v3MigrationSkillName, true)
-	writeSkillFile(t, flatDir, "---\nname: v3-cli-invocation-migration\n---\n")
-	writeSkillFile(t, groupedDir, "---\nname: v3-cli-invocation-migration\n---\n")
+	writeSkillFile(t, flatDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
+	writeSkillFile(t, groupedDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	options := skillCommandOptions{targets: []skillTarget{target}}
@@ -1260,7 +1260,7 @@ func TestRunV3MigrationSkillUninstallRemovesAlternateLayout(t *testing.T) {
 func TestInstallV3MigrationSkillForTargetRemovesAlternateLayoutWhenInstalled(t *testing.T) {
 	projectRoot := t.TempDir()
 	skillContent := `---
-name: v3-cli-invocation-migration
+name: tloop-v3-cli-invocation-migration
 ---
 
 # temporary migration
@@ -1301,7 +1301,7 @@ name: v3-cli-invocation-migration
 func TestInstallV3MigrationSkillForTargetUpdatesOutdatedSkill(t *testing.T) {
 	projectRoot := t.TempDir()
 	writeV3MigrationSkillFixture(t, projectRoot, `---
-name: v3-cli-invocation-migration
+name: tloop-v3-cli-invocation-migration
 ---
 
 # temporary migration v1
@@ -1321,7 +1321,7 @@ name: v3-cli-invocation-migration
 	}
 
 	updatedContent := `---
-name: v3-cli-invocation-migration
+name: tloop-v3-cli-invocation-migration
 ---
 
 # temporary migration v2
@@ -1358,7 +1358,7 @@ func TestRunV3MigrationSkillUninstallRemovesEmptyGroupedParent(t *testing.T) {
 	}
 	groupedDir := getPreferredSkillDir(baseDir, v3MigrationSkillName, true)
 	managedParent := filepath.Join(baseDir, managedSkillsDir)
-	writeSkillFile(t, groupedDir, "---\nname: v3-cli-invocation-migration\n---\n")
+	writeSkillFile(t, groupedDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	options := skillCommandOptions{targets: []skillTarget{target}}
@@ -1414,13 +1414,13 @@ func writeTestSkill(t *testing.T, projectRoot string, relativeDir string, conten
 func writeV3MigrationSkillFixture(t *testing.T, projectRoot string, skillContent string) {
 	t.Helper()
 	writePackageRootMarker(t, projectRoot)
-	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/v3-cli-invocation-migration/Skill", skillContent)
+	writeTestSkill(t, projectRoot, "Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill", skillContent)
 	referenceDir := filepath.Join(
 		projectRoot,
 		"Packages",
 		"src",
 		"TemporarySkills~",
-		"v3-cli-invocation-migration",
+		"tloop-v3-cli-invocation-migration",
 		"Skill",
 		"references",
 	)
@@ -1456,7 +1456,7 @@ func writePackageRootMarker(t *testing.T, projectRoot string) {
 
 func writeToolSettings(t *testing.T, projectRoot string, content string) {
 	t.Helper()
-	settingsDir := filepath.Join(projectRoot, ".uloop")
+	settingsDir := filepath.Join(projectRoot, ".tloop")
 	if err := os.MkdirAll(settingsDir, 0o755); err != nil {
 		t.Fatalf("failed to create settings dir: %v", err)
 	}
@@ -1541,7 +1541,7 @@ func sampleSkillWithSource(t *testing.T) skillDefinition {
 	t.Helper()
 	sourceDir := filepath.Join(t.TempDir(), "Skill")
 	writeSkillFile(t, sourceDir, sampleSkillContent)
-	return skillDefinition{name: "uloop-sample", content: []byte(sampleSkillContent), sourceDirectory: sourceDir}
+	return skillDefinition{name: "tloop-sample", content: []byte(sampleSkillContent), sourceDirectory: sourceDir}
 }
 
 func TestInstallSkillsForTargetGlobalIgnoresProjectToolSettings(t *testing.T) {
@@ -1556,7 +1556,7 @@ func TestInstallSkillsForTargetGlobalIgnoresProjectToolSettings(t *testing.T) {
 	if err != nil || result.installed != 1 {
 		t.Fatalf("unexpected result: %+v err=%v", result, err)
 	}
-	if !fileExists(filepath.Join(homeDir, ".claude", "skills", "uloop-sample", "SKILL.md")) {
+	if !fileExists(filepath.Join(homeDir, ".claude", "skills", "tloop-sample", "SKILL.md")) {
 		t.Fatal("global install must write under the home directory")
 	}
 }
@@ -1581,7 +1581,7 @@ func TestInstallSkillsForTargetReportsFailures(t *testing.T) {
 			grouped:     true,
 			wantMessage: "rename ",
 			setup: func(t *testing.T, baseDir string, skill *skillDefinition) {
-				writeSkillFile(t, filepath.Join(baseDir, "uloop-sample"), sampleSkillContent)
+				writeSkillFile(t, filepath.Join(baseDir, "tloop-sample"), sampleSkillContent)
 				lockSkillsTestDirectory(t, filepath.Join(baseDir, managedSkillsDir), 0o555)
 			},
 		},
@@ -1596,7 +1596,7 @@ func TestInstallSkillsForTargetReportsFailures(t *testing.T) {
 			name:        "alternate layout cannot be removed",
 			wantMessage: "unlinkat ",
 			setup: func(t *testing.T, baseDir string, skill *skillDefinition) {
-				alternateDir := filepath.Join(baseDir, managedSkillsDir, "uloop-sample")
+				alternateDir := filepath.Join(baseDir, managedSkillsDir, "tloop-sample")
 				writeSkillFile(t, filepath.Join(alternateDir, "locked"), "x")
 				lockSkillsTestDirectory(t, filepath.Join(alternateDir, "locked"), 0o555)
 			},
@@ -1631,7 +1631,7 @@ func TestInstallSkillsForTargetReportsHomeLookupFailure(t *testing.T) {
 func TestInstallSkillForTargetReportsStatusFailure(t *testing.T) {
 	// Verifies a skill whose installed location cannot be inspected is reported rather than overwritten.
 	baseDir := t.TempDir()
-	blockSkillsDirWithFile(t, baseDir, "uloop-sample")
+	blockSkillsDirWithFile(t, baseDir, "tloop-sample")
 	result := skillInstallResult{}
 
 	err := installSkillForTarget(baseDir, sampleSkillWithSource(t), nil, false, &result)
@@ -1639,7 +1639,7 @@ func TestInstallSkillForTargetReportsStatusFailure(t *testing.T) {
 	if err == nil || !strings.Contains(err.Error(), "SKILL.md: not a directory") {
 		t.Fatalf("expected a status failure, got %v", err)
 	}
-	assertFileContent(t, filepath.Join(baseDir, "uloop-sample"), "not a directory")
+	assertFileContent(t, filepath.Join(baseDir, "tloop-sample"), "not a directory")
 }
 
 func TestUninstallSkillsForTargetReportsFailures(t *testing.T) {
@@ -1652,11 +1652,11 @@ func TestUninstallSkillsForTargetReportsFailures(t *testing.T) {
 	})
 	t.Run("removal blocked", func(t *testing.T) {
 		projectRoot := t.TempDir()
-		lockedDir := filepath.Join(projectRoot, ".claude", "skills", "uloop-sample", "locked")
+		lockedDir := filepath.Join(projectRoot, ".claude", "skills", "tloop-sample", "locked")
 		writeSkillFile(t, lockedDir, "x")
 		lockSkillsTestDirectory(t, lockedDir, 0o555)
 
-		removed, _, err := uninstallSkillsForTarget(projectRoot, targetConfigs["claude"], []skillDefinition{{name: "uloop-sample"}}, false, false)
+		removed, _, err := uninstallSkillsForTarget(projectRoot, targetConfigs["claude"], []skillDefinition{{name: "tloop-sample"}}, false, false)
 
 		if err == nil || removed != 0 || !strings.HasPrefix(err.Error(), "unlinkat "+filepath.Join(lockedDir, "SKILL.md")) {
 			t.Fatalf("expected a removal failure, got removed=%d err=%v", removed, err)
@@ -1667,9 +1667,9 @@ func TestUninstallSkillsForTargetReportsFailures(t *testing.T) {
 func TestCollectSkillDefinitionsHandlesEditorFolderLayouts(t *testing.T) {
 	// Verifies discovery reads loose SKILL.md files, skips excluded folders, empty Skill folders, and unsafe names.
 	projectRoot := t.TempDir()
-	writeTestSkill(t, projectRoot, "Assets/Editor/Loose", "---\nname: uloop-loose\n---\n")
+	writeTestSkill(t, projectRoot, "Assets/Editor/Loose", "---\nname: tloop-loose\n---\n")
 	writeDispatcherTestFile(t, filepath.Join(projectRoot, "Assets", "Editor", "Loose", "README.md"), "docs")
-	writeTestSkill(t, projectRoot, "Assets/Editor/node_modules/pkg/Skill", "---\nname: uloop-excluded\n---\n")
+	writeTestSkill(t, projectRoot, "Assets/Editor/node_modules/pkg/Skill", "---\nname: tloop-excluded\n---\n")
 	writeDispatcherTestFile(t, filepath.Join(projectRoot, "Assets", "Editor", "Empty", "Skill", "notes.md"), "no skill file")
 	writeTestSkill(t, projectRoot, "Assets/Editor/Unsafe/Skill", "---\nname: bad/name\n---\n")
 
@@ -1677,7 +1677,7 @@ func TestCollectSkillDefinitionsHandlesEditorFolderLayouts(t *testing.T) {
 	if err != nil {
 		t.Fatalf("collectSkillDefinitions failed: %v", err)
 	}
-	if names := skillNames(skills); !reflect.DeepEqual(names, []string{"uloop-loose"}) {
+	if names := skillNames(skills); !reflect.DeepEqual(names, []string{"tloop-loose"}) {
 		t.Fatalf("skill names mismatch: %v", names)
 	}
 }
@@ -1738,7 +1738,7 @@ func TestCollectV3MigrationSkillDefinitionReportsMissingOrUnreadableSource(t *te
 	})
 	t.Run("unreadable", func(t *testing.T) {
 		projectRoot := t.TempDir()
-		writeV3MigrationSkillFixture(t, projectRoot, "---\nname: v3-cli-invocation-migration\n---\n")
+		writeV3MigrationSkillFixture(t, projectRoot, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
 		lockSkillsTestFile(t, filepath.Join(projectRoot, "Packages", "src", "TemporarySkills~", v3MigrationSkillName, "Skill", "SKILL.md"))
 		_, err := collectV3MigrationSkillDefinition(projectRoot)
 		if err == nil || !strings.Contains(err.Error(), "SKILL.md: permission denied") {

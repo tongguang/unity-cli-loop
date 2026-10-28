@@ -5,7 +5,7 @@ set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 PROJECT_PATH="$ROOT_DIR"
-ULOOP_PATH="${ULOOP_BIN:-}"
+TLOOP_PATH="${TLOOP_BIN:-}"
 TIMEOUT_SECONDS=120
 LAUNCH_TIMEOUT_SECONDS=240
 SKIP_RECOVERY_READINESS=false
@@ -23,7 +23,7 @@ Usage: sh scripts/run-posix-e2e.sh [options]
 
 Options:
   --project-path <path>              Unity project to test. Defaults to this repository.
-  --uloop-path <path>                uloop binary to execute. Defaults to the built native binary.
+  --tloop-path <path>                tloop binary to execute. Defaults to the built native binary.
   --timeout <seconds>                Per-command smoke timeout. Default: 120.
   --launch-timeout <seconds>         Launch/reuse smoke timeout. Default: 240.
   --skip-recovery-readiness          Skip recovery/readiness smoke.
@@ -40,9 +40,9 @@ while [ "$#" -gt 0 ]; do
             PROJECT_PATH=$2
             shift 2
             ;;
-        --uloop-path)
-            [ "$#" -ge 2 ] || fail "--uloop-path requires a value"
-            ULOOP_PATH=$2
+        --tloop-path)
+            [ "$#" -ge 2 ] || fail "--tloop-path requires a value"
+            TLOOP_PATH=$2
             shift 2
             ;;
         --timeout)
@@ -88,18 +88,18 @@ resolve_path() {
     (cd "$parent" && printf '%s/%s\n' "$(pwd)" "$leaf")
 }
 
-default_uloop_path() {
+default_tloop_path() {
     case "$(uname -s)" in
         Darwin)
             machine=$(uname -m)
             if [ "$machine" = "arm64" ] || [ "$machine" = "aarch64" ]; then
-                printf '%s\n' "$ROOT_DIR/dist/darwin-arm64/uloop"
+                printf '%s\n' "$ROOT_DIR/dist/darwin-arm64/tloop"
             else
-                printf '%s\n' "$ROOT_DIR/dist/darwin-amd64/uloop"
+                printf '%s\n' "$ROOT_DIR/dist/darwin-amd64/tloop"
             fi
             ;;
         MINGW*|MSYS*|CYGWIN*)
-            printf '%s\n' "$ROOT_DIR/dist/windows-amd64/uloop.exe"
+            printf '%s\n' "$ROOT_DIR/dist/windows-amd64/tloop.exe"
             ;;
         *)
             printf '%s\n' ""
@@ -115,28 +115,28 @@ run_step() {
 }
 
 PROJECT_PATH=$(resolve_path "$PROJECT_PATH")
-if [ -z "$ULOOP_PATH" ]; then
-    ULOOP_PATH=$(default_uloop_path)
+if [ -z "$TLOOP_PATH" ]; then
+    TLOOP_PATH=$(default_tloop_path)
 fi
-[ -n "$ULOOP_PATH" ] || fail "no checked-in uloop binary for this platform; pass --uloop-path"
-ULOOP_PATH=$(resolve_path "$ULOOP_PATH")
-[ -x "$ULOOP_PATH" ] || fail "uloop binary is not executable: $ULOOP_PATH"
+[ -n "$TLOOP_PATH" ] || fail "no checked-in tloop binary for this platform; pass --tloop-path"
+TLOOP_PATH=$(resolve_path "$TLOOP_PATH")
+[ -x "$TLOOP_PATH" ] || fail "tloop binary is not executable: $TLOOP_PATH"
 [ -d "$PROJECT_PATH/Assets" ] || fail "--project-path does not contain Assets: $PROJECT_PATH"
 [ -d "$PROJECT_PATH/ProjectSettings" ] || fail "--project-path does not contain ProjectSettings: $PROJECT_PATH"
 
-export ULOOP_BIN="$ULOOP_PATH"
-PATH="$(dirname -- "$ULOOP_PATH"):$PATH"
+export TLOOP_BIN="$TLOOP_PATH"
+PATH="$(dirname -- "$TLOOP_PATH"):$PATH"
 export PATH
 
 printf '=== POSIX terminal-driven E2E ===\n'
 printf 'project_path=%s\n' "$PROJECT_PATH"
-printf 'uloop_path=%s\n' "$ULOOP_PATH"
+printf 'tloop_path=%s\n' "$TLOOP_PATH"
 
 if [ "$SKIP_RECOVERY_READINESS" = false ]; then
     run_step "CLI recovery/readiness" \
         go run "$ROOT_DIR/scripts/smoke-cli-recovery-readiness.go" \
             --project-path "$PROJECT_PATH" \
-            --uloop-path "$ULOOP_PATH" \
+            --tloop-path "$TLOOP_PATH" \
             --timeout "$TIMEOUT_SECONDS" \
             --launch-timeout "$LAUNCH_TIMEOUT_SECONDS"
 fi

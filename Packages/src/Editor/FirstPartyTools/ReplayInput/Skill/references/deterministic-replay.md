@@ -9,7 +9,7 @@ Replay injects input frame-by-frame, so the game must produce identical results 
 | `Rigidbody` / Physics simulation | Kinematic movement via `Transform.Translate` | Physics is non-deterministic across runs |
 | `WaitForSeconds(n)` in coroutines | Frame counting | Real-time waits depend on frame timing |
 | `Time.time` / `Time.realtimeSinceStartup` | Frame counter (`Time.frameCount - startFrame`) | Time values drift between runs |
-| `FindObjectsOfType` without sort | Serialized object lists or sorting by a stable project-defined key | Unity object iteration order is not replay-stable |
+| `FindObjectsOfType` without sort | Serialized object lists or sorting by a stable project-defined key | Tuanjie object iteration order is not replay-stable |
 | `async/await` with `Task.Delay` | Frame-based waiting | Real-time delays are non-deterministic |
 
 Set `QualitySettings.vSyncCount = 0` before `Application.targetFrameRate = 60` or another fixed target to reduce frame timing variance. See `InputReplayVerificationController` for a complete example of deterministic game logic.

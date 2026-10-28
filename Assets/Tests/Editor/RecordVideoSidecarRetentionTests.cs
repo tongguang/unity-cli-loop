@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _directory = Path.Combine(Path.GetTempPath(), "uloop-sidecar-retention-" + Guid.NewGuid().ToString("N"));
+            _directory = Path.Combine(Path.GetTempPath(), "tloop-sidecar-retention-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_directory);
         }
 

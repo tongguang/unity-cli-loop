@@ -121,7 +121,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void FindWindowsByName_UnknownName_ReturnsEmpty()
         {
             EditorWindow[] result = EditorWindowFinder.FindWindowsByName(
-                "NoSuchWindow-uloop-test",
+                "NoSuchWindow-tloop-test",
                 WindowMatchMode.exact);
 
             Assert.That(result, Is.Empty);

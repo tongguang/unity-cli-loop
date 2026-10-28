@@ -166,7 +166,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         internal static string CreateSourceDirectory(string name)
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string directory = Path.Combine(projectRoot, "Library", "UloopHotReload", "TestSources", "IntroducedTypes", name);
+            string directory = Path.Combine(projectRoot, "Library", "TloopHotReload", "TestSources", "IntroducedTypes", name);
             Directory.CreateDirectory(directory);
             return directory;
         }

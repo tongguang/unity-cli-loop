@@ -15,7 +15,7 @@ import (
 func newCompilerPlan() BuildPlan {
 	return BuildPlan{
 		DagDir:    planDagDirectory,
-		OutputDir: filepath.Join("Library", "uloop", "compile-check", "aaaa.dag"),
+		OutputDir: filepath.Join("Library", "tloop", "compile-check", "aaaa.dag"),
 		Units: []CompileUnit{
 			{Assembly: ResponseFile{AssemblyName: "A"}},
 			{
@@ -143,7 +143,7 @@ func TestParseDiagnosticsDropsRepeatedDiagnostics(t *testing.T) {
 func TestCompileUnitRewritesTheResponseFile(t *testing.T) {
 	written, _ := compileSecondUnit(t, "", 0)
 
-	outputDir := filepath.Join("Library", "uloop", "compile-check", "aaaa.dag")
+	outputDir := filepath.Join("Library", "tloop", "compile-check", "aaaa.dag")
 	expected := []string{
 		`-out:"` + filepath.ToSlash(filepath.Join(outputDir, "B.dll")) + `"`,
 		`-refout:"` + filepath.ToSlash(filepath.Join(outputDir, "B.ref.dll")) + `"`,

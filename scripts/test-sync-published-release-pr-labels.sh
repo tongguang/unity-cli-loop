@@ -156,12 +156,12 @@ test_marks_component_summary_release_pr_from_body() {
 # Verifies component-prefixed project runner summaries use the component release tag.
 test_marks_project_runner_component_summary_release_pr_from_body() {
   run_case project-runner-component-summary \
-    '[{"number":1450,"title":"chore: release v3-beta","body":"<details><summary>uloop-project-runner: 3.0.0-beta.45</summary></details>","mergeCommit":{"oid":"abc123"}}]' \
-    '{"uloop-project-runner-v3.0.0-beta.45":{"isDraft":false,"targetCommitish":"abc123"}}'
+    '[{"number":1450,"title":"chore: release v3-beta","body":"<details><summary>tloop-project-runner: 3.0.0-beta.45</summary></details>","mergeCommit":{"oid":"abc123"}}]' \
+    '{"tloop-project-runner-v3.0.0-beta.45":{"isDraft":false,"targetCommitish":"abc123"}}'
 
   assert_file_equals "$TMP_DIR/project-runner-component-summary/status.txt" "0"
   assert_contains "$TMP_DIR/project-runner-component-summary/gh.log" "pr edit 1450 --repo hatayama/unity-cli-loop --remove-label autorelease: pending --add-label autorelease: tagged"
-  assert_contains "$TMP_DIR/project-runner-component-summary/output.txt" "Marked release PR #1450 as tagged for uloop-project-runner-v3.0.0-beta.45."
+  assert_contains "$TMP_DIR/project-runner-component-summary/output.txt" "Marked release PR #1450 as tagged for tloop-project-runner-v3.0.0-beta.45."
 }
 
 # Verifies component-prefixed dispatcher summaries use the dispatcher release tag.
@@ -175,15 +175,15 @@ test_marks_dispatcher_component_summary_release_pr_from_body() {
   assert_contains "$TMP_DIR/dispatcher-component-summary/output.txt" "Marked release PR #1470 as tagged for dispatcher-v3.0.1-beta.12."
 }
 
-# Verifies uloop-prefixed dispatcher summaries written by the release PR clarifier still resolve the dispatcher release tag.
-test_marks_uloop_dispatcher_component_summary_release_pr_from_body() {
-  run_case uloop-dispatcher-component-summary \
-    '[{"number":1696,"title":"chore: release v3-beta","body":"<details><summary>uloop-dispatcher: 3.0.1-beta.13</summary></details>","mergeCommit":{"oid":"abc123"}}]' \
+# Verifies tloop-prefixed dispatcher summaries written by the release PR clarifier still resolve the dispatcher release tag.
+test_marks_tloop_dispatcher_component_summary_release_pr_from_body() {
+  run_case tloop-dispatcher-component-summary \
+    '[{"number":1696,"title":"chore: release v3-beta","body":"<details><summary>tloop-dispatcher: 3.0.1-beta.13</summary></details>","mergeCommit":{"oid":"abc123"}}]' \
     '{"dispatcher-v3.0.1-beta.13":{"isDraft":false,"targetCommitish":"abc123"}}'
 
-  assert_file_equals "$TMP_DIR/uloop-dispatcher-component-summary/status.txt" "0"
-  assert_contains "$TMP_DIR/uloop-dispatcher-component-summary/gh.log" "release view dispatcher-v3.0.1-beta.13 --repo hatayama/unity-cli-loop --json isDraft,targetCommitish"
-  assert_contains "$TMP_DIR/uloop-dispatcher-component-summary/output.txt" "Marked release PR #1696 as tagged for dispatcher-v3.0.1-beta.13."
+  assert_file_equals "$TMP_DIR/tloop-dispatcher-component-summary/status.txt" "0"
+  assert_contains "$TMP_DIR/tloop-dispatcher-component-summary/gh.log" "release view dispatcher-v3.0.1-beta.13 --repo hatayama/unity-cli-loop --json isDraft,targetCommitish"
+  assert_contains "$TMP_DIR/tloop-dispatcher-component-summary/output.txt" "Marked release PR #1696 as tagged for dispatcher-v3.0.1-beta.13."
 }
 
 # Verifies the head branch component resolves the release tag even when the body summary carries a bare version.
@@ -201,13 +201,13 @@ test_marks_component_branch_release_pr_from_head_ref() {
 # Verifies component summaries take precedence over legacy numeric release titles.
 test_marks_project_runner_component_summary_release_pr_before_numeric_title() {
   run_case project-runner-component-before-title \
-    '[{"number":1452,"title":"chore(v3-beta): release 3.0.0-beta.45","body":"<details><summary>uloop-project-runner: 3.0.0-beta.45</summary></details>","mergeCommit":{"oid":"abc123"}}]' \
-    '{"uloop-project-runner-v3.0.0-beta.45":{"isDraft":false,"targetCommitish":"abc123"}}'
+    '[{"number":1452,"title":"chore(v3-beta): release 3.0.0-beta.45","body":"<details><summary>tloop-project-runner: 3.0.0-beta.45</summary></details>","mergeCommit":{"oid":"abc123"}}]' \
+    '{"tloop-project-runner-v3.0.0-beta.45":{"isDraft":false,"targetCommitish":"abc123"}}'
 
   assert_file_equals "$TMP_DIR/project-runner-component-before-title/status.txt" "0"
-  assert_contains "$TMP_DIR/project-runner-component-before-title/gh.log" "release view uloop-project-runner-v3.0.0-beta.45 --repo hatayama/unity-cli-loop --json isDraft,targetCommitish"
+  assert_contains "$TMP_DIR/project-runner-component-before-title/gh.log" "release view tloop-project-runner-v3.0.0-beta.45 --repo hatayama/unity-cli-loop --json isDraft,targetCommitish"
   assert_not_contains "$TMP_DIR/project-runner-component-before-title/gh.log" "release view v3.0.0-beta.45 --repo hatayama/unity-cli-loop --json isDraft,targetCommitish"
-  assert_contains "$TMP_DIR/project-runner-component-before-title/output.txt" "Marked release PR #1452 as tagged for uloop-project-runner-v3.0.0-beta.45."
+  assert_contains "$TMP_DIR/project-runner-component-before-title/output.txt" "Marked release PR #1452 as tagged for tloop-project-runner-v3.0.0-beta.45."
 }
 
 # Verifies draft releases remain pending so release completion is not hidden.
@@ -257,7 +257,7 @@ test_marks_stale_pending_release_pr
 test_marks_branch_title_release_pr_from_body
 test_marks_component_summary_release_pr_from_body
 test_marks_dispatcher_component_summary_release_pr_from_body
-test_marks_uloop_dispatcher_component_summary_release_pr_from_body
+test_marks_tloop_dispatcher_component_summary_release_pr_from_body
 test_marks_project_runner_component_summary_release_pr_from_body
 test_marks_project_runner_component_summary_release_pr_before_numeric_title
 test_marks_component_branch_release_pr_from_head_ref

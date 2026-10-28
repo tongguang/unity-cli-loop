@@ -4,14 +4,14 @@ set -eu
 ROOT_DIR=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
 
 DIST_FILES="
-dist/darwin-arm64/uloop
-dist/darwin-arm64/uloop-project-runner
-dist/darwin-amd64/uloop
-dist/darwin-amd64/uloop-project-runner
-dist/windows-amd64/uloop.exe
-dist/windows-amd64/uloop-project-runner.exe
-dist/linux-amd64/uloop
-dist/linux-amd64/uloop-project-runner
+dist/darwin-arm64/tloop
+dist/darwin-arm64/tloop-project-runner
+dist/darwin-amd64/tloop
+dist/darwin-amd64/tloop-project-runner
+dist/windows-amd64/tloop.exe
+dist/windows-amd64/tloop-project-runner.exe
+dist/linux-amd64/tloop
+dist/linux-amd64/tloop-project-runner
 "
 
 "$ROOT_DIR/scripts/build-go-cli.sh"

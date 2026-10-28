@@ -91,7 +91,7 @@ func TestWaitForAttachedCompileCompletionStopsOnceUnityHasExited(t *testing.T) {
 	assertUnityExitedDuringCommand(t, err)
 }
 
-// Verifies uloop compile prints the not-running envelope when the Editor exits during the domain reload
+// Verifies tloop compile prints the not-running envelope when the Editor exits during the domain reload
 // wait, so the caller is told to launch Unity rather than to wait.
 func TestRunCompileReportsUnityNotRunningWhenTheEditorExitsDuringTheWait(t *testing.T) {
 	deps := exitedEditorCompileDeps()

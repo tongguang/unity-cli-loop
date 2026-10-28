@@ -43,7 +43,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(result.PlayModeExitRequested, Is.False);
             Assert.That(result.PlayModeExitConfirmed, Is.True);
             Assert.That(result.StopWaitTimedOut, Is.False);
-            Assert.That(result.DegradationNote, Is.EqualTo("Restart with `uloop launch -r` if Unity remains stuck."));
+            Assert.That(result.DegradationNote, Is.EqualTo("Restart with `tloop launch -r` if Unity remains stuck."));
             Assert.That(_hooks.Warnings, Is.Empty);
         }
 
@@ -133,7 +133,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 result.DegradationNote,
                 Is.EqualTo("Play Mode exit was requested and confirmed. " +
-                           "Restart with `uloop launch -r` if Unity remains stuck."));
+                           "Restart with `tloop launch -r` if Unity remains stuck."));
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Is.EqualTo("Unity Test Framework 1.3.9 has no public API to cancel an in-flight test job. " +
                            "Play Mode exit was requested but not confirmed within the stop wait. " +
                            "Stop-wait polling reached its upper bound. " +
-                           "Restart with `uloop launch -r` if Unity remains stuck."));
+                           "Restart with `tloop launch -r` if Unity remains stuck."));
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(_hooks.ExitRequestCount, Is.EqualTo(0));
             Assert.That(result.PlayModeExitRequested, Is.False);
             Assert.That(result.PlayModeExitConfirmed, Is.True);
-            Assert.That(result.DegradationNote, Is.EqualTo("Restart with `uloop launch -r` if Unity remains stuck."));
+            Assert.That(result.DegradationNote, Is.EqualTo("Restart with `tloop launch -r` if Unity remains stuck."));
         }
 
         /// <summary>

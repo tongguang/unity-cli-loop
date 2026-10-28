@@ -26,7 +26,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private const string PackageEditorPath = "Packages/src/Editor";
         private const string SkillFileName = "SKILL.md";
         private const string SkillDirectoryName = "Skill";
-        private const string SkillNamePrefix = "uloop-";
+        private const string SkillNamePrefix = "tloop-";
         private const string ParametersSectionHeading = "## Parameters";
         private const string SectionHeadingPrefix = "## ";
         private const string SubsectionHeadingPrefix = "### ";

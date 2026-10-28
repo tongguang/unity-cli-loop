@@ -43,7 +43,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Patches patchInfo = Harmony.GetPatchInfo(original);
             Assert.That(patchInfo, Is.Not.Null);
             Patch[] ownedPrefixes = patchInfo.Prefixes
-                .Where(patch => patch.owner == "io.github.hatayama.uloop.compile-api-updater-consent")
+                .Where(patch => patch.owner == "io.github.tongguang.tloop.compile-api-updater-consent")
                 .ToArray();
             Assert.That(ownedPrefixes.Length, Is.EqualTo(1));
         }

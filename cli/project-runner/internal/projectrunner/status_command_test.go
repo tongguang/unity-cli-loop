@@ -101,25 +101,25 @@ func TestRunStatusCommandReportsBusyBeforeMainThreadBlocked(t *testing.T) {
 
 	report := assertStatusReport(t, run, "Busy")
 	assertStatusFields(t, report, append(append([]string{}, statusTestEditorStateFields...), statusTestRunningToolFields...)...)
-	assertStatusMessage(t, report, "uloop run-tests has been running for 12s (Executing).")
+	assertStatusMessage(t, report, "tloop run-tests has been running for 12s (Executing).")
 	assertStatusValue(t, report, "RunningToolName", "run-tests")
 	assertStatusValue(t, report, "RunningToolElapsedSeconds", 12.0)
 	assertStatusValue(t, report, "RunningToolPhase", "Executing")
 	assertStatusRequestCount(t, server, 1)
 }
 
-// Verifies a Busy report offers uloop cancel after the wait steps when a tool uloop cancel can
+// Verifies a Busy report offers tloop cancel after the wait steps when a tool tloop cancel can
 // stop holds the slot, and leaves it out for run-tests and compile.
 func TestRunStatusCommandBusyNextActionsOfferCancelOnlyForCancellableTools(t *testing.T) {
 	waitSteps := []string{
-		"Wait for the running command to finish, then run uloop status again.",
+		"Wait for the running command to finish, then run tloop status again.",
 		"Another command sent now is rejected as busy.",
 	}
 	cases := []struct {
 		toolName string
 		want     []string
 	}{
-		{toolName: "execute-dynamic-code", want: append(append([]string{}, waitSteps...), "If it does not finish, run `uloop cancel` to stop it.")},
+		{toolName: "execute-dynamic-code", want: append(append([]string{}, waitSteps...), "If it does not finish, run `tloop cancel` to stop it.")},
 		{toolName: "run-tests", want: waitSteps},
 		{toolName: "compile", want: waitSteps},
 	}
@@ -158,7 +158,7 @@ func TestRunStatusCommandReportsBusyBeforeStarting(t *testing.T) {
 
 	report := assertStatusReport(t, run, "Busy")
 	assertStatusFields(t, report, append([]string{"SecondsSinceLastMainThreadTick"}, statusTestRunningToolFields...)...)
-	assertStatusMessage(t, report, "uloop compile has been running for 2s (WaitingForMainThread).")
+	assertStatusMessage(t, report, "tloop compile has been running for 2s (WaitingForMainThread).")
 	assertStatusRequestCount(t, server, 1)
 }
 
@@ -175,7 +175,7 @@ func TestRunStatusCommandReportsStartingWithoutEditorState(t *testing.T) {
 
 	report := assertStatusReport(t, run, "Starting")
 	assertStatusFields(t, report, "SecondsSinceLastMainThreadTick")
-	assertStatusMessage(t, report, "The uloop server answered, but Unity has not reported its Editor state yet.")
+	assertStatusMessage(t, report, "The tloop server answered, but Unity has not reported its Editor state yet.")
 	assertStatusRequestCount(t, server, 1)
 }
 
@@ -417,8 +417,8 @@ func TestRunStatusCommandReportsServerUnavailableWhenProcessRuns(t *testing.T) {
 
 	report := assertStatusReport(t, run, "ServerUnavailable")
 	assertStatusFields(t, report, "ConnectionError", "UnityProcessRunning")
-	assertStatusMessage(t, report, "Unity is running for this project, but its uloop server is not accepting connections. "+
-		"Unity is starting, reloading scripts, or was started in Safe Mode because of compile errors (uloop cannot run in Safe Mode).")
+	assertStatusMessage(t, report, "Unity is running for this project, but its tloop server is not accepting connections. "+
+		"Unity is starting, reloading scripts, or was started in Safe Mode because of compile errors (tloop cannot run in Safe Mode).")
 	assertStatusValue(t, report, "UnityProcessRunning", true)
 	assertStatusConnectionError(t, report, "")
 }
@@ -478,7 +478,7 @@ func TestRunStatusCommandReportsAnAbnormalExitWhenTheLockfileWasLeftBehind(t *te
 	if first, _ := nextActions[0].(string); !strings.Contains(first, editorLogPath) {
 		t.Fatalf("NextActions[0] = %q, want the Editor log step", first)
 	}
-	if second, _ := nextActions[1].(string); second != "Start it with uloop launch." {
+	if second, _ := nextActions[1].(string); second != "Start it with tloop launch." {
 		t.Fatalf("NextActions[1] = %q, want the launch step", second)
 	}
 }
@@ -493,8 +493,8 @@ func TestRunStatusCommandReportsUnreachableWhileAnUnidentifiedEditorRuns(t *test
 	run := runStatusForTest(context.Background(), unreachableConnection(projectRoot), nil, deps)
 
 	report := assertStatusReport(t, run, "Unreachable")
-	assertStatusMessage(t, report, "The uloop server is not accepting connections, and a running Unity Editor's command line "+
-		"does not name its project, so uloop cannot tell whether Unity is running for this project.")
+	assertStatusMessage(t, report, "The tloop server is not accepting connections, and a running Unity Editor's command line "+
+		"does not name its project, so tloop cannot tell whether Unity is running for this project.")
 }
 
 // Verifies a refused connection whose process lookup fails is Unreachable, naming the lookup
@@ -508,7 +508,7 @@ func TestRunStatusCommandReportsUnreachableWhenProcessLookupFails(t *testing.T) 
 
 	report := assertStatusReport(t, run, "Unreachable")
 	assertStatusFields(t, report, "ConnectionError")
-	assertStatusMessage(t, report, "The uloop server is not accepting connections, and the Unity process list could not be read: ps failed.")
+	assertStatusMessage(t, report, "The tloop server is not accepting connections, and the Unity process list could not be read: ps failed.")
 	assertStatusConnectionError(t, report, "")
 }
 

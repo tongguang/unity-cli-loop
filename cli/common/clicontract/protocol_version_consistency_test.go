@@ -14,7 +14,7 @@ import (
 const (
 	unityProtocolConstantPath = "../../../Packages/src/Editor/Domain/CliConstants.cs"
 	unityPackageCliPinPath    = "../../../Packages/src/project-runner-pin.json"
-	unityProjectCliPinPath    = "../../../.uloop/project-runner-pin.json"
+	unityProjectCliPinPath    = "../../../.tloop/project-runner-pin.json"
 )
 
 var unityRequiredProtocolVersionPattern = regexp.MustCompile(`REQUIRED_CLI_PROTOCOL_VERSION\s*=\s*(\d+)`)

@@ -48,7 +48,7 @@ func commandForScript(name string, scriptName string, version string, updateSele
 	installerURL := ScriptAssetURL(version, scriptName)
 	return Command{
 		Name:                 name,
-		Env:                  []string{"ULOOP_VERSION=" + updateSelector},
+		Env:                  []string{"TLOOP_VERSION=" + updateSelector},
 		InstallerName:        scriptName,
 		InstallerURL:         installerURL,
 		InstallerChecksumURL: installerURL + ".sha256",

@@ -47,7 +47,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     /// <summary>
     /// Compiled fixture whose on-disk source path is passed as <c>files[]</c> to the
     /// orchestrator. Edited copies for worker input live under
-    /// <c>Library/UloopHotReload/TestSources/</c> (never under Assets).
+    /// <c>Library/TloopHotReload/TestSources/</c> (never under Assets).
     /// </summary>
     public class HotReloadE2EFixture : HotReloadE2EBase, IHotReloadE2EMarker
     {

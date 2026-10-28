@@ -283,7 +283,7 @@ func TestInspectPackageManifestStatusCharacterizesInstalledFlags(t *testing.T) {
 			name: "dependency without registry",
 			content: `{
   "dependencies": {
-    "io.github.hatayama.uloopmcp": "1.2.3"
+    "io.github.tongguang.tloop": "1.2.3"
   }
 }
 `,
@@ -315,7 +315,7 @@ func TestInspectPackageManifestStatusCharacterizesInstalledFlags(t *testing.T) {
     {
       "name": "Other",
       "url": "https://example.invalid/registry",
-      "scopes": ["io.github.hatayama.uloopmcp"]
+      "scopes": ["io.github.tongguang.tloop"]
     }
   ]
 }
@@ -330,7 +330,7 @@ func TestInspectPackageManifestStatusCharacterizesInstalledFlags(t *testing.T) {
     {
       "name": "package.openupm.com",
       "url": "https://package.openupm.com",
-      "scopes": ["io.github.hatayama.uloopmcp"]
+      "scopes": ["io.github.tongguang.tloop"]
     }
   ]
 }
@@ -353,7 +353,7 @@ func TestInspectPackageManifestStatusCharacterizesInstalledFlags(t *testing.T) {
   "scopedRegistries": [
     {
       "name": "package.openupm.com",
-      "scopes": ["io.github.hatayama.uloopmcp"]
+      "scopes": ["io.github.tongguang.tloop"]
     }
   ]
 }
@@ -373,7 +373,7 @@ func TestInspectPackageManifestStatusCharacterizesInstalledFlags(t *testing.T) {
     {
       "name": "package.openupm.com",
       "url": "https://package.openupm.com",
-      "scopes": ["io.github.hatayama.uloopmcp"]
+      "scopes": ["io.github.tongguang.tloop"]
     },
     "not-an-object"
   ]
@@ -415,7 +415,7 @@ func TestPackageUnknownSubcommandFails(t *testing.T) {
 	if code != 1 {
 		t.Fatalf("expected exit 1, got %d stderr=%s", code, stderr.String())
 	}
-	if !strings.Contains(stderr.String(), "uloop package install") || !strings.Contains(stderr.String(), "uloop package status") {
+	if !strings.Contains(stderr.String(), "tloop package install") || !strings.Contains(stderr.String(), "tloop package status") {
 		t.Fatalf("expected valid subcommand guidance:\n%s", stderr.String())
 	}
 }
@@ -440,14 +440,14 @@ func installedPackageManifest(version string) string {
 	return `{
   "dependencies": {
     "com.unity.modules.ai": "1.0.0",
-    "io.github.hatayama.uloopmcp": "` + version + `"
+    "io.github.tongguang.tloop": "` + version + `"
   },
   "scopedRegistries": [
     {
       "name": "package.openupm.com",
       "url": "https://package.openupm.com",
       "scopes": [
-        "io.github.hatayama.uloopmcp"
+        "io.github.tongguang.tloop"
       ]
     }
   ]
@@ -645,7 +645,7 @@ func TestTryHandlePackageRequestPrintsSubcommandHelp(t *testing.T) {
 
 	handled, code := tryHandlePackageRequest(context.Background(), []string{"package", "install", "--help"}, t.TempDir(), "", &stdout, &stderr)
 
-	if !handled || code != 0 || stderr.Len() != 0 || !strings.Contains(stdout.String(), "uloop package install [--version <x.y.z>]") {
+	if !handled || code != 0 || stderr.Len() != 0 || !strings.Contains(stdout.String(), "tloop package install [--version <x.y.z>]") {
 		t.Fatalf("unexpected help: code=%d stdout=%s stderr=%s", code, stdout.String(), stderr.String())
 	}
 }

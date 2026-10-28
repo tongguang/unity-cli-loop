@@ -1,7 +1,7 @@
 #!/bin/sh
 TargetPath='{{TARGET_PATH}}'
-PathBlockStart="# >>> uloop PATH >>>"
-PathBlockEnd="# <<< uloop PATH <<<"
+PathBlockStart="# >>> tloop PATH >>>"
+PathBlockEnd="# <<< tloop PATH <<<"
 
 resolve_profile_write_path() {
     profile_path=$1
@@ -48,7 +48,7 @@ remove_path_block() {
             ;;
     esac
 
-    tmp_path=$(mktemp "$profile_dir/.uloop_path.XXXXXX" 2>/dev/null || true)
+    tmp_path=$(mktemp "$profile_dir/.tloop_path.XXXXXX" 2>/dev/null || true)
     if [ -z "$tmp_path" ]; then
         echo "Could not create a temporary file for PATH cleanup." >&2
         return 1
@@ -79,7 +79,7 @@ remove_path_block() {
     fi
 
     if mv "$tmp_path" "$profile_write_path"; then
-        echo "Removed uloop PATH block from $profile_path."
+        echo "Removed tloop PATH block from $profile_path."
         return 0
     fi
 

@@ -21,9 +21,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     public sealed class PausePointScriptPathFormTests
     {
         private const string FixtureAssetPath =
-            "Packages/io.github.hatayama.uloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/io.github.tongguang.tloop.hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const string FixturePhysicalPath =
-            "Packages/uloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
+            "Packages/tloop-hotreload-package-fixture/Runtime/HotReloadPackageFixture.cs";
         private const int SecondStatementLine = 16;
         private const string SecondStatementText = "return 2;";
         private const string AssetsFixturePath =

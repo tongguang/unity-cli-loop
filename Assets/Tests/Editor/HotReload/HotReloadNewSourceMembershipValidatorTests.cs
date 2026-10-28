@@ -67,7 +67,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         // A unique path that is never created, so the directory check fails without touching the disk.
         private static string CreateMissingProjectRoot()
         {
-            return Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            return Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
         }
     }
 }

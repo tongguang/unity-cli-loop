@@ -46,9 +46,9 @@ func dispatcherV2BinEntrypoint(bin json.RawMessage) (string, error) {
 	if err := json.Unmarshal(bin, &entries); err != nil {
 		return "", fmt.Errorf("%s package bin must be a string or object: %w", dispatcherV2CLIPackageName, err)
 	}
-	entrypoint, found := entries["uloop"]
+	entrypoint, found := entries["tloop"]
 	if !found || entrypoint == "" {
-		return "", fmt.Errorf("%s package bin does not define uloop", dispatcherV2CLIPackageName)
+		return "", fmt.Errorf("%s package bin does not define tloop", dispatcherV2CLIPackageName)
 	}
 	return entrypoint, nil
 }

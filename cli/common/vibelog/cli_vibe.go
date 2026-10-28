@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	CLIVibeLogDirectory = ".uloop/outputs/VibeLogs"
+	CLIVibeLogDirectory = ".tloop/outputs/VibeLogs"
 	CLIVibeLogPrefix    = "cli_vibe"
-	CLIVibeLogEnvName   = "ULOOP_DEBUG"
+	CLIVibeLogEnvName   = "TLOOP_DEBUG"
 
 	cliProjectIdentityHashLength = 16
 )

@@ -28,7 +28,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-artifact-sweep-" + NewId());
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-artifact-sweep-" + NewId());
             Directory.CreateDirectory(_projectRoot);
             _currentSessionId = NewId();
         }

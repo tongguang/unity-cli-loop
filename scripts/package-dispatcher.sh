@@ -12,11 +12,11 @@ package_unix() {
   platform="$1"
   tmp_dir="$RELEASE_DIR/tmp-$platform"
   mkdir -p "$tmp_dir"
-  cp "$DIST_DIR/$platform/uloop" "$tmp_dir/uloop"
-  chmod +x "$tmp_dir/uloop"
+  cp "$DIST_DIR/$platform/tloop" "$tmp_dir/tloop"
+  chmod +x "$tmp_dir/tloop"
   (
     cd "$tmp_dir"
-    tar -czf "$RELEASE_DIR/uloop-dispatcher-$platform.tar.gz" uloop
+    tar -czf "$RELEASE_DIR/tloop-dispatcher-$platform.tar.gz" tloop
   )
   rm -rf "$tmp_dir"
 }
@@ -25,10 +25,10 @@ package_windows() {
   platform="windows-amd64"
   tmp_dir="$RELEASE_DIR/tmp-$platform"
   mkdir -p "$tmp_dir"
-  cp "$DIST_DIR/$platform/uloop.exe" "$tmp_dir/uloop.exe"
+  cp "$DIST_DIR/$platform/tloop.exe" "$tmp_dir/tloop.exe"
   (
     cd "$tmp_dir"
-    zip -q "$RELEASE_DIR/uloop-dispatcher-$platform.zip" uloop.exe
+    zip -q "$RELEASE_DIR/tloop-dispatcher-$platform.zip" tloop.exe
   )
   rm -rf "$tmp_dir"
 }

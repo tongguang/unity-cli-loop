@@ -27,17 +27,17 @@ func TestCommandForDarwinRemovesUloopFromInstallDirectory(t *testing.T) {
 		t.Fatalf("command name mismatch: %s", command.Name)
 	}
 	joinedArgs := strings.Join(command.Args, " ")
-	if !strings.Contains(joinedArgs, "/Users/ExampleUser/.local/bin/uloop") {
+	if !strings.Contains(joinedArgs, "/Users/ExampleUser/.local/bin/tloop") {
 		t.Fatalf("target path missing: %s", joinedArgs)
 	}
 	if !strings.Contains(joinedArgs, "rm -f") {
 		t.Fatalf("remove command missing: %s", joinedArgs)
 	}
 	uninstallScript := posixUninstallScript(command.TargetPath)
-	if !strings.Contains(uninstallScript, `TargetPath='/Users/ExampleUser/.local/bin/uloop'`) {
+	if !strings.Contains(uninstallScript, `TargetPath='/Users/ExampleUser/.local/bin/tloop'`) {
 		t.Fatalf("target path assignment missing: %s", uninstallScript)
 	}
-	if command.TargetPath != "/Users/ExampleUser/.local/bin/uloop" {
+	if command.TargetPath != "/Users/ExampleUser/.local/bin/tloop" {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
 	}
 }
@@ -56,13 +56,13 @@ func TestCommandForLinuxRemovesUloopFromInstallDirectory(t *testing.T) {
 		t.Fatalf("command name mismatch: %s", command.Name)
 	}
 	joinedArgs := strings.Join(command.Args, " ")
-	if !strings.Contains(joinedArgs, "/home/tester/.local/bin/uloop") {
+	if !strings.Contains(joinedArgs, "/home/tester/.local/bin/tloop") {
 		t.Fatalf("target path missing: %s", joinedArgs)
 	}
 	if !strings.Contains(joinedArgs, "rm -f") {
 		t.Fatalf("remove command missing: %s", joinedArgs)
 	}
-	if command.TargetPath != "/home/tester/.local/bin/uloop" {
+	if command.TargetPath != "/home/tester/.local/bin/tloop" {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
 	}
 }
@@ -70,7 +70,7 @@ func TestCommandForLinuxRemovesUloopFromInstallDirectory(t *testing.T) {
 func TestCommandForWindowsSchedulesRemovalAfterCurrentProcessExits(t *testing.T) {
 	// Verifies Windows uninstall defers deletion until the running dispatcher process exits.
 	command, err := CommandForOS("windows", Options{
-		InstallDir: `C:\Users\ExampleUser\AppData\Local\Programs\uloop\bin`,
+		InstallDir: `C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin`,
 		CurrentPID: 5678,
 	})
 	if err != nil {
@@ -99,20 +99,20 @@ func TestCommandForWindowsSchedulesRemovalAfterCurrentProcessExits(t *testing.T)
 	if !command.Deferred {
 		t.Fatal("windows uninstall should be deferred")
 	}
-	if command.TargetPath != `C:\Users\ExampleUser\AppData\Local\Programs\uloop\bin\uloop.exe` {
+	if command.TargetPath != `C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin\tloop.exe` {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
 	}
 }
 
 func TestPosixUninstallScriptReplacesTemplateValues(t *testing.T) {
 	// Verifies POSIX uninstall templates cannot ship with unresolved placeholders.
-	targetPath := "/tmp/uloop's bin/uloop"
+	targetPath := "/tmp/tloop's bin/tloop"
 	uninstallScript := posixUninstallScript(targetPath)
 
 	if strings.Contains(uninstallScript, "{{") {
 		t.Fatalf("uninstall script contains unresolved template placeholder: %s", uninstallScript)
 	}
-	if !strings.Contains(uninstallScript, `TargetPath='/tmp/uloop'"'"'s bin/uloop'`) {
+	if !strings.Contains(uninstallScript, `TargetPath='/tmp/tloop'"'"'s bin/tloop'`) {
 		t.Fatalf("uninstall script does not quote target path correctly: %s", uninstallScript)
 	}
 }
@@ -155,8 +155,8 @@ func TestPosixUninstallScriptRestoresBashrcBytesAfterInstall(t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to read bashrc after install: %v", err)
 			}
-			if !strings.Contains(string(installedContent), "# >>> uloop PATH >>>") {
-				t.Fatalf("install did not add the uloop PATH block:\n%s", installedContent)
+			if !strings.Contains(string(installedContent), "# >>> tloop PATH >>>") {
+				t.Fatalf("install did not add the tloop PATH block:\n%s", installedContent)
 			}
 
 			runPosixUninstallCommand(t, home, installDir)
@@ -226,7 +226,7 @@ func writePosixUninstallPathBlockProfiles(t *testing.T, home string, installDir 
 		if err := os.MkdirAll(filepath.Dir(profilePath), 0o755); err != nil {
 			t.Fatalf("failed to create profile dir: %v", err)
 		}
-		content := "before\n# >>> uloop PATH >>>\nexport PATH='" + installDir + ":$PATH'\n# <<< uloop PATH <<<\nafter\n"
+		content := "before\n# >>> tloop PATH >>>\nexport PATH='" + installDir + ":$PATH'\n# <<< tloop PATH <<<\nafter\n"
 		if err := os.WriteFile(profilePath, []byte(content), 0o600); err != nil {
 			t.Fatalf("failed to write profile: %v", err)
 		}
@@ -271,8 +271,8 @@ func assertPosixUninstallRemovedPathBlocks(t *testing.T, profilePaths []string) 
 				t.Fatalf("failed to read profile: %v", err)
 			}
 			content := string(profileContent)
-			if strings.Contains(content, "# >>> uloop PATH >>>") || strings.Contains(content, "# <<< uloop PATH <<<") {
-				t.Fatalf("profile still contains uloop marker block:\n%s", content)
+			if strings.Contains(content, "# >>> tloop PATH >>>") || strings.Contains(content, "# <<< tloop PATH <<<") {
+				t.Fatalf("profile still contains tloop marker block:\n%s", content)
 			}
 			if !strings.Contains(content, "before\n") || !strings.Contains(content, "after\n") {
 				t.Fatalf("profile should preserve unrelated content:\n%s", content)
@@ -283,7 +283,7 @@ func assertPosixUninstallRemovedPathBlocks(t *testing.T, profilePaths []string) 
 
 func TestWindowsUninstallScriptsReplaceTemplateValues(t *testing.T) {
 	// Verifies Windows uninstall templates cannot ship with unresolved placeholders.
-	targetPath := `C:\Temp\uloop's bin\uloop.exe`
+	targetPath := `C:\Temp\tloop's bin\tloop.exe`
 	deletionScript := windowsDeletionScript(targetPath, 5678)
 	encodedDeletionScript := encodePowerShellCommand(deletionScript)
 	launchScript := windowsLaunchScript(encodedDeletionScript)
@@ -293,7 +293,7 @@ func TestWindowsUninstallScriptsReplaceTemplateValues(t *testing.T) {
 			t.Fatalf("uninstall script contains unresolved template placeholder: %s", script)
 		}
 	}
-	if !strings.Contains(deletionScript, `$Target = 'C:\Temp\uloop''s bin\uloop.exe'`) {
+	if !strings.Contains(deletionScript, `$Target = 'C:\Temp\tloop''s bin\tloop.exe'`) {
 		t.Fatalf("deletion script does not quote target path correctly: %s", deletionScript)
 	}
 	if !strings.Contains(deletionScript, `$ParentPid = [int]'5678'`) {
@@ -303,7 +303,7 @@ func TestWindowsUninstallScriptsReplaceTemplateValues(t *testing.T) {
 		t.Fatalf("launch script does not assign encoded deletion command: %s", launchScript)
 	}
 	decodedDeletionScript := decodePowerShellCommandForTest(t, encodedDeletionScript)
-	if !strings.Contains(decodedDeletionScript, `$Target = 'C:\Temp\uloop''s bin\uloop.exe'`) {
+	if !strings.Contains(decodedDeletionScript, `$Target = 'C:\Temp\tloop''s bin\tloop.exe'`) {
 		t.Fatalf("encoded deletion script does not contain replaced target path: %s", decodedDeletionScript)
 	}
 }
@@ -329,7 +329,7 @@ func decodePowerShellCommandForTest(t *testing.T, encodedCommand string) string 
 func TestCommandForWindowsRemovesUserPathBeforeDeletingDispatcher(t *testing.T) {
 	// Verifies Unity does not observe dispatcher removal before persistent PATH cleanup finishes.
 	deletionScript := windowsDeletionScript(
-		`C:\Users\ExampleUser\AppData\Local\Programs\uloop\bin\uloop.exe`,
+		`C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin\tloop.exe`,
 		5678)
 
 	pathRemovalIndex := strings.Index(deletionScript, "[Environment]::SetEnvironmentVariable('Path', $NewUserPath, 'User')")

@@ -52,7 +52,7 @@ func TestWriteErrorEnvelopeWritesMachineReadableJSON(t *testing.T) {
 func TestClassifyConnectionAttemptError(t *testing.T) {
 	err := &unityipc.ConnectionAttemptError{
 		ProjectRoot: "/tmp/MyProject",
-		Endpoint:    "/tmp/uloop/UnityCliLoop-sample.sock",
+		Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
 		Cause:       errors.New("connect: no such file or directory"),
 	}
 
@@ -74,11 +74,11 @@ func TestClassifyConnectionAttemptError(t *testing.T) {
 func TestClassifyConnectionAttemptErrorForRefusedConnect(t *testing.T) {
 	err := &unityipc.ConnectionAttemptError{
 		ProjectRoot: "/tmp/MyProject",
-		Endpoint:    "/tmp/uloop-501/UnityCliLoop-sample.sock",
+		Endpoint:    "/tmp/tloop-501/TuanjieCliLoop-sample.sock",
 		Cause: &net.OpError{
 			Op:   "dial",
 			Net:  "unix",
-			Addr: &net.UnixAddr{Name: "/tmp/uloop-501/UnityCliLoop-sample.sock", Net: "unix"},
+			Addr: &net.UnixAddr{Name: "/tmp/tloop-501/TuanjieCliLoop-sample.sock", Net: "unix"},
 			Err:  os.NewSyscallError("connect", syscall.EPERM),
 		},
 	}
@@ -101,7 +101,7 @@ func TestClassifyConnectionAttemptAllowsNilCause(t *testing.T) {
 	// Verifies connection classification handles a missing low-level cause.
 	err := &unityipc.ConnectionAttemptError{
 		ProjectRoot: "/tmp/MyProject",
-		Endpoint:    "/tmp/uloop/UnityCliLoop-sample.sock",
+		Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
 	}
 
 	cliErr := ClassifyError(err, ErrorContext{Command: "get-logs"})
@@ -118,10 +118,10 @@ func TestClassifyUnityServerNotRespondingError(t *testing.T) {
 	cliErr := ClassifyError(
 		UnityServerNotRespondingError{
 			ProjectRoot: "/tmp/MyProject",
-			Endpoint:    "/tmp/uloop/UnityCliLoop-sample.sock",
+			Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
 			Cause: &unityipc.ConnectionAttemptError{
 				ProjectRoot: "/tmp/MyProject",
-				Endpoint:    "/tmp/uloop/UnityCliLoop-sample.sock",
+				Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
 				Cause:       errors.New("connect failed"),
 			},
 		},
@@ -140,7 +140,7 @@ func TestClassifyUnityServerNotRespondingError(t *testing.T) {
 			t.Fatalf("next action should not guide restart: %#v", cliErr.NextActions)
 		}
 	}
-	if cliErr.Details["Endpoint"] != "/tmp/uloop/UnityCliLoop-sample.sock" {
+	if cliErr.Details["Endpoint"] != "/tmp/tloop/TuanjieCliLoop-sample.sock" {
 		t.Fatalf("details mismatch: %#v", cliErr.Details)
 	}
 }
@@ -175,7 +175,7 @@ func TestClassifyEditorUnresponsiveError(t *testing.T) {
 	if !strings.Contains(joinedActions, "API Update") || !strings.Contains(joinedActions, "never auto-dismiss") {
 		t.Fatalf("next actions should mention API Update consent guidance: %#v", cliErr.NextActions)
 	}
-	if !strings.Contains(joinedActions, "uloop focus-window") {
+	if !strings.Contains(joinedActions, "tloop focus-window") {
 		t.Fatalf("next actions should mention focus-window: %#v", cliErr.NextActions)
 	}
 }
@@ -188,7 +188,7 @@ func TestWriteToolFailureWhenServerStopsBeforeAcceptingDispatchedRequestIsNotSaf
 		&stderr,
 		UnityServerNotRespondingError{
 			ProjectRoot: "/tmp/MyProject",
-			Endpoint:    "/tmp/uloop/UnityCliLoop-sample.sock",
+			Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
 			Cause:       errors.New("read timeout"),
 		},
 		unityipc.UnitySendOutcome{RequestDispatched: true},
@@ -235,9 +235,9 @@ func TestClassifyCliUpdateRequiredRPCError(t *testing.T) {
 	// Verifies Unity compatibility errors become self-repair guidance for AI clients.
 	err := &unityipc.RPCError{
 		Code:    -32603,
-		Message: "The installed uloop CLI uses an IPC protocol that does not match this Unity package.",
+		Message: "The installed tloop CLI uses an IPC protocol that does not match this Unity package.",
 		Data: json.RawMessage(
-			`{"type":"cli_update_required","currentCliVersion":"3.0.0-beta.5","currentProtocolVersion":1,"requiredProtocolVersion":2,"updateCommand":"uloop update","retryableAfterUpdate":true}`),
+			`{"type":"cli_update_required","currentCliVersion":"3.0.0-beta.5","currentProtocolVersion":1,"requiredProtocolVersion":2,"updateCommand":"tloop update","retryableAfterUpdate":true}`),
 	}
 
 	cliErr := ClassifyError(err, ErrorContext{ProjectRoot: "/tmp/MyProject", Command: "compile"})
@@ -247,7 +247,7 @@ func TestClassifyCliUpdateRequiredRPCError(t *testing.T) {
 	if !cliErr.Retryable || !cliErr.SafeToRetry {
 		t.Fatalf("retry flags mismatch: %#v", cliErr)
 	}
-	if len(cliErr.NextActions) == 0 || cliErr.NextActions[0] != "Run `uloop update`." {
+	if len(cliErr.NextActions) == 0 || cliErr.NextActions[0] != "Run `tloop update`." {
 		t.Fatalf("next actions mismatch: %#v", cliErr.NextActions)
 	}
 }
@@ -256,7 +256,7 @@ func TestClassifyCliUpdateRequiredRPCErrorForNewerProtocol(t *testing.T) {
 	// Verifies a future CLI protocol mismatch does not tell users to update the CLI again.
 	err := &unityipc.RPCError{
 		Code:    -32603,
-		Message: "The installed uloop CLI uses an IPC protocol that does not match this Unity package.",
+		Message: "The installed tloop CLI uses an IPC protocol that does not match this Unity package.",
 		Data: json.RawMessage(
 			`{"type":"cli_update_required","currentCliVersion":"3.0.0-beta.99","currentProtocolVersion":3,"requiredProtocolVersion":2,"retryableAfterUpdate":true}`),
 	}
@@ -289,7 +289,7 @@ func TestClassifyServerBusyRPCError(t *testing.T) {
 	if !cliErr.Retryable || !cliErr.SafeToRetry {
 		t.Fatalf("retry flags mismatch: %#v", cliErr)
 	}
-	expectedMessage := "'get-logs' was not executed because Unity is busy running 'compile'. uloop is single-flight per Editor. Wait for 'compile' to complete, then run the command once more; do not retry in a loop."
+	expectedMessage := "'get-logs' was not executed because Unity is busy running 'compile'. tloop is single-flight per Editor. Wait for 'compile' to complete, then run the command once more; do not retry in a loop."
 	if cliErr.Message != expectedMessage {
 		t.Fatalf("message mismatch: %s", cliErr.Message)
 	}
@@ -312,7 +312,7 @@ func TestClassifyServerBusyRPCError_WhenElapsedSecondsPresent_IncludesElapsedMes
 	}
 
 	cliErr := ClassifyError(err, ErrorContext{ProjectRoot: "/tmp/MyProject", Command: "get-logs"})
-	expectedMessage := "'get-logs' was not executed because Unity is busy running 'compile' (running for 12s). uloop is single-flight per Editor. Wait for 'compile' to complete, then run the command once more; do not retry in a loop."
+	expectedMessage := "'get-logs' was not executed because Unity is busy running 'compile' (running for 12s). tloop is single-flight per Editor. Wait for 'compile' to complete, then run the command once more; do not retry in a loop."
 	if cliErr.Message != expectedMessage {
 		t.Fatalf("message mismatch: %s", cliErr.Message)
 	}
@@ -356,7 +356,7 @@ func TestClassifyServerBusyRPCError_WhenPausedInPlayMode_ExplainsTheStallAndReco
 		t.Fatalf("next actions must lead with the pause stall: %#v", cliErr.NextActions)
 	}
 	joinedActions := strings.Join(cliErr.NextActions, "\n")
-	if !strings.Contains(joinedActions, "Run `uloop cancel`") {
+	if !strings.Contains(joinedActions, "Run `tloop cancel`") {
 		t.Fatalf("next actions must name the recovery step: %#v", cliErr.NextActions)
 	}
 	editorActivity, ok := cliErr.Details["EditorActivity"].(map[string]any)
@@ -387,7 +387,7 @@ func TestWriteClassifiedServerBusyRPCErrorWritesErrorEnvelope(t *testing.T) {
 	if envelope.Error.ErrorCode != errorCodeUnityServerBusy {
 		t.Fatalf("error code mismatch: %#v", envelope)
 	}
-	expectedMessage := "'get-logs' was not executed because Unity is busy running 'compile'. uloop is single-flight per Editor. Wait for 'compile' to complete, then run the command once more; do not retry in a loop."
+	expectedMessage := "'get-logs' was not executed because Unity is busy running 'compile'. tloop is single-flight per Editor. Wait for 'compile' to complete, then run the command once more; do not retry in a loop."
 	if envelope.Error.Message != expectedMessage {
 		t.Fatalf("message mismatch: %#v", envelope)
 	}
@@ -605,7 +605,7 @@ func TestClassifyNotUnityProjectError(t *testing.T) {
 
 func TestClassifyConnectionAttemptUsesContextProjectRootFallback(t *testing.T) {
 	err := &unityipc.ConnectionAttemptError{
-		Endpoint: "/tmp/uloop/UnityCliLoop-sample.sock",
+		Endpoint: "/tmp/tloop/TuanjieCliLoop-sample.sock",
 		Cause:    errors.New("connect failed"),
 	}
 

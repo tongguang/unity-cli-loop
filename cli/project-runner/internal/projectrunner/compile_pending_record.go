@@ -17,7 +17,7 @@ const (
 )
 
 // compilePendingRecord remembers which compile a COMPILE_WAIT_TIMEOUT left in flight
-// so a later uloop compile can reattach instead of starting a new request.
+// so a later tloop compile can reattach instead of starting a new request.
 type compilePendingRecord struct {
 	RequestID     string    `json:"requestId"`
 	TimedOutAtUtc time.Time `json:"timedOutAtUtc"`

@@ -19,6 +19,7 @@ const (
 	compileCheckAllFlag         = "--all"
 	compileCheckFullFlag        = "--full"
 	compileCheckEditorFlag      = "--editor-version"
+	compileCheckEditorPathFlag  = "--editor-path"
 	compileCheckMaxDepthFlag    = "--max-depth"
 	compileCheckJobsFlag        = "--jobs"
 )
@@ -29,11 +30,12 @@ type compileCheckOptions struct {
 	all           bool
 	full          bool // compile changed assemblies in full instead of checking only their changed files
 	editorVersion string
+	editorPath    string
 	maxDepth      int
 	jobs          int // how many assemblies compile at once; 0 leaves the choice to the compiler
 }
 
-// compileCheckIssue is one diagnostic in the response, shaped like the ones `uloop compile` returns.
+// compileCheckIssue is one diagnostic in the response, shaped like the ones `tloop compile` returns.
 type compileCheckIssue struct {
 	Message  string `json:"Message"`
 	Code     string `json:"Code"`
@@ -80,7 +82,7 @@ type compileCheckResponse struct {
 	ProjectRoot       string                     `json:"ProjectRoot"`
 	Message           string                     `json:"Message"`
 	// NextActions says what to do after this run: fix the errors and run again, cover the rules a
-	// changed-files check skipped with --full, or make the result live with uloop compile. It is
+	// changed-files check skipped with --full, or make the result live with tloop compile. It is
 	// empty when nothing changed since the last Unity build, since the Editor already has that result.
 	NextActions []string `json:"NextActions"`
 }
@@ -104,7 +106,7 @@ type compileCheckFastPathFallback struct {
 	Reason   string `json:"Reason"`
 }
 
-// tryHandleCompileCheckRequest answers `uloop compile-check` inside the dispatcher process, because
+// tryHandleCompileCheckRequest answers `tloop compile-check` inside the dispatcher process, because
 // the command never talks to the Editor and must work while Unity is closed.
 func tryHandleCompileCheckRequest(
 	ctx context.Context,
@@ -209,6 +211,9 @@ func resolveCompileCheckProjectRoot(startPath string, options compileCheckOption
 
 // resolveCompileCheckEditorPath finds the Editor whose bundled compiler this run has to use.
 func resolveCompileCheckEditorPath(projectRoot string, options compileCheckOptions) (string, error) {
+	if options.editorPath != "" {
+		return resolveExplicitEditorPath(options.editorPath)
+	}
 	version := options.editorVersion
 	if version == "" {
 		readVersion, err := readUnityEditorVersion(projectRoot)
@@ -304,7 +309,7 @@ func addCompileCheckUnitKind(response *compileCheckResponse, unit compilecheck.U
 	}
 }
 
-// newCompileCheckIssue shapes one diagnostic the way `uloop compile` shapes its own.
+// newCompileCheckIssue shapes one diagnostic the way `tloop compile` shapes its own.
 func newCompileCheckIssue(assembly string, diagnostic compilecheck.Diagnostic) compileCheckIssue {
 	return compileCheckIssue{
 		Message:  diagnostic.Code + ": " + diagnostic.Message,
@@ -319,13 +324,15 @@ func newCompileCheckIssue(assembly string, diagnostic compilecheck.Diagnostic) c
 // printCompileCheckHelp documents the command and the build it replays.
 func printCompileCheckHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop compile-check [options]")
+	clicore.WriteLine(stdout, "  tloop compile-check [options]")
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Options:")
 	clicore.WriteLine(stdout, "      --all                Compile every assembly instead of only the changed ones")
 	clicore.WriteLine(stdout, "      --full               Compile changed assemblies in full instead of checking only their changed files")
 	clicore.WriteLine(stdout, "      --editor-version <version>")
-	clicore.WriteLine(stdout, "                           Use this Unity Editor version instead of ProjectVersion.txt")
+	clicore.WriteLine(stdout, "                           Use this Tuanjie Editor version instead of ProjectVersion.txt")
+	clicore.WriteLine(stdout, "      --editor-path <path>")
+	clicore.WriteLine(stdout, "                           Use this Editor executable instead of automatic discovery")
 	clicore.WriteLine(stdout, "      --jobs <n>           Compile up to n assemblies at once, 1 = sequential (default: half the CPUs, at least 1)")
 	clicore.WriteLine(stdout, "      --max-depth <n>      Max directory depth when auto-searching for the project (default: 3, -1 = unlimited)")
 	clicore.WriteLine(stdout, "      --project-path <path>")
@@ -353,7 +360,7 @@ func parseCompileCheckOptions(args []string, globalProjectPath string) (compileC
 		index = nextIndex
 	}
 
-	return options, nil
+	return options, validateEditorSelection(options.editorPath, options.editorVersion)
 }
 
 // applyCompileCheckOption reads one argument into the options.
@@ -368,6 +375,10 @@ func applyCompileCheckOption(options *compileCheckOptions, args []string, index 
 		return index, nil
 	case isCompileCheckKeyedOption(arg, compileCheckEditorFlag):
 		return applyCompileCheckEditorVersion(options, args, index)
+	case isCompileCheckKeyedOption(arg, compileCheckEditorPathFlag):
+		value, consumed, err := readLaunchOptionValue(arg, args, index)
+		options.editorPath = value
+		return nextLaunchOptionIndex(index, consumed), err
 	case isCompileCheckKeyedOption(arg, compileCheckMaxDepthFlag):
 		return applyCompileCheckMaxDepth(options, args, index)
 	case isCompileCheckKeyedOption(arg, compileCheckJobsFlag):
@@ -431,6 +442,6 @@ func unknownCompileCheckOptionError(arg string) error {
 		Message:     "Unknown compile-check option: " + arg,
 		Option:      arg,
 		Command:     clicore.CompileCheckCommandName,
-		NextActions: []string{"Run `uloop compile-check --help` to inspect supported options."},
+		NextActions: []string{"Run `tloop compile-check --help` to inspect supported options."},
 	}
 }

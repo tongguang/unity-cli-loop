@@ -61,7 +61,7 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
             {
                 if (ServiceValue == null)
                 {
-                    throw new InvalidOperationException("Unity CLI Loop main-thread dispatcher is not registered.");
+                    throw new InvalidOperationException("Tuanjie CLI Loop main-thread dispatcher is not registered.");
                 }
 
                 return ServiceValue;

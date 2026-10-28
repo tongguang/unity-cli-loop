@@ -66,7 +66,7 @@ set -eu
 asset_json() {
   has_assets=$1
   if [ "$has_assets" = "true" ]; then
-    printf '[{"name":"uloop-project-runner-darwin-amd64.tar.gz","size":1},{"name":"uloop-project-runner-darwin-amd64.tar.gz.sha256","size":1},{"name":"uloop-project-runner-darwin-arm64.tar.gz","size":1},{"name":"uloop-project-runner-darwin-arm64.tar.gz.sha256","size":1},{"name":"uloop-project-runner-linux-amd64.tar.gz","size":1},{"name":"uloop-project-runner-linux-amd64.tar.gz.sha256","size":1},{"name":"uloop-project-runner-windows-amd64.zip","size":1},{"name":"uloop-project-runner-windows-amd64.zip.sha256","size":1}]'
+    printf '[{"name":"tloop-project-runner-darwin-amd64.tar.gz","size":1},{"name":"tloop-project-runner-darwin-amd64.tar.gz.sha256","size":1},{"name":"tloop-project-runner-darwin-arm64.tar.gz","size":1},{"name":"tloop-project-runner-darwin-arm64.tar.gz.sha256","size":1},{"name":"tloop-project-runner-linux-amd64.tar.gz","size":1},{"name":"tloop-project-runner-linux-amd64.tar.gz.sha256","size":1},{"name":"tloop-project-runner-windows-amd64.zip","size":1},{"name":"tloop-project-runner-windows-amd64.zip.sha256","size":1}]'
     return
   fi
   printf '[]'
@@ -74,7 +74,7 @@ asset_json() {
 
 if [ "$1" = "release" ] && [ "$2" = "view" ]; then
   tag=$3
-  if [ "$tag" != "uloop-project-runner-v$CURRENT_VERSION" ]; then
+  if [ "$tag" != "tloop-project-runner-v$CURRENT_VERSION" ]; then
     echo "release not found" >&2
     exit 1
   fi
@@ -174,7 +174,7 @@ run_success_case() {
 
     assert_line_equals output.txt "publish=$expected_publish"
     assert_line_equals output.txt "release=$expected_release"
-    assert_line_equals output.txt "tag=uloop-project-runner-v$current_version"
+    assert_line_equals output.txt "tag=tloop-project-runner-v$current_version"
     assert_line_equals output.txt "version=$current_version"
     assert_line_equals output.txt "sha=$build_sha_value"
     assert_line_equals output.txt "build_sha=$build_sha_value"
@@ -310,17 +310,17 @@ test_release_lookup_error_fails() {
 
 # Verifies explicit project runner tags must use a full SemVer suffix.
 test_invalid_release_tag_version_fails() {
-  run_failure_case invalid-release-tag-version 3.0.0-beta.3 push v3-beta "Invalid release tag: uloop-project-runner-v3-beta" missing uloop-project-runner-v3-beta
+  run_failure_case invalid-release-tag-version 3.0.0-beta.3 push v3-beta "Invalid release tag: tloop-project-runner-v3-beta" missing tloop-project-runner-v3-beta
 }
 
 # Verifies numeric prerelease identifiers cannot have leading zeroes.
 test_invalid_release_tag_numeric_prerelease_fails() {
-  run_failure_case invalid-release-tag-numeric-prerelease 3.0.0-beta.3 push v3-beta "Invalid release tag: uloop-project-runner-v3.0.0-01" missing uloop-project-runner-v3.0.0-01
+  run_failure_case invalid-release-tag-numeric-prerelease 3.0.0-beta.3 push v3-beta "Invalid release tag: tloop-project-runner-v3.0.0-01" missing tloop-project-runner-v3.0.0-01
 }
 
 # Verifies prerelease identifiers cannot be empty.
 test_invalid_release_tag_empty_prerelease_identifier_fails() {
-  run_failure_case invalid-release-tag-empty-prerelease-identifier 3.0.0-beta.3 push v3-beta "Invalid release tag: uloop-project-runner-v3.0.0-alpha..1" missing uloop-project-runner-v3.0.0-alpha..1
+  run_failure_case invalid-release-tag-empty-prerelease-identifier 3.0.0-beta.3 push v3-beta "Invalid release tag: tloop-project-runner-v3.0.0-alpha..1" missing tloop-project-runner-v3.0.0-alpha..1
 }
 
 test_push_stamped_missing_release_publishes

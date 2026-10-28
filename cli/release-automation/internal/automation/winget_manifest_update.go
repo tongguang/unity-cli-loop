@@ -13,21 +13,21 @@ import (
 
 const (
 	wingetPkgsTokenEnvName          = "WINGET_PKGS_TOKEN"
-	wingetPackageIdentifier         = "hatayama.uloop"
-	wingetWindowsAmd64AssetName     = "uloop-dispatcher-windows-amd64.zip"
+	wingetPackageIdentifier         = "tongguang.tloop"
+	wingetWindowsAmd64AssetName     = "tloop-dispatcher-windows-amd64.zip"
 	wingetUpstreamRepo              = "microsoft/winget-pkgs"
 	wingetUpstreamBranch            = "master"
 	wingetManifestSchemaVersion     = "1.10.0"
-	wingetVersionManifestFilename   = "hatayama.uloop.yaml"
-	wingetInstallerManifestFilename = "hatayama.uloop.installer.yaml"
-	wingetLocaleManifestFilename    = "hatayama.uloop.locale.en-US.yaml"
+	wingetVersionManifestFilename   = "tongguang.tloop.yaml"
+	wingetInstallerManifestFilename = "tongguang.tloop.installer.yaml"
+	wingetLocaleManifestFilename    = "tongguang.tloop.locale.en-US.yaml"
 )
 
 // winget-pkgs validation rejects manifests at ManifestVersion 1.7.0 or later
 // with SchemaHeaderNotFound when the yaml-language-server schema header is
 // missing, so every generated manifest must start with it.
 const wingetVersionManifestTemplate = `# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.` + wingetManifestSchemaVersion + `.schema.json
-PackageIdentifier: hatayama.uloop
+PackageIdentifier: tongguang.tloop
 PackageVersion: {{.Version}}
 DefaultLocale: en-US
 ManifestType: version
@@ -35,37 +35,37 @@ ManifestVersion: ` + wingetManifestSchemaVersion + `
 `
 
 const wingetInstallerManifestTemplate = `# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.` + wingetManifestSchemaVersion + `.schema.json
-PackageIdentifier: hatayama.uloop
+PackageIdentifier: tongguang.tloop
 PackageVersion: {{.Version}}
 InstallerType: zip
 NestedInstallerType: portable
 NestedInstallerFiles:
-  - RelativeFilePath: uloop.exe
-    PortableCommandAlias: uloop
+  - RelativeFilePath: tloop.exe
+    PortableCommandAlias: tloop
 Commands:
-  - uloop
+  - tloop
 ReleaseDate: {{.ReleaseDate}}
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/{{.Repository}}/releases/download/dispatcher-v{{.Version}}/uloop-dispatcher-windows-amd64.zip
+    InstallerUrl: https://github.com/{{.Repository}}/releases/download/dispatcher-v{{.Version}}/tloop-dispatcher-windows-amd64.zip
     InstallerSha256: {{.SHA256Upper}}
 ManifestType: installer
 ManifestVersion: ` + wingetManifestSchemaVersion + `
 `
 
 const wingetLocaleManifestTemplate = `# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.` + wingetManifestSchemaVersion + `.schema.json
-PackageIdentifier: hatayama.uloop
+PackageIdentifier: tongguang.tloop
 PackageVersion: {{.Version}}
 PackageLocale: en-US
-Publisher: hatayama
-PublisherUrl: https://github.com/hatayama
-PublisherSupportUrl: https://github.com/hatayama/unity-cli-loop/issues
-PackageName: Unity CLI Loop
-PackageUrl: https://github.com/hatayama/unity-cli-loop
+Publisher: tongguang
+PublisherUrl: https://github.com/tongguang
+PublisherSupportUrl: https://github.com/tongguang/unity-cli-loop/issues
+PackageName: Tuanjie CLI Loop
+PackageUrl: https://github.com/tongguang/unity-cli-loop
 License: MIT
-LicenseUrl: https://github.com/hatayama/unity-cli-loop/blob/main/LICENSE.md
+LicenseUrl: https://github.com/tongguang/unity-cli-loop/blob/main/LICENSE.md
 ShortDescription: Let AI drive Unity, from Editor to Play Mode
-Moniker: uloop
+Moniker: tloop
 Tags:
   - unity
   - cli
@@ -181,7 +181,7 @@ func runUpdateWingetManifestWithDeps(
 	if err != nil {
 		return writeWingetManifestUpdateError(stderr, err)
 	}
-	branch := "hatayama-uloop-" + version
+	branch := "tongguang-tloop-" + version
 	if err = publishWingetManifestBranch(ctx, deps, token, config.forkRepo, branch, versionPath, version, manifests); err != nil {
 		return writeWingetManifestUpdateError(stderr, err)
 	}
@@ -379,7 +379,7 @@ func wingetPullRequestTitle(version string) string {
 }
 
 func wingetPackageManifestPath() string {
-	return "manifests/h/hatayama/uloop"
+	return "manifests/t/tongguang/tloop"
 }
 
 func writeWingetManifestUpdateError(stderr io.Writer, err error) int {

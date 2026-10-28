@@ -1,6 +1,6 @@
 # Annotated Elements and Coordinates
 
-Read this when using `uloop screenshot --capture-mode rendering --annotate-elements` or `--annotate-raycast-grid` output to find coordinates for `simulate-mouse-ui` or `simulate-mouse-input` (including `--dry-run`).
+Read this when using `tloop screenshot --capture-mode rendering --annotate-elements` or `--annotate-raycast-grid` output to find coordinates for `simulate-mouse-ui` or `simulate-mouse-input` (including `--dry-run`).
 
 Device Simulator is supported for this flow: prefer `--capture-mode rendering` (not `window`) so coordinates match the simulated device resolution.
 
@@ -41,7 +41,7 @@ Omitted on purpose:
 
 - Disabled elements, `visibility: hidden`, `display: none` (with everything under it), and zero-size elements.
 - Elements covered at the center and every interior quarter probe point by a panel with a higher sorting order or by another element of the same panel, including parts clipped away by a parent with `overflow: hidden`.
-- Panels that render into a RenderTexture, panels on a display other than the Game View's, world-space panels (Unity 6), and panels whose screen-to-panel mapping is not a plain scale and offset.
+- Panels that render into a RenderTexture, panels on a display other than the Game View's, world-space panels (Tuanjie 6), and panels whose screen-to-panel mapping is not a plain scale and offset.
 - Parts inside a control (the slider and buttons of a `Scroller`, for example) and any element that is not one of the types above. A custom element with only a `Clickable` manipulator is not listed.
 
 Limits:
@@ -49,7 +49,7 @@ Limits:
 - When uGUI and UI Toolkit overlap, which one is in front is not checked; both may be listed.
 - Panels with the same sorting order are not checked against each other.
 - `Bounds` is the whole element rectangle and can include parts clipped away by a parent.
-- Unity 2022.3 with both Device Simulator and Game View open lays UI Toolkit panels out at the Game View size and stretches them onto the simulated screen. Bounds and `SimX`/`SimY` then match where clicks land but not the PNG, and `set-game-view-size` cannot change the hidden Game View while Simulator is shown. Closing the Game View while using Simulator makes them match.
+- Tuanjie 2022.3 with both Device Simulator and Game View open lays UI Toolkit panels out at the Game View size and stretches them onto the simulated screen. Bounds and `SimX`/`SimY` then match where clicks land but not the PNG, and `set-game-view-size` cannot change the hidden Game View while Simulator is shown. Closing the Game View while using Simulator makes them match.
 
 Clicking:
 
@@ -68,7 +68,7 @@ When multiple entries share the same `Path`, use `SimX`/`SimY` (or the label pos
 `RaycastLayerSummaries` is always populated when `--annotate-raycast-grid` is used, regardless of `--raycast-layer-mask`. It is built from a dense 40x40 raycast sample pass over `Physics.DefaultRaycastLayers` (fixed, independent of `--raycast-layer-mask`), so it always tells you what else is hittable across every default-visible layer, even when you narrowed `AnnotatedElements` down to one layer with `--raycast-layer-mask`.
 
 - `Layer`: Physics layer name to pass to `--raycast-layer-mask`
-- `LayerIndex`: Unity physics layer index
+- `LayerIndex`: Tuanjie physics layer index
 - `HitCount`: Dense raycast hit count for the layer
 - `RepresentativeObjectPath`: Hierarchy path for the object with the most hits on that layer. Ties are resolved alphabetically by path.
 
@@ -99,7 +99,7 @@ For clustered `PhysicsCollider` entries, points where the frontmost EventSystem 
 
 `PhysicsCollider` bounds expand each reachable sample by half the dense raycast sampling step in X and Y, then clamp the result to the captured Game View area. The screenshot overlay draws only the outer edges of those reachable sample cells, so angled, L-shaped, separated, and partially UI-covered hit regions do not become one large rectangle. `BoundsMinX/Y` and `BoundsMaxX/Y` are still an axis-aligned bbox for JSON consumers, may extend up to half a sample step past the visible collider edge, and do not guarantee that every interior point is clickable.
 
-`simulate-mouse-input` (including `--dry-run`) converts internally to Unity Input System coordinates:
+`simulate-mouse-input` (including `--dry-run`) converts internally to Tuanjie Input System coordinates:
 
 ```text
 unity_x = input_x

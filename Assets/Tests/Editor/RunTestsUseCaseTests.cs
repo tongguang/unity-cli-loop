@@ -25,7 +25,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _recordDirectory = Path.Combine(Path.GetTempPath(), "uloop-last-run-" + Guid.NewGuid().ToString("N"));
+            _recordDirectory = Path.Combine(Path.GetTempPath(), "tloop-last-run-" + Guid.NewGuid().ToString("N"));
             _recordStore = new RunTestsLastRunRecordStore(_recordDirectory);
         }
 
@@ -805,7 +805,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 response.Warning,
                 Is.EqualTo(
-                    "2 active hot-reload change(s) were live during this test run. If script changes were imported during the run, the deferred domain reload that follows it discards every active hot-reload change, including introduced types - check 'uloop hot-reload --status' and re-apply, or run 'uloop compile' to bake them in."));
+                    "2 active hot-reload change(s) were live during this test run. If script changes were imported during the run, the deferred domain reload that follows it discards every active hot-reload change, including introduced types - check 'tloop hot-reload --status' and re-apply, or run 'tloop compile' to bake them in."));
         }
 
         /// <summary>
@@ -888,7 +888,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Assert.That(
                     response.Warning,
                     Is.EqualTo(
-                        "3 active hot-reload change(s) were live during this test run. If script changes were imported during the run, the deferred domain reload that follows it discards every active hot-reload change, including introduced types - check 'uloop hot-reload --status' and re-apply, or run 'uloop compile' to bake them in."));
+                        "3 active hot-reload change(s) were live during this test run. If script changes were imported during the run, the deferred domain reload that follows it discards every active hot-reload change, including introduced types - check 'tloop hot-reload --status' and re-apply, or run 'tloop compile' to bake them in."));
             }
             finally
             {
@@ -924,7 +924,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 response.Warning,
                 Is.EqualTo(
-                    "2 active hot-reload change(s) were live during this test run. If script changes were imported during the run, the deferred domain reload that follows it discards every active hot-reload change, including introduced types - check 'uloop hot-reload --status' and re-apply, or run 'uloop compile' to bake them in."));
+                    "2 active hot-reload change(s) were live during this test run. If script changes were imported during the run, the deferred domain reload that follows it discards every active hot-reload change, including introduced types - check 'tloop hot-reload --status' and re-apply, or run 'tloop compile' to bake them in."));
         }
 
         /// <summary>
@@ -1281,7 +1281,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 response.Message,
                 Is.EqualTo(
-                    "No tests found matching the specified filter criteria. Additionally, 2 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha, Assembly-CSharp-Editor: Editor.Bar.Beta. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'uloop compile' and rerun the tests."));
+                    "No tests found matching the specified filter criteria. Additionally, 2 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha, Assembly-CSharp-Editor: Editor.Bar.Beta. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'tloop compile' and rerun the tests."));
         }
 
         /// <summary>
@@ -1315,7 +1315,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 response.Message,
                 Is.EqualTo(
-                    "No tests found matching the specified filter criteria Possible asmdef issues: Assets/Tests/EditMode/Sample.Tests.asmdef: sample finding. Additionally, 1 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'uloop compile' and rerun the tests."));
+                    "No tests found matching the specified filter criteria Possible asmdef issues: Assets/Tests/EditMode/Sample.Tests.asmdef: sample finding. Additionally, 1 NUnit test method(s) are compiled into predefined assemblies rather than any test assembly, so this run could not discover them: Assembly-CSharp: Game.Foo.Alpha. Move these scripts into a folder whose .asmdef has Test Assemblies enabled (EditMode tests target the Editor platform only), reference the assemblies under test, then run 'tloop compile' and rerun the tests."));
         }
 
         /// <summary>
@@ -1660,7 +1660,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 response.Message,
                 Is.EqualTo(
-                    "No completed EditMode run is recorded for this project. Run uloop run-tests without --rerun-failed first."));
+                    "No completed EditMode run is recorded for this project. Run tloop run-tests without --rerun-failed first."));
             Assert.That(executionService.WasCalled, Is.False);
             Assert.That(validationService.WasCalled, Is.False);
         }
@@ -1686,7 +1686,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(response.Success, Is.False);
             Assert.That(response.Status, Is.EqualTo(RunTestsExecutionStatus.ExecutionFailed));
             Assert.That(response.Message, Does.StartWith("The recorded EditMode run could not be read (invalid JSON"));
-            Assert.That(response.Message, Does.EndWith("Run uloop run-tests without --rerun-failed."));
+            Assert.That(response.Message, Does.EndWith("Run tloop run-tests without --rerun-failed."));
             Assert.That(executionService.WasCalled, Is.False);
             Assert.That(validationService.WasCalled, Is.False);
             Assert.That(File.ReadAllText(recordPath), Is.EqualTo(invalidRecord));
@@ -1789,7 +1789,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(response.NoTestsFound, Is.True);
             Assert.That(response.RerunTargetCount, Is.EqualTo(2));
             const string expectedMessage =
-                "None of the 2 tests recorded as failed in the EditMode run completed at 2026-01-02T03:04:05.0000000Z exist any more; they were renamed or removed. Run uloop run-tests without --rerun-failed.";
+                "None of the 2 tests recorded as failed in the EditMode run completed at 2026-01-02T03:04:05.0000000Z exist any more; they were renamed or removed. Run tloop run-tests without --rerun-failed.";
             Assert.That(response.Message, Is.EqualTo(expectedMessage));
             Assert.That(response.NoTestsFoundExplanation, Is.EqualTo(expectedMessage));
             Assert.That(response.ProposedTestAsmdef, Is.Null);
@@ -1820,7 +1820,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 response.Message,
                 Is.EqualTo(
-                    "No completed PlayMode run is recorded for this project. Run uloop run-tests without --rerun-failed first."));
+                    "No completed PlayMode run is recorded for this project. Run tloop run-tests without --rerun-failed first."));
             Assert.That(executionService.WasCalled, Is.False);
         }
 

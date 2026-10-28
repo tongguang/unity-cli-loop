@@ -2,7 +2,7 @@
 
 [English](tools.md) | 日本語
 
-Unity CLI Loop に内蔵されている各ツールの詳細な説明です。全体像や設計思想は [README](../../../README_ja.md) を参照してください。
+Tuanjie CLI Loop に内蔵されている各ツールの詳細な説明です。全体像や設計思想は [README](../../../README_ja.md) を参照してください。
 
 ## 自律開発ループ系ツール
 
@@ -54,7 +54,7 @@ Unity Test Runnerを実行し、テスト結果を取得します。FilterType�
 
 新しいメソッドやフィールドの追加も適用できます（追加したメンバーは、同じファイル内の編集済みコードからのみ参照できます）。新しい型の追加や、他ファイルから参照されるメンバーの追加には `compile` が必要です。反映できないメソッドはメソッド単位で `Skipped` / `Failed` として報告され、1つのメソッドが失敗しても残りの適用は止まりません。
 
-事前の仕込みが一切要らないのも特徴です。既存のホットリロード手法には、対象メソッドにあらかじめ属性を付けてコンパイルしておく必要があるものや、対象にできるメソッドの種類が限定されるものがあります。uloopのhot reloadはこうした事前準備や制限なしで、すでに実行中のPlayModeの任意のメソッドに後から適用できます。メソッド本体の編集にとどまらず、ローカル変数の型や、メソッドの戻り値・引数といったシグネチャの変更も反映できます。
+事前の仕込みが一切要らないのも特徴です。既存のホットリロード手法には、対象メソッドにあらかじめ属性を付けてコンパイルしておく必要があるものや、対象にできるメソッドの種類が限定されるものがあります。tloopのhot reloadはこうした事前準備や制限なしで、すでに実行中のPlayModeの任意のメソッドに後から適用できます。メソッド本体の編集にとどまらず、ローカル変数の型や、メソッドの戻り値・引数といったシグネチャの変更も反映できます。
 
 ### 5. pause-point - コードを書き換えずに任意の行で止めて変数を見る
 ソースを編集することも再コンパイルすることもなく、任意の `file:line` でPlayModeを停止します。コンパイル済みのメソッドを直接パッチするため、PlayMode実行中に仕掛けることもできます。
@@ -94,12 +94,12 @@ log検索時、ノイズのとなるlogをクリアする事ができます。
 
 ### 8. get-hierarchy - シーン構造の解析
 現在アクティブなHierarchyの情報をネストされたJSON形式で取得します。ランタイムでも動作します。
-**自動ファイル出力**: 取得したHierarchyは常に`{project_root}/.uloop/outputs/HierarchyResults/`ディレクトリにJSONとして保存されます。レスポンスにはファイルパスのみが返るため、大量データでもトークン消費を最小限に抑えられます。
-**選択モード**: `uloop get-hierarchy --use-selection` を指定すると、Unity Editorで選択中のGameObjectから階層を取得できます。複数選択にも対応 - 親子両方が選択されている場合、重複を避けるため親のみがルートとして使用されます。
+**自動ファイル出力**: 取得したHierarchyは常に`{project_root}/.tloop/outputs/HierarchyResults/`ディレクトリにJSONとして保存されます。レスポンスにはファイルパスのみが返るため、大量データでもトークン消費を最小限に抑えられます。
+**選択モード**: `tloop get-hierarchy --use-selection` を指定すると、Unity Editorで選択中のGameObjectから階層を取得できます。複数選択にも対応 - 親子両方が選択されている場合、重複を避けるため親のみがルートとして使用されます。
 ```text
 → GameObject間の親子関係を理解。構造的な問題を発見・修正
 → シーンの規模にかかわらず、Hierarchyデータはファイルに保存され、生のJSONの代わりにパスが返されます
-→ uloop get-hierarchy --use-selection
+→ tloop get-hierarchy --use-selection
 → パスを手動で指定せずに、選択中のGameObjectの階層を取得
 ```
 
@@ -115,7 +115,7 @@ macOS / Windows Editor上で、Unity Editor ウィンドウを最前面に表示
 `CaptureMode: rendering` を指定すると、EditorWindowの見た目ではなくGame Viewのレンダリング結果を直接キャプチャします。PlayMode中のゲーム画面を、Editorのウィンドウ枠やスケーリングの影響を受けずに取得したい場合に使います。
 `AnnotateRaycastGrid: true` を併用すると、キャプチャ画像に座標グリッドが重ねて描画されます。画像を見たAIが `simulate-mouse-input` に渡す座標を決めやすくなります。
 
-`uloop set-game-view-size --width 1920 --height 1080` でGame Viewのカスタム解像度を固定できます。`CaptureMode: rendering` の座標系を実行ごとに安定させたいときに使ってください（引数なしで実行すると現在の解像度を取得できます）。
+`tloop set-game-view-size --width 1920 --height 1080` でGame Viewのカスタム解像度を固定できます。`CaptureMode: rendering` の座標系を実行ごとに安定させたいときに使ってください（引数なしで実行すると現在の解像度を取得できます）。
 ```text
 → screenshot (WindowName: "Console")
 → Console画面の状態をPNGで保存
@@ -123,17 +123,17 @@ macOS / Windows Editor上で、Unity Editor ウィンドウを最前面に表示
 ```
 
 ### 11. record-video - Play Mode中のGame View録画
-`uloop record-video` でPlay Mode中のGame Viewを録画できます。`start` はすぐ戻るので録画中に他コマンドを実行でき、`stop` で `.uloop/outputs/Videos/` にMP4（LinuxではWebM）を確定します。
+`tloop record-video` でPlay Mode中のGame Viewを録画できます。`start` はすぐ戻るので録画中に他コマンドを実行でき、`stop` で `.tloop/outputs/Videos/` にMP4（LinuxではWebM）を確定します。
 ```text
-uloop record-video --action start
-uloop simulate-keyboard --key W --duration 2
-uloop record-video --action stop
+tloop record-video --action start
+tloop simulate-keyboard --key W --duration 2
+tloop record-video --action stop
 ```
 
 ### 12. control-play-mode - Play Modeの制御
 Unity EditorのPlay Modeを制御します。Play（再生開始/一時停止解除）、Stop（停止）、Pause（一時停止）の3つのアクションを実行できます。
 
-端末の枠の中でゲームを確認したいときは、再生の前に `uloop game-view-mode --to Simulator` を実行します。現在のGame Viewタブをその場でDevice Simulatorに置き換え（Game / Simulatorドロップダウンと同じ動き）、Player Settingsが許す範囲でGame Viewの向きに合わせて端末を回転させます。`--to GameView` で元に戻し、引数なしで実行すると現在どちらのビューかを報告します。`--device "iPhone 12"` でその端末を映し（`--to Simulator` を含意します）、`--list-devices` で選べる端末名を一覧できます。再生状態は変更しません。
+端末の枠の中でゲームを確認したいときは、再生の前に `tloop game-view-mode --to Simulator` を実行します。現在のGame Viewタブをその場でDevice Simulatorに置き換え（Game / Simulatorドロップダウンと同じ動き）、Player Settingsが許す範囲でGame Viewの向きに合わせて端末を回転させます。`--to GameView` で元に戻し、引数なしで実行すると現在どちらのビューかを報告します。`--device "iPhone 12"` でその端末を映し（`--to Simulator` を含意します）、`--list-devices` で選べる端末名を一覧できます。再生状態は変更しません。
 ```text
 → control-play-mode (Action: Play)
 → Play Modeを開始してゲームの動作を確認
@@ -207,7 +207,7 @@ Input System経由でPlayMode中のキーボード入力をシミュレーショ
 ```
 
 ### 17. replay-input - 記録された入力のPlayMode再生
-記録されたキーボード・マウス入力をPlayMode中に再生します。JSON記録を読み込み、Input System経由でフレーム単位で入力を注入します。ループ再生と進捗モニタリングに対応しています。このツールは Input System パッケージ導入時のみ利用可能です。記録ファイルは、まず Unity Editor の **Window > Unity CLI Loop > Recordings** で **Start Recording** と **Stop Recording** を使って作成します。CLI に記録コマンドはありません。
+記録されたキーボード・マウス入力をPlayMode中に再生します。JSON記録を読み込み、Input System経由でフレーム単位で入力を注入します。ループ再生と進捗モニタリングに対応しています。このツールは Input System パッケージ導入時のみ利用可能です。記録ファイルは、まず Unity Editor の **Window > Tuanjie CLI Loop > Recordings** で **Start Recording** と **Stop Recording** を使って作成します。CLI に記録コマンドはありません。
 
 ```text
 → replay-input (Action: start)
@@ -216,11 +216,11 @@ Input System経由でPlayMode中のキーボード入力をシミュレーショ
 → replay-input (Action: stop)
 ```
 
-terminal から uloop コマンドを実行するE2Eは、shell 系統ごとに1つのrunnerから実行します:
+terminal から tloop コマンドを実行するE2Eは、shell 系統ごとに1つのrunnerから実行します:
 
 ```bash
 sh scripts/run-posix-e2e.sh --project-path /path/to/unity-project
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run-windows-e2e.ps1
 ```
 
-`run-posix-e2e.sh` は、デフォルトでチェックイン済みのネイティブCLIバイナリを使い、すべての `uloop` 呼び出しに明示的な `--project-path` を渡します。CLI recovery/readiness、simulate-mouse UI、UI Toolkit のスクリーンショット注釈とクリックを1つの流れで検証します（最後のものは `--skip-uitoolkit-annotation` で省けます）。Recordingsウィンドウで作成したJSONの replay-input 検証は `verify-replay-via-cli.sh` を個別に実行します。
+`run-posix-e2e.sh` は、デフォルトでチェックイン済みのネイティブCLIバイナリを使い、すべての `tloop` 呼び出しに明示的な `--project-path` を渡します。CLI recovery/readiness、simulate-mouse UI、UI Toolkit のスクリーンショット注釈とクリックを1つの流れで検証します（最後のものは `--skip-uitoolkit-annotation` で省けます）。Recordingsウィンドウで作成したJSONの replay-input 検証は `verify-replay-via-cli.sh` を個別に実行します。

@@ -45,7 +45,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         private static class PatchTargets
         {
             // Never called: only its missing IL body is inspected, so the library is never loaded.
-            [DllImport("uloop-test-nonexistent-library")]
+            [DllImport("tloop-test-nonexistent-library")]
             internal static extern int NativeCompute();
 
             internal static T Echo<T>(T value)

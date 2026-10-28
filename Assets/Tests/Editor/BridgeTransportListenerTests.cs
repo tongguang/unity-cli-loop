@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _tempProjectRoot = Path.Combine(Path.GetTempPath(), "uloop-listener-test-" + Guid.NewGuid().ToString("N"));
+            _tempProjectRoot = Path.Combine(Path.GetTempPath(), "tloop-listener-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempProjectRoot);
             _endpoint = BridgeTransportEndpoint.CreateProjectIpc(_tempProjectRoot);
             if (_endpoint.Kind != BridgeTransportKind.UnixDomainSocket)

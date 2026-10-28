@@ -105,7 +105,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 warnings[0],
                 Is.EqualTo(
                     "Broken.cs declares a type hot reload introduced (assembly Some.Assembly), so "
-                    + "it has no compiled baseline until 'uloop compile'. This is expected: hot "
+                    + "it has no compiled baseline until 'tloop compile'. This is expected: hot "
                     + "reload tracks the introduced type from its own recorded declaration. Any "
                     + "other type in this file has no baseline either and is patched in full."));
         }
@@ -405,7 +405,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         {
             Assert.That(warning, Does.StartWith("No verified source snapshot for Broken.cs (assembly Some.Assembly)"));
             Assert.That(warning, Does.Contain("patching all methods"));
-            Assert.That(warning, Does.Contain("uloop compile"));
+            Assert.That(warning, Does.Contain("tloop compile"));
         }
 
         private static TransformWorkerFileOutputDto CreateFileOutput(string[] parseErrors)

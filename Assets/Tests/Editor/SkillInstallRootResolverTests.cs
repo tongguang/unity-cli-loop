@@ -22,7 +22,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUpTemporaryRoot()
         {
-            _temporaryRoot = Path.Combine(Path.GetTempPath(), "uloop-install-root-" + Guid.NewGuid().ToString("N"));
+            _temporaryRoot = Path.Combine(Path.GetTempPath(), "tloop-install-root-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_temporaryRoot);
         }
 
@@ -76,7 +76,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             new SkillInstallRootResolver().SaveInstallRoot(projectRoot, SkillInstallRoot.GitRepositoryRoot);
 
-            string json = File.ReadAllText(Path.Combine(projectRoot, ".uloop", "settings.skills.json"));
+            string json = File.ReadAllText(Path.Combine(projectRoot, ".tloop", "settings.skills.json"));
             Assert.That(json.Replace(" ", string.Empty), Does.Contain("\"installRoot\":\"git\""));
         }
 
@@ -210,7 +210,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 CancellationToken.None);
 
             Assert.That(
-                File.Exists(Path.Combine(_temporaryRoot, ".claude", "skills", "v3-cli-invocation-migration", "SKILL.md")),
+                File.Exists(Path.Combine(_temporaryRoot, ".claude", "skills", "tloop-v3-cli-invocation-migration", "SKILL.md")),
                 Is.True);
             Assert.That(Directory.Exists(Path.Combine(projectRoot, ".claude")), Is.False);
         }

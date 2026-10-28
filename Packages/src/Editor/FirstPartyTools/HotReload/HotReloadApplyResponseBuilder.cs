@@ -334,7 +334,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             if (result.Methods.Count == 0)
             {
                 return "Hot reload found no patchable method bodies in the given files; nothing was changed. "
-                    + "Hot reload only replaces existing ordinary method bodies; use uloop compile for other edits.";
+                    + "Hot reload only replaces existing ordinary method bodies; use tloop compile for other edits.";
             }
 
             if (AreAllOutcomesAlreadyActive(result))

@@ -27,10 +27,10 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             GetLogsEditorStartup.Initialize();
             ScreenshotEditorStartup.Initialize();
             RecordVideoEditorStartup.Initialize();
-#if ULOOP_HAS_TEST_FRAMEWORK
+#if TLOOP_HAS_TEST_FRAMEWORK
             RunTestsTestFrameworkStartup.Initialize();
 #endif
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
             RecordInputEditorStartup.Initialize();
             ReplayInputEditorStartup.Initialize();
             SimulateKeyboardEditorStartup.Initialize();

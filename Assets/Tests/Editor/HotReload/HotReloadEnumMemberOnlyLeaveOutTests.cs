@@ -393,7 +393,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
             Assert.That(warning, Does.StartWith("Left '" + EnumPath + "' out of this reload"));
             Assert.That(warning, Does.Contain(EnumMemberName + ", Game.Kind.Fourth"));
-            Assert.That(warning, Does.Contain("'uloop compile'"));
+            Assert.That(warning, Does.Contain("'tloop compile'"));
         }
 
         private static HotReloadLeaveOutFile DefaultFile(string path)

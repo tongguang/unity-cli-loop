@@ -498,7 +498,7 @@ jobs:
           go run ./cmd/update-homebrew-formula
           --repo "${{ github.repository }}"
           --tag "${{ needs.build.outputs.release_tag }}"
-          --tap-repo hatayama/homebrew-tap
+          --tap-repo tongguang/homebrew-tap
 
       - name: Open winget-pkgs pull request
         if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true'
@@ -512,4 +512,4 @@ jobs:
           go run ./cmd/update-winget-manifest
           --repo "${GITHUB_REPOSITORY}"
           --tag "${RELEASE_TAG}"
-          --fork-repo hatayama/winget-pkgs
+          --fork-repo tongguang/winget-pkgs

@@ -33,7 +33,7 @@ func TestTryHandleCommandHelpRendersDispatcherOwnedCommandsWithoutProject(t *tes
 			}
 			output := stdout.String()
 			description, _ := nativeCommandDescription(testCase.command)
-			if !strings.HasPrefix(output, "Usage:\n  uloop "+testCase.command) || !strings.Contains(output, description) {
+			if !strings.HasPrefix(output, "Usage:\n  tloop "+testCase.command) || !strings.Contains(output, description) {
 				t.Fatalf("missing usage or description: %s", output)
 			}
 			if got := strings.Contains(output, "Options:\n"); got != testCase.wantOptions {
@@ -69,7 +69,7 @@ func TestPrintToolHelpOmitsOptionsMarkerForToolWithoutOptions(t *testing.T) {
 	printToolHelp(clicore.ToolDefinition{Name: "custom-tool"}, "", &stdout)
 
 	output := stdout.String()
-	if !strings.HasPrefix(output, "Usage:\n  uloop custom-tool\n") || strings.Contains(output, "Options:\n") {
+	if !strings.HasPrefix(output, "Usage:\n  tloop custom-tool\n") || strings.Contains(output, "Options:\n") {
 		t.Fatalf("unexpected help: %s", output)
 	}
 }

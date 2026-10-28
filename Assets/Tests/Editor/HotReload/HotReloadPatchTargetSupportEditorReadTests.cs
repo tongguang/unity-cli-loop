@@ -27,7 +27,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             // Never created: the path only has to lie outside the project root.
             string outsidePath = Path.Combine(
                 Path.GetTempPath(),
-                "uloop-test-" + Guid.NewGuid().ToString("N"),
+                "tloop-test-" + Guid.NewGuid().ToString("N"),
                 "Outside.cs");
 
             HotReloadPatchTargetResolution resolution = ResolveWithReadyEditor(outsidePath);

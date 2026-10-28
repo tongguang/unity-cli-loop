@@ -22,16 +22,16 @@ func internalSkill(fields string) string {
 }
 
 // Verifies that internal tool names are collected from the CLI-only root and from Editor folders,
-// using toolName, a uloop- prefixed name, or the folder name, and that public skills are ignored.
+// using toolName, a tloop- prefixed name, or the folder name, and that public skills are ignored.
 func TestCollectInternalSkillToolNamesReadsInternalSkillsFromEverySource(t *testing.T) {
 	projectRoot := t.TempDir()
 	cliOnlyRoot := CliOnlySourceRoot(projectRoot)
 	writeSkillFile(t, filepath.Join(cliOnlyRoot, "Explicit", "Skill"), internalSkill("toolName: explicit-tool\n"))
-	writeSkillFile(t, filepath.Join(cliOnlyRoot, "Prefixed", "Skill"), internalSkill("name: uloop-prefixed-tool\n"))
-	writeSkillFile(t, filepath.Join(cliOnlyRoot, "uloop-folder-tool", "Skill"), internalSkill(""))
+	writeSkillFile(t, filepath.Join(cliOnlyRoot, "Prefixed", "Skill"), internalSkill("name: tloop-prefixed-tool\n"))
+	writeSkillFile(t, filepath.Join(cliOnlyRoot, "tloop-folder-tool", "Skill"), internalSkill(""))
 	writeSkillFile(t, filepath.Join(cliOnlyRoot, "Unprefixed", "Skill"), internalSkill("name: other-tool\n"))
-	writeSkillFile(t, filepath.Join(cliOnlyRoot, "Public", "Skill"), "---\nname: uloop-public-tool\n---\n")
-	writeSkillFile(t, filepath.Join(cliOnlyRoot, "uloop-bare-tool"), internalSkill(""))
+	writeSkillFile(t, filepath.Join(cliOnlyRoot, "Public", "Skill"), "---\nname: tloop-public-tool\n---\n")
+	writeSkillFile(t, filepath.Join(cliOnlyRoot, "tloop-bare-tool"), internalSkill(""))
 
 	assetsRoot := filepath.Join(projectRoot, "Assets")
 	writeSkillFile(t, filepath.Join(assetsRoot, "Feature", "Editor", "Tool", "Skill"), internalSkill("toolName: assets-editor-tool\n"))
@@ -93,8 +93,8 @@ func TestEnumerateSourceRootsDeduplicatesRootsReachedTwice(t *testing.T) {
 // Verifies that the fallback skill name skips a trailing Skill folder and otherwise uses the folder itself.
 func TestFallbackSkillName(t *testing.T) {
 	cases := map[string]string{
-		filepath.Join("Tools", "uloop-sample", "Skill"): "uloop-sample",
-		filepath.Join("Tools", "uloop-direct"):          "uloop-direct",
+		filepath.Join("Tools", "tloop-sample", "Skill"): "tloop-sample",
+		filepath.Join("Tools", "tloop-direct"):          "tloop-direct",
 	}
 	for skillDirectory, expected := range cases {
 		if actual := FallbackSkillName(skillDirectory); actual != expected {
@@ -110,13 +110,13 @@ func TestParseSkillFrontmatter(t *testing.T) {
 		content  string
 		expected map[string]string
 	}{
-		{name: "no leading delimiter", content: "name: uloop-x\n", expected: map[string]string{}},
-		{name: "unterminated", content: "---\nname: uloop-x\n", expected: map[string]string{}},
+		{name: "no leading delimiter", content: "name: tloop-x\n", expected: map[string]string{}},
+		{name: "unterminated", content: "---\nname: tloop-x\n", expected: map[string]string{}},
 		{
 			name:    "quoted values and plain lines",
-			content: "---\nname: \"uloop-x\"\ntoolName: 'x-tool'\nnot a pair\ndescription: a: b\n---\nbody: ignored\n",
+			content: "---\nname: \"tloop-x\"\ntoolName: 'x-tool'\nnot a pair\ndescription: a: b\n---\nbody: ignored\n",
 			expected: map[string]string{
-				"name":        "uloop-x",
+				"name":        "tloop-x",
 				"toolName":    "x-tool",
 				"description": "a: b",
 			},

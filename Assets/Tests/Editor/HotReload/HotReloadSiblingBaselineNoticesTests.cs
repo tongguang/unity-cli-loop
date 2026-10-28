@@ -34,7 +34,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(new[]
                 {
                     "2 re-applied sibling file(s) declare a type hot reload introduced, so they have "
-                    + "no compiled baseline until 'uloop compile': " + FirstPath + ", " + SecondPath
+                    + "no compiled baseline until 'tloop compile': " + FirstPath + ", " + SecondPath
                     + ". This is expected: hot reload tracks each introduced type from its own "
                     + "recorded declaration."
                 }));

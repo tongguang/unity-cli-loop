@@ -50,7 +50,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             // Verifies that the embedded package lock mirrors the optional dependency contract.
             JObject packagesLock = ReadJson(PackageLockPath);
-            JToken embeddedPackageDependencies = packagesLock["dependencies"]?["io.github.hatayama.uloopmcp"]?["dependencies"];
+            JToken embeddedPackageDependencies = packagesLock["dependencies"]?["io.github.tongguang.tloop"]?["dependencies"];
 
             Assert.That(embeddedPackageDependencies?[UnityCliLoopConstants.PACKAGE_NAME_TEST_FRAMEWORK], Is.Null);
         }

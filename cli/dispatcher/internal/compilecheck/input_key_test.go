@@ -27,7 +27,7 @@ type inputKeyProject struct {
 func newInputKeyProject(t *testing.T) *inputKeyProject {
 	t.Helper()
 	root := t.TempDir()
-	outputDir := filepath.Join("Library", "uloop", "compile-check", "aaaa.dag")
+	outputDir := filepath.Join("Library", "tloop", "compile-check", "aaaa.dag")
 
 	writeProjectFile(t, root, filepath.Join("Editor", "csc.dll"), "compiler")
 	writeProjectFile(t, root, filepath.Join("Editor", "dotnet"), "host")

@@ -139,7 +139,7 @@ func TestDetectStructuralChangeRejectsEditedAssemblyDefinition(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an edited assembly definition to be rejected")
 	}
-	if !strings.Contains(err.Error(), "uloop compile") {
+	if !strings.Contains(err.Error(), "tloop compile") {
 		t.Errorf("the error should tell the user how to recover, got: %v", err)
 	}
 }
@@ -183,7 +183,7 @@ func TestDetectStructuralChangeRejectsAnEditedAssemblyDefinitionWithoutAnArtifac
 	if err == nil {
 		t.Fatal("expected an edited assembly definition to be rejected without an artifact")
 	}
-	if !strings.Contains(err.Error(), "uloop compile") {
+	if !strings.Contains(err.Error(), "tloop compile") {
 		t.Errorf("the error should tell the user how to recover, got: %v", err)
 	}
 }

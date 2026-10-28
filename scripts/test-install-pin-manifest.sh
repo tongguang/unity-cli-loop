@@ -1,6 +1,6 @@
 #!/bin/sh
 # Verifies install.sh pin-manifest helpers: field extraction, \n-only unescape,
-# fail-closed manifest validation, and ULOOP_REF format checks. Extracts the
+# fail-closed manifest validation, and TLOOP_REF format checks. Extracts the
 # real functions from install.sh so a later refactor cannot silently drift.
 set -eu
 
@@ -42,7 +42,7 @@ expect_fail() {
 eval "$(extract_function extract_pin_string_field)"
 eval "$(extract_function unescape_pin_manifest)"
 eval "$(extract_function validate_pin_manifest)"
-eval "$(extract_function validate_uloop_ref)"
+eval "$(extract_function validate_tloop_ref)"
 
 HEX64_LOWER="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 HEX64_UPPER="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -52,7 +52,7 @@ HEX63="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 # \\n in the unquoted heredoc becomes the two-character JSON escape \n.
 pin_json=$(cat <<PIN
 {
-  "dispatcherArchiveManifest": "${HEX64_LOWER}  uloop-dispatcher-darwin-arm64.tar.gz\\n${HEX64_LOWER}  install.sh",
+  "dispatcherArchiveManifest": "${HEX64_LOWER}  tloop-dispatcher-darwin-arm64.tar.gz\\n${HEX64_LOWER}  install.sh",
   "dispatcherReleaseTag": "dispatcher-v3.1.0-beta.16",
   "minimumDispatcherVersion": "3.0.0-beta.19",
   "projectRunnerVersion": "3.0.0-beta.64"
@@ -73,7 +73,7 @@ raw=$(extract_pin_string_field dispatcherArchiveManifest) || {
   echo "FAIL: extract dispatcherArchiveManifest from fixture" >&2
   exit 1
 }
-expected_raw="${HEX64_LOWER}  uloop-dispatcher-darwin-arm64.tar.gz\\n${HEX64_LOWER}  install.sh"
+expected_raw="${HEX64_LOWER}  tloop-dispatcher-darwin-arm64.tar.gz\\n${HEX64_LOWER}  install.sh"
 if [ "$raw" != "$expected_raw" ]; then
   echo "FAIL: unexpected raw dispatcherArchiveManifest: $raw" >&2
   exit 1
@@ -111,7 +111,7 @@ if [ "$line_count" != "2" ]; then
   exit 1
 fi
 assert_line=$(printf '%s\n' "$unescaped" | awk 'NR==1 { print }')
-if [ "$assert_line" != "${HEX64_LOWER}  uloop-dispatcher-darwin-arm64.tar.gz" ]; then
+if [ "$assert_line" != "${HEX64_LOWER}  tloop-dispatcher-darwin-arm64.tar.gz" ]; then
   echo "FAIL: unexpected first unescaped line: $assert_line" >&2
   exit 1
 fi
@@ -135,12 +135,12 @@ ${HEX64_UPPER}  install.sh"
 expect_fail "reject empty manifest" validate_pin_manifest ""
 expect_fail "reject CR in expanded manifest" validate_pin_manifest "${HEX64_LOWER}  install.sh$(printf '\r')"
 
-# Ref validation takes the candidate as $1 (same interface as validate_uloop_version).
-expect_pass "accept v3-beta ref" validate_uloop_ref "v3-beta"
-expect_pass "accept main ref" validate_uloop_ref "main"
-expect_pass "accept release/1.0 ref" validate_uloop_ref "release/1.0"
-expect_fail "reject empty ref" validate_uloop_ref ""
-expect_fail "reject path traversal ref" validate_uloop_ref "../evil"
-expect_fail "reject space in ref" validate_uloop_ref "a b"
+# Ref validation takes the candidate as $1 (same interface as validate_tloop_version).
+expect_pass "accept v3-beta ref" validate_tloop_ref "v3-beta"
+expect_pass "accept main ref" validate_tloop_ref "main"
+expect_pass "accept release/1.0 ref" validate_tloop_ref "release/1.0"
+expect_fail "reject empty ref" validate_tloop_ref ""
+expect_fail "reject path traversal ref" validate_tloop_ref "../evil"
+expect_fail "reject space in ref" validate_tloop_ref "a b"
 
 echo "OK"

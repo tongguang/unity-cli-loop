@@ -1,9 +1,9 @@
 ---
-name: uloop-pause-point
+name: tloop-pause-point
 description: "Count how many times a source file:line runs (trace mode; zero hits shows it did not run), or pause there to read locals and screenshot that exact frame, without editing code. Use after a fix to confirm whether a code path ran."
 ---
 
-# uloop pause-point
+# tloop pause-point
 
 A pause point captures locals at an exact frame without a source edit. Prefer it over sleeps or after-the-fact reads when input delivery, event ordering, or transition-frame fidelity matters.
 
@@ -13,22 +13,22 @@ A pause point captures locals at an exact frame without a source edit. Prefer it
 2. Arm the marker, fire the input, and wait for the hit in one foreground command:
 
 ```bash
-uloop enable-pause-point --file Assets/Scripts/Enemy.cs --line 42 --timeout-seconds 60 --await --trigger "simulate-keyboard --action Press --key Space"
+tloop enable-pause-point --file Assets/Scripts/Enemy.cs --line 42 --timeout-seconds 60 --await --trigger "simulate-keyboard --action Press --key Space"
 # paused the game in step 1? add --resume-play, or the input never lands
 ```
 
 3. Read `CapturedVariables` in the hit response first, then gather extra evidence while still paused (`execute-dynamic-code`, one screenshot).
-4. A `single-shot` marker (the default) disarms after the hit; clear other modes with `uloop clear-pause-point`.
+4. A `single-shot` marker (the default) disarms after the hit; clear other modes with `tloop clear-pause-point`.
 
 Only `CapturedVariables` is evidence of the values at the patched line. Before deviating, read `references/quick-check-template.md`.
 
 ## Parameters
 
-Tables list Unity-accepted parameters plus clear's CLI-only `--file`/`--line`; other CLI-only flags (`--await`, `--trigger`, `--resume-play`, `--expect`, capture filters) are in the references.
+Tables list Tuanjie-accepted parameters plus clear's CLI-only `--file`/`--line`; other CLI-only flags (`--await`, `--trigger`, `--resume-play`, `--expect`, capture filters) are in the references.
 
 ### enable-pause-point
 
-Enable a pause point so Unity pauses when that code path is reached, either by a named UloopPausePoint.Pause marker (Id) or by resolving a source file and line (File+Line)
+Enable a pause point so Tuanjie pauses when that code path is reached, either by a named UloopPausePoint.Pause marker (Id) or by resolving a source file and line (File+Line)
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|

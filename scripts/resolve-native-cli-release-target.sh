@@ -127,9 +127,9 @@ if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
   exit 1
 fi
 
-RELEASE_TAG="${INPUT_RELEASE_TAG:-uloop-project-runner-v$VERSION}"
+RELEASE_TAG="${INPUT_RELEASE_TAG:-tloop-project-runner-v$VERSION}"
 case "$RELEASE_TAG" in
-  uloop-project-runner-v*)
+  tloop-project-runner-v*)
     ;;
   *)
     echo "Invalid release tag: $RELEASE_TAG" >&2
@@ -137,7 +137,7 @@ case "$RELEASE_TAG" in
     ;;
 esac
 
-RELEASE_TAG_VERSION=${RELEASE_TAG#uloop-project-runner-v}
+RELEASE_TAG_VERSION=${RELEASE_TAG#tloop-project-runner-v}
 if ! is_semver_version "$RELEASE_TAG_VERSION"; then
   echo "Invalid release tag: $RELEASE_TAG" >&2
   exit 1

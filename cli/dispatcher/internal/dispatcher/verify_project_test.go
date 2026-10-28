@@ -174,7 +174,7 @@ func TestVerifyProjectFailsWhenNoProjectFound(t *testing.T) {
 func assertUnknownVerifyProjectOption(t *testing.T, call verifyProjectCall, arg string) {
 	t.Helper()
 	cliError := requireVerifyProjectError(t, call)
-	wantNextActions := []string{"Run `uloop verify-project --help` to inspect supported options."}
+	wantNextActions := []string{"Run `tloop verify-project --help` to inspect supported options."}
 	if cliError.ErrorCode != "INVALID_ARGUMENT" ||
 		cliError.Message != "Unknown verify-project option: "+arg ||
 		strings.Join(cliError.NextActions, "\n") != strings.Join(wantNextActions, "\n") {
@@ -211,12 +211,12 @@ func TestVerifyProjectHelpPrintsUsage(t *testing.T) {
 		if !call.handled || call.code != 0 || call.stderr != "" {
 			t.Fatalf("%v: handled=%v code=%d stderr=%s", args, call.handled, call.code, call.stderr)
 		}
-		for _, expected := range []string{"uloop verify-project", "Global options:"} {
+		for _, expected := range []string{"tloop verify-project", "Global options:"} {
 			if !strings.Contains(call.stdout, expected) {
 				t.Fatalf("%v: help output missing %q:\n%s", args, expected, call.stdout)
 			}
 		}
-		if strings.Contains(call.stdout, "uloop-verify-project") {
+		if strings.Contains(call.stdout, "tloop-verify-project") {
 			t.Fatalf("%v: help output must not name the uninstalled skill:\n%s", args, call.stdout)
 		}
 	}
@@ -288,7 +288,7 @@ func TestRunDispatcherAnswersVerifyProjectHelpLocally(t *testing.T) {
 	code := runDispatcherWithDeps(context.Background(), []string{"verify-project", "--help"}, &stdout, &stderr,
 		verifyProjectLocalDeps(t))
 
-	if code != 0 || stderr.String() != "" || !strings.Contains(stdout.String(), "uloop verify-project") {
+	if code != 0 || stderr.String() != "" || !strings.Contains(stdout.String(), "tloop verify-project") {
 		t.Fatalf("code=%d stdout=%s stderr=%s, want the usage", code, stdout.String(), stderr.String())
 	}
 }

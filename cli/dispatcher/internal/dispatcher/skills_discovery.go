@@ -35,7 +35,7 @@ func collectSkillDefinitions(projectRoot string) ([]skillDefinition, error) {
 func collectV3MigrationSkillDefinition(projectRoot string) ([]skillDefinition, error) {
 	packageRoot := skillscan.ResolvePackageRoot(projectRoot)
 	if packageRoot == "" {
-		return nil, errors.New("the Unity CLI Loop package root was not found")
+		return nil, errors.New("the Tuanjie CLI Loop package root was not found")
 	}
 
 	skillDirectory := filepath.Join(
@@ -137,7 +137,7 @@ func readSkillDefinition(skillDirectory string) (skillDefinition, bool, error) {
 	if name == "" {
 		name = skillscan.FallbackSkillName(skillDirectory)
 	}
-	if !isSafeSkillName(name) {
+	if !isSafeSkillName(name) || strings.HasPrefix(name, "uloop-") {
 		return skillDefinition{}, false, nil
 	}
 	return skillDefinition{

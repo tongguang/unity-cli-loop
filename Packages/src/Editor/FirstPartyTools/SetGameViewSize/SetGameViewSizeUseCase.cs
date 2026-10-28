@@ -9,7 +9,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     public sealed class SetGameViewSizeUseCase
     {
-        private const string RenderingResolutionBaseName = "uloop";
+        private const string RenderingResolutionBaseName = "tloop";
 
         /// <summary>
         /// Reads the current resolution and optionally applies a paired width and height.

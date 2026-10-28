@@ -1,10 +1,10 @@
 # Prefab Capture (`--prefab-path`)
 
-`uloop screenshot --prefab-path <asset path>` instantiates the prefab or model asset in a temporary preview scene, renders it with a temporary camera, and returns one PNG. No window opens, and open scenes, Prefab Mode, and the asset itself are left untouched. It works in Edit Mode and Play Mode.
+`tloop screenshot --prefab-path <asset path>` instantiates the prefab or model asset in a temporary preview scene, renders it with a temporary camera, and returns one PNG. No window opens, and open scenes, Prefab Mode, and the asset itself are left untouched. It works in Edit Mode and Play Mode.
 
 ```bash
-uloop screenshot --prefab-path Assets/UI/Panel.prefab
-uloop screenshot --prefab-path Assets/UI/Panel.prefab --prefab-background-color "#00000000"
+tloop screenshot --prefab-path Assets/UI/Panel.prefab
+tloop screenshot --prefab-path Assets/UI/Panel.prefab --prefab-background-color "#00000000"
 ```
 
 ## How the prefab is framed
@@ -20,7 +20,7 @@ Prefabs with visible renderers (rules 3 and 4) are drawn with a preview camera, 
 
 A prefab with nothing to render is rejected, including one whose renderers have empty bounds, such as a particle system that has not emitted. A render in which nothing appears (every pixel transparent or the background color) is rejected too; for a prefab that is a single flat color, pass a different `--prefab-background-color`. When a prefab has both Screen Space UI and 3D content, the UI rule wins and the 3D content may not appear.
 
-The Game View size comes from the current Game View; change it with `uloop set-game-view-size`.
+The Game View size comes from the current Game View; change it with `tloop set-game-view-size`.
 
 ## Options
 

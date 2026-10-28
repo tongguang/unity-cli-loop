@@ -16,7 +16,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
     public sealed class ThirdPartyToolMigrationFastFirstPartyScreenshotRequirementCollectorTests
     {
         private const string LegacyCaptureSource =
-            "using io.github.hatayama.uLoopMCP;\n" +
+            "using io.github.tongguang.tloop;\n" +
             "using UnityEditor;\n" +
             "public sealed class ScreenshotTool\n" +
             "{\n" +
@@ -37,7 +37,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             _toolDirectory = Path.Combine(_projectRoot, "Assets", "VendorTools");
             Directory.CreateDirectory(_toolDirectory);
             _toolContractsDirectories = new HashSet<string>();

@@ -1,6 +1,6 @@
 #!/bin/sh
 set -u
-# Endurance (soak) harness for the uloop CLI against a real Unity project.
+# Endurance (soak) harness for the tloop CLI against a real Unity project.
 # Full guide (expected failures, safety, reading results): docs/soak-testing.md
 #
 # Each iteration rewrites a scratch editor script inside the target project to
@@ -10,29 +10,29 @@ set -u
 # Unity tests, full editor restarts, forced recompiles, and a PlayMode
 # pause-point cycle against a generated minimal scene. Every command's exit code, duration, and payload
 # size is appended to a CSV so latency drift and failure rate over time can be
-# graphed afterwards. Editor memory (RSS) and leftover uloop processes are
+# graphed afterwards. Editor memory (RSS) and leftover tloop processes are
 # sampled per iteration as leak signals.
 #
 # Usage:
 #   sh scripts/soak-loop.sh --project-path <unity-project> \
 #     [--iterations N]      total iterations (default: 100)
-#     [--restart-every N]   run `uloop launch -r` every N iterations (default: 25, 0 = never)
+#     [--restart-every N]   run `tloop launch -r` every N iterations (default: 25, 0 = never)
 #     [--force-every N]     use compile --force-recompile every N iterations (default: 10, 0 = never)
 #     [--pause-every N]     run a PlayMode cycle (button click + pause-point) every N iterations (default: 5, 0 = never)
-#     [--tests-every N]     run `uloop run-tests` every N iterations (default: 10, 0 = never)
+#     [--tests-every N]     run `tloop run-tests` every N iterations (default: 10, 0 = never)
 #     [--test-assembly A]   test assembly name passed to run-tests --filter-type assembly
 #                           (required when --tests-every > 0; never run the full suite of a large project)
 #     [--sleep-seconds N]   pause between iterations (default: 0)
-#     [--out-dir DIR]       results directory (default: ./uloop-soak-results/<timestamp>)
+#     [--out-dir DIR]       results directory (default: ./tloop-soak-results/<timestamp>)
 #
 # Environment:
-#   ULOOP_BIN  uloop binary to use (default: uloop from PATH — the realistic
+#   TLOOP_BIN  tloop binary to use (default: tloop from PATH — the realistic
 #              release configuration; point at a dist/ binary to soak unreleased CLI code)
 #
 # Prerequisites:
-#   - uloop package installed in the target project
+#   - tloop package installed in the target project
 #   - Unity Editor may or may not be running: a busy editor is waited on, and
-#     a missing one is launched via `uloop launch`
+#     a missing one is launched via `tloop launch`
 #
 # All generated files live under Assets/UloopSoak/ in the target project (the
 # recompile scratch script, the PlayMode ticker script, and the pause-point
@@ -41,7 +41,7 @@ set -u
 # scene during the run and releases it before the cleanup reminder, so save
 # your own scene changes before running.
 
-ULOOP_BIN="${ULOOP_BIN:-uloop}"
+TLOOP_BIN="${TLOOP_BIN:-tloop}"
 
 PROJECT_PATH=""
 ITERATIONS=100
@@ -88,7 +88,7 @@ if [ "$PAUSE_EVERY" -gt 0 ] && ! command -v jq > /dev/null 2>&1; then
 fi
 
 STAMP="$(date +%Y%m%d-%H%M%S)"
-[ -n "$OUT_DIR" ] || OUT_DIR="$PWD/uloop-soak-results/$STAMP"
+[ -n "$OUT_DIR" ] || OUT_DIR="$PWD/tloop-soak-results/$STAMP"
 mkdir -p "$OUT_DIR"
 COMMANDS_CSV="$OUT_DIR/commands.csv"
 METRICS_CSV="$OUT_DIR/metrics.csv"
@@ -111,19 +111,19 @@ now_ms() {
     perl -MTime::HiRes=time -e 'printf "%d\n", time * 1000'
 }
 
-# Every uloop call runs under a sleep+kill watchdog (POSIX, no GNU coreutils
+# Every tloop call runs under a sleep+kill watchdog (POSIX, no GNU coreutils
 # dependency): a hung IPC call — e.g. a frozen editor that accepted the
 # connection but never answers — must surface as one failed, finite sample so
 # the consecutive-failure recovery can fire, instead of blocking the
 # unattended soak forever. The bound sits well above the slowest legitimate
 # command observed under parallel load (forced recompile / run-tests, ~4 min).
 CMD_TIMEOUT_SECONDS=600
-run_uloop() {
-    "$ULOOP_BIN" "$@" --project-path "$PROJECT_PATH" &
+run_tloop() {
+    "$TLOOP_BIN" "$@" --project-path "$PROJECT_PATH" &
     _cmd_pid=$!
     # Detached from the caller's stdout: the watchdog (and its sleep child,
     # which outlives the kill below as an orphan) must not hold a pipe open,
-    # or `run_uloop ... | grep -q` style callers would block on EOF until the
+    # or `run_tloop ... | grep -q` style callers would block on EOF until the
     # full timeout elapses.
     ( sleep "$CMD_TIMEOUT_SECONDS"; kill "$_cmd_pid" 2>/dev/null ) > /dev/null 2>&1 &
     _watchdog_pid=$!
@@ -134,13 +134,13 @@ run_uloop() {
     return "$_cmd_exit"
 }
 
-# Runs one uloop command, appends a CSV row, and returns the command's exit code.
-# $1 = iteration, $2 = label, rest = uloop arguments.
+# Runs one tloop command, appends a CSV row, and returns the command's exit code.
+# $1 = iteration, $2 = label, rest = tloop arguments.
 CAPTURE_FILE="$OUT_DIR/.last-output"
 timed() {
     _iter="$1"; _label="$2"; shift 2
     _start="$(now_ms)"
-    run_uloop "$@" > "$CAPTURE_FILE" 2>&1
+    run_tloop "$@" > "$CAPTURE_FILE" 2>&1
     _exit=$?
     _end="$(now_ms)"
     _bytes="$(wc -c < "$CAPTURE_FILE" | tr -d ' ')"
@@ -260,9 +260,9 @@ ensure_soak_scene() {
 }
 
 sample_metrics() {
-    _rss="$(ps ax -o rss=,args= | grep -F "$PROJECT_PATH" | grep -F "Unity.app" | grep -v grep | awk '{print $1; exit}')"
-    _runners="$(pgrep -f "uloop-project-runner" 2>/dev/null | wc -l | tr -d ' ')"
-    _outputs_kb="$(du -sk "$PROJECT_PATH/.uloop/outputs" 2>/dev/null | awk '{print $1}')"
+    _rss="$(ps ax -o rss=,args= | grep -F "$PROJECT_PATH" | grep -F 'Tuanjie.app' | grep -v grep | awk '{print $1; exit}')"
+    _runners="$(pgrep -f "tloop-project-runner" 2>/dev/null | wc -l | tr -d ' ')"
+    _outputs_kb="$(du -sk "$PROJECT_PATH/.tloop/outputs" 2>/dev/null | awk '{print $1}')"
     echo "$(now_ms),$1,${_rss:-},$_runners,${_outputs_kb:-0}" >> "$METRICS_CSV"
 }
 
@@ -270,7 +270,7 @@ sample_metrics() {
 wait_for_editor() {
     _deadline=$(( $(date +%s) + 900 ))
     while [ "$(date +%s)" -lt "$_deadline" ]; do
-        if run_uloop get-logs --max-count 1 > /dev/null 2>&1; then
+        if run_tloop get-logs --max-count 1 > /dev/null 2>&1; then
             return 0
         fi
         sleep 20
@@ -282,9 +282,9 @@ wait_for_editor() {
 # always hand the editor back in a usable state.
 cleanup_editor_state() {
     if [ "$PAUSE_EVERY" -gt 0 ]; then
-        run_uloop clear-pause-point --all > /dev/null 2>&1 || true
-        run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
-        run_uloop execute-dynamic-code --code 'string activeScenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path; if (!System.String.Equals(activeScenePath, "Assets/UloopSoak/UloopSoak.unity", System.StringComparison.Ordinal)) { return "not-soak-scene"; } UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene, UnityEditor.SceneManagement.NewSceneMode.Single); return "released";' > /dev/null 2>&1 || true
+        run_tloop clear-pause-point --all > /dev/null 2>&1 || true
+        run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
+        run_tloop execute-dynamic-code --code 'string activeScenePath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path; if (!System.String.Equals(activeScenePath, "Assets/UloopSoak/UloopSoak.unity", System.StringComparison.Ordinal)) { return "not-soak-scene"; } UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene, UnityEditor.SceneManagement.NewSceneMode.Single); return "released";' > /dev/null 2>&1 || true
     fi
 }
 
@@ -304,7 +304,7 @@ summarize() {
 trap summarize EXIT
 trap 'exit 130' INT TERM
 
-log "Soak start: $ITERATIONS iterations against $PROJECT_PATH (uloop: $ULOOP_BIN)"
+log "Soak start: $ITERATIONS iterations against $PROJECT_PATH (tloop: $TLOOP_BIN)"
 log "restart-every=$RESTART_EVERY force-every=$FORCE_EVERY pause-every=$PAUSE_EVERY tests-every=$TESTS_EVERY sleep=${SLEEP_SECONDS}s"
 
 # A freshly launched editor can be busy importing/compiling for a long time
@@ -313,18 +313,18 @@ log "restart-every=$RESTART_EVERY force-every=$FORCE_EVERY pause-every=$PAUSE_EV
 # a busy editor would be wrong, and waiting 15 minutes for an editor that was
 # never started would be wasted, so the two cases are told apart by whether a
 # Unity process has this project open.
-if ! run_uloop get-logs --max-count 1 > /dev/null 2>&1; then
+if ! run_tloop get-logs --max-count 1 > /dev/null 2>&1; then
     if ps ax -o args= | grep -F "$PROJECT_PATH" | grep -F "Unity" | grep -v grep > /dev/null; then
         log "Editor busy — waiting up to 15 minutes for it to answer"
     else
-        log "Editor not running — launching it with uloop launch"
+        log "Editor not running — launching it with tloop launch"
         if ! timed 0 launch-start launch; then
             log "Preflight failed: could not launch the editor."
             exit 1
         fi
     fi
     if ! wait_for_editor; then
-        log "Preflight failed: uloop cannot reach the editor."
+        log "Preflight failed: tloop cannot reach the editor."
         exit 1
     fi
 fi
@@ -333,7 +333,7 @@ fi
 # --wait-for-domain-reload (off by default), older ones wait by default and only
 # expose --no-wait-for-domain-reload. Detect which flavor the pinned runner speaks.
 COMPILE_WAIT_FLAG=""
-if run_uloop compile --help 2>/dev/null | grep -qE '^[[:space:]]*--wait-for-domain-reload'; then
+if run_tloop compile --help 2>/dev/null | grep -qE '^[[:space:]]*--wait-for-domain-reload'; then
     COMPILE_WAIT_FLAG="--wait-for-domain-reload"
 fi
 log "compile wait flag: ${COMPILE_WAIT_FLAG:-(runner waits by default)}"
@@ -434,7 +434,7 @@ while [ "$i" -le "$ITERATIONS" ]; do
             else
                 ITER_FAILED=1
             fi
-            run_uloop clear-pause-point --all > /dev/null 2>&1
+            run_tloop clear-pause-point --all > /dev/null 2>&1
             timed "$i" play-stop control-play-mode --action Stop || ITER_FAILED=1
         else
             ITER_FAILED=1
@@ -443,7 +443,7 @@ while [ "$i" -le "$ITERATIONS" ]; do
 
     if [ "$TESTS_EVERY" -gt 0 ] && [ $((i % TESTS_EVERY)) -eq 0 ]; then
         # Red project tests are not a soak failure — the harness measures whether
-        # uloop transported and completed the run, so only a missing test report
+        # tloop transported and completed the run, so only a missing test report
         # (no TestCount in the response) counts against the iteration.
         if ! timed "$i" run-tests run-tests --test-mode EditMode --filter-type assembly --filter-value "$TEST_ASSEMBLY"; then
             grep -q '"TestCount"' "$CAPTURE_FILE" || ITER_FAILED=1
@@ -475,7 +475,7 @@ while [ "$i" -le "$ITERATIONS" ]; do
     fi
     if [ "$CONSECUTIVE_FAILS" -ge 3 ]; then
         log "3 consecutive failing iterations — attempting one recovery restart."
-        run_uloop launch -r > /dev/null 2>&1 || true
+        run_tloop launch -r > /dev/null 2>&1 || true
         if ! wait_for_editor; then
             log "Recovery restart failed — aborting soak."
             exit 1

@@ -20,7 +20,7 @@ func TestWriteOptionalDispatcherUpdateCompletionReportsNormalizedVersions(t *tes
 
 	writeOptionalDispatcherUpdateCompletion(&stderr, "v3.0.1-beta.2", "3.0.1-beta.3")
 
-	expected := "uloop: dispatcher updated from 3.0.1-beta.2 to 3.0.1-beta.3"
+	expected := "tloop: dispatcher updated from 3.0.1-beta.2 to 3.0.1-beta.3"
 	if !bytes.Contains(stderr.Bytes(), []byte(expected)) {
 		t.Fatalf("update output mismatch: %s", stderr.String())
 	}
@@ -48,9 +48,9 @@ func TestWriteManualDispatcherUpdateCompletion(t *testing.T) {
 		toVersion string
 		want      string
 	}{
-		{toVersion: "", want: "uloop dispatcher update completed.\n"},
-		{toVersion: "v3.0.0", want: "uloop dispatcher is already up to date at 3.0.0.\n"},
-		{toVersion: "3.1.0", want: "uloop dispatcher updated from 3.0.0 to 3.1.0.\n"},
+		{toVersion: "", want: "tloop dispatcher update completed.\n"},
+		{toVersion: "v3.0.0", want: "tloop dispatcher is already up to date at 3.0.0.\n"},
+		{toVersion: "3.1.0", want: "tloop dispatcher updated from 3.0.0 to 3.1.0.\n"},
 	}
 	for _, testCase := range cases {
 		var stdout bytes.Buffer

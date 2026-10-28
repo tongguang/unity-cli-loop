@@ -43,7 +43,7 @@ func TestRunReportsMissingMeta(t *testing.T) {
 	assertMessagesAt(t, report, projectverify.CheckMetaMissing, "Assets/NoMeta.cs",
 		"Assets/NoMeta.cs has no .meta file. Unity will create one with a new GUID, which breaks every"+
 			" reference to the old one. If the file came from another branch or folder, bring its .meta file"+
-			" along; if you just created it, let Unity import it (for example with uloop compile) and commit"+
+			" along; if you just created it, let Unity import it (for example with tloop compile) and commit"+
 			" the generated .meta file.")
 }
 

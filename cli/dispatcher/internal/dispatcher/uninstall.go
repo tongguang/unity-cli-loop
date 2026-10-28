@@ -32,7 +32,7 @@ func tryHandleUninstallRequest(ctx context.Context, args []string, stdout io.Wri
 			Message:     "Unknown uninstall option: " + args[1],
 			Option:      args[1],
 			Command:     clicore.UninstallCommandName,
-			NextActions: []string{"Run `uloop uninstall` without options."},
+			NextActions: []string{"Run `tloop uninstall` without options."},
 		}, clierrors.ErrorContext{Command: clicore.UninstallCommandName})
 		return true, 1
 	}
@@ -51,7 +51,7 @@ func tryHandleUninstallRequest(ctx context.Context, args []string, stdout io.Wri
 		return true, 1
 	}
 
-	clicore.WriteLine(stdout, "Uninstalling global uloop dispatcher...")
+	clicore.WriteLine(stdout, "Uninstalling global tloop dispatcher...")
 	command := exec.CommandContext(ctx, uninstallCommand.Name, uninstallCommand.Args...)
 	command.Stdout = stdout
 	command.Stderr = stderr
@@ -63,7 +63,7 @@ func tryHandleUninstallRequest(ctx context.Context, args []string, stdout io.Wri
 			Retryable:   true,
 			SafeToRetry: true,
 			Command:     clicore.UninstallCommandName,
-			NextActions: []string{"Retry `uloop uninstall` after checking file permissions."},
+			NextActions: []string{"Retry `tloop uninstall` after checking file permissions."},
 			Details: map[string]any{
 				"Cause": err.Error(),
 			},
@@ -72,9 +72,9 @@ func tryHandleUninstallRequest(ctx context.Context, args []string, stdout io.Wri
 	}
 
 	if uninstallCommand.Deferred {
-		clicore.WriteFormat(stdout, "Scheduled uloop dispatcher removal: %s\n", uninstallCommand.TargetPath)
+		clicore.WriteFormat(stdout, "Scheduled tloop dispatcher removal: %s\n", uninstallCommand.TargetPath)
 	} else {
-		clicore.WriteFormat(stdout, "Removed uloop dispatcher: %s\n", uninstallCommand.TargetPath)
+		clicore.WriteFormat(stdout, "Removed tloop dispatcher: %s\n", uninstallCommand.TargetPath)
 	}
 	writeUninstallPathCompletion(stdout, runtime.GOOS)
 	return true, 0
@@ -91,12 +91,12 @@ func writeUninstallPathCompletion(stdout io.Writer, goos string) {
 
 func printUninstallHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  uloop uninstall")
+	clicore.WriteLine(stdout, "  tloop uninstall")
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Removes the global uloop dispatcher binary from the install directory.")
-	clicore.WriteLine(stdout, "Set ULOOP_INSTALL_DIR to uninstall from a custom install directory.")
+	clicore.WriteLine(stdout, "Removes the global tloop dispatcher binary from the install directory.")
+	clicore.WriteLine(stdout, "Set TLOOP_INSTALL_DIR to uninstall from a custom install directory.")
 	clicore.WriteLine(stdout, "On Windows, also removes the package-owned install directory from User PATH.")
-	clicore.WriteLine(stdout, "On macOS and Linux, removes the uloop PATH block from the shell profile.")
+	clicore.WriteLine(stdout, "On macOS and Linux, removes the tloop PATH block from the shell profile.")
 }
 
 func resolveUninstallInstallDir(goos string) (string, error) {

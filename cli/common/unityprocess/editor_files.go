@@ -99,11 +99,11 @@ func loggedEditorProjectPath(head string) string {
 func editorLogPathFor(goos string, homeDir string, localAppData string) string {
 	switch goos {
 	case "darwin":
-		return joinUnderBase(homeDir, "Library", "Logs", "Unity", "Editor.log")
+		return joinUnderBase(homeDir, "Library", "Logs", "Tuanjie", "Editor.log")
 	case "windows":
-		return joinUnderBase(localAppData, "Unity", "Editor", "Editor.log")
+		return joinUnderBase(localAppData, "Tuanjie", "Editor", "Editor.log")
 	case "linux":
-		return joinUnderBase(homeDir, ".config", "unity3d", "Editor.log")
+		return joinUnderBase(homeDir, ".config", "tuanjie", "Editor.log")
 	default:
 		return ""
 	}

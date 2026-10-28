@@ -4,11 +4,11 @@
     {
       "id": "identical-copy",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "expected": "installed"
@@ -16,11 +16,11 @@
     {
       "id": "root-level-non-markdown-file-is-ignored",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n",
         "apm.yml": "name: sample\n"
       },
@@ -29,11 +29,11 @@
     {
       "id": "root-level-non-markdown-file-with-uppercase-extension-is-ignored",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n",
         "manifest.YML": "name: sample\n"
       },
@@ -42,11 +42,11 @@
     {
       "id": "extra-root-level-markdown-file-is-outdated",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n",
         "EXTRA.md": "extra\n"
       },
@@ -55,11 +55,11 @@
     {
       "id": "extra-root-level-markdown-file-with-uppercase-extension-is-outdated",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n",
         "EXTRA.MD": "extra\n"
       },
@@ -68,11 +68,11 @@
     {
       "id": "extra-file-in-subdirectory-is-outdated",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n",
         "references/extra.txt": "extra\n"
       },
@@ -81,22 +81,22 @@
     {
       "id": "missing-reference-file-is-outdated",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n"
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n"
       },
       "expected": "outdated"
     },
     {
       "id": "changed-skill-file-is-outdated",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# changed\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# changed\n",
         "references/note.md": "note\n"
       },
       "expected": "outdated"
@@ -104,11 +104,11 @@
     {
       "id": "meta-file-is-ignored",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n",
         "SKILL.md.meta": "fileFormatVersion: 2\n"
       },
@@ -117,12 +117,12 @@
     {
       "id": "source-only-root-level-non-markdown-file-is-ignored",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n",
         "tool.yml": "name: sample\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "expected": "installed"
@@ -130,11 +130,11 @@
     {
       "id": "gitkeep-in-subdirectory-is-ignored",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n",
         "references/.gitkeep": ""
       },
@@ -143,11 +143,11 @@
     {
       "id": "crlf-line-endings-are-equivalent",
       "source": {
-        "SKILL.md": "---\nname: uloop-sample\n---\n\n# sample\n",
+        "SKILL.md": "---\nname: tloop-sample\n---\n\n# sample\n",
         "references/note.md": "note\n"
       },
       "installed": {
-        "SKILL.md": "---\r\nname: uloop-sample\r\n---\r\n\r\n# sample\r\n",
+        "SKILL.md": "---\r\nname: tloop-sample\r\n---\r\n\r\n# sample\r\n",
         "references/note.md": "note\r\n"
       },
       "expected": "installed"

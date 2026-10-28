@@ -1,14 +1,14 @@
 # Wiring a value into an added field
 
 A field a reload added has no compiled storage: its values live in a side table, and it is
-invisible to the Inspector until `uloop compile`. Nothing serializes into it, so an added
+invisible to the Inspector until `tloop compile`. Nothing serializes into it, so an added
 `[SerializeField] GameObject _target;` starts at `default(T)` (or at its initializer value when
 the declaration has one) for every instance. The run that
 first makes such a field active says so in one `Warnings` line naming `Namespace.Type.field`;
 later reloads of the same field stay quiet.
 
 To put a value or a scene reference in it without compiling, call the wiring entry point from
-`uloop execute-dynamic-code`. The reading shim picks the value up on the next access.
+`tloop execute-dynamic-code`. The reading shim picks the value up on the next access.
 
 ## Recipe
 
@@ -58,7 +58,7 @@ Every check runs before anything is stored, so a refused call leaves an earlier 
 | A destroyed `UnityEngine.Object` as the instance | Throws: its patched methods never run again |
 
 The try-read calls refuse the same way for every row that is about the field or the instance
-rather than the value: on a type with no added fields, or after a `uloop compile`, they throw
+rather than the value: on a type with no added fields, or after a `tloop compile`, they throw
 instead of returning `false`.
 
 `TryReadInstanceField` / `TryReadStaticField` return `false` until the field's slot exists. A
@@ -78,24 +78,24 @@ never happened. Use the wiring entry point, which refuses all of those.
 ## Wired values are not durable
 
 The side table belongs to the current domain and the current reload, and re-running the script is
-not enough on its own: `uloop compile`, a domain reload, and `--revert-all` all drop the field's
+not enough on its own: `tloop compile`, a domain reload, and `--revert-all` all drop the field's
 *declaration* as well, and the wiring call then refuses with
 
 ```
 '_target' is not an added field of <Type>, which has no active added fields at all. Run a hot
-reload that adds the field first; a compile, a domain reload, or 'uloop hot-reload --revert-all'
+reload that adds the field first; a compile, a domain reload, or 'tloop hot-reload --revert-all'
 drops the added fields.
 ```
 
 So the recovery order is always **re-apply the hot reload first, then re-run the wiring script**.
-`uloop hot-reload` with no `--files` re-selects the files changed since the last compile, which is
+`tloop hot-reload` with no `--files` re-selects the files changed since the last compile, which is
 usually the one you want; it works while play mode is running. A new file that declares a type hot
 reload introduced is never a changed file, but after entering play mode or `--revert-all` it is
 selected again too, so the field it declares comes back with the rest.
 The `--revert-all` response's `Warnings` names the added fields it dropped, and the re-apply that
 adds them back names them again as fields to wire again, so you can see which wiring to re-run.
 
-After `uloop compile` there is a second case: if the compile included the edit that added the
+After `tloop compile` there is a second case: if the compile included the edit that added the
 field, the field is a real compiled field now, and the wiring call says so instead of the message
 above. Set it through the Inspector or as a normal field and delete the wiring script — the side
 table is no longer involved.
@@ -106,8 +106,8 @@ What play mode costs depends on the project's Enter Play Mode Options.
 
 | Setting | What survives | What to do |
 |---------|---------------|------------|
-| Domain reload on (the default for projects created before Unity 6.6) | Nothing. `--status` reports `0 change(s) currently active` and says the changes were discarded when play mode was entered | Re-apply the hot reload, then re-run the wiring script — both work from inside play mode |
-| Domain reload disabled (the default for new projects since Unity 6.6) | The declarations, and the values written through `SetInstanceField` when the host is a scene object or an asset and the value is a plain value, a scene object, or an asset. `--status` still lists the `Active` and `AddedField` rows. Some values that could not be restored are named by `--status` and by the `Warnings` of the next apply; the rest are not named (see below) | Wire again every value named as not restored, and the one unnamed case below |
+| Domain reload on (the default for projects created before Tuanjie 6.6) | Nothing. `--status` reports `0 change(s) currently active` and says the changes were discarded when play mode was entered | Re-apply the hot reload, then re-run the wiring script — both work from inside play mode |
+| Domain reload disabled (the default for new projects since Tuanjie 6.6) | The declarations, and the values written through `SetInstanceField` when the host is a scene object or an asset and the value is a plain value, a scene object, or an asset. `--status` still lists the `Active` and `AddedField` rows. Some values that could not be restored are named by `--status` and by the `Warnings` of the next apply; the rest are not named (see below) | Wire again every value named as not restored, and the one unnamed case below |
 
 Play mode builds the scene's objects again either way, and an added field on a new instance starts
 at its initializer unless something gives the value back.
@@ -157,8 +157,8 @@ dereferences it fails every frame until then (a `NullReferenceException` per fra
 When the response names fields to wire while play mode runs unpaused, its `Warnings` says so. Do
 this instead:
 
-1. `uloop control-play-mode --action Pause`, preferably before the hot reload.
+1. `tloop control-play-mode --action Pause`, preferably before the hot reload.
 2. Apply the hot reload if you have not yet, then run the wiring script.
-3. `uloop control-play-mode --action Play` resumes from the pause.
+3. `tloop control-play-mode --action Play` resumes from the pause.
 
 No frame runs while play mode is paused, so the first read after resuming sees the wired value.

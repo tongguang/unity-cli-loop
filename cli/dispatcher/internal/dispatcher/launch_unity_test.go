@@ -13,8 +13,8 @@ func TestReadUnityEditorVersionRejectsMissingOrEmptyVersion(t *testing.T) {
 		"empty version":   "m_EditorVersion:   \n",
 	}
 	wants := map[string]string{
-		"no version line": "unity editor version not found in " + projectVersionFilePath,
-		"empty version":   "unity editor version is empty in " + projectVersionFilePath,
+		"no version line": "tuanjie editor version not found in " + projectVersionFilePath,
+		"empty version":   "tuanjie editor version is empty in " + projectVersionFilePath,
 	}
 	for name, content := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -39,9 +39,9 @@ func TestWindowsUnityExecutableCandidatesSkipsUnsetBases(t *testing.T) {
 	candidates := windowsUnityExecutableCandidates("2022.3.0f1")
 
 	want := []string{
-		filepath.Join("<PROGRAM_FILES>", "Unity", "Hub", "Editor", "2022.3.0f1", "Editor", "Unity.exe"),
-		filepath.Join("<LOCAL_APP_DATA>", "Unity", "Hub", "Editor", "2022.3.0f1", "Editor", "Unity.exe"),
-		filepath.Join(`C:\Program Files`, "Unity", "Hub", "Editor", "2022.3.0f1", "Editor", "Unity.exe"),
+		filepath.Join("<PROGRAM_FILES>", "Tuanjie", "Hub", "Editor", "2022.3.0f1", "Editor", "Tuanjie.exe"),
+		filepath.Join("<LOCAL_APP_DATA>", "Tuanjie", "Hub", "Editor", "2022.3.0f1", "Editor", "Tuanjie.exe"),
+		filepath.Join(`C:\Program Files`, "Tuanjie", "Hub", "Editor", "2022.3.0f1", "Editor", "Tuanjie.exe"),
 	}
 	if !reflect.DeepEqual(candidates, want) {
 		t.Fatalf("candidates mismatch:\n got %v\nwant %v", candidates, want)

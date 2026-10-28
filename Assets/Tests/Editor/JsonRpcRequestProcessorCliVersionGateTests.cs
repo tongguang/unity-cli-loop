@@ -672,7 +672,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
         private static string ExpectedCliUpdateCommand()
         {
-            return "uloop update";
+            return "tloop update";
         }
 
         private static string BuildToolRequest(string toolName, int id)

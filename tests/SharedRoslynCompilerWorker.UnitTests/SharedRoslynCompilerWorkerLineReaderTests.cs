@@ -90,11 +90,11 @@ namespace io.github.hatayama.UnityCliLoop.UnitTests
         public async Task ReadDiagnosticLinesAsync_WhenEndMarkerArrives_ShouldReturnCollectedLines()
         {
             // Verifies diagnostic aggregation stops at the protocol end marker.
-            using StringReader reader = new("diag-a\ndiag-b\n__ULOOP_END__\n");
+            using StringReader reader = new("diag-a\ndiag-b\n__TLOOP_END__\n");
 
             List<string> lines = await SharedRoslynCompilerWorkerLineReader.ReadDiagnosticLinesAsync(
                 reader,
-                "__ULOOP_END__",
+                "__TLOOP_END__",
                 CancellationToken.None,
                 timeoutMilliseconds: 1000);
 

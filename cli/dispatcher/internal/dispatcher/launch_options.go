@@ -54,6 +54,10 @@ func applyLaunchKeyedOption(options *launchOptions, args []string, index int) (i
 	case arg == "--editor-version" || strings.HasPrefix(arg, "--editor-version="):
 		next, err := applyLaunchEditorVersionOption(options, args, index)
 		return next, true, err
+	case arg == "--editor-path" || strings.HasPrefix(arg, "--editor-path="):
+		value, consumed, err := readLaunchOptionValue(arg, args, index)
+		options.editorPath = value
+		return nextLaunchOptionIndex(index, consumed), true, err
 	case arg == "-p" || arg == "--platform" || strings.HasPrefix(arg, "--platform="):
 		next, err := applyLaunchPlatformOption(options, args, index)
 		return next, true, err
@@ -63,6 +67,17 @@ func applyLaunchKeyedOption(options *launchOptions, args []string, index int) (i
 	default:
 		return index, false, nil
 	}
+}
+
+func validateEditorSelection(editorPath string, editorVersion string) error {
+	if editorPath != "" && editorVersion != "" {
+		return &clierrors.ArgumentError{
+			Message:     "--editor-path and --editor-version cannot be used together.",
+			Option:      "--editor-path",
+			NextActions: []string{"Choose an explicit Editor executable or an Editor version."},
+		}
+	}
+	return nil
 }
 
 func isUnsupportedLaunchHubOption(arg string) bool {
@@ -82,7 +97,7 @@ func unsupportedLaunchHubOptionError(arg string) error {
 		Message:     "Native launch does not support Unity Hub registration options.",
 		Option:      arg,
 		Command:     clicore.LaunchCommandName,
-		NextActions: []string{"Remove the Unity Hub registration option and retry `uloop launch`."},
+		NextActions: []string{"Remove the Unity Hub registration option and retry `tloop launch`."},
 	}
 }
 
@@ -91,7 +106,7 @@ func unknownLaunchOptionError(arg string) error {
 		Message:     "Unknown launch option: " + arg,
 		Option:      arg,
 		Command:     clicore.LaunchCommandName,
-		NextActions: []string{"Run `uloop launch --help` to inspect supported launch options."},
+		NextActions: []string{"Run `tloop launch --help` to inspect supported launch options."},
 	}
 }
 
@@ -132,7 +147,7 @@ func applyLaunchProjectPathArgument(options *launchOptions, arg string, index in
 			Message:     "Unexpected extra launch argument: " + arg,
 			Received:    arg,
 			Command:     clicore.LaunchCommandName,
-			NextActions: []string{"Pass only one project path to `uloop launch`."},
+			NextActions: []string{"Pass only one project path to `tloop launch`."},
 		}
 	}
 	options.projectPath = arg

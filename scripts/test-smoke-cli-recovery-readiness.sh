@@ -2,17 +2,17 @@
 set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-TMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/uloop-recovery-e2e-test.XXXXXX")
+TMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/tloop-recovery-e2e-test.XXXXXX")
 PROJECT_PATH="$TMP_DIR/project"
 case "$(uname -s)" in
     MINGW*|MSYS*|CYGWIN*)
-        FAKE_ULOOP="$TMP_DIR/uloop.exe"
+        FAKE_TLOOP="$TMP_DIR/tloop.exe"
         ;;
     *)
-        FAKE_ULOOP="$TMP_DIR/uloop"
+        FAKE_TLOOP="$TMP_DIR/tloop"
         ;;
 esac
-FAKE_ULOOP_SOURCE="$TMP_DIR/fake-uloop.go"
+FAKE_TLOOP_SOURCE="$TMP_DIR/fake-tloop.go"
 CALL_LOG="$TMP_DIR/calls.log"
 
 cleanup() {
@@ -22,10 +22,10 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 mkdir -p "$PROJECT_PATH/Assets" "$PROJECT_PATH/ProjectSettings"
-mkdir -p "$PROJECT_PATH/.uloop"
-cp "$ROOT_DIR/.uloop/project-runner-pin.json" "$PROJECT_PATH/.uloop/project-runner-pin.json"
+mkdir -p "$PROJECT_PATH/.tloop"
+cp "$ROOT_DIR/.tloop/project-runner-pin.json" "$PROJECT_PATH/.tloop/project-runner-pin.json"
 
-cat > "$FAKE_ULOOP_SOURCE" <<'EOF'
+cat > "$FAKE_TLOOP_SOURCE" <<'EOF'
 package main
 
 import (
@@ -49,13 +49,13 @@ func main() {
 	case "launch":
 		fmt.Printf("Unity is already running for %s (PID: 1234)\n", projectPath)
 	case "get-logs":
-		if os.Getenv("ULOOP_FAKE_CONNECTION_FAILURE") == "1" {
-			fmt.Fprintln(os.Stderr, "{\n  \"Success\": false,\n  \"Error\": {\n    \"ErrorCode\": \"UNITY_NOT_REACHABLE\",\n    \"Message\": \"The Unity CLI Loop server is not reachable for this project.\",\n    \"NextActions\": [\n      \"If Unity is closed, run `uloop launch`.\"\n    ]\n  }\n}")
+		if os.Getenv("TLOOP_FAKE_CONNECTION_FAILURE") == "1" {
+			fmt.Fprintln(os.Stderr, "{\n  \"Success\": false,\n  \"Error\": {\n    \"ErrorCode\": \"UNITY_NOT_REACHABLE\",\n    \"Message\": \"The Tuanjie CLI Loop server is not reachable for this project.\",\n    \"NextActions\": [\n      \"If Unity is closed, run `tloop launch`.\"\n    ]\n  }\n}")
 			os.Exit(1)
 		}
 		fmt.Println(`{"DisplayedCount":0,"Logs":[],"MaxCount":1,"TotalCount":0}`)
 	case "compile":
-		if os.Getenv("ULOOP_FAKE_COMPILE_WITHOUT_SUCCESS") == "1" {
+		if os.Getenv("TLOOP_FAKE_COMPILE_WITHOUT_SUCCESS") == "1" {
 			fmt.Println(`{"ErrorCount":0,"WarningCount":0}`)
 			return
 		}
@@ -91,11 +91,11 @@ func appendCallLog(projectPath string, commandName string, commandArgs []string)
 
 EOF
 
-go build -o "$FAKE_ULOOP" "$FAKE_ULOOP_SOURCE"
+go build -o "$FAKE_TLOOP" "$FAKE_TLOOP_SOURCE"
 
 if ! CALL_LOG="$CALL_LOG" go run "$ROOT_DIR/scripts/smoke-cli-recovery-readiness.go" \
     --project-path "$PROJECT_PATH" \
-    --uloop-path "$FAKE_ULOOP" \
+    --tloop-path "$FAKE_TLOOP" \
     --timeout 2 \
     --launch-timeout 2 > "$TMP_DIR/output.txt"; then
     cat "$TMP_DIR/output.txt"
@@ -111,9 +111,9 @@ if grep -F "fix" "$CALL_LOG" >/dev/null; then
 fi
 grep -F "stale recovery-state ignored" "$TMP_DIR/output.txt" >/dev/null
 
-if CALL_LOG="$CALL_LOG" ULOOP_FAKE_COMPILE_WITHOUT_SUCCESS=1 go run "$ROOT_DIR/scripts/smoke-cli-recovery-readiness.go" \
+if CALL_LOG="$CALL_LOG" TLOOP_FAKE_COMPILE_WITHOUT_SUCCESS=1 go run "$ROOT_DIR/scripts/smoke-cli-recovery-readiness.go" \
     --project-path "$PROJECT_PATH" \
-    --uloop-path "$FAKE_ULOOP" \
+    --tloop-path "$FAKE_TLOOP" \
     --timeout 2 \
     --launch-timeout 2 > "$TMP_DIR/missing-success-output.txt" 2>&1; then
     cat "$TMP_DIR/missing-success-output.txt"

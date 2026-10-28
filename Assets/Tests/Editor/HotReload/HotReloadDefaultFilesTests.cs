@@ -88,7 +88,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     "--files was omitted; 1 changed file(s) since the last compile were selected: Assets/Selected.cs."
                     + " New files that have never been compiled are not selected automatically. "
                     + "Hot reload applied. PatchedTotal=1, ActivePatchTotal=1. 2 warning(s). See Warnings. "
-                    + "A single 'uloop compile' clears all of them at once when you want them gone; none of them has to be cleared before you keep working."));
+                    + "A single 'tloop compile' clears all of them at once when you want them gone; none of them has to be cleared before you keep working."));
             Assert.That(
                 response.Warnings,
                 Is.EqualTo(new[] { "orchestrator warning", "scan limit warning" }));
@@ -124,7 +124,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     new[]
                     {
-                        "Save the edited .cs files to disk, then run 'uloop hot-reload' again.",
+                        "Save the edited .cs files to disk, then run 'tloop hot-reload' again.",
                         "Pass project-relative .cs paths with --files (required for new files that have not "
                         + "been compiled yet)."
                     }));
@@ -177,7 +177,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     "--files was omitted; 2 changed file(s) since the last compile were selected: "
                     + "Assets/Changed1.cs, Assets/Changed2.cs. 1 new file(s) declaring a type hot reload "
-                    + "introduced were selected again, because entering Play Mode or 'uloop hot-reload "
+                    + "introduced were selected again, because entering Play Mode or 'tloop hot-reload "
                     + "--revert-all' dropped what earlier reloads had applied from them: "
                     + ExistingDroppedSourcePath + "."
                     + " Other new files that have never been compiled are not selected automatically. "
@@ -228,7 +228,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 Is.EqualTo(
                     "--files was omitted; no file changed since the last compile. 1 new file(s) declaring "
                     + "a type hot reload introduced were selected again, because entering Play Mode or "
-                    + "'uloop hot-reload --revert-all' dropped what earlier reloads had applied from them: "
+                    + "'tloop hot-reload --revert-all' dropped what earlier reloads had applied from them: "
                     + ExistingDroppedSourcePath + "."
                     + " Other new files that have never been compiled are not selected automatically. "
                     + AppliedMessageTail));

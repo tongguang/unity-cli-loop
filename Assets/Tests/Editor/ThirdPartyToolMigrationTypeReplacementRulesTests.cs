@@ -17,7 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public void ReplaceLegacyDomainTypeNamesInCode_WhenTypeIsLegacyQualified_RewritesToToolContracts()
         {
-            const string source = "io.github.hatayama.uLoopMCP.ServiceResult result;";
+            const string source = "io.github.tongguang.tloop.ServiceResult result;";
             int replacementCount = 0;
 
             string content = ThirdPartyToolMigrationTypeReplacementRules.ReplaceLegacyDomainTypeNamesInCode(

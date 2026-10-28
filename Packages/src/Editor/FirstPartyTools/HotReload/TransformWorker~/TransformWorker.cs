@@ -29,7 +29,7 @@ public static class TransformWorkerProgram
 
     // SyntaxAnnotation kind for original-source 1-based lines; survive rewriter + NormalizeWhitespace
     // so Emit can inject #line directives after formatting.
-    internal const string UloopLineAnnotationKind = "uloop-line";
+    internal const string UloopLineAnnotationKind = "tloop-line";
 
     private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
     {

@@ -48,7 +48,7 @@ namespace io.github.hatayama.UnityCliLoop.Domain
         {
             get
             {
-#if ULOOP_HAS_TEST_FRAMEWORK
+#if TLOOP_HAS_TEST_FRAMEWORK
                 return true;
 #else
                 return false;

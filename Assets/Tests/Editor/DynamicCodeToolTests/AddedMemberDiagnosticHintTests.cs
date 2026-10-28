@@ -26,11 +26,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.DynamicCodeToolTests
             "'ComputeScore' matches a member hot reload added, which is active now. An added member "
             + "is not visible to the compilation of a dynamic-code snippet, which compiles against "
             + "the compiled assemblies only, and it is not visible through reflection either. Run "
-            + "'uloop compile' to make the added member compiled, then rerun, or read the state "
+            + "'tloop compile' to make the added member compiled, then rerun, or read the state "
             + "through a member that was already compiled.";
 
         private const string CompileSuggestion =
-            "Run 'uloop compile' to make the added member compiled, then rerun";
+            "Run 'tloop compile' to make the added member compiled, then rerun";
 
         private const string CompiledMemberSuggestion =
             "Read the state through a member that was already compiled instead of the added one";

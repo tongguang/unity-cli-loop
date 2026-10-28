@@ -2,7 +2,7 @@ package clierrors
 
 import "github.com/hatayama/unity-cli-loop/common/unityipc"
 
-// toolCancelledError reports to the CLI that waited for a tool that uloop cancel stopped it.
+// toolCancelledError reports to the CLI that waited for a tool that tloop cancel stopped it.
 // Why not retryable: the cancel was asked for on purpose, so running the command again is a new
 // decision for the caller, not a recovery.
 func toolCancelledError(
@@ -13,7 +13,7 @@ func toolCancelledError(
 ) CLIError {
 	message := rpcErr.Message
 	if data.RunningToolName != "" {
-		message = "'" + data.RunningToolName + "' was cancelled by uloop cancel."
+		message = "'" + data.RunningToolName + "' was cancelled by tloop cancel."
 	}
 
 	return CLIError{
@@ -25,7 +25,7 @@ func toolCancelledError(
 		ProjectRoot: context.ProjectRoot,
 		Command:     context.Command,
 		NextActions: []string{
-			"Run `uloop status` to confirm the Editor is Ready before the next command.",
+			"Run `tloop status` to confirm the Editor is Ready before the next command.",
 		},
 		Details: details,
 	}

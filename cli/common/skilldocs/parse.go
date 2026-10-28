@@ -8,7 +8,7 @@ import (
 
 const (
 	parametersSectionHeading = "## Parameters"
-	skillNamePrefix          = "uloop-"
+	skillNamePrefix          = "tloop-"
 
 	sectionHeadingPrefix    = "## "
 	subsectionHeadingPrefix = "### "
@@ -68,7 +68,7 @@ func parseSingleToolSkill(lines []string) map[string]ToolDocs {
 
 // singleSkillToolName resolves the tool a one-tool skill documents. toolName is authoritative when
 // present; otherwise the skill name carries it, since every skill in this package is named
-// "uloop-<tool-name>" (focus-window's skill declares no toolName).
+// "tloop-<tool-name>" (focus-window's skill declares no toolName).
 func singleSkillToolName(frontmatter map[string]string) string {
 	if toolName := frontmatter["toolName"]; toolName != "" {
 		return toolName

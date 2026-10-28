@@ -12,12 +12,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// <summary>
         /// Verifies that WinGet Packages and Links paths are recognized across roots, separators, and casing.
         /// </summary>
-        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Packages\hatayama.uloop_Microsoft.Winget.Source_8wekyb3d8bbwe\uloop.exe")]
-        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Links\uloop.exe")]
-        [TestCase(@"C:\Program Files\WinGet\Packages\hatayama.uloop_Microsoft.Winget.Source_8wekyb3d8bbwe\uloop.exe")]
-        [TestCase(@"C:\Program Files\WinGet\Links\uloop.exe")]
-        [TestCase("C:/Users/<USER_NAME>/AppData/Local/Microsoft/WinGet/Packages/hatayama.uloop_Microsoft.Winget.Source_8wekyb3d8bbwe/uloop.exe")]
-        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Microsoft\winget\packages\hatayama.uloop\uloop.exe")]
+        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Packages\tongguang.tloop_Microsoft.Winget.Source_8wekyb3d8bbwe\tloop.exe")]
+        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Microsoft\WinGet\Links\tloop.exe")]
+        [TestCase(@"C:\Program Files\WinGet\Packages\tongguang.tloop_Microsoft.Winget.Source_8wekyb3d8bbwe\tloop.exe")]
+        [TestCase(@"C:\Program Files\WinGet\Links\tloop.exe")]
+        [TestCase("C:/Users/<USER_NAME>/AppData/Local/Microsoft/WinGet/Packages/tongguang.tloop_Microsoft.Winget.Source_8wekyb3d8bbwe/tloop.exe")]
+        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Microsoft\winget\packages\tongguang.tloop\tloop.exe")]
         public void IsWingetManagedPath_WithManagedDirectory_ReturnsTrue(string executablePath)
         {
             bool result = WingetManagedCliPolicy.IsWingetManagedPath(executablePath);
@@ -28,11 +28,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         /// <summary>
         /// Verifies that unrelated paths are not classified as winget-managed.
         /// </summary>
-        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Programs\uloop\bin\uloop.exe")]
-        [TestCase("/opt/homebrew/Cellar/uloop/3.1.0/bin/uloop")]
-        [TestCase(@"C:\Tools\WinGet\uloop.exe")]
-        [TestCase(@"C:\Tools\WinGet\Other\Packages\uloop.exe")]
-        [TestCase(@"D:\Packages\WinGet\uloop.exe")]
+        [TestCase(@"C:\Users\<USER_NAME>\AppData\Local\Programs\tloop\bin\tloop.exe")]
+        [TestCase("/opt/homebrew/Cellar/tloop/3.1.0/bin/tloop")]
+        [TestCase(@"C:\Tools\WinGet\tloop.exe")]
+        [TestCase(@"C:\Tools\WinGet\Other\Packages\tloop.exe")]
+        [TestCase(@"D:\Packages\WinGet\tloop.exe")]
         public void IsWingetManagedPath_WithoutAdjacentManagedDirectory_ReturnsFalse(string executablePath)
         {
             bool result = WingetManagedCliPolicy.IsWingetManagedPath(executablePath);

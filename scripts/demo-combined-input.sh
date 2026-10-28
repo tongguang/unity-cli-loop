@@ -8,7 +8,7 @@ set -e
 #
 # Prerequisites:
 #   - SimulateKeyboardDemoScene must be open in Unity
-#   - uloop CLI must be installed
+#   - tloop CLI must be installed
 
 PROJECT_PATH=""
 if [ "$1" = "--project-path" ] && [ -n "$2" ]; then
@@ -17,15 +17,15 @@ fi
 
 cleanup() {
     printf "\033[33m[combined]\033[0m Stopping PlayMode (cleanup)...\n"
-    run_uloop control-play-mode --action Stop > /dev/null 2>&1 || true
+    run_tloop control-play-mode --action Stop > /dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
-run_uloop() {
+run_tloop() {
     if [ -n "$PROJECT_PATH" ]; then
-        uloop "$@" --project-path "$PROJECT_PATH"
+        tloop "$@" --project-path "$PROJECT_PATH"
     else
-        uloop "$@"
+        tloop "$@"
     fi
 }
 
@@ -34,31 +34,31 @@ log() {
 }
 
 look() {
-    run_uloop simulate-mouse-input --action SmoothDelta --delta-x "$1" --delta-y "${2:-0}" --duration "${3:-0.5}" > /dev/null
+    run_tloop simulate-mouse-input --action SmoothDelta --delta-x "$1" --delta-y "${2:-0}" --duration "${3:-0.5}" > /dev/null
 }
 
 shoot() {
-    run_uloop simulate-mouse-input --action Click --x 400 --y 300 > /dev/null
+    run_tloop simulate-mouse-input --action Click --x 400 --y 300 > /dev/null
 }
 
 middle_click() {
-    run_uloop simulate-mouse-input --action Click --x 400 --y 300 --button Middle > /dev/null
+    run_tloop simulate-mouse-input --action Click --x 400 --y 300 --button Middle > /dev/null
 }
 
 scroll() {
-    run_uloop simulate-mouse-input --action Scroll --scroll-y "$1" > /dev/null
+    run_tloop simulate-mouse-input --action Scroll --scroll-y "$1" > /dev/null
 }
 
 key_press() {
-    run_uloop simulate-keyboard --action Press --key "$1" --duration "${2:-0.1}" > /dev/null
+    run_tloop simulate-keyboard --action Press --key "$1" --duration "${2:-0.1}" > /dev/null
 }
 
 key_down() {
-    run_uloop simulate-keyboard --action KeyDown --key "$1" > /dev/null
+    run_tloop simulate-keyboard --action KeyDown --key "$1" > /dev/null
 }
 
 key_up() {
-    run_uloop simulate-keyboard --action KeyUp --key "$1" > /dev/null
+    run_tloop simulate-keyboard --action KeyUp --key "$1" > /dev/null
 }
 
 wait_sec() {
@@ -67,7 +67,7 @@ wait_sec() {
 
 # ============================================================
 log "Starting PlayMode..."
-run_uloop control-play-mode --action Play > /dev/null
+run_tloop control-play-mode --action Play > /dev/null
 wait_sec 2
 
 log "=== Combined Input Demo Start ==="

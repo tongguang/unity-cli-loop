@@ -9,12 +9,12 @@ import (
 
 func TestResolveInstallDirUsesExplicitDirectory(t *testing.T) {
 	// Verifies command-line install directories take precedence over environment defaults.
-	installDir, err := ResolveInstallDir("windows", `D:\Tools\uloop`, Environment{})
+	installDir, err := ResolveInstallDir("windows", `D:\Tools\tloop`, Environment{})
 	if err != nil {
 		t.Fatalf("ResolveInstallDir failed: %v", err)
 	}
 
-	if installDir != `D:\Tools\uloop` {
+	if installDir != `D:\Tools\tloop` {
 		t.Fatalf("install dir mismatch: %s", installDir)
 	}
 }
@@ -74,7 +74,7 @@ func TestDefaultInstallDirForWindowsUsesLocalAppData(t *testing.T) {
 		t.Fatalf("DefaultInstallDir failed: %v", err)
 	}
 
-	expected := `C:\Users\<USER_NAME>\AppData\Local\Programs\uloop\bin`
+	expected := `C:\Users\<USER_NAME>\AppData\Local\Programs\tloop\bin`
 	if installDir != expected {
 		t.Fatalf("install dir mismatch: %s", installDir)
 	}
@@ -94,7 +94,7 @@ func TestDefaultInstallDirForWindowsTrimsLocalAppDataSeparator(t *testing.T) {
 		t.Fatalf("DefaultInstallDir failed: %v", err)
 	}
 
-	expected := `C:\Users\<USER_NAME>\AppData\Local\Programs\uloop\bin`
+	expected := `C:\Users\<USER_NAME>\AppData\Local\Programs\tloop\bin`
 	if installDir != expected {
 		t.Fatalf("install dir mismatch: %s", installDir)
 	}
@@ -157,7 +157,7 @@ func TestCacheRootUsesExplicitDirectory(t *testing.T) {
 	cacheRoot, err := CacheRoot("darwin", Environment{
 		Getenv: func(name string) string {
 			if name == CacheDirEnvName {
-				return " /tmp/uloop-cache "
+				return " /tmp/tloop-cache "
 			}
 			return ""
 		},
@@ -166,7 +166,7 @@ func TestCacheRootUsesExplicitDirectory(t *testing.T) {
 		t.Fatalf("CacheRoot failed: %v", err)
 	}
 
-	if cacheRoot != "/tmp/uloop-cache" {
+	if cacheRoot != "/tmp/tloop-cache" {
 		t.Fatalf("cache root mismatch: %s", cacheRoot)
 	}
 }
@@ -185,7 +185,7 @@ func TestCacheRootForWindowsTrimsLocalAppDataSeparator(t *testing.T) {
 		t.Fatalf("CacheRoot failed: %v", err)
 	}
 
-	expected := `C:\Users\<USER_NAME>\AppData\Local\uloop`
+	expected := `C:\Users\<USER_NAME>\AppData\Local\tloop`
 	if cacheRoot != expected {
 		t.Fatalf("cache root mismatch: %s", cacheRoot)
 	}
@@ -205,34 +205,34 @@ func TestCacheRootForLinuxUsesXDGCacheHome(t *testing.T) {
 		t.Fatalf("CacheRoot failed: %v", err)
 	}
 
-	if cacheRoot != "/cache/uloop" {
+	if cacheRoot != "/cache/tloop" {
 		t.Fatalf("cache root mismatch: %s", cacheRoot)
 	}
 }
 
 func TestCommandPathTrimsInstallDirectorySeparators(t *testing.T) {
 	// Verifies install and uninstall target paths normalize trailing separators consistently.
-	targetPath := CommandPath("windows", `C:\Tools\uloop\`, "uloop", "uloop.exe")
+	targetPath := CommandPath("windows", `C:\Tools\tloop\`, "tloop", "tloop.exe")
 
-	if targetPath != `C:\Tools\uloop\uloop.exe` {
+	if targetPath != `C:\Tools\tloop\tloop.exe` {
 		t.Fatalf("target path mismatch: %s", targetPath)
 	}
 }
 
 func TestJoinForWindowsPreservesFirstNonEmptyRoot(t *testing.T) {
 	// Verifies empty leading elements do not make an absolute Windows path relative.
-	joinedPath := Join("windows", "", `\Server\Share\`, "uloop")
+	joinedPath := Join("windows", "", `\Server\Share\`, "tloop")
 
-	if joinedPath != `\Server\Share\uloop` {
+	if joinedPath != `\Server\Share\tloop` {
 		t.Fatalf("joined path mismatch: %s", joinedPath)
 	}
 }
 
 func TestCommandPathPreservesPosixRootDirectory(t *testing.T) {
 	// Verifies trimming a POSIX install directory does not turn the filesystem root into an empty path.
-	targetPath := CommandPath("darwin", "/", "uloop", "uloop.exe")
+	targetPath := CommandPath("darwin", "/", "tloop", "tloop.exe")
 
-	if targetPath != "/uloop" {
+	if targetPath != "/tloop" {
 		t.Fatalf("target path mismatch: %s", targetPath)
 	}
 }
@@ -277,9 +277,9 @@ func TestCacheRootUsesOSDefaults(t *testing.T) {
 		values map[string]string
 		want   string
 	}{
-		{goos: "darwin", want: "/Users/<USER_NAME>/Library/Caches/uloop"},
-		{goos: "windows", values: map[string]string{LocalAppDataEnvName: `C:\Users\<USER_NAME>\AppData\Local`}, want: `C:\Users\<USER_NAME>\AppData\Local\uloop`},
-		{goos: "linux", want: "/Users/<USER_NAME>/.cache/uloop"},
+		{goos: "darwin", want: "/Users/<USER_NAME>/Library/Caches/tloop"},
+		{goos: "windows", values: map[string]string{LocalAppDataEnvName: `C:\Users\<USER_NAME>\AppData\Local`}, want: `C:\Users\<USER_NAME>\AppData\Local\tloop`},
+		{goos: "linux", want: "/Users/<USER_NAME>/.cache/tloop"},
 	}
 	for _, testCase := range cases {
 		cacheRoot, err := CacheRoot(testCase.goos, homeEnvironment("/Users/<USER_NAME>", nil, testCase.values))
@@ -295,15 +295,15 @@ func TestCacheRootUsesOSDefaults(t *testing.T) {
 func TestCacheRootRejectsMissingWindowsLocalAppData(t *testing.T) {
 	// Verifies Windows cache resolution fails with its own message when LOCALAPPDATA is missing.
 	_, err := CacheRoot("windows", homeEnvironment("/unused", nil, nil))
-	if err == nil || err.Error() != "LOCALAPPDATA is required to resolve the uloop cache directory" {
+	if err == nil || err.Error() != "LOCALAPPDATA is required to resolve the tloop cache directory" {
 		t.Fatalf("err = %v", err)
 	}
 }
 
 func TestCommandPathUsesWindowsSeparatorAndCommandName(t *testing.T) {
 	// Verifies Windows command paths use a backslash and the Windows command name.
-	commandPath := CommandPath("windows", `C:\Tools\uloop\`, "uloop", "uloop.exe")
-	if commandPath != `C:\Tools\uloop\uloop.exe` {
+	commandPath := CommandPath("windows", `C:\Tools\tloop\`, "tloop", "tloop.exe")
+	if commandPath != `C:\Tools\tloop\tloop.exe` {
 		t.Fatalf("command path mismatch: %s", commandPath)
 	}
 }

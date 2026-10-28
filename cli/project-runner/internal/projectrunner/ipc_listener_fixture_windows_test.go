@@ -22,7 +22,7 @@ func newLoopbackIpcListener(t *testing.T) net.Listener {
 	if _, err := rand.Read(suffix); err != nil {
 		t.Fatalf("failed to generate pipe name suffix: %v", err)
 	}
-	pipeName := `\\.\pipe\uloop-test-` + hex.EncodeToString(suffix)
+	pipeName := `\\.\pipe\tloop-test-` + hex.EncodeToString(suffix)
 	listener, err := winio.ListenPipe(pipeName, nil)
 	if err != nil {
 		t.Fatalf("failed to listen on named pipe %s: %v", pipeName, err)

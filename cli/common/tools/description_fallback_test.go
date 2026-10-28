@@ -132,7 +132,7 @@ func TestApplyEmbeddedDescriptionFallbackKeepsCachedSchemaFacts(t *testing.T) {
 }
 
 // Verifies the fallback is applied when a project cache is loaded, which is the path both `--help`
-// and `uloop list` read in a synced project.
+// and `tloop list` read in a synced project.
 func TestLoadProjectCacheAppliesDescriptionFallback(t *testing.T) {
 	projectRoot := t.TempDir()
 	cacheDirectory := filepath.Join(projectRoot, CacheDirectoryName)

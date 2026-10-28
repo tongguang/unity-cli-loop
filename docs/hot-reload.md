@@ -8,8 +8,8 @@ executable pins of the runtime behavior this design depends on.
 ## Goal
 
 Reload edited method bodies into a running Unity Editor (including Play Mode) without domain
-reload, without requiring any attribute on user code, driven by `uloop hot-reload --files
-<edited .cs files>`. The input is the real source file, so a later `uloop compile` (real
+reload, without requiring any attribute on user code, driven by `tloop hot-reload --files
+<edited .cs files>`. The input is the real source file, so a later `tloop compile` (real
 compilation + domain reload) naturally converges to the same behavior.
 
 Editor-only. Players (Mono or IL2CPP) are out of scope.
@@ -69,11 +69,11 @@ touches one renderer instead of both processes. `TransformWorkerDtoSyncTests` co
 worker's payload types against the Editor's data transfer objects field by field, so a field
 added on one side alone fails a test rather than silently serializing to nothing.
 
-Harmony ID: `io.github.hatayama.uloop.hot-reload` (distinct from the pause point's ID).
-Caches: `Library/UloopHotReload/PublicizedRefs/fmt2/<assemblyName>-<mvid>.dll`,
-`Library/UloopHotReload/PublicizedExternalRefs/fmt1/<assemblyName>-<mvid>.dll`,
-`Library/UloopHotReload/Worker/<sourceHash>/`,
-`Library/UloopHotReload/SourceSnapshot/<assemblyName>-<mvid>/` (with a `source-stamps.txt` that
+Harmony ID: `io.github.tongguang.tloop.hot-reload` (distinct from the pause point's ID).
+Caches: `Library/TloopHotReload/PublicizedRefs/fmt2/<assemblyName>-<mvid>.dll`,
+`Library/TloopHotReload/PublicizedExternalRefs/fmt1/<assemblyName>-<mvid>.dll`,
+`Library/TloopHotReload/Worker/<sourceHash>/`,
+`Library/TloopHotReload/SourceSnapshot/<assemblyName>-<mvid>/` (with a `source-stamps.txt` that
 records each copied source's length and write time, so a run after a domain reload tells an
 unchanged sibling by a stat instead of reading it; a source written since the compile started
 whose bytes do not match the PDB checksum carries a mark that it was edited after the compile,
@@ -82,7 +82,7 @@ changed; a capture moves the previous build's directory to the new MVID's and re
 sources whose length or write time changed, that carry no unmarked manifest line, or that were
 written since the compile started; it deletes the copies of sources no longer in the assembly.
 The capture runs on a pool thread after the domain load reads its inputs on the main thread, one
-capture at a time; `uloop compile` returns only after it finishes (or after 30 seconds), a hot
+capture at a time; `tloop compile` returns only after it finishes (or after 30 seconds), a hot
 reload run waits for it, and a pause point waits for it unless the file on disk matches the PDB
 checksum, in which case it reads that file. A domain reload or a compile start cancels it, and
 the next reader starts it again (`docs/adr/0014-capture-the-hot-reload-source-snapshot-off-the-main-thread.md`).
@@ -93,13 +93,13 @@ the PDB. The capture lists the assemblies from the compiled dlls that have a PDB
 reads an assembly's sources from its PDB only when its dll changed; a read-only package's
 assembly gets a `<assemblyName>.immutable` marker beside the snapshots instead, which skips its
 PDB until the dll changes),
-`Library/UloopHotReload/PdbDocuments/fmt1/<assemblyName>.txt` (the documents the PDB's sequence
+`Library/TloopHotReload/PdbDocuments/fmt1/<assemblyName>.txt` (the documents the PDB's sequence
 points refer to, stamped with the dll's and the PDB's length and write time and the MVID, so the
 first run after a domain reload does not walk the PDB again while they still match), and
-`Library/UloopHotReload/ReferencedMethods/fmt1/<assemblyName>.txt` (the methods of other
+`Library/TloopHotReload/ReferencedMethods/fmt1/<assemblyName>.txt` (the methods of other
 assemblies the dll's MemberRef table names, stamped with the dll's length, write time and MVID,
 so the first run after a domain reload does not read an assembly that names none of the edited
-methods), and `Library/UloopHotReload/WarmUp/targets.txt` (the assemblies the runs of this project
+methods), and `Library/TloopHotReload/WarmUp/targets.txt` (the assemblies the runs of this project
 edited, most recent first, read by the warm-up after a domain reload).
 
 Warm-up after a domain reload: on the first Editor update tick after a reload, hot reload loads in
@@ -133,7 +133,7 @@ When a verified snapshot marks a currently patched method as unchanged, the
 orchestrator reverts that patch to the compiled IL instead of re-emitting a shim.
 The outside-method-body warning compares against the same snapshot, the source of the last
 compile, so a declaration edit made since then keeps the warning on every reload until
-`uloop compile`; comment-only differences do not count.
+`tloop compile`; comment-only differences do not count.
 
 The response's `Timing` object breaks the run down per phase (worker, shim compile, patch)
 and, after a fallback compile, adds the compile's time.
@@ -455,7 +455,7 @@ Wire details:
   (parameterless `public static`). Types with no accessor delegates simply have no binder.
 - Bind failure (for example the source names a member the compiled assembly does not have yet)
   fails the file of any entry in that shim type, whatever its patch kind: the entry reports
-  `Failed` with a remediation hint to run `uloop compile`, and the file's other entries are
+  `Failed` with a remediation hint to run `tloop compile`, and the file's other entries are
   `Skipped`. Transplant entries are included because a transplanted body's closures may call
   the same accessors (see the closure scope below).
 - Closure scope: when only closures (lambdas, anonymous methods, local functions, query
@@ -480,13 +480,13 @@ Wire details:
 - The patch ledger and loaded shim assemblies are static state; both are cleared by domain
   reload by design (no persistence, no auto-reapply). Shim assemblies cannot be unloaded and
   accumulate until the next domain reload; that is accepted.
-- `uloop run-tests` compiles first by default, so that compile drops every live patch;
+- `tloop run-tests` compiles first by default, so that compile drops every live patch;
   `--skip-compile` runs the tests against the live patches instead. What each path was observed to
   do is in "Running tests while patches are live" of
   `Packages/src/Editor/FirstPartyTools/HotReload/Skill/references/mechanism-and-lifecycle.md`.
 - Mvid guard before patching: if the on-disk `Library/ScriptAssemblies/<asm>.dll` Mvid
   differs from the loaded module's `ModuleVersionId`, the assembly has already been rebuilt
-  and reloaded — hot reload is refused with a pointer to `uloop compile`.
+  and reloaded — hot reload is refused with a pointer to `tloop compile`.
 - Re-reloading the same method unpatches the previous transpiler before applying the new one.
 
 ## Known Limits (documented, not worked around)
@@ -495,17 +495,17 @@ Wire details:
   `internal`, or without an access modifier, are introduced by the reload that declares them and
   can use that assembly's internal members when the Editor's runtime passes the internal-access
   probe; every other new-type shape, and any use of an
-  introduced type from another assembly or through Unity, still requires `uloop compile`
+  introduced type from another assembly or through Unity, still requires `tloop compile`
   (`docs/hot-reload-introduced-types.md`). Added members referenced from another assembly or
   from a file that is neither passed to this reload nor already hot-reloaded, and changed
   field initializers or `const` values, and members added to a compiled enum (a body that
-  names one fails with CS0117 even in the same reload) — all require `uloop compile`.
+  names one fails with CS0117 even in the same reload) — all require `tloop compile`.
   Added fields, methods, and properties themselves apply, and are visible to the bodies
   edited in any file of the same assembly passed to the same reload — including on a type an
   earlier reload introduced, where they are applied on the artifact that already carries it. An
   added auto-property is backed by the added-field store, so its value shares that lifetime,
   and so is a field-like event added to a compiled, non-generic class whose declaring and delegate types are visible outside the assembly (ADR 0011; not on a struct, not with custom accessors). Other added events, indexers, and the property shapes listed in the skill's scope reference
-  (set-only, virtual, explicit interface, `init`, struct host) still require `uloop compile`. Unchanged files of that assembly that
+  (set-only, virtual, explicit interface, `init`, struct host) still require `tloop compile`. Unchanged files of that assembly that
   already hold active patches are re-applied so they bind to the newest shim. Shim compile errors caused by references to
   members that are still missing are reported with that hint, and changed `const` values
   (including enum members) are compared against the compiled target assembly and reported as
@@ -517,7 +517,7 @@ Wire details:
   `LateUpdate`, `FixedUpdate`, `OnGUI`, and the collision, trigger, mouse, and
   application messages are forwarded; `Awake`, `OnEnable`, `OnDisable`, `OnDestroy`, the
   editor-only messages, and any message declared with a return value or a `ref`/`out`
-  parameter are not, and the run names those in one warning pointing at `uloop compile`.
+  parameter are not, and the run names those in one warning pointing at `tloop compile`.
   An added `Start` runs once on each instance that already exists, at the moment the proxy
   attaches. The proxies live only for the running session — nothing is attached outside
   Play Mode, and a compile or domain reload drops them — and execution order relative to
@@ -531,21 +531,21 @@ Wire details:
   compiled body. The residual limit is a marker whose requested line no longer
   resolves in the code now executing — it is suppressed (`SuppressedByHotReload: true`,
   reason in `SuppressedByHotReloadReason`) rather than cleared, and stays silent until
-  a later patch transition restores the line or `uloop compile` runs.
+  a later patch transition restores the line or `tloop compile` runs.
   Enabling a new marker reads `--line` as a line of the edited file:
   - A line in a method hot reload has not patched is mapped onto the verified source
     snapshot of the last compile and armed there. The response reports
     `LineBasis: EditedFile`, and `ResolvedLine` is the edited-file line.
   - A line added or changed since the last compile is refused with
     `PAUSE_POINT_LINE_NOT_COMPILED`. So is a line whose next statement, where the resolver
-    would round to, is uncompiled. Run `uloop hot-reload` or `uloop compile` and retry, or
+    would round to, is uncompiled. Run `tloop hot-reload` or `tloop compile` and retry, or
     pick an unchanged line.
   - A line inside a patched method's edited body arms the patched body directly. A line
     that would round onto the compiled body of a patched method, or whose uncompiled next
     statement is inside a patched method's edited body, is refused with
     `PAUSE_POINT_PATCHED_BY_HOT_RELOAD` instead, naming the method's edited line range.
   - Only when the file has no verified source snapshot is the line armed as a compiled
-    line number, with `LineBasis: LastCompiledSource` and a warning to run `uloop compile`.
+    line number, with `LineBasis: LastCompiledSource` and a warning to run `tloop compile`.
 
 ## Open Questions Tracked for Implementation
 

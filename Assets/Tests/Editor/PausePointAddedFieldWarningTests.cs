@@ -75,10 +75,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 response.ErrorCode + " / " + response.Message);
             string addedFieldsWarning =
                 "Hot reload added 2 field(s) to '" + typeName + "' (alpha, beta); they never appear "
-                + "in CapturedVariables, and naming them as members in 'uloop execute-dynamic-code' "
+                + "in CapturedVariables, and naming them as members in 'tloop execute-dynamic-code' "
                 + "fails with CS1061 because it compiles against the compiled assembly. Read one there "
                 + "with HotReloadAddedFieldWiring.TryReadInstanceField (TryReadStaticField for a "
-                + "static field); references/added-field-wiring.md in the uloop-hot-reload skill "
+                + "static field); references/added-field-wiring.md in the tloop-hot-reload skill "
                 + "shows how.";
             string expectedWarning = PausePointEnableWarnings.MergeWarnings(
                 PausePointEnableWarnings.MergeWarnings(
@@ -113,7 +113,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 response.Warning,
                 Does.Not.Contain(
-                    "Read them via a patched method body or 'uloop execute-dynamic-code' instead"));
+                    "Read them via a patched method body or 'tloop execute-dynamic-code' instead"));
             Assert.That(
                 response.Warning,
                 Does.Not.Contain("Read them from a patched method body"));

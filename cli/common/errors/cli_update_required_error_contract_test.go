@@ -24,7 +24,7 @@ func TestClassifyError_WhenCliUpdateRequiredContractFixture_ClassifiesAsCLIUpdat
 
 	err := &unityipc.RPCError{
 		Code:    -32603,
-		Message: "The installed uloop CLI uses an IPC protocol that does not match this Unity package.",
+		Message: "The installed tloop CLI uses an IPC protocol that does not match this Unity package.",
 		Data:    contract.ErrorData,
 	}
 
@@ -42,7 +42,7 @@ func TestDecodeCliUpdateRequiredErrorData_WhenContractFixture_ReadsEveryField(t 
 	if decoded.Type != "cli_update_required" {
 		t.Fatalf("type mismatch: %#v", decoded)
 	}
-	if decoded.Message != "Install matching uloop CLI and Unity package versions, then retry the original command." {
+	if decoded.Message != "Install matching tloop CLI and Unity package versions, then retry the original command." {
 		t.Fatalf("message mismatch: %#v", decoded)
 	}
 	if decoded.CurrentCliVersion != "3.0.0-beta.5" {
@@ -54,7 +54,7 @@ func TestDecodeCliUpdateRequiredErrorData_WhenContractFixture_ReadsEveryField(t 
 	if decoded.RequiredProtocolVersion != 3 {
 		t.Fatalf("requiredProtocolVersion mismatch: %#v", decoded)
 	}
-	if decoded.UpdateCommand != "uloop update" {
+	if decoded.UpdateCommand != "tloop update" {
 		t.Fatalf("updateCommand mismatch: %#v", decoded)
 	}
 	if !decoded.RetryableAfterUpdate {

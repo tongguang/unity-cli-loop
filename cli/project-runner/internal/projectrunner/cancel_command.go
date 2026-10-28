@@ -45,7 +45,7 @@ func runCancelCommandWithTimeout(
 		clierrors.WriteClassifiedError(stderr, &clierrors.ArgumentError{
 			Message:     "cancel takes no options: " + args[0],
 			Option:      args[0],
-			NextActions: []string{"Run `uloop cancel` with no options other than --project-path."},
+			NextActions: []string{"Run `tloop cancel` with no options other than --project-path."},
 		}, errorContext)
 		return 1
 	}

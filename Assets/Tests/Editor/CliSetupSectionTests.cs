@@ -185,7 +185,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 warningLabel.text,
                 Is.EqualTo("Homebrew-managed CLI did not report a version.\n"
-                    + "Run this command in your terminal:\nbrew reinstall uloop"));
+                    + "Run this command in your terminal:\nbrew reinstall tloop"));
             Assert.That(warningLabel.ClassListContains("unity-cli-loop-warning-message--visible"), Is.True);
         }
 
@@ -211,7 +211,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 warningLabel.text,
                 Is.EqualTo("Homebrew-managed CLI v2.9.0 does not meet the required v3.0.0.\n"
-                    + "Run this command in your terminal:\nbrew upgrade uloop"));
+                    + "Run this command in your terminal:\nbrew upgrade tloop"));
             Assert.That(warningLabel.ClassListContains("unity-cli-loop-warning-message--visible"), Is.True);
         }
 
@@ -240,7 +240,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(
                 warningLabel.text,
                 Is.EqualTo("winget-managed CLI v2.9.0 does not meet the required v3.0.0.\n"
-                    + "Run this command in your terminal:\nwinget upgrade --id hatayama.uloop"));
+                    + "Run this command in your terminal:\nwinget upgrade --id tongguang.tloop"));
             Assert.That(warningLabel.ClassListContains("unity-cli-loop-warning-message--visible"), Is.True);
         }
 
@@ -264,8 +264,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Label warningLabel = root.Q<Label>("cli-homebrew-upgrade-message");
             Assert.That(
                 warningLabel.text,
-                Is.EqualTo("Homebrew-managed CLI v3.0.0 did not answer as the required uloop CLI.\n"
-                    + "Run this command in your terminal:\nbrew reinstall uloop"));
+                Is.EqualTo("Homebrew-managed CLI v3.0.0 did not answer as the required tloop CLI.\n"
+                    + "Run this command in your terminal:\nbrew reinstall tloop"));
             Assert.That(warningLabel.ClassListContains("unity-cli-loop-warning-message--visible"), Is.True);
         }
 

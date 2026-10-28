@@ -1,7 +1,7 @@
 #!/bin/sh
-# Development helper for refreshing generated uloop skill files in sibling Unity projects.
+# Development helper for refreshing generated tloop skill files in sibling Unity projects.
 # This is not an installed agent skill or a runtime command. It exists to support local
-# uloop development by resetting each target Git repository, quitting each target
+# tloop development by resetting each target Git repository, quitting each target
 # Unity Editor, regenerating Claude/Agents skill copies, committing those generated
 # files locally, removing Library after Unity has stopped, relaunching each project,
 # and opening the sample scene.
@@ -11,7 +11,7 @@ skill_name="refresh-neighbor-game-skills"
 expected_project_count=3
 sample_scene_path="Assets/Scenes/SampleScene.unity"
 dry_run=0
-uloop_root="${ULOOP_ROOT:-}"
+tloop_root="${TLOOP_ROOT:-}"
 project_file="$(mktemp "${TMPDIR:-/tmp}/${skill_name}.projects.XXXXXX")"
 
 cleanup() {
@@ -30,12 +30,12 @@ trap 'on_signal 143' TERM
 usage() {
     cat <<'USAGE'
 Usage:
-  refresh-neighbor-game-skills.sh [--dry-run] [--uloop-root PATH] [--project PATH ...]
+  refresh-neighbor-game-skills.sh [--dry-run] [--tloop-root PATH] [--project PATH ...]
 
 Workflow for each target Unity project:
   0. Reset Git state to HEAD and remove untracked files
   1. Quit Unity if running
-  2. Install uloop skills for Claude and Agents
+  2. Install tloop skills for Claude and Agents
   3. Commit generated skill changes without pushing
   4. Remove Library
   5. Launch Unity with launch-unity
@@ -176,9 +176,9 @@ parse_args() {
                 dry_run=1
                 shift
                 ;;
-            --uloop-root)
-                [ "$#" -ge 2 ] || fail "--uloop-root requires a path"
-                uloop_root=$2
+            --tloop-root)
+                [ "$#" -ge 2 ] || fail "--tloop-root requires a path"
+                tloop_root=$2
                 shift 2
                 ;;
             --project)
@@ -197,26 +197,26 @@ parse_args() {
     done
 }
 
-has_local_uloop() {
+has_local_tloop() {
     candidate=$1
-    [ -x "$candidate/dist/darwin-arm64/uloop" ]
+    [ -x "$candidate/dist/darwin-arm64/tloop" ]
 }
 
-resolve_uloop_root() {
-    if [ -n "$uloop_root" ]; then
-        [ -d "$uloop_root" ] || fail "--uloop-root does not exist: $uloop_root"
-        uloop_root=$(cd "$uloop_root" && pwd -P)
-        has_local_uloop "$uloop_root" || fail "local uloop binary not found under --uloop-root"
+resolve_tloop_root() {
+    if [ -n "$tloop_root" ]; then
+        [ -d "$tloop_root" ] || fail "--tloop-root does not exist: $tloop_root"
+        tloop_root=$(cd "$tloop_root" && pwd -P)
+        has_local_tloop "$tloop_root" || fail "local tloop binary not found under --tloop-root"
         return 0
     fi
 
     current_git_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
-    if [ -n "$current_git_root" ] && has_local_uloop "$current_git_root"; then
-        uloop_root=$current_git_root
+    if [ -n "$current_git_root" ] && has_local_tloop "$current_git_root"; then
+        tloop_root=$current_git_root
         return 0
     fi
 
-    fail "run from the uloop checkout or pass --uloop-root"
+    fail "run from the tloop checkout or pass --tloop-root"
 }
 
 discover_projects() {
@@ -224,7 +224,7 @@ discover_projects() {
         return 0
     fi
 
-    parent_dir=$(dirname "$uloop_root")
+    parent_dir=$(dirname "$tloop_root")
     for candidate in "$parent_dir"/cli-loop-*; do
         [ -d "$candidate" ] || continue
         [ -f "$candidate/ProjectSettings/ProjectVersion.txt" ] || continue
@@ -308,7 +308,7 @@ quit_unity() {
 
 install_skills() {
     project=$1
-    run "$uloop_bin" --project-path "$project" skills install --claude --agents
+    run "$tloop_bin" --project-path "$project" skills install --claude --agents
 }
 
 commit_generated_skills() {
@@ -316,7 +316,7 @@ commit_generated_skills() {
     if [ "$dry_run" -eq 1 ]; then
         run git -C "$project" add -A -- .claude/skills .agents/skills
         run git -C "$project" diff --cached --quiet -- .claude/skills .agents/skills
-        log "[dry-run] git -C $project commit -m 'Update generated uloop skills'"
+        log "[dry-run] git -C $project commit -m 'Update generated tloop skills'"
         return 0
     fi
 
@@ -325,7 +325,7 @@ commit_generated_skills() {
         log "No generated skill changes to commit: $project"
         return 0
     fi
-    git -C "$project" commit -m "Update generated uloop skills"
+    git -C "$project" commit -m "Update generated tloop skills"
 }
 
 remove_library() {
@@ -348,12 +348,12 @@ wait_for_unity_ready() {
     elapsed_seconds=0
 
     if [ "$dry_run" -eq 1 ]; then
-        log "[dry-run] wait until Unity responds to uloop for $project"
+        log "[dry-run] wait until Unity responds to tloop for $project"
         return 0
     fi
 
     while [ "$elapsed_seconds" -lt "$timeout_seconds" ]; do
-        if "$uloop_bin" --project-path "$project" get-logs --max-count 1 >/dev/null 2>&1; then
+        if "$tloop_bin" --project-path "$project" get-logs --max-count 1 >/dev/null 2>&1; then
             return 0
         fi
 
@@ -382,13 +382,13 @@ if (SceneManager.GetActiveScene().path != scenePath)
 return SceneManager.GetActiveScene().path;
 "
     if [ "$dry_run" -eq 1 ]; then
-        run "$uloop_bin" --project-path "$project" execute-dynamic-code --code "$code"
+        run "$tloop_bin" --project-path "$project" execute-dynamic-code --code "$code"
         return 0
     fi
 
     command -v jq >/dev/null 2>&1 || fail "jq is not available on PATH"
     response=''
-    if ! response=$("$uloop_bin" --project-path "$project" execute-dynamic-code --code "$code"); then
+    if ! response=$("$tloop_bin" --project-path "$project" execute-dynamic-code --code "$code"); then
         [ -z "$response" ] || printf '%s\n' "$response" >&2
         fail "failed to execute sample scene open command: $project"
     fi
@@ -400,14 +400,14 @@ return SceneManager.GetActiveScene().path;
 }
 
 parse_args "$@"
-resolve_uloop_root
+resolve_tloop_root
 discover_projects
 assert_project_count
 
-uloop_bin="$uloop_root/dist/darwin-arm64/uloop"
+tloop_bin="$tloop_root/dist/darwin-arm64/tloop"
 command -v launch-unity >/dev/null 2>&1 || fail "launch-unity is not available on PATH"
 
-log "Using uloop: $uloop_bin"
+log "Using tloop: $tloop_bin"
 log "Target projects:"
 while IFS= read -r project; do
     log "  $project"

@@ -1,4 +1,4 @@
-#if ULOOP_HAS_INPUT_SYSTEM
+#if TLOOP_HAS_INPUT_SYSTEM
 using UnityEngine;
 
 namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
@@ -12,7 +12,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         internal const string MonitorRemovalWarning =
             "An input callback removed an Input System state monitor while this input was being applied " +
             "(for example, a performed callback that disables its own action map). " +
-            "uloop suppressed the internal \"Assertion failed\" log that Unity's Input System raises in the Editor for this case. " +
+            "tloop suppressed the internal \"Assertion failed\" log that Unity's Input System raises in the Editor for this case. " +
             "If other actions are bound to the same control, they may have missed this input; " +
             "switch action maps on the next frame instead of inside the callback if that matters.";
 

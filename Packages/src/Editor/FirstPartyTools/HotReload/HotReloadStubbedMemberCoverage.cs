@@ -122,13 +122,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 return "Not introduced: " + labels[0]
                     + " calls members that a hot reload added, so its body runs only once this reload "
                     + "patches it in, and this reload did not. Fix what kept it from being patched and "
-                    + "rerun, or run 'uloop compile' to apply this edit.";
+                    + "rerun, or run 'tloop compile' to apply this edit.";
             }
 
             return "Not introduced: " + string.Join(", ", labels)
                 + " call members that a hot reload added, so their bodies run only once this reload "
                 + "patches them in, and this reload did not. Fix what kept them from being patched and "
-                + "rerun, or run 'uloop compile' to apply this edit.";
+                + "rerun, or run 'tloop compile' to apply this edit.";
         }
     }
 }

@@ -18,7 +18,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private const string AssemblyDirectoryKey = "<PROJECT_ROOT>/Assets/VendorTools";
 
         private const string LegacyToolSource =
-            "using io.github.hatayama.uLoopMCP;\n" +
+            "using io.github.tongguang.tloop;\n" +
             "[McpTool] public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse> {}";
 
         private const string CurrentApplicationSource =
@@ -38,7 +38,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _projectRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _projectRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_projectRoot);
             _legacyDirectories = new HashSet<string>();
             _toolContractsDirectories = new HashSet<string>();

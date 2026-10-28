@@ -49,7 +49,7 @@ accessors are methods and follow the same mapping. A field-like event's private 
 stays private without a name-based exception.
 
 Copies use their own cache,
-`Library/UloopHotReload/InternalsExposedRefs/fmt1/<assembly>-<mvid>.dll`. The existing fully
+`Library/TloopHotReload/InternalsExposedRefs/fmt1/<assembly>-<mvid>.dll`. The existing fully
 publicized shim references keep their separate cache and behavior. The worker's planning,
 verification, and transform inputs continue to receive the original reference paths. Source
 promotion and exposed-reference generation must not change shared worker input objects.

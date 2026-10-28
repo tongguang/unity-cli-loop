@@ -26,7 +26,7 @@ const (
 	compileWaitTimeoutParam  = "TimeoutSeconds"
 	// Why separate from ToolReadinessTimeout (180s): launch readiness stays short.
 	// Why 10m: worst-case blind block beats headroom. Why ≤ C# CompileResultLifetime (20m):
-	// timed-out clients can still retrieve results by retrying uloop compile ~10m more.
+	// timed-out clients can still retrieve results by retrying tloop compile ~10m more.
 	compileWaitTimeout = 10 * time.Minute
 	// Why warn at 20m: Unity stores compile results for CompileResultLifetime (20m).
 	// Waiting longer does not fail, but a timed-out retry may miss the retained result.

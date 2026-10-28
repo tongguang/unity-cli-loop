@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	launchReadinessMessage           = "Waiting for Unity CLI Loop server readiness..."
-	launchReadyMessage               = "Unity CLI Loop is ready."
+	launchReadinessMessage           = "Waiting for Tuanjie CLI Loop server readiness..."
+	launchReadyMessage               = "Tuanjie CLI Loop is ready."
 	launchAlreadyRunningReadyMessage = "Unity is already running and ready."
 	launchQuitStoppedMessage         = "Unity quit. It saved its window layout and discarded unsaved scene changes."
 	launchForceKillStoppedMessage    = "Unity was force-killed. Its window layout was not saved, and unsaved scene changes were lost."
@@ -81,7 +81,7 @@ func writeExistingV2LaunchReadyResponse(stdout io.Writer, stderr io.Writer, proj
 		AlreadyRunning:   true,
 		CurrentProcessId: &currentPid,
 		ProjectRoot:      projectRoot,
-		Message:          "Unity is already running and the V2 uloop server is ready. This project uses uloop V2; commands run through the V2 CLI.",
+		Message:          "Unity is already running and the V2 tloop server is ready. This project uses tloop V2; commands run through the V2 CLI.",
 	})
 }
 
@@ -127,7 +127,7 @@ func writeLaunchedV2ReadyResponse(
 		StopMethod:        string(previousStop),
 		CurrentProcessId:  &currentPid,
 		ProjectRoot:       projectRoot,
-		Message:           "Unity started and the V2 uloop server is ready. This project uses uloop V2; commands run through the V2 CLI.",
+		Message:           "Unity started and the V2 tloop server is ready. This project uses tloop V2; commands run through the V2 CLI.",
 	})
 }
 

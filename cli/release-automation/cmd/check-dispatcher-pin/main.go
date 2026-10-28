@@ -19,7 +19,7 @@ func main() {
 	headRef := flag.String("head", "HEAD", "head git ref used to select network verification")
 	flag.Parse()
 	packagePinPath := filepath.Join("..", "..", "Packages", "src", "project-runner-pin.json")
-	projectPinPath := filepath.Join("..", "..", ".uloop", "project-runner-pin.json")
+	projectPinPath := filepath.Join("..", "..", ".tloop", "project-runner-pin.json")
 	packagePin, err := os.ReadFile(packagePinPath)
 	if err == nil {
 		projectPin, projectErr := os.ReadFile(projectPinPath)
@@ -91,7 +91,7 @@ func dispatcherPinNetworkVerificationRequired(baseRef string, headRef string) bo
 
 func dispatcherPinPathNeedsNetworkVerification(path string) bool {
 	return path == "Packages/src/project-runner-pin.json" ||
-		path == ".uloop/project-runner-pin.json" ||
+		path == ".tloop/project-runner-pin.json" ||
 		path == "scripts/install.sh" ||
 		path == "scripts/install.ps1" ||
 		path == ".github/workflows/build-and-test.yml" ||

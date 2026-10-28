@@ -7,14 +7,14 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal static class HotReloadConstants
     {
-        public const string HarmonyId = "io.github.hatayama.uloop.hot-reload";
+        public const string HarmonyId = "io.github.tongguang.tloop.hot-reload";
 
         public const string ScriptAssembliesRelativeDirectory = "Library/ScriptAssemblies";
 
         // Where one domain's introduced-type artifact assemblies are written, one directory per
         // session and artifact below it. Shared with the publicizer, which accepts an image from
         // here as well as one from ScriptAssemblies.
-        public const string IntroducedTypeArtifactsRelativeDirectory = "Library/UloopHotReload/IntroducedTypes";
+        public const string IntroducedTypeArtifactsRelativeDirectory = "Library/TloopHotReload/IntroducedTypes";
 
         // An artifact assembly is named this prefix followed by its artifact id, which is also the
         // name of its directory. The reference caches key their copies by the same name.
@@ -27,52 +27,52 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // rule change (event backing fields stay non-public since fmt2) must move the directory —
         // otherwise a cache written under the old rule keeps poisoning shim compiles until the
         // assembly happens to recompile.
-        public const string PublicizedRefsRelativeDirectory = "Library/UloopHotReload/PublicizedRefs/fmt2";
+        public const string PublicizedRefsRelativeDirectory = "Library/TloopHotReload/PublicizedRefs/fmt2";
 
         // Shim reference copies of an assembly that grants the edited assembly no internals. They
         // keep the assembly's internal types and members internal, so they must not share a cache
         // directory with the fully publicized copies of the same assembly name and Mvid.
         // "fmt1" = generation of that rewrite rule, bumped the same way as PublicizedRefs.
-        public const string PublicizedExternalRefsRelativeDirectory = "Library/UloopHotReload/PublicizedExternalRefs/fmt1";
+        public const string PublicizedExternalRefsRelativeDirectory = "Library/TloopHotReload/PublicizedExternalRefs/fmt1";
 
         // Artifact compilation must not inherit the shim cache's private-member visibility.
-        public const string InternalsExposedRefsRelativeDirectory = "Library/UloopHotReload/InternalsExposedRefs/fmt1";
+        public const string InternalsExposedRefsRelativeDirectory = "Library/TloopHotReload/InternalsExposedRefs/fmt1";
 
         // Worker binaries are keyed by SHA256 of every TransformWorker~/*.cs file name and content.
-        public const string WorkerCacheRelativeDirectory = "Library/UloopHotReload/Worker";
+        public const string WorkerCacheRelativeDirectory = "Library/TloopHotReload/Worker";
 
         // EditMode e2e tests place edited source copies here so AssetDatabase is never provoked.
-        public const string TestSourcesRelativeDirectory = "Library/UloopHotReload/TestSources";
+        public const string TestSourcesRelativeDirectory = "Library/TloopHotReload/TestSources";
 
         // Per-assembly source snapshots keyed by assembly name + Mvid; file names are SHA256 of
         // the project-relative source path (slash-normalized) so separators and MAX_PATH never
         // affect the on-disk layout. Adoption is decided at use time by PDB document checksum.
-        public const string SourceSnapshotRelativeDirectory = "Library/UloopHotReload/SourceSnapshot";
+        public const string SourceSnapshotRelativeDirectory = "Library/TloopHotReload/SourceSnapshot";
 
         // The compilation assembly list saved by a clean domain, from which the next domain
         // rebuilds the list without asking Unity on the main thread.
-        public const string CompilationAssemblyListRelativePath = "Library/UloopHotReload/CompilationAssemblies.json";
+        public const string CompilationAssemblyListRelativePath = "Library/TloopHotReload/CompilationAssemblies.json";
 
         // The file inside a snapshot directory that records each copied source's length and last
         // write time (UTC ticks), so a later domain tells an unchanged source by its stat alone.
         public const string SourceStampManifestFileName = "source-stamps.txt";
-        public const string SourceStampManifestHeader = "uloop-source-stamps 2";
+        public const string SourceStampManifestHeader = "tloop-source-stamps 2";
 
         // Per-assembly lists of the documents a PDB's sequence points refer to, keyed by the dll's
         // file name and stamped with the dll's and the PDB's length, write time and MVID. Lets the
         // first hot reload run after a domain reload skip the walk over every sequence point.
         // "fmt1" = generation of the file format, bumped the same way as PublicizedRefs.
-        public const string PdbDocumentsRelativeDirectory = "Library/UloopHotReload/PdbDocuments/fmt1";
+        public const string PdbDocumentsRelativeDirectory = "Library/TloopHotReload/PdbDocuments/fmt1";
 
         // Per-assembly sets of the methods of other assemblies the dll's MemberRef table names, keyed
         // by the dll's file name and stamped with its length, write time and MVID. Lets the first hot
         // reload run after a domain reload skip reading assemblies that name none of the edited methods.
         // "fmt1" = generation of the file format, bumped the same way as PublicizedRefs.
-        public const string ReferencedMethodsRelativeDirectory = "Library/UloopHotReload/ReferencedMethods/fmt1";
+        public const string ReferencedMethodsRelativeDirectory = "Library/TloopHotReload/ReferencedMethods/fmt1";
 
         // The assemblies the hot reload runs of this project edited, most recent first. The
         // warm-up after a domain reload reads it to choose what to load before the first run.
-        public const string WarmUpRelativeDirectory = "Library/UloopHotReload/WarmUp";
+        public const string WarmUpRelativeDirectory = "Library/TloopHotReload/WarmUp";
         public const string WarmUpTargetsFileName = "targets.txt";
 
         // Package-relative directory of the out-of-process transform worker sources (tilde dir = Unity-ignored).
@@ -120,7 +120,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             "Added members declared in the edited files of the same assembly are applied through "
             + "the shim assembly. A member that another assembly declares, one declared in a file "
             + "outside this reload that no earlier reload applied, or a kind hot reload cannot add "
-            + "(such as an added enum member) still requires a real compile (uloop compile).";
+            + "(such as an added enum member) still requires a real compile (tloop compile).";
 
         public const string ActiveSiblingsRebindWarningFormat =
             "Also re-applied {0} unchanged file(s) with active patches in assembly '{1}' so their "
@@ -164,14 +164,14 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string ActiveSiblingRebindSkippedWarningFormat =
             "'{0}' was pulled in to re-bind its active patches, but this reload stopped before "
             + "re-applying them, so its active patches are unchanged. Fix the refused declaration "
-            + "and rerun, or run uloop compile to clear the run.";
+            + "and rerun, or run tloop compile to clear the run.";
 
         // Why a third wording: a sibling whose every row was Skipped did not fail, and its
         // earlier patches stay live, so the failed sentence would overstate what happened.
         public const string ActiveSiblingRebindSkippedOnlyWarningFormat =
             "'{0}' was pulled in to re-bind its active patches, but every method there was Skipped "
             + "this time; see its rows for the reasons. Any earlier patches there stay active until "
-            + "uloop compile clears the run.";
+            + "tloop compile clears the run.";
 
         // Why a fourth wording: when the whole reload is refused, every file of the group gets the
         // same file-level Failed row, so the sibling's rows only repeat the run's refusal reason
@@ -180,11 +180,11 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string ActiveSiblingRebindRunRefusedWarningFormat =
             "'{0}' was pulled in to re-bind its active patches, but the whole reload was refused "
             + "before re-applying them, so its active patches are unchanged; its rows repeat the "
-            + "refusal reason. Fix that and rerun, or run uloop compile to clear the run.";
+            + "refusal reason. Fix that and rerun, or run tloop compile to clear the run.";
 
         public const string ActiveSiblingRebindFailedWarningFormat =
             "'{0}' was pulled in to re-bind its active patches but this reload failed for it; "
-            + "see its rows for which patches changed and run uloop compile to clear the run.";
+            + "see its rows for which patches changed and run tloop compile to clear the run.";
 
         // Wire value for TransformWorkerEntryDto.patchKind when the worker emits a shim for a
         // method that exists only in the edited source. Keep in sync with PatchKinds.AddedMethod
@@ -211,42 +211,42 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string UnappliedAddedMethodCallerSkipReasonFormat =
             "Calls the added method '{0}', which this reload did not apply; the caller was left unpatched. "
             + "That method's own row gives the reason: fix its compile error when it Failed, or the failure "
-            + "elsewhere in its file when it was Skipped, and reload again, or run 'uloop compile'.";
+            + "elsewhere in its file when it was Skipped, and reload again, or run 'tloop compile'.";
 
         public const string IsolatedAddedMethodCallerSkipReason =
             "Calls an added method whose shim failed to compile; the caller was left unpatched. "
-            + "Fix the compile error in the added method (see the Failed row in this response) and reload again, or run 'uloop compile'.";
+            + "Fix the compile error in the added method (see the Failed row in this response) and reload again, or run 'tloop compile'.";
 
         public const string SignatureChangedGateSkipReasonFormat =
-            "The return type of '{0}' changed, but this hot reload does not patch every compiled call site of the old method. Applying it would leave those call sites on the old version. Run 'uloop compile'.";
+            "The return type of '{0}' changed, but this hot reload does not patch every compiled call site of the old method. Applying it would leave those call sites on the old version. Run 'tloop compile'.";
 
-        // Why drop the original trailing "Run 'uloop compile'.": the inserted sentence already
+        // Why drop the original trailing "Run 'tloop compile'.": the inserted sentence already
         // ends with that CTA, and keeping both would duplicate it.
         public const string SignatureChangedGateSkipReasonSameFileCallersFormat =
-            "The return type of '{0}' changed, but this hot reload does not patch every compiled call site of the old method. Applying it would leave those call sites on the old version. Editing the bodies of {1} in this file and reloading again applies them together, or run 'uloop compile'.";
+            "The return type of '{0}' changed, but this hot reload does not patch every compiled call site of the old method. Applying it would leave those call sites on the old version. Editing the bodies of {1} in this file and reloading again applies them together, or run 'tloop compile'.";
 
         public const string SignatureChangedGateSkipReasonAlreadyActiveFormat =
             "The return type of '{0}' changed against the last compile, and the replacement applied by an "
-            + "earlier hot reload is still active; this run left it unchanged. Run 'uloop compile' to make it permanent.";
+            + "earlier hot reload is still active; this run left it unchanged. Run 'tloop compile' to make it permanent.";
 
         public const string SignatureChangedGatedCallerSkipReason =
-            "Calls a method whose signature change was not applied because unpatched compiled call sites remain; this caller was left unpatched too. Run 'uloop compile'.";
+            "Calls a method whose signature change was not applied because unpatched compiled call sites remain; this caller was left unpatched too. Run 'tloop compile'.";
 
         public const string StaleSignatureCallersWarningFormat =
-            "Compiled call sites of the removed signature '{0}' are not patched by this hot reload: {1}. They keep the previous behavior until 'uloop compile'.";
+            "Compiled call sites of the removed signature '{0}' are not patched by this hot reload: {1}. They keep the previous behavior until 'tloop compile'.";
 
         public const string SignatureChangeCallersRepatchedNoticeFormat =
             "Signature change '{0}' applied because its compiled call sites were already hot-reload patched; this run re-applied them on the new signature: {1}.";
 
         public const string SignatureChangeCoverageLostFailureFormat =
-            "Isolation excluded compiled callers of '{0}'; applying the rest would leave those callers on the old version. Run 'uloop compile'.";
+            "Isolation excluded compiled callers of '{0}'; applying the rest would leave those callers on the old version. Run 'tloop compile'.";
 
         public const string DeactivatedPatchesWarningFormat =
             "This run deactivated previously active patches: {0}. They reverted to the compiled behavior; "
-            + "edit and reload again to re-apply them, or run 'uloop compile'.";
+            + "edit and reload again to re-apply them, or run 'tloop compile'.";
 
         public const string DeactivatedAddedMembersWarningFormat =
-            "This run deactivated previously active added members: {0}. They are no longer registered, but patches this run left active may still reach their previous shim bodies. Edit and reload again to re-apply them, or run 'uloop compile'.";
+            "This run deactivated previously active added members: {0}. They are no longer registered, but patches this run left active may still reach their previous shim bodies. Edit and reload again to re-apply them, or run 'tloop compile'.";
 
         // Why a separate sentence for the members this run skipped: the ordinary wording invites
         // an edit to them, while what has to change first is what their Methods[] reason names,
@@ -255,7 +255,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string DeactivatedSkippedPatchesWarningFormat =
             "This run deactivated previously active patches by skipping them: {0}. They reverted to the "
             + "compiled behavior. The next reload of this assembly retries their file once while it stays "
-            + "unchanged, so change what their Methods[].Reason names and reload, or run 'uloop compile'.";
+            + "unchanged, so change what their Methods[].Reason names and reload, or run 'tloop compile'.";
 
         // Why this is reported at all: a skip that leaves an earlier patch active produces no
         // Skipped-versus-compiled difference the reader can see. The method keeps running the
@@ -265,13 +265,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             "This run skipped these methods, so what runs for them is still the body an earlier hot "
             + "reload applied, which matches neither the compiled assembly nor the source on disk: {0}. "
             + "Reloading the same shape skips them again; change what their Methods[].Reason names and "
-            + "reload, or run 'uloop compile'.";
+            + "reload, or run 'tloop compile'.";
 
         public const string DeactivatedSkippedAddedMembersWarningFormat =
             "This run deactivated previously active added members by skipping them: {0}. They are no longer "
             + "registered, but patches this run left active may still reach their previous shim bodies. "
             + "The next reload of this assembly retries their file once while it stays unchanged, so "
-            + "change what their Methods[].Reason names and reload, or run 'uloop compile'.";
+            + "change what their Methods[].Reason names and reload, or run 'tloop compile'.";
 
         // Format: each stale call as "caller calls member", joined with ", " in ordinal order.
         // Why it names the pair: the member is gone from the ledger and from --status, and the
@@ -281,7 +281,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             "Methods that earlier hot reloads patched or added still call added members that are no "
             + "longer registered: {0}. Those calls still run the members' earlier bodies, which match "
             + "neither the compiled assembly nor the source on disk. Reload until the calling methods "
-            + "apply again, or run 'uloop compile'.";
+            + "apply again, or run 'tloop compile'.";
 
         // Wire value for TransformWorkerRemovedMemberDto.kind.
         // Keep in sync with RemovedMemberKinds in TransformWorker~/RemovedMemberKinds.cs.
@@ -291,7 +291,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
         // Format: comma-separated removed member names.
         public const string RemovedMembersWarningFormat =
-            "Removed members stay present in the compiled assembly until 'uloop compile'; "
+            "Removed members stay present in the compiled assembly until 'tloop compile'; "
             + "edited bodies no longer call them: {0}.";
 
         // Format: count of removed members, then the comma-separated names (ordinal).
@@ -300,25 +300,25 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // as news, which buries the warnings the run produced for the first time.
         public const string ContinuingRemovedMembersWarningFormat =
             "Continuing from an earlier run: the same {0} removed member(s) are still in the "
-            + "compiled assembly and still uncalled by the edited bodies ({1}); 'uloop compile' "
+            + "compiled assembly and still uncalled by the edited bodies ({1}); 'tloop compile' "
             + "is what removes them.";
 
         // Reason on a Stale row: the source no longer declares the method, but the patch is still
         // installed, so compiled callers keep running the patched body.
         public const string StalePatchRemovedFromSourceReason =
             "The method was removed from the edited source, but its patch stays active until "
-            + "'uloop compile', '--revert-all', or a later reload whose source restores the method "
+            + "'tloop compile', '--revert-all', or a later reload whose source restores the method "
             + "to the compiled baseline; compiled callers still run the patched body.";
 
         public const string AddedFieldsLifetimeWarningFormat =
-            "Added field values live outside the compiled assembly and last only until the next 'uloop compile' or domain reload: {0}.";
+            "Added field values live outside the compiled assembly and last only until the next 'tloop compile' or domain reload: {0}.";
 
         // Why one line naming Type.field: two types can gain a field of the same name, and the
         // recipe file is named because the reader has no other way to find it.
         public const string SerializedAddedFieldWarningFormat =
             "Added field(s) with a serialization attribute will not appear in the Inspector or "
-            + "serialize until 'uloop compile': {0}. To put a value in one now, follow "
-            + "references/added-field-wiring.md in the uloop-hot-reload skill.";
+            + "serialize until 'tloop compile': {0}. To put a value in one now, follow "
+            + "references/added-field-wiring.md in the tloop-hot-reload skill.";
 
         // Why name the fields: a domain reload (a compile, or entering Play Mode with Domain
         // Reload enabled) or a revert dropped the values an earlier run wired into them, and
@@ -344,8 +344,8 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string PauseBeforeWiringDuringPlayWarning =
             "Play Mode is running, so code that reads these added fields may already have run with "
             + "them unset (for example a NullReferenceException every frame). Pause Play Mode "
-            + "('uloop control-play-mode --action Pause'), wire them, then resume "
-            + "('uloop control-play-mode --action Play'); to wire them before any read next time, "
+            + "('tloop control-play-mode --action Pause'), wire them, then resume "
+            + "('tloop control-play-mode --action Play'); to wire them before any read next time, "
             + "pause before the hot reload.";
 
         // Why at the revert already: the revert drops the declarations and their values, and the
@@ -362,7 +362,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             "A previous reload already added these fields, so this run's initializer for them does "
             + "not reach a value that already exists: {0}. It runs only where the field has not been "
             + "read yet; assign the value inside a patched method (for a reference type, "
-            + "'if (field == null) field = ...;'), rename the field, or run 'uloop compile'.";
+            + "'if (field == null) field = ...;'), rename the field, or run 'tloop compile'.";
 
         // Why a warning: the store keeps a value under the field's key whatever its type, and a
         // read with a type that cannot hold it starts over from the initializer, so a value (for
@@ -373,7 +373,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             + "under the old type is replaced by the initializer (or the default) wherever the new "
             + "type cannot hold it; an added event loses its subscribers unless the new delegate type "
             + "can still be read from the old one: {0}. Assign or subscribe "
-            + "again inside a patched method, or run 'uloop compile'.";
+            + "again inside a patched method, or run 'tloop compile'.";
 
         public const string MissingUsingCompileHint =
             "This can mean a missing using or global using (hot reload collects global usings from the edited file's assembly).";
@@ -384,7 +384,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // edited file instead, which is not where the answer is.
         public const string IntroducedTypeOtherAssemblyCompileHint =
             "If the missing type was introduced by this reload into a different assembly, it is "
-            + "visible only inside that assembly until 'uloop compile' makes it a compiled type.";
+            + "visible only inside that assembly until 'tloop compile' makes it a compiled type.";
 
         // Why a separate line after Compose: CS1061/CS0117/CS0103 name the missing member, but
         // not that this same run skipped it (generic add, etc.). Agents otherwise treat the
@@ -395,7 +395,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Why a separate note for types: CS0246/CS0234 only say the type is missing, while the
         // source still declares it. The type was refused by this run, so only a compile adds it.
         public const string RefusedIntroducedTypeCompileFailureNoteFormat =
-            "'{0}' was refused by this hot reload run ({1}), which is why this compile failed; run 'uloop compile'.";
+            "'{0}' was refused by this hot reload run ({1}), which is why this compile failed; run 'tloop compile'.";
 
         // Wire value for TransformWorkerEntryDto.patchKind when the worker rewrote inaccessible
         // accesses into accessor delegates.
@@ -439,7 +439,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
         public const string StaleAssemblyHint =
             "The loaded assembly no longer matches the compiled assembly on disk (a script compile "
-            + "or domain reload may have happened). Hot reload is not needed — use uloop compile, "
+            + "or domain reload may have happened). Hot reload is not needed — use tloop compile, "
             + "or wait for compilation to finish and retry.";
 
         public const string AssemblyNotLoadedHint =
@@ -453,7 +453,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // file may also hold a compiled type, and that one is still patched in full.
         public const string IntroducedTypeSourceNoBaselineWarningFormat =
             "{0} declares a type hot reload introduced (assembly {1}), so it has no compiled "
-            + "baseline until 'uloop compile'. This is expected: hot reload tracks the introduced "
+            + "baseline until 'tloop compile'. This is expected: hot reload tracks the introduced "
             + "type from its own recorded declaration. Any other type in this file has no baseline "
             + "either and is patched in full.";
 
@@ -464,7 +464,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string NoVerifiedSourceSnapshotForCurrentBuildWarningFormat =
             "No verified source snapshot for {0} (assembly {1}) matches the current build; patching "
             + "all methods. Hot reload captures the snapshot after each compile, so either the capture "
-            + "had not finished when this reload arrived or the file is new: run 'uloop compile', or "
+            + "had not finished when this reload arrived or the file is new: run 'tloop compile', or "
             + "rerun in a moment.";
 
         // Format: file name, assembly name. Used instead of the warning above when the snapshot's
@@ -474,13 +474,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const string NoVerifiedSourceSnapshotMismatchWarningFormat =
             "No verified source snapshot for {0} (assembly {1}): the snapshot does not match the "
             + "compiled file (most often the file was saved after the compile had read it); "
-            + "patching all methods. Run 'uloop compile' to re-establish the baseline.";
+            + "patching all methods. Run 'tloop compile' to re-establish the baseline.";
 
         // Format: file name, assembly name. Used instead of the warnings above when the compiled
         // assembly or its PDB is not on disk, so there is nothing to verify a snapshot against.
         public const string NoVerifiedSourceSnapshotNoCompiledAssemblyWarningFormat =
             "No verified source snapshot for {0} (assembly {1}): the compiled assembly or its PDB is "
-            + "missing; patching all methods. Run 'uloop compile'.";
+            + "missing; patching all methods. Run 'tloop compile'.";
 
         // Format: file name, assembly name. Used instead of the warnings above when no sequence
         // point of the compiled PDB refers to the file: a file whose code compiles to no method
@@ -496,12 +496,12 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // warnings above for files a run only re-applied; see HotReloadSiblingBaselineNotices.
         public const string SiblingIntroducedTypeNoBaselineWarningFormat =
             "{0} re-applied sibling file(s) declare a type hot reload introduced, so they have no "
-            + "compiled baseline until 'uloop compile': {1}. This is expected: hot reload tracks "
+            + "compiled baseline until 'tloop compile': {1}. This is expected: hot reload tracks "
             + "each introduced type from its own recorded declaration.";
 
         public const string SiblingNoVerifiedSourceSnapshotWarningFormat =
             "{0} re-applied sibling file(s) have no verified source snapshot, so every method in them "
-            + "is treated as edited: {1}. Run uloop compile to establish a baseline for edited-method detection.";
+            + "is treated as edited: {1}. Run tloop compile to establish a baseline for edited-method detection.";
 
         public const string SiblingNoCompiledMethodBodyBaselineWarningFormat =
             "{0} re-applied sibling file(s) have no compiled method body, so there is no baseline "
@@ -554,7 +554,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // behind, so a caller told the revert succeeded would otherwise wait for a refresh that
         // this session will not perform.
         public const string ActiveIntroducedTypesRevertAllHoldNote =
-            " Auto Refresh stays held for them; run 'uloop compile' to release it.";
+            " Auto Refresh stays held for them; run 'tloop compile' to release it.";
 
         // Format: how many method outcomes of this run were Skipped.
         public const string SkippedCountApplyMessageSuffixFormat = " Skipped: {0}.";
@@ -612,7 +612,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // The row must also say how to trigger the next call, because for
         // initialization-only methods that is the non-obvious step.
         public const string ActivePatchNeverInvokedReason =
-            "Not invoked since this patch was applied. Calls that already finished before the patch (for example one-time initialization) do not re-run automatically; the patched body takes effect the next time this method is called. If this method only runs during initialization, trigger that path again — re-create the object that runs it, toggle the component's `enabled` to false and back to true when it runs from OnEnable or OnDisable (for example with `uloop execute-dynamic-code`), or run 'uloop compile' and enter Play Mode again.";
+            "Not invoked since this patch was applied. Calls that already finished before the patch (for example one-time initialization) do not re-run automatically; the patched body takes effect the next time this method is called. If this method only runs during initialization, trigger that path again — re-create the object that runs it, toggle the component's `enabled` to false and back to true when it runs from OnEnable or OnDisable (for example with `tloop execute-dynamic-code`), or run 'tloop compile' and enter Play Mode again.";
 
         // Format: replacement display name for an Active row whose compiled signature was
         // replaced in a later edit. Supersedes ActivePatchNeverInvokedReason when both apply.
@@ -625,7 +625,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             "{0} change(s) have not been invoked since they were applied; see Methods[].Reason.";
 
         public const string MultiWarningSingleCompileResolutionMessage =
-            "A single 'uloop compile' clears all of them at once when you want them gone; none of them has to be cleared before you keep working.";
+            "A single 'tloop compile' clears all of them at once when you want them gone; none of them has to be cleared before you keep working.";
 
         // Format: project-relative path of the source that matched a non-baseline ledger entry.
         public const string UnchangedSourceNonBaselineWarningFormat =
@@ -646,7 +646,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Patched or Added rows for that sibling, and a summary counting them reads as if the
         // edits the caller asked for had been applied.
         public const string RequestedFilesAllSkippedMessage =
-            "Nothing from the requested file(s) was applied: every method there was Skipped (see Warnings for the reasons). Run 'uloop compile' to apply these edits.";
+            "Nothing from the requested file(s) was applied: every method there was Skipped (see Warnings for the reasons). Run 'tloop compile' to apply these edits.";
 
         // Format: leftover patches peeled because source matched compiled IL again.
         public const string StalePatchesRevertedMessageFormat =
@@ -784,13 +784,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // predefined assembly, so the name from GetAssemblyNameFromScriptPath often does not
         // exist in CompilationPipeline.GetAssemblies().
         public const string CompilationAssemblyNotFoundReasonFormat =
-            "Resolved assembly '{0}' was not found in the compilation pipeline. Unity resolves files under a not-yet-imported .asmdef to a predefined assembly, so a brand-new .asmdef or a brand-new script cannot be hot-reloaded. Run 'uloop compile' first.";
+            "Resolved assembly '{0}' was not found in the compilation pipeline. Unity resolves files under a not-yet-imported .asmdef to a predefined assembly, so a brand-new .asmdef or a brand-new script cannot be hot-reloaded. Run 'tloop compile' first.";
 
         // Format: resolved assembly name. Used when the name is one of Unity's predefined
         // assemblies, which exist only once a script has been compiled into them, so the
         // .asmdef wording above would send the reader looking for a file that is not there.
         public const string PredefinedAssemblyNotCompiledReasonFormat =
-            "Resolved assembly '{0}' does not exist yet: no script has been compiled into it, so there is no assembly to patch. Hot reload can only introduce types into an assembly that already exists. Run 'uloop compile' once; later scripts in this assembly can then be hot-reloaded.";
+            "Resolved assembly '{0}' does not exist yet: no script has been compiled into it, so there is no assembly to patch. Hot reload can only introduce types into an assembly that already exists. Run 'tloop compile' once; later scripts in this assembly can then be hot-reloaded.";
 
         // Format: resolved assembly name, project-relative script path, project-relative
         // .asmdef path. Used when the script has no imported .asmdef but an ancestor directory
@@ -798,30 +798,30 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Unity falls back to while the .asmdef is unimported, and leading with it reads as a
         // contradiction with the .asmdef the reader has to import.
         public const string UnimportedAsmdefCompilationAssemblyNotFoundReasonFormat =
-            "'{1}' sits under '{2}', which Unity has not imported yet, so no compilation assembly exists for it (Unity currently maps the file to the predefined assembly '{0}'). Run 'uloop compile' first; hot reload can target the file once the .asmdef is imported.";
+            "'{1}' sits under '{2}', which Unity has not imported yet, so no compilation assembly exists for it (Unity currently maps the file to the predefined assembly '{0}'). Run 'tloop compile' first; hot reload can target the file once the .asmdef is imported.";
 
         // Why "declarations or methods": a run can fail on a refused type declaration alone, and
         // Methods is then empty, so a next action naming only methods would send the reader to a
         // section with nothing in it.
         public const string PartialApplyRecommendedNextAction =
-            "Partially applied. Fix the failed declarations or methods and rerun, run 'uloop compile' to apply every edit, or run 'uloop hot-reload --revert-all' to discard the applied patches.";
+            "Partially applied. Fix the failed declarations or methods and rerun, run 'tloop compile' to apply every edit, or run 'tloop hot-reload --revert-all' to discard the applied patches.";
 
         public const string AtomicFileSkipReason =
-            "Skipped: hot reload applies each file all-or-nothing, and another method in this file failed. Nothing from this file was applied; patches from earlier reloads are untouched. Fix the failed methods and rerun, or run 'uloop compile'.";
+            "Skipped: hot reload applies each file all-or-nothing, and another method in this file failed. Nothing from this file was applied; patches from earlier reloads are untouched. Fix the failed methods and rerun, or run 'tloop compile'.";
 
         // Format: count of Patched + Added entries already applied in this file before a
         // Harmony patch-engine failure. Used only when that count is at least 1.
         public const string PartialApplyAfterPatchEngineFailureWarningFormat =
-            "A Harmony patch failed after {0} method(s) in this file were already applied by this run; the file is partially applied. Run 'uloop hot-reload --revert-all' and re-apply your edits, or run 'uloop compile'.";
+            "A Harmony patch failed after {0} method(s) in this file were already applied by this run; the file is partially applied. Run 'tloop hot-reload --revert-all' and re-apply your edits, or run 'tloop compile'.";
 
         public const string FailedWithNoApplyRecommendedNextAction =
-            "Fix the failed declarations or methods and rerun, or run 'uloop compile'.";
+            "Fix the failed declarations or methods and rerun, or run 'tloop compile'.";
 
         // Why these replace the fix advice when every failure is of their kind: the failed rows
         // name a compile or an import the Editor ran during the reload, and "Fix the failed
         // declarations or methods" sends the reader looking for a mistake that is not there.
         public const string EditorNotReadyRecommendedNextAction =
-            "The Editor compiled or imported while this reload ran, so there is nothing to fix in the source. Wait until 'uloop status' no longer reports compiling or importing, then rerun; or run 'uloop compile' to apply every edit.";
+            "The Editor compiled or imported while this reload ran, so there is nothing to fix in the source. Wait until 'tloop status' no longer reports compiling or importing, then rerun; or run 'tloop compile' to apply every edit.";
 
         // Why a sentence apart from the new-source ones: this refusal happens for any file the
         // moment the request arrives, before the transform, and the CLI retries once the Editor
@@ -833,7 +833,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             "The Editor is importing assets, so this reload cannot be applied until the import finishes. Wait for it, then retry hot reload.";
 
         public const string EditorNotReadyAfterPartialApplyRecommendedNextAction =
-            "Partially applied. The remaining files were not patched because the Editor compiled or imported while this reload ran: wait until 'uloop status' no longer reports that, then rerun; or run 'uloop compile' to apply every edit; or run 'uloop hot-reload --revert-all' to discard the applied patches.";
+            "Partially applied. The remaining files were not patched because the Editor compiled or imported while this reload ran: wait until 'tloop status' no longer reports that, then rerun; or run 'tloop compile' to apply every edit; or run 'tloop hot-reload --revert-all' to discard the applied patches.";
 
         // Appended after the fix advice when the run also failed for a reason the reader has to
         // fix, so the rows that only need a rerun are not read as more to fix.
@@ -843,12 +843,12 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // Why the main Editor's project: a Virtual Player loads the script assemblies of the main
         // project, so only a compile there reaches it.
         public const string VirtualPlayerRecommendedNextAction =
-            "This Editor is a Multiplayer Play Mode Virtual Player and reads the compiled assemblies of the main Editor's project. Run 'uloop compile' against the main Editor's project; the compiled result reaches this player. Then rerun hot reload with this player's project path. A patch applied to the main Editor does not reach this player.";
+            "This Editor is a Multiplayer Play Mode Virtual Player and reads the compiled assemblies of the main Editor's project. Run 'tloop compile' against the main Editor's project; the compiled result reaches this player. Then rerun hot reload with this player's project path. A patch applied to the main Editor does not reach this player.";
 
         public const string CompiledAssemblyMissingRecommendedNextAction =
-            "The compiled assembly for the file is missing, so there is nothing to fix in the source: run 'uloop compile'.";
+            "The compiled assembly for the file is missing, so there is nothing to fix in the source: run 'tloop compile'.";
 
-        // Why this replaces whatever next action the run chose: those all read "run 'uloop
+        // Why this replaces whatever next action the run chose: those all read "run 'tloop
         // compile'", and during play that is the one thing --compile-on-skip auto declined to do,
         // so the reader has to be told the choice was theirs and how to make it.
         public const string CompileFallbackHeldForPlayModeRecommendedNextAction =
@@ -858,7 +858,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // (CompileErrorNextActionsConstants.PlayModeStopNextAction); restated here because a tool
         // may not reference another tool's assembly.
         public const string CompileFallbackRefusedDuringPlayRecommendedNextAction =
-            "Before compiling, do any fix that Methods[].Reason or IntroducedTypes[].Reason names without a compile. No compile ran because the Editor is in Play Mode and Unity's 'Script Changes While Playing' is set to 'Recompile After Finished Playing'. Run 'uloop control-play-mode --action Stop' to leave Play Mode, then rerun 'uloop compile'.";
+            "Before compiling, do any fix that Methods[].Reason or IntroducedTypes[].Reason names without a compile. No compile ran because the Editor is in Play Mode and Unity's 'Script Changes While Playing' is set to 'Recompile After Finished Playing'. Run 'tloop control-play-mode --action Stop' to leave Play Mode, then rerun 'tloop compile'.";
 
         // Unity's EditorPrefs entry behind "Script Changes While Playing", and its value for
         // "Recompile After Finished Playing", under which the compile tool refuses to run during
@@ -868,7 +868,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public const int ScriptCompilationDuringPlayRecompileAfterFinishedPlaying = 1;
 
         public const string RequestedFilesAllSkippedRecommendedNextAction =
-            "Each Skipped row's Methods[].Reason names what to change (a file to pass with --files, an initializer to drop, a shape hot reload can patch; see Warnings); do that and rerun. Run 'uloop compile' to apply the Skipped edits as they are instead.";
+            "Each Skipped row's Methods[].Reason names what to change (a file to pass with --files, an initializer to drop, a shape hot reload can patch; see Warnings); do that and rerun. Run 'tloop compile' to apply the Skipped edits as they are instead.";
 
         // Why one sentence in one place: the same rule has to reach the caller from the skill, the
         // docs, and every selection response, and two wordings of it read as two rules.
@@ -877,7 +877,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             + "other path) with --files.";
 
         public const string NoCompileSnapshotsMessage =
-            "No compile snapshots exist yet. Run 'uloop compile' first or pass project-relative .cs "
+            "No compile snapshots exist yet. Run 'tloop compile' first or pass project-relative .cs "
             + "paths with --files. " + NewFilesNotAutoSelectedSentence;
 
         public const string NoChangedFilesMessage =
@@ -901,7 +901,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // revert-all dropped. The wording names both, because the ledger does not say which.
         public const string DefaultSelectionReselectedDroppedFilesFormat =
             " {0} new file(s) declaring a type hot reload introduced were selected again, because "
-            + "entering Play Mode or 'uloop hot-reload --revert-all' dropped what earlier reloads had "
+            + "entering Play Mode or 'tloop hot-reload --revert-all' dropped what earlier reloads had "
             + "applied from them: {1}.";
 
         // Replaces DefaultSelectionNewFilesNote when discarded new files were selected, so the
@@ -913,34 +913,34 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         // types) discarded by the Play-entry domain reload.
         // SessionState survives that reload and is cleared when the Editor process exits.
         public const string PlayModeEntryDropSessionStateKey =
-            "io.github.hatayama.uloop.hot-reload.playModeEntryDroppedIdentities";
+            "io.github.tongguang.tloop.hot-reload.playModeEntryDroppedIdentities";
 
         // SessionState key for the owner files of introduced types discarded by the Play-entry
         // domain reload, or left loaded by revert-all with their later additions dropped, one
         // "identity<TAB>project-relative path" line per type.
         public const string PlayModeEntryDropSourcesSessionStateKey =
-            "io.github.hatayama.uloop.hot-reload.playModeEntryDroppedIntroducedSources";
+            "io.github.tongguang.tloop.hot-reload.playModeEntryDroppedIntroducedSources";
 
         // SessionState key for the added fields whose wired values a domain reload discarded, one
         // "Type.field" display name per line, as the apply response lists added fields.
         public const string RewireFieldsSessionStateKey =
-            "io.github.hatayama.uloop.hot-reload.rewireAddedFields";
+            "io.github.tongguang.tloop.hot-reload.rewireAddedFields";
 
         // SessionState key for the unchanged files earlier reloads were given beside what they
         // applied, one "project-relative path<TAB>hash" line per file, so a Play-entry domain
         // reload does not forget them.
         public const string CompanionSourcesSessionStateKey =
-            "io.github.hatayama.uloop.hot-reload.companionSources";
+            "io.github.tongguang.tloop.hot-reload.companionSources";
 
         // SessionState key for the time the latest compile started (UTC ticks). The snapshot capture
         // checks sources written since then against the PDB. SessionState survives the compile's
         // domain reload and is cleared when the Editor process exits.
         public const string CompileStartedUtcTicksSessionStateKey =
-            "io.github.hatayama.uloop.hot-reload.compileStartedUtcTicks";
+            "io.github.tongguang.tloop.hot-reload.compileStartedUtcTicks";
 
         // Format: remaining discarded identity count. Used only when --status active count is 0.
         public const string PlayModeEntryDropStatusMessageFormat =
-            "0 change(s) currently active. {0} change(s) were discarded by the domain reload when Play Mode was entered — hot-reloaded edits that were never compiled are not in effect. Re-apply 'uloop hot-reload', or edit the files and run 'uloop compile'.";
+            "0 change(s) currently active. {0} change(s) were discarded by the domain reload when Play Mode was entered — hot-reloaded edits that were never compiled are not in effect. Re-apply 'tloop hot-reload', or edit the files and run 'tloop compile'.";
 
         public const int SiblingConstDriftScanFileLimit = 50;
 
@@ -960,6 +960,6 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             " {0} hot-reload change(s) are still active.";
 
         public const string ValidationFailureInspectOrRevertNextAction =
-            "Run 'uloop hot-reload --status' to inspect the active changes, or 'uloop hot-reload --revert-all' to drop them.";
+            "Run 'tloop hot-reload --status' to inspect the active changes, or 'tloop hot-reload --revert-all' to drop them.";
     }
 }

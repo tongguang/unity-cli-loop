@@ -97,7 +97,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     Assert.That(outcome.Reason, Does.Contain(
                         "Internal override in an introduced type requires a compile: "
                         + FixtureNamespace + ".RefusedOverride.Read"));
-                    Assert.That(outcome.Reason, Does.Contain("run 'uloop compile'."));
+                    Assert.That(outcome.Reason, Does.Contain("run 'tloop compile'."));
                     return;
                 }
             }

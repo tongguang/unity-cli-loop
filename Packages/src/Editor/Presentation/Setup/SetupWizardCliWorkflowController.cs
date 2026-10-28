@@ -166,7 +166,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
                         : commandResult.ErrorOutput;
                     _dialogs.ShowMessage(
                         "Installation Failed",
-                        $"Failed to install uloop CLI.\n\n{result.ErrorOutput}\n\n"
+                        $"Failed to install tloop CLI.\n\n{result.ErrorOutput}\n\n"
                         + manualInstallGuidance);
                     return;
                 }

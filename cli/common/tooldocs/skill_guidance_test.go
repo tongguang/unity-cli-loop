@@ -14,8 +14,8 @@ func TestSkillGuidanceLineNamesTheMatchingSkill(t *testing.T) {
 	if !ok {
 		t.Fatalf("simulate-keyboard has no skill guidance line")
 	}
-	if !strings.Contains(line, "uloop-simulate-keyboard") {
-		t.Errorf("guidance line = %q, want it to name uloop-simulate-keyboard", line)
+	if !strings.Contains(line, "tloop-simulate-keyboard") {
+		t.Errorf("guidance line = %q, want it to name tloop-simulate-keyboard", line)
 	}
 }
 
@@ -30,7 +30,7 @@ func TestSkillGuidanceLineLeavesOutHiddenCommands(t *testing.T) {
 	}
 }
 
-// Verifies all four pause-point commands point at the single uloop-pause-point skill rather than a
+// Verifies all four pause-point commands point at the single tloop-pause-point skill rather than a
 // per-command skill name derived from the command, which would not exist.
 func TestSkillGuidanceLineMapsEveryPausePointCommandToOneSkill(t *testing.T) {
 	commands := []string{
@@ -46,8 +46,8 @@ func TestSkillGuidanceLineMapsEveryPausePointCommandToOneSkill(t *testing.T) {
 			t.Errorf("%s has no skill guidance line", command)
 			continue
 		}
-		if !strings.Contains(line, "uloop-pause-point") {
-			t.Errorf("%s guidance line = %q, want it to name uloop-pause-point", command, line)
+		if !strings.Contains(line, "tloop-pause-point") {
+			t.Errorf("%s guidance line = %q, want it to name tloop-pause-point", command, line)
 		}
 	}
 }
@@ -162,7 +162,7 @@ func repositoryRoot(t *testing.T) string {
 // skill it sits next to in the catalog.
 func TestSkillGuidanceLineNamesTheGameViewModeSkill(t *testing.T) {
 	line, ok := SkillGuidanceLine("game-view-mode")
-	if !ok || !strings.Contains(line, "uloop-game-view-mode") {
-		t.Errorf("guidance line = %q (ok %v), want it to name uloop-game-view-mode", line, ok)
+	if !ok || !strings.Contains(line, "tloop-game-view-mode") {
+		t.Errorf("guidance line = %q (ok %v), want it to name tloop-game-view-mode", line, ok)
 	}
 }

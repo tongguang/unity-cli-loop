@@ -24,10 +24,10 @@ func TestCommandForOSBuildsTheInstallerCommandPerOS(t *testing.T) {
 				t.Fatalf("CommandForOS failed: %v", err)
 			}
 
-			assetURL := "https://github.com/hatayama/unity-cli-loop/releases/download/dispatcher-v3.1.0/" + testCase.wantScript
+			assetURL := "https://github.com/tongguang/unity-cli-loop/releases/download/dispatcher-v3.1.0/" + testCase.wantScript
 			want := Command{
 				Name:                 testCase.wantName,
-				Env:                  []string{"ULOOP_VERSION=" + LatestStable},
+				Env:                  []string{"TLOOP_VERSION=" + LatestStable},
 				InstallerName:        testCase.wantScript,
 				InstallerURL:         assetURL,
 				InstallerChecksumURL: assetURL + ".sha256",
@@ -60,7 +60,7 @@ func TestCommandForOSUsesTheTargetVersion(t *testing.T) {
 	if command.ReleaseTag != "dispatcher-v3.2.0" {
 		t.Fatalf("ReleaseTag = %q, want dispatcher-v3.2.0", command.ReleaseTag)
 	}
-	if !reflect.DeepEqual(command.Env, []string{"ULOOP_VERSION=dispatcher-v3.2.0"}) {
+	if !reflect.DeepEqual(command.Env, []string{"TLOOP_VERSION=dispatcher-v3.2.0"}) {
 		t.Fatalf("Env = %#v", command.Env)
 	}
 }
@@ -81,8 +81,8 @@ func TestNormalizeTargetVersionStripsReleasePrefixes(t *testing.T) {
 		"V3.2.0":                      "3.2.0",
 		"dispatcher-v3.2.0":           "3.2.0",
 		"Dispatcher-V3.2.0":           "3.2.0",
-		"uloop-project-runner-v3.2.0": "3.2.0",
-		"ULOOP-PROJECT-RUNNER-V3.2.0": "3.2.0",
+		"tloop-project-runner-v3.2.0": "3.2.0",
+		"TLOOP-PROJECT-RUNNER-V3.2.0": "3.2.0",
 	}
 	for input, want := range cases {
 		if got := NormalizeTargetVersion(input); got != want {

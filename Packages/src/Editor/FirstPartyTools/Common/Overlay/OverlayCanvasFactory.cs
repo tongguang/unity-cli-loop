@@ -11,7 +11,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
     /// </summary>
     internal sealed class OverlayCanvasFactoryService
     {
-        private const string CANVAS_PREFAB_PATH = "Packages/io.github.hatayama.uloopmcp/Runtime/Common/InputVisualizationCanvas.prefab";
+        private const string CANVAS_PREFAB_PATH = "Packages/io.github.tongguang.tloop/Runtime/Common/InputVisualizationCanvas.prefab";
 
         private InputVisualizationCanvas _instance;
 

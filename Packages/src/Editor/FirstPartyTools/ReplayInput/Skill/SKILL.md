@@ -1,32 +1,32 @@
 ---
-name: uloop-replay-input
+name: tloop-replay-input
 toolName: replay-input
 description: "Replay recorded PlayMode keyboard and mouse input. Use for exact gameplay reproduction, E2E runs, or consistent demos from JSON recordings."
 ---
 
-# uloop replay-input
+# tloop replay-input
 
 Replay recorded keyboard and mouse input during PlayMode. Loads a JSON recording and injects input frame-by-frame via Input System with zero CLI overhead. Supports looping and progress monitoring.
 
-Create recording JSON files in the Unity Editor from **Window > Unity CLI Loop > Recordings** with **Start Recording** and **Stop Recording**. There is no CLI command for recording input.
+Create recording JSON files in the Tuanjie Editor from **Window > Tuanjie CLI Loop > Recordings** with **Start Recording** and **Stop Recording**. There is no CLI command for recording input.
 
 ## Usage
 
 ```bash
 # Start replay (auto-detect latest recording)
-uloop replay-input --action start
+tloop replay-input --action start
 
 # Start replay with specific file
-uloop replay-input --action start --input-path scripts/my-play.json
+tloop replay-input --action start --input-path scripts/my-play.json
 
 # Start replay with looping
-uloop replay-input --action start --loop
+tloop replay-input --action start --loop
 
 # Check replay progress
-uloop replay-input --action status
+tloop replay-input --action status
 
 # Stop replay
-uloop replay-input --action stop
+tloop replay-input --action stop
 ```
 
 ## Parameters
@@ -34,7 +34,7 @@ uloop replay-input --action stop
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `--action` | enum | `start` | `start` - begin replaying, `stop` - stop mid-way, `status` - check progress |
-| `--input-path` | string | auto | Path to the recording JSON. When empty, auto-detects the latest recording in `.uloop/outputs/InputRecordings/` |
+| `--input-path` | string | auto | Path to the recording JSON. When empty, auto-detects the latest recording in `.tloop/outputs/InputRecordings/` |
 | `--no-show-overlay` | flag | - | Hide replay progress overlay |
 | `--loop` | flag | - | Loop continuously |
 
@@ -44,7 +44,7 @@ Replay injects the exact same input frame-by-frame, but the game must also be de
 
 ## Prerequisites
 
-- Unity must be in **PlayMode**
+- Tuanjie must be in **PlayMode**
 - **Input System package** (`com.unity.inputsystem`) must be installed; this tool only works with the New Input System.
 
 ## Output

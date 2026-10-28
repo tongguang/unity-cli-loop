@@ -58,13 +58,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(warnings[0], Does.Contain("'AddedValue'"));
             Assert.That(warnings[0], Does.Contain(HostLabelPrefix + "AddedSetUp()"));
             Assert.That(warnings[0], Does.Contain(HostLabelPrefix + "Value()"));
-            Assert.That(warnings[0], Does.Contain("uloop compile"));
+            Assert.That(warnings[0], Does.Contain("tloop compile"));
             Assert.That(
                 warnings[0],
                 Is.EqualTo(
                     "Added field 'AddedValue' is assigned only in " + HostLabelPrefix + "AddedSetUp(), "
                     + "which this reload skipped, but " + HostLabelPrefix + "Value() was applied and reads it; "
-                    + "the field keeps its default value until 'uloop compile'."));
+                    + "the field keeps its default value until 'tloop compile'."));
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     + "which this reload skipped, but " + HostLabelPrefix + "Value() was applied and reads it; "
                     + "an earlier hot reload applied " + HostLabelPrefix + "AddedSetUp(), so while that body "
                     + "stays active the field holds what it assigns, and if it assigns nothing the field keeps "
-                    + "its default value until 'uloop compile'."));
+                    + "its default value until 'tloop compile'."));
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             AssertWriterSkipped(result);
             List<string> warnings = FindWarnings(result);
             Assert.That(warnings, Has.Count.EqualTo(1), string.Join(" | ", warnings));
-            Assert.That(warnings[0], Does.EndWith("reads it; the field keeps its default value until 'uloop compile'."));
+            Assert.That(warnings[0], Does.EndWith("reads it; the field keeps its default value until 'tloop compile'."));
         }
 
         /// <summary>
@@ -393,7 +393,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     "Added auto-property 'AddedCount' is assigned only in " + HostLabelPrefix + "AddedSetUp(), "
                     + "which this reload skipped, but " + CallerLabelPrefix + "Call("
                     + "io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload.HotReloadCrossFileAddedMemberHost) "
-                    + "was applied and reads it; the property keeps its default value until 'uloop compile'."));
+                    + "was applied and reads it; the property keeps its default value until 'tloop compile'."));
         }
 
         /// <summary>
@@ -577,7 +577,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string temporaryDirectory = Path.Combine(
                 projectRoot,
                 "Library",
-                "UloopHotReload",
+                "TloopHotReload",
                 "TestSources",
                 "SkippedWriterWarning");
             Directory.CreateDirectory(temporaryDirectory);

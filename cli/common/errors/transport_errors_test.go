@@ -103,7 +103,7 @@ func TestIsPermanentConnectErrorMatchesRefusedSyscalls(t *testing.T) {
 		dialError := &net.OpError{
 			Op:   "dial",
 			Net:  "unix",
-			Addr: &net.UnixAddr{Name: "/tmp/uloop-501/UnityCliLoop-sample.sock", Net: "unix"},
+			Addr: &net.UnixAddr{Name: "/tmp/tloop-501/TuanjieCliLoop-sample.sock", Net: "unix"},
 			Err:  os.NewSyscallError("connect", errno),
 		}
 		wrapped := &unityipc.ConnectionAttemptError{Cause: dialError}
@@ -120,7 +120,7 @@ func TestIsPermanentConnectErrorMatchesNamedPipeAccessDenial(t *testing.T) {
 	deniedPipe := &unityipc.ConnectionAttemptError{
 		Cause: &os.PathError{
 			Op:   "open",
-			Path: `\\.\pipe\UnityCliLoop-sample`,
+			Path: `\\.\pipe\TuanjieCliLoop-sample`,
 			Err:  os.ErrPermission,
 		},
 	}
@@ -152,7 +152,7 @@ func TestIsPermanentConnectErrorRejectsTransientFailures(t *testing.T) {
 		&unityipc.ConnectionAttemptError{Cause: os.NewSyscallError("connect", syscall.ENOENT)},
 		&unityipc.ConnectionAttemptError{Cause: os.NewSyscallError("connect", syscall.ECONNREFUSED)},
 		&unityipc.ConnectionAttemptError{Cause: timeoutOnlyError{}},
-		fmt.Errorf("dial unix /tmp/uloop-501/UnityCliLoop-sample.sock: i/o timeout"),
+		fmt.Errorf("dial unix /tmp/tloop-501/TuanjieCliLoop-sample.sock: i/o timeout"),
 	}
 
 	for _, err := range transientErrors {

@@ -5,8 +5,8 @@ Set-StrictMode -Version Latest
 [string]$RepoRoot = Split-Path -Parent $PSScriptRoot
 [string]$DispatcherContractPath = Join-Path $RepoRoot "cli/dispatcher/dispatchercontract/dispatcher-contract.json"
 [string]$ProjectRunnerContractPath = Join-Path $RepoRoot "cli/common/clicontract/contract.json"
-[string]$DispatcherExePath = Join-Path $RepoRoot "dist/windows-amd64/uloop.exe"
-[string]$ProjectRunnerExePath = Join-Path $RepoRoot "dist/windows-amd64/uloop-project-runner.exe"
+[string]$DispatcherExePath = Join-Path $RepoRoot "dist/windows-amd64/tloop.exe"
+[string]$ProjectRunnerExePath = Join-Path $RepoRoot "dist/windows-amd64/tloop-project-runner.exe"
 
 function Read-JsonObject {
     param(
@@ -48,12 +48,12 @@ function Assert-WindowsVersionInfo {
         exit 1
     }
 
-    if ($ProductName -ne "uloop") {
-        Write-Error "ProductName mismatch for $ExePath. Expected 'uloop', got '$ProductName'."
+    if ($ProductName -ne "tloop") {
+        Write-Error "ProductName mismatch for $ExePath. Expected 'tloop', got '$ProductName'."
         exit 1
     }
 
-    if ($CompanyName -ne "unity-cli-loop") {
+    if ($CompanyName -ne "tuanjie-cli-loop") {
         Write-Error "CompanyName mismatch for $ExePath. Expected 'unity-cli-loop', got '$CompanyName'."
         exit 1
     }

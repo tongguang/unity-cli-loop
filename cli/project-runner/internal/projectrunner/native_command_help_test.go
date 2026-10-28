@@ -44,7 +44,7 @@ func TestRunProjectLocalAwaitPausePointHelpOptionsSection(t *testing.T) {
   --matching-logs-max-count <value>  Maximum Console logs matching the marker id to include on a hit
   --resume-play                      After confirming the marker is armed, resume PlayMode if paused (before --trigger), so a paused-arm workflow can fire input in one call
   --timeout-seconds <value>          Seconds to wait for a hit before timing out
-  --trigger <value>                  Runs a single uloop subcommand in-process right after arming/registration. Pass the subcommand without the leading 'uloop', e.g. "simulate-keyboard --action Press --key Space"
+  --trigger <value>                  Runs a single tloop subcommand in-process right after arming/registration. Pass the subcommand without the leading 'tloop', e.g. "simulate-keyboard --action Press --key Space"
 `
 	assertNativeCommandHelpOptionsSection(t, "await-pause-point", expectedOptions)
 }
@@ -100,7 +100,7 @@ func TestRunProjectLocalSetCodeOptimizationHelpOutput(t *testing.T) {
 		t.Fatalf("set-code-optimization --help failed: code=%d stderr=%s", code, stderr.String())
 	}
 	const expected = "Usage:\n" +
-		"  uloop set-code-optimization debug [options]\n" +
+		"  tloop set-code-optimization debug [options]\n" +
 		"\n" +
 		"Switch Unity's Code Optimization to Debug for this session or, with approval, as the machine-wide startup default\n" +
 		"\n" +
@@ -127,14 +127,14 @@ func TestStatusHelpPrintsUsage(t *testing.T) {
 		t.Fatalf("status --help failed: code=%d stderr=%s", code, stderr.String())
 	}
 	const expected = "Usage:\n" +
-		"  uloop status\n" +
+		"  tloop status\n" +
 		"\n" +
 		"Report whether the Unity Editor for this project can take a command now, without changing anything\n" +
 		"\n" +
 		"Global options:\n" +
 		"  --project-path <path>   Run against a Unity project outside the current directory\n" +
 		"\n" +
-		"Load the uloop-status skill for workflow rules and response fields that --help does not cover.\n"
+		"Load the tloop-status skill for workflow rules and response fields that --help does not cover.\n"
 	if stdout.String() != expected {
 		t.Fatalf("status --help output mismatch:\n got:\n%s\nwant:\n%s", stdout.String(), expected)
 	}
@@ -154,14 +154,14 @@ func TestCancelHelpPrintsUsage(t *testing.T) {
 		t.Fatalf("cancel --help failed: code=%d stderr=%s", code, stderr.String())
 	}
 	const expected = "Usage:\n" +
-		"  uloop cancel\n" +
+		"  tloop cancel\n" +
 		"\n" +
 		"Cancel the tool the Unity Editor for this project is running now\n" +
 		"\n" +
 		"Global options:\n" +
 		"  --project-path <path>   Run against a Unity project outside the current directory\n" +
 		"\n" +
-		"Load the uloop-status skill for workflow rules and response fields that --help does not cover.\n"
+		"Load the tloop-status skill for workflow rules and response fields that --help does not cover.\n"
 	if stdout.String() != expected {
 		t.Fatalf("cancel --help output mismatch:\n got:\n%s\nwant:\n%s", stdout.String(), expected)
 	}
@@ -180,7 +180,7 @@ func TestRunProjectLocalListHelpOutput(t *testing.T) {
 	}
 
 	const expected = "Usage:\n" +
-		"  uloop list [options]\n" +
+		"  tloop list [options]\n" +
 		"\n" +
 		"Show Unity tools currently exposed by the Editor\n" +
 		"\n" +
@@ -246,7 +246,7 @@ func TestRunProjectLocalPausePointHelpPointsAtTheSkill(t *testing.T) {
 			if code != 0 {
 				t.Fatalf("%s --help failed: code=%d stderr=%s", command, code, stderr.String())
 			}
-			if !strings.Contains(stdout.String(), "uloop-pause-point skill") {
+			if !strings.Contains(stdout.String(), "tloop-pause-point skill") {
 				t.Fatalf("%s --help must point at the pause-point skill: %s", command, stdout.String())
 			}
 		})

@@ -6,7 +6,7 @@ Returns JSON with:
 - `Status` (string): Machine-readable execution status such as `Passed`, `Failed`, `Inconclusive`, `NoTestsFound`, `ExecutionFailed`, or `NothingToRerun` (`--rerun-failed` found nothing to rerun; `Success` is `true`)
 - `HasFailures` (boolean): Whether any discovered test or suite failed
 - `Message` (string): Summary message
-- `NoTestsFound` (boolean): Whether Unity Test Runner discovered zero matching tests
+- `NoTestsFound` (boolean): Whether Tuanjie Test Runner discovered zero matching tests
 - `NoTestsFoundExplanation` (string): Agent-facing explanation when `NoTestsFound` is true; empty otherwise. When `--rerun-failed` finds that every recorded test was renamed or removed, it says that instead of the test-assembly advice.
 - `CompletedAt` (string): ISO timestamp when the run finished
 - `TestCount` (number): Total tests executed
@@ -22,11 +22,11 @@ Returns JSON with:
 - `FailedSuites` (array, optional): Up to 10 suites that failed outside their tests (e.g. a `OneTimeSetUp` or `OneTimeTearDown` threw), with the `FailedTests` fields. The run is `Failed` even when `FailedCount` is 0. Omitted when none.
 - `ProposedTestAsmdef` (object, optional): `AssetPath` and `Content` of a ready-to-write test `.asmdef` (test-assembly wiring plus references to the project's assemblies under test). Present only when an unfiltered run found no tests and no test assembly exists for the TestMode.
 - `CompileNote` (string, optional): States that the automatic compile ran and succeeded before the tests and names `--skip-compile` as the opt-out. When the compile response carried a Warning (for example active hot-reload changes dropped by the domain reload), the note repeats it. Omitted when `--skip-compile` was passed; a failed compile returns the compile error response instead.
-- `RerunTargetCount` (number, optional): Number of tests and fixtures a `--rerun-failed` run asked Unity to run. Omitted on other runs.
+- `RerunTargetCount` (number, optional): Number of tests and fixtures a `--rerun-failed` run asked Tuanjie to run. Omitted on other runs.
 - `RerunSourceCompletedAt` (string, optional): `CompletedAt` of the recorded run whose failures `--rerun-failed` reran. Omitted on other runs.
 
 Both are absent when `--respect-enter-play-mode-settings` entered Play Mode with a Domain Reload: the result is then recovered after the reload (see `Warning`), and a rerun whose recorded tests are all gone reports the generic no-tests message.
 
 ## XML Result File
 
-Saved to `{project_root}/.uloop/outputs/TestResults/<timestamp>.xml`. What it records, including failed suites: `references/xml-results.md`.
+Saved to `{project_root}/.tloop/outputs/TestResults/<timestamp>.xml`. What it records, including failed suites: `references/xml-results.md`.

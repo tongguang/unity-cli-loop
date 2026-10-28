@@ -431,7 +431,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             string repositoryUrl = SetupWizardWindow.GetGitHubRepositoryUrl();
 
-            Assert.That(repositoryUrl, Is.EqualTo("https://github.com/hatayama/unity-cli-loop"));
+            Assert.That(repositoryUrl, Is.EqualTo("https://github.com/tongguang/unity-cli-loop"));
         }
 
         [Test]
@@ -445,7 +445,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
                 SetupWizardWindow.PrepareForOpen(
                     window,
-                    "Unity CLI Loop Setup",
+                    "Tuanjie CLI Loop Setup",
                     position,
                     true);
 
@@ -453,7 +453,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 SerializedProperty recordVersionProperty =
                     serializedWindow.FindProperty("_shouldRecordLastSeenVersionAfterCreateGui");
 
-                Assert.That(window.titleContent.text, Is.EqualTo("Unity CLI Loop Setup"));
+                Assert.That(window.titleContent.text, Is.EqualTo("Tuanjie CLI Loop Setup"));
                 Assert.That(window.position, Is.EqualTo(position));
                 Assert.That(recordVersionProperty, Is.Not.Null);
                 Assert.That(recordVersionProperty.boolValue, Is.True);
@@ -548,34 +548,34 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             true,
             true,
             "Homebrew-managed CLI v2.9.0 does not meet the required v3.0.0.\n"
-            + "Run this command in your terminal:\nbrew upgrade uloop")]
+            + "Run this command in your terminal:\nbrew upgrade tloop")]
         [TestCase(
             ManagedCliKind.Homebrew,
             null,
             true,
             true,
             "Homebrew-managed CLI did not report a version.\n"
-            + "Run this command in your terminal:\nbrew reinstall uloop")]
+            + "Run this command in your terminal:\nbrew reinstall tloop")]
         [TestCase(
             ManagedCliKind.Homebrew,
             "3.0.0",
             false,
             true,
-            "Homebrew-managed CLI v3.0.0 did not answer as the required uloop CLI.\n"
-            + "Run this command in your terminal:\nbrew reinstall uloop")]
+            "Homebrew-managed CLI v3.0.0 did not answer as the required tloop CLI.\n"
+            + "Run this command in your terminal:\nbrew reinstall tloop")]
         [TestCase(ManagedCliKind.Winget, "2.9.0", true, true,
             "winget-managed CLI v2.9.0 does not meet the required v3.0.0.\n"
-            + "Run this command in your terminal:\nwinget upgrade --id hatayama.uloop")]
+            + "Run this command in your terminal:\nwinget upgrade --id tongguang.tloop")]
         [TestCase(ManagedCliKind.Winget, null, true, true,
             "winget-managed CLI did not report a version.\n"
             + "Run these commands in your terminal:\n"
-            + "winget uninstall --id hatayama.uloop\n"
-            + "winget install --id hatayama.uloop")]
+            + "winget uninstall --id tongguang.tloop\n"
+            + "winget install --id tongguang.tloop")]
         [TestCase(ManagedCliKind.Winget, "3.0.0", false, true,
-            "winget-managed CLI v3.0.0 did not answer as the required uloop CLI.\n"
+            "winget-managed CLI v3.0.0 did not answer as the required tloop CLI.\n"
             + "Run these commands in your terminal:\n"
-            + "winget uninstall --id hatayama.uloop\n"
-            + "winget install --id hatayama.uloop")]
+            + "winget uninstall --id tongguang.tloop\n"
+            + "winget install --id tongguang.tloop")]
         [TestCase(ManagedCliKind.Homebrew, "3.0.0", true, false, "")]
         [TestCase(ManagedCliKind.None, "2.9.0", true, false, "")]
         [TestCase(ManagedCliKind.None, null, true, false, "")]

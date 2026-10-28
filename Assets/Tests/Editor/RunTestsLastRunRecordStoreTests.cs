@@ -20,7 +20,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _recordDirectory = Path.Combine(Path.GetTempPath(), "uloop-last-run-" + Guid.NewGuid().ToString("N"));
+            _recordDirectory = Path.Combine(Path.GetTempPath(), "tloop-last-run-" + Guid.NewGuid().ToString("N"));
             _store = new RunTestsLastRunRecordStore(_recordDirectory);
         }
 

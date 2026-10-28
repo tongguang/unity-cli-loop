@@ -127,7 +127,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Directory.CreateDirectory(ToWindowsExtendedLengthPath(longDirectoryPath));
                 File.WriteAllText(
                     ToWindowsExtendedLengthPath(filePath),
-                    @"using io.github.hatayama.uLoopMCP;
+                    @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class LongPathTool : AbstractUnityTool<LongPathSchema, LongPathResponse>
@@ -173,7 +173,7 @@ public sealed class LongPathResponse : BaseToolResponse
                 Directory.CreateDirectory(ToWindowsExtendedLengthPath(longDirectoryPath));
                 File.WriteAllText(
                     ToWindowsExtendedLengthPath(filePath),
-                    @"using io.github.hatayama.uLoopMCP;
+                    @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class LongDirectoryTool : AbstractUnityTool<LongDirectorySchema, LongDirectoryResponse>
@@ -410,7 +410,7 @@ public sealed class LongDirectoryResponse : BaseToolResponse
             // Verifies that startup preflight detects direct legacy custom tool source immediately.
             MigrationTargetPreflightResult result =
                 ThirdPartyToolMigrationPreflightScanner.InspectSourceText(
-                    "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class HelloTool {}",
+                    "using io.github.tongguang.tloop; [McpTool] public sealed class HelloTool {}",
                     ".cs");
 
             Assert.That(result, Is.EqualTo(MigrationTargetPreflightResult.HasTargets));
@@ -422,7 +422,7 @@ public sealed class LongDirectoryResponse : BaseToolResponse
             // Verifies that startup preflight does not report targets from marker text inside comments.
             MigrationTargetPreflightResult result =
                 ThirdPartyToolMigrationPreflightScanner.InspectSourceText(
-                    "// using io.github.hatayama.uLoopMCP;",
+                    "// using io.github.tongguang.tloop;",
                     ".cs");
 
             Assert.That(result, Is.EqualTo(MigrationTargetPreflightResult.NeedsFullScan));
@@ -463,10 +463,10 @@ public sealed class LongDirectoryResponse : BaseToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 File.WriteAllText(
                     Path.Combine(toolDirectory, "0_Ambiguous.cs"),
-                    "// using io.github.hatayama.uLoopMCP;");
+                    "// using io.github.tongguang.tloop;");
                 File.WriteAllText(
                     Path.Combine(toolDirectory, "1_HelloTool.cs"),
-                    "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class HelloTool {}");
+                    "using io.github.tongguang.tloop; [McpTool] public sealed class HelloTool {}");
 
                 MigrationTargetPreflightResult result =
                     await ThirdPartyToolMigrationPreflightScanner.FindMigrationTargetAsync(
@@ -493,7 +493,7 @@ public sealed class LongDirectoryResponse : BaseToolResponse
                 string lockedToolPath = Path.Combine(toolDirectory, "LockedTool.cs");
                 File.WriteAllText(
                     lockedToolPath,
-                    "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class LockedTool {}");
+                    "using io.github.tongguang.tloop; [McpTool] public sealed class LockedTool {}");
 
                 using FileStream lockedFile =
                     new(lockedToolPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
@@ -615,7 +615,7 @@ public sealed class LongDirectoryResponse : BaseToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -662,7 +662,7 @@ public sealed class HelloResponse : BaseToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -705,7 +705,7 @@ public sealed class HelloResponse : BaseToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "ManualToolRegistration.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 public static class ManualToolRegistration
 {
@@ -749,7 +749,7 @@ public static class ManualToolRegistration
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string registrationPath = Path.Combine(toolDirectory, "CurrentManualToolRegistration.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -1143,7 +1143,7 @@ public static class CurrentManualToolRegistration
                 Directory.CreateDirectory(toolDirectory);
                 string registrationPath = Path.Combine(toolDirectory, "ToolCountLabel.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(registrationPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(registrationPath, @"using io.github.tongguang.tloop;
 
 public static class ToolCountLabel
 {
@@ -1186,7 +1186,7 @@ public static class ToolCountLabel
                 Directory.CreateDirectory(toolDirectory);
                 string metadataPath = Path.Combine(toolDirectory, "ToolMetadataProvider.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(metadataPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(metadataPath, @"using io.github.tongguang.tloop;
 
 public static class ToolMetadataProvider
 {
@@ -1229,7 +1229,7 @@ public static class ToolMetadataProvider
                 Directory.CreateDirectory(toolDirectory);
                 string helperPath = Path.Combine(toolDirectory, "ToolHelper.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(helperPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(helperPath, @"using io.github.tongguang.tloop;
 
 public static class ToolHelper
 {
@@ -1569,7 +1569,7 @@ public sealed class HelloResponse : UnityCliLoopToolResponse
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string schemaPath = Path.Combine(toolDirectory, "HelloSchema.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(schemaPath, "public sealed class HelloSchema : BaseToolSchema {}");
                 File.WriteAllText(asmdefPath, @"{
     ""name"": ""VendorTools.Editor"",
@@ -1604,7 +1604,7 @@ public sealed class HelloResponse : UnityCliLoopToolResponse
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string helperPath = Path.Combine(toolDirectory, "ScreenshotHelper.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(helperPath, @"using UnityEditor;
 
 public sealed class ScreenshotHelper
@@ -1762,7 +1762,7 @@ public sealed class MainThreadResponse : UnityCliLoopToolResponse
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
                 File.WriteAllText(toolPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -1805,7 +1805,7 @@ public sealed class MainThreadTool
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "ElementTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 public sealed class ElementTool
 {
@@ -1994,7 +1994,7 @@ public sealed class MainThreadUsage
                 string callerPath = Path.Combine(toolDirectory, "MainThreadCaller.cs");
                 File.WriteAllText(wrapperPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2005,7 +2005,7 @@ public sealed class MainThreadWrapper
 }");
                 File.WriteAllText(callerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadCaller
 {
@@ -2034,7 +2034,7 @@ public sealed class MainThreadCaller
 
         private const string InheritedTimingRunnerSource = @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public class Runner
 {
@@ -2064,7 +2064,7 @@ public class Runner
                 File.WriteAllText(midPath, InheritedTimingMidSource);
                 File.WriteAllText(derivedPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public class Derived : Mid
 {
@@ -2109,7 +2109,7 @@ public class Derived : Mid
                 string derivedPath = Path.Combine(toolDirectory, "Derived.cs");
                 File.WriteAllText(runnerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public class Runner
 {
@@ -2122,7 +2122,7 @@ public class Runner
                 File.WriteAllText(midPath, InheritedTimingMidSource);
                 File.WriteAllText(derivedPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public class Derived : Mid
 {
@@ -2168,7 +2168,7 @@ public class Derived : Mid
                 File.WriteAllText(midPath, InheritedTimingMidSource);
                 File.WriteAllText(derivedPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public class Derived : Mid
 {
@@ -2179,7 +2179,7 @@ public class Derived : Mid
 }");
                 File.WriteAllText(callerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class Caller
 {
@@ -2223,7 +2223,7 @@ public sealed class Caller
                 string toolAsmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
                 File.WriteAllText(wrapperPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2234,7 +2234,7 @@ public sealed class MainThreadWrapper
 }");
                 File.WriteAllText(callerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadCaller
 {
@@ -2293,7 +2293,7 @@ public sealed class MainThreadCaller
                 string unrelatedAsmdefPath = Path.Combine(unrelatedDirectory, "UnrelatedTools.Editor.asmdef");
                 File.WriteAllText(helperWrapperPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2304,7 +2304,7 @@ public sealed class MainThreadWrapper
 }");
                 File.WriteAllText(toolCallerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadCaller
 {
@@ -2315,7 +2315,7 @@ public sealed class MainThreadCaller
 }");
                 File.WriteAllText(unrelatedWrapperPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadWrapper
 {
@@ -2326,7 +2326,7 @@ public sealed class MainThreadWrapper
 }");
                 File.WriteAllText(unrelatedCallerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadCaller
 {
@@ -2383,7 +2383,7 @@ public sealed class MainThreadCaller
                 string callerPath = Path.Combine(toolDirectory, "MainThreadCaller.cs");
                 File.WriteAllText(innerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class InnerWrapper
 {
@@ -2394,7 +2394,7 @@ public sealed class InnerWrapper
 }");
                 File.WriteAllText(outerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class OuterWrapper
 {
@@ -2405,7 +2405,7 @@ public sealed class OuterWrapper
 }");
                 File.WriteAllText(callerPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadCaller
 {
@@ -2745,7 +2745,7 @@ public sealed class CurrentScreenshotTool
                 string unrelatedPath = Path.Combine(toolDirectory, "BaseToolSchema.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
                 string unrelatedSource = "public sealed class BaseToolSchema {}";
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(unrelatedPath, unrelatedSource);
                 File.WriteAllText(asmdefPath, @"{
     ""name"": ""VendorTools.Editor"",
@@ -2782,7 +2782,7 @@ public sealed class CurrentScreenshotTool
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
                 string unrelatedSource =
                     "public sealed class UnrelatedMetadata { public BaseToolResponse Response; }";
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -2830,7 +2830,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string listPath = Path.Combine(toolDirectory, "ToolList.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(
                     listPath,
                     "public sealed class ToolList { public System.Collections.Generic.List<IUnityTool> Tools; }");
@@ -2866,7 +2866,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string helperPath = Path.Combine(toolDirectory, "ToolHelper.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(
                     helperPath,
                     "public static class ToolHelper { public static ServiceResult<int> Create() => null; }");
@@ -2904,7 +2904,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string responseFactoryPath = Path.Combine(toolDirectory, "ResponseFactory.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(
                     responseFactoryPath,
                     "public static class ResponseFactory { public static BaseToolResponse Create() => null; }");
@@ -2940,7 +2940,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string toolAttributePath = Path.Combine(toolDirectory, "HelloTool.Attribute.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(
                     toolAttributePath,
                     "[McpTool]\npublic sealed partial class HelloTool\n{\n}");
@@ -2976,7 +2976,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string toolAttributePath = Path.Combine(toolDirectory, "HelloTool.Attribute.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using Old = io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using Old = io.github.tongguang.tloop;");
                 File.WriteAllText(
                     toolAttributePath,
                     "[Old.McpTool]\npublic sealed partial class HelloTool\n{\n    private Old.IUnityTool tool;\n}");
@@ -3015,7 +3015,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string responseFactoryPath = Path.Combine(toolDirectory, "ResponseFactory.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using Old = io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using Old = io.github.tongguang.tloop;");
                 File.WriteAllText(
                     responseFactoryPath,
                     "public static class ResponseFactory { public static Old.BaseToolResponse Create() => null; }");
@@ -3054,7 +3054,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
                 File.WriteAllText(
                     globalUsingPath,
-                    "global using LegacyToolInfo = io.github.hatayama.uLoopMCP.ToolInfo;");
+                    "global using LegacyToolInfo = io.github.tongguang.tloop.ToolInfo;");
                 File.WriteAllText(
                     metadataPath,
                     @"using io.github.hatayama.UnityCliLoop.ToolContracts;
@@ -3104,7 +3104,7 @@ public static class ToolMetadataProvider
                 string unrelatedSource = "public sealed class UnrelatedMetadata { public BaseToolSchema Schema; }";
                 File.WriteAllText(
                     globalUsingPath,
-                    "global using LegacyToolInfo = io.github.hatayama.uLoopMCP.ToolInfo;");
+                    "global using LegacyToolInfo = io.github.tongguang.tloop.ToolInfo;");
                 File.WriteAllText(unrelatedPath, unrelatedSource);
                 File.WriteAllText(asmdefPath, @"{
     ""name"": ""VendorTools.Editor"",
@@ -3141,7 +3141,7 @@ public static class ToolMetadataProvider
                 string toolPath = Path.Combine(asmrefDirectory, "HelloTool.cs");
                 string asmrefPath = Path.Combine(asmrefDirectory, "VendorTools.Editor.asmref");
                 string asmdefPath = Path.Combine(asmdefDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -3191,7 +3191,7 @@ public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
     ""name"": ""OuterAssembly.Editor"",
     ""references"": []
 }");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -3311,7 +3311,7 @@ public sealed class UIElementInfo
                 Directory.CreateDirectory(toolDirectory);
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string schemaPath = Path.Combine(toolDirectory, "HelloSchema.cs");
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(schemaPath, "public sealed class HelloSchema : BaseToolSchema {}");
 
                 ThirdPartyToolMigrationFileService service = new();
@@ -3384,7 +3384,7 @@ public sealed class CaptureTool : UnityCliLoopTool<ScreenshotSchema, ScreenshotR
                 string globalUsingPath = Path.Combine(editorDirectory, "GlobalUsings.cs");
                 string runtimePath = Path.Combine(runtimeDirectory, "BaseToolSchema.cs");
                 string runtimeSource = "public sealed class BaseToolSchema {}";
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(runtimePath, runtimeSource);
 
                 ThirdPartyToolMigrationFileService service = new();
@@ -3415,7 +3415,7 @@ public sealed class CaptureTool : UnityCliLoopTool<ScreenshotSchema, ScreenshotR
                 string runtimePath = Path.Combine(runtimeDirectory, "UnrelatedMetadata.cs");
                 string runtimeSource =
                     "public sealed class UnrelatedMetadata { public BaseToolResponse Response; }";
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(runtimePath, runtimeSource);
 
                 ThirdPartyToolMigrationFileService service = new();
@@ -3446,7 +3446,7 @@ public sealed class CaptureTool : UnityCliLoopTool<ScreenshotSchema, ScreenshotR
                 string editorPath = Path.Combine(editorDirectory, "UnrelatedMetadata.cs");
                 string editorSource =
                     "public sealed class UnrelatedMetadata { public BaseToolResponse Response; }";
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(editorPath, editorSource);
 
                 ThirdPartyToolMigrationFileService service = new();
@@ -3474,7 +3474,7 @@ public sealed class CaptureTool : UnityCliLoopTool<ScreenshotSchema, ScreenshotR
                 string globalUsingPath = Path.Combine(toolDirectory, "GlobalUsings.cs");
                 string registrationPath = Path.Combine(toolDirectory, "ManualToolRegistration.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(globalUsingPath, "global using io.github.hatayama.uLoopMCP;");
+                File.WriteAllText(globalUsingPath, "global using io.github.tongguang.tloop;");
                 File.WriteAllText(registrationPath, @"public static class ManualToolRegistration
 {
     public static void Register(IUnityTool tool)
@@ -3551,7 +3551,7 @@ public sealed class CaptureTool : UnityCliLoopTool<ScreenshotSchema, ScreenshotR
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string tempSidecarPath = toolPath + ".tmp";
                 string backupSidecarPath = toolPath + ".bak";
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -3585,7 +3585,7 @@ public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
                 Directory.CreateDirectory(generatedDirectory);
                 File.WriteAllText(
                     Path.Combine(generatedDirectory, "GeneratedTool.cs"),
-                    "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class GeneratedTool {}");
+                    "using io.github.tongguang.tloop; [McpTool] public sealed class GeneratedTool {}");
 
                 ThirdPartyToolMigrationFileService service = new();
                 ThirdPartyToolMigrationPreview preview = service.PreviewMigration(projectRoot);
@@ -3609,7 +3609,7 @@ public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
                 Directory.CreateDirectory(toolsDirectory);
                 File.WriteAllText(
                     Path.Combine(toolsDirectory, "LegacyToolFixture.cs"),
-                    "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class LegacyToolFixture {}");
+                    "using io.github.tongguang.tloop; [McpTool] public sealed class LegacyToolFixture {}");
 
                 ThirdPartyToolMigrationFileService service = new();
                 ThirdPartyToolMigrationPreview preview = service.PreviewMigration(projectRoot);
@@ -3633,7 +3633,7 @@ public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -3682,7 +3682,7 @@ public sealed class HelloResponse : BaseToolResponse
                 Directory.CreateDirectory(packageDirectory);
                 string toolPath = Path.Combine(packageDirectory, "PackageTool.cs");
                 string asmdefPath = Path.Combine(packageDirectory, "LegacyPackageTool.Editor.asmdef");
-                string toolSource = @"using io.github.hatayama.uLoopMCP;
+                string toolSource = @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class PackageTool : AbstractUnityTool<PackageToolSchema, PackageToolResponse>
@@ -3731,7 +3731,7 @@ public sealed class PackageToolResponse : BaseToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 File.WriteAllText(
                     Path.Combine(toolDirectory, "HelloTool.cs"),
-                    "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class HelloTool {}");
+                    "using io.github.tongguang.tloop; [McpTool] public sealed class HelloTool {}");
 
                 ThirdPartyToolMigrationFileService service = new();
 
@@ -3921,7 +3921,7 @@ public sealed class HelloResponse : UnityCliLoopToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 File.WriteAllText(
                     Path.Combine(toolDirectory, "GlobalUsings.cs"),
-                    "global using io.github.hatayama.uLoopMCP;");
+                    "global using io.github.tongguang.tloop;");
                 File.WriteAllText(
                     Path.Combine(toolDirectory, "BareAttributeTool.cs"),
                     @"[McpTool]
@@ -4143,7 +4143,7 @@ public sealed class HelloResponse : UnityCliLoopToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 File.WriteAllText(
                     Path.Combine(toolDirectory, "GlobalUsings.cs"),
-                    "global using Old = io.github.hatayama.uLoopMCP;");
+                    "global using Old = io.github.tongguang.tloop;");
                 File.WriteAllText(
                     Path.Combine(toolDirectory, "ScreenshotTool.cs"),
                     @"using System.Threading;
@@ -4992,7 +4992,7 @@ public static class ToolCountLabel
                 Directory.CreateDirectory(packageDirectory);
                 File.WriteAllText(
                     Path.Combine(packageDirectory, "PackageTool.cs"),
-                    "using io.github.hatayama.uLoopMCP; [McpTool] public sealed class PackageTool {}");
+                    "using io.github.tongguang.tloop; [McpTool] public sealed class PackageTool {}");
 
                 ThirdPartyToolMigrationFileService service = new();
 
@@ -5017,7 +5017,7 @@ public static class ToolCountLabel
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -5066,7 +5066,7 @@ public sealed class HelloResponse : BaseToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -5117,7 +5117,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string toolDirectory = Path.Combine(projectRoot, "Assets", "VendorTools");
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -5175,7 +5175,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string toolDirectory = Path.Combine(projectRoot, "Assets", "VendorTools");
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -5233,7 +5233,7 @@ public sealed class HelloResponse : BaseToolResponse
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -5290,7 +5290,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string editedToolSource = "public sealed class EditedTool {}";
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -5504,7 +5504,7 @@ public static class CurrentManualToolRegistration
 
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -5567,7 +5567,7 @@ public sealed class HelloResponse : BaseToolResponse
 
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -5627,7 +5627,7 @@ public sealed class HelloResponse : BaseToolResponse
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
                 File.WriteAllText(toolPath, @"using System.Threading;
 using System.Threading.Tasks;
-using io.github.hatayama.uLoopMCP;
+using io.github.tongguang.tloop;
 
 public sealed class MainThreadTool
 {
@@ -5967,7 +5967,7 @@ public sealed class ScreenshotMetadata
                 Directory.CreateDirectory(toolDirectory);
                 string toolPath = Path.Combine(toolDirectory, "HelloTool.cs");
                 string asmdefPath = Path.Combine(toolDirectory, "VendorTools.Editor.asmdef");
-                File.WriteAllText(toolPath, @"using io.github.hatayama.uLoopMCP;
+                File.WriteAllText(toolPath, @"using io.github.tongguang.tloop;
 
 [McpTool]
 public sealed class HelloTool : AbstractUnityTool<HelloSchema, HelloResponse>
@@ -6187,7 +6187,7 @@ public sealed class ScreenshotResponse : UnityCliLoopToolResponse
         [SetUp]
         public void SetUp()
         {
-            _missingProjectRoot = Path.Combine(Path.GetTempPath(), "uloop-test-" + Guid.NewGuid().ToString("N"));
+            _missingProjectRoot = Path.Combine(Path.GetTempPath(), "tloop-test-" + Guid.NewGuid().ToString("N"));
         }
 
         [TearDown]

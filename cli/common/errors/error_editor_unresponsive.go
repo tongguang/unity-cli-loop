@@ -30,7 +30,7 @@ func unityEditorUnresponsiveError(err *unityipc.EditorUnresponsiveError, context
 		NextActions: []string{
 			"Check Unity for a modal dialog or long editor operation that is blocking the Editor main thread.",
 			ApiUpdateConsentModalNextAction,
-			"Run `uloop focus-window` if Unity is hidden behind another window.",
+			"Run `tloop focus-window` if Unity is hidden behind another window.",
 			"Close the modal dialog or wait for the Editor operation to finish, then retry the command.",
 		},
 		Details: map[string]any{

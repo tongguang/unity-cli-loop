@@ -44,18 +44,18 @@ func dispatcherV2ProjectDetectedError(projectRoot string, v2Project dispatcherV2
 	if len(v2Project.PackageVersionCandidates) > 0 {
 		nextActions := []string{
 			"Open the Unity project once so Unity Package Manager can refresh `Packages/packages-lock.json`, then retry the command.",
-			"As a last resort, run `npx uloop-cli@2 <command>` from this project.",
+			"As a last resort, run `npx tloop-cli@2 <command>` from this project.",
 		}
 		if v2Project.AmbiguousEmbedded {
 			nextActions = []string{
 				"Remove the duplicate embedded package directories under `Packages/` so only one copy of the V2 package remains, then retry the command.",
-				"As a last resort, run `npx uloop-cli@2 <command>` from this project.",
+				"As a last resort, run `npx tloop-cli@2 <command>` from this project.",
 			}
 		}
 		return clierrors.CLIError{
 			ErrorCode:   clierrors.ErrorCodeV2ProjectDetected,
 			Phase:       clierrors.ErrorPhaseProjectResolve,
-			Message:     "This Unity project uses uloop V2, but its package version could not be resolved unambiguously.",
+			Message:     "This Unity project uses tloop V2, but its package version could not be resolved unambiguously.",
 			Retryable:   true,
 			SafeToRetry: true,
 			ProjectRoot: projectRoot,
@@ -75,13 +75,13 @@ func dispatcherV2ProjectDetectedError(projectRoot string, v2Project dispatcherV2
 	return clierrors.CLIError{
 		ErrorCode:   clierrors.ErrorCodeV2ProjectDetected,
 		Phase:       clierrors.ErrorPhaseProjectResolve,
-		Message:     "This Unity project uses uloop V2 and requires Node.js 22 or later.",
+		Message:     "This Unity project uses tloop V2 and requires Node.js 22 or later.",
 		Retryable:   true,
 		SafeToRetry: true,
 		ProjectRoot: projectRoot,
 		NextActions: []string{
 			"Install Node.js 22 or later, then retry the command.",
-			"As a last resort, run `npx uloop-cli@" + v2Project.PackageVersion + " <command>` from this project.",
+			"As a last resort, run `npx tloop-cli@" + v2Project.PackageVersion + " <command>` from this project.",
 		},
 		Details: details,
 	}
@@ -92,8 +92,8 @@ func dispatcherV2ProjectDetectedError(projectRoot string, v2Project dispatcherV2
 // Why the dispatcher version is named too: the delegated V2 CLI prints its own version on stdout, which
 // otherwise hides the dispatcher generation actually installed on this machine.
 func dispatcherV2ModeNotice(version string) string {
-	return "uloop: executing in V2 mode (" + dispatcherV2CLIPackageName + "@" + version +
-		") via uloop dispatcher " + dispatcherVersion + "\n"
+	return "tloop: executing in V2 mode (" + dispatcherV2CLIPackageName + "@" + version +
+		") via tloop dispatcher " + dispatcherVersion + "\n"
 }
 
 // runDispatcherV2CLI installs and executes the V2 CLI while preserving the original command arguments.
