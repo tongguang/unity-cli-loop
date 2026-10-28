@@ -33,9 +33,9 @@ CLI 与 Editor 使用本地 IPC：Windows 使用命名管道，macOS / Linux 使
 
 | 组件 | 当前版本 |
 | --- | --- |
-| 团结 UPM 插件 | [3.22.0](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.0) |
-| CLI dispatcher | [3.14.0](https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.14.0) |
-| Project runner | [3.13.0](https://github.com/tongguang/unity-cli-loop/releases/tag/tloop-project-runner-v3.13.0) |
+| 团结 UPM 插件 | [3.22.1](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.1) |
+| CLI dispatcher | [3.14.1](https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.14.1) |
+| Project runner | [3.13.1](https://github.com/tongguang/unity-cli-loop/releases/tag/tloop-project-runner-v3.13.1) |
 
 已在 Windows 上使用 **团结 1.10.3 / `2022.3.62t15`** 完成无界面导入、IPC 连通、90 项定向测试和 57 个程序集的离线编译检查。
 
@@ -72,7 +72,7 @@ tloop --version
 在团结 Editor 的 `Window > Package Manager` 中选择 **Add package from git URL**，输入：
 
 ```text
-https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.0
+https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.1
 ```
 
 也可以在已有 `Packages/manifest.json` 的 `dependencies` 中添加这一项，保留工程原有依赖：
@@ -80,12 +80,12 @@ https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.0
 ```json
 {
   "dependencies": {
-    "io.github.tongguang.tloop": "https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.0"
+    "io.github.tongguang.tloop": "https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.1"
   }
 }
 ```
 
-另一种方式是下载 [UPM 发行包](https://github.com/tongguang/unity-cli-loop/releases/download/v3.22.0/io.github.tongguang.tloop-3.22.0.tgz)，选择 **Add package from tarball**。
+另一种方式是下载 [UPM 发行包](https://github.com/tongguang/unity-cli-loop/releases/download/v3.22.1/io.github.tongguang.tloop-3.22.1.tgz)，选择 **Add package from tarball**。
 
 插件按普通 UPM 包发布，无需 Unity Cloud 包签名。CLI 发行包继续使用校验和及来源证明校验。
 
@@ -175,4 +175,3 @@ tloop execute-dynamic-code --code 'using UnityEngine; Debug.Log("Hello from tloo
 完整版权、许可条件和免责声明保留在 [LICENSE.md](LICENSE.md)。本分支的更名和团结适配不改变上游代码的作者归属。复制、修改或再分发本项目时，请保留该版权声明及完整许可文本。
 
 包内第三方组件另见 [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md) 及相应插件目录的许可证。这些声明继续随插件分发。
-

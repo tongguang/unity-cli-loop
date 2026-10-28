@@ -22,9 +22,9 @@ GUI の起動、PlayMode、hot reload、録画などは追加検証が必要で�
 
 | コンポーネント | バージョン |
 | --- | --- |
-| Tuanjie UPM パッケージ | [3.22.0](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.0) |
-| CLI dispatcher | [3.14.0](https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.14.0) |
-| Project runner | [3.13.0](https://github.com/tongguang/unity-cli-loop/releases/tag/tloop-project-runner-v3.13.0) |
+| Tuanjie UPM パッケージ | [3.22.1](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.1) |
+| CLI dispatcher | [3.14.1](https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.14.1) |
+| Project runner | [3.13.1](https://github.com/tongguang/unity-cli-loop/releases/tag/tloop-project-runner-v3.13.1) |
 
 runner のバージョンはプロジェクトの pin から自動選択されます。
 
@@ -51,10 +51,10 @@ curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scrip
 Tuanjie の `Window > Package Manager` で **Add package from git URL** を選択し、次の URL を入力してください。
 
 ```text
-https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.0
+https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.1
 ```
 
-または [UPM リリース](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.0) の `.tgz` をダウンロードし、**Add package from tarball** でインストールできます。通常の UPM パッケージとして配布しており、Unity Cloud のパッケージ署名は不要です。CLI のチェックサムと来歴証明の検証は維持しています。
+または [UPM リリース](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.1) の `.tgz` をダウンロードし、**Add package from tarball** でインストールできます。通常の UPM パッケージとして配布しており、Unity Cloud のパッケージ署名は不要です。CLI のチェックサムと来歴証明の検証は維持しています。
 
 ### 3. Skills
 
@@ -103,4 +103,3 @@ Editor が起動していなければ `tloop launch` を使用できます。プ
 著作権表示、許諾条件、免責条項の全文は [LICENSE.md](LICENSE.md) に保持しています。名称の変更や Tuanjie 対応によって、上流コードの著作者の帰属は変わりません。コピー、変更、再配布の際には、元の著作権表示とライセンス全文を保持してください。
 
 同梱の第三者コンポーネントについては [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md) と各プラグインのライセンスも参照してください。
-
