@@ -99,7 +99,7 @@ https://github.com/user-attachments/assets/0ecf0876-8230-4b4d-b51a-fe72cf9ca4c7
 
 # Quickstart
 
-This guide installs three things — the CLI, the Unity package, and the skills — so that your LLM tool can drive Unity. You can install everything from the terminal or from the Unity UI; either path is complete on its own.
+This guide installs the CLI, the Tuanjie package, and the skills so that your LLM tool can drive Tuanjie.
 
 ## Before you begin
 
@@ -132,37 +132,33 @@ curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scrip
 irm https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scripts/install.ps1 | iex
 ```
 
-**Homebrew (macOS):**
-
-```bash
-brew install hatayama/tap/tloop
-```
-
 Check that the install worked:
 
 ```bash
 tloop -v
 ```
 
-The install succeeded when the first line shows the CLI version (for example `3.0.1`).
+The install succeeded when the first line shows the CLI version (for example `3.14.0`).
 
-### Step 2: Install the Unity package
+### Step 2: Install the Tuanjie package
 
-Run this in the root of your Unity project:
+Add this entry to the existing `dependencies` object in your Tuanjie project's `Packages/manifest.json`:
 
-```bash
-tloop package install
+```json
+"io.github.tongguang.tloop": "https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.0"
 ```
 
-This adds the OpenUPM scoped registry and the `io.github.tongguang.tloop` dependency to `Packages/manifest.json`. Add `--version <x.y.z>` to pin a specific version.
+Alternatively, download the `.tgz` from the [package release](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.0) and choose **Add package from tarball** in Package Manager. The archive includes all `tloop-*` source skills.
 
-Then launch Unity. If Unity is already running, this focuses that window instead:
+Then launch Tuanjie. If Tuanjie is already running, this focuses that window instead:
 
 ```bash
 tloop launch
 ```
 
-Once Unity is up, the package is installed into the project. The next step reads the skills from the installed package.
+Once Tuanjie is up, the package is installed into the project. The next step reads the skills from the installed package.
+
+This fork has not registered an OpenUPM package or published a Homebrew formula. `tloop package install` requires OpenUPM registration; use the Git URL or release tarball above for this release.
 
 ### Step 3: Install the skills
 
@@ -185,18 +181,20 @@ tloop skills install --claude --global
 tloop skills install --output-dir path/to/skills
 ```
 
-## Install from the Unity UI
+## Install from the Tuanjie UI
 
-### Step 1: Install the Unity package
+### Step 1: Install the Tuanjie package
 
 In `Window > Package Manager`, press "+", choose **Add package from git URL**, and enter:
 
 ```text
-https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src
+https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.0
 ```
 
 <details>
 <summary>Installing from the OpenUPM scoped registry</summary>
+
+This optional channel requires separate registration of this fork's package. It is not available for the initial Tuanjie release.
 
 1. In `Project Settings > Package Manager`, add this entry to Scoped Registries:
 ```text
