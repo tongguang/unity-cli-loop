@@ -94,9 +94,7 @@ working-notes**
 memo.md
 Packages/src/Docs/**
 
-# uloop CLI cache and outputs
-**/.uloop/*
-!**/.uloop/project-runner-pin.json
+# tloop CLI cache and outputs
 **/.tloop/*
 !**/.tloop/project-runner-pin.json
 
@@ -168,4 +166,4 @@ eslint-results.xml
 # Soak harness output (scripts/soak-loop.*) - the default --out-dir lands here
 # when the harness is run from the repository root. One run leaves CSVs, logs,
 # and a failures/ payload dump per failed command.
-uloop-soak-results/
+tloop-soak-results/
