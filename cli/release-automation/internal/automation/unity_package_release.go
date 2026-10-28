@@ -15,17 +15,17 @@ const (
 
 // unityPackageReleaseTagPattern accepts only the Unity package component's tags. The CLI
 // components share the repository and its releases, so their tags must never select the package
-// source for signing.
+// source for packing.
 var unityPackageReleaseTagPattern = regexp.MustCompile(`^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$`)
 
-// releaseCommitPattern matches a full commit SHA. The package release is signed from, and tagged
+// releaseCommitPattern matches a full commit SHA. The package release is packed from, and tagged
 // at, its release commit, so anything that could resolve to another commit later (a branch, an
 // abbreviation) is refused.
 var releaseCommitPattern = regexp.MustCompile(`^[0-9a-f]{40}$`)
 
-// signedUnityPackageAssetName is the release asset OpenUPM picks up; its fixed prefix is what the
+// unityPackageAssetName is the release asset OpenUPM picks up; its fixed prefix is what the
 // OpenUPM package metadata matches with githubReleaseAssetName.
-func signedUnityPackageAssetName(version string) string {
+func unityPackageAssetName(version string) string {
 	return unityPackageName + "-" + version + ".tgz"
 }
 

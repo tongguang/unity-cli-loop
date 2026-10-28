@@ -12,9 +12,8 @@ import (
 const planUnityPackageReleaseCommandName = "plan-unity-package-release"
 
 // unityPackageReleasePlanOptions selects the repository and the root holding the release-please
-// manifest, whose Unity package version is the release that is planned. DryRun signs without
-// publishing, and also signs a release that is already published, because it is how a new UPM CLI
-// pin is validated once every release is signed.
+// manifest, whose Unity package version is the release that is planned. DryRun packs without
+// publishing, and also packs an already published release from its original tag.
 type unityPackageReleasePlanOptions struct {
 	Repository string
 	RepoRoot   string
@@ -26,12 +25,12 @@ type unityPackageReleasePlanDeps struct {
 	checkRelease func(ctx context.Context, log io.Writer, version string) (unityPackageReleaseReadiness, error)
 }
 
-// unityPackageReleasePlan says whether the release is signed and whether it is then created.
-// SourceRef is what the signing job checks out: the release commit of a release that is due, or
+// unityPackageReleasePlan says whether the release is packed and whether it is then created.
+// SourceRef is what the packing job checks out: the release commit of a release that is due, or
 // the tag of a published release. Annotation is the workflow command level ("notice" or
 // "warning") the reason is reported with, or empty for a plain log line.
 type unityPackageReleasePlan struct {
-	Sign       bool
+	Pack       bool
 	Publish    bool
 	Tag        string
 	Version    string
@@ -41,10 +40,10 @@ type unityPackageReleasePlan struct {
 	Annotation string
 }
 
-// RunPlanUnityPackageRelease prints GITHUB_OUTPUT lines (sign, publish, tag, version, asset-name,
-// source-ref) that tell the Unity package release workflow whether to sign the manifest version of
+// RunPlanUnityPackageRelease prints GITHUB_OUTPUT lines (pack, publish, tag, version, asset-name,
+// source-ref) that tell the Unity package release workflow whether to pack the manifest version of
 // the package and create its release. A published release is immutable, so the release is created
-// only once the signed tarball exists, and only when the readiness check names its release commit.
+// only once the tarball exists, and only when the readiness check names its release commit.
 func RunPlanUnityPackageRelease(ctx context.Context, stdout io.Writer, stderr io.Writer, args []string) int {
 	options, err := parseUnityPackageReleasePlanOptions(ctx, args, os.LookupEnv)
 	if err != nil {
@@ -69,7 +68,7 @@ func parseUnityPackageReleasePlanOptions(ctx context.Context, args []string, loo
 	flags.SetOutput(io.Discard)
 	repository := flags.String("repo", "", "owner/name of the repository; defaults to GITHUB_REPOSITORY")
 	repoRoot := flags.String("repo-root", "", "repository root holding the release-please manifest (default: the current git repository root)")
-	dryRun := flags.Bool("dry-run", false, "sign without creating the release, and sign a published release too")
+	dryRun := flags.Bool("dry-run", false, "pack without creating the release, and pack a published release too")
 	if err := flags.Parse(args); err != nil {
 		return unityPackageReleasePlanOptions{}, err
 	}
@@ -119,8 +118,8 @@ func runPlanUnityPackageReleaseWithDeps(ctx context.Context, stdout io.Writer, s
 	} else {
 		_, _ = fmt.Fprintln(stderr, plan.Reason)
 	}
-	_, _ = fmt.Fprintf(stdout, "sign=%t\npublish=%t\ntag=%s\nversion=%s\nasset-name=%s\nsource-ref=%s\n",
-		plan.Sign, plan.Publish, plan.Tag, plan.Version, plan.AssetName, plan.SourceRef)
+	_, _ = fmt.Fprintf(stdout, "pack=%t\npublish=%t\ntag=%s\nversion=%s\nasset-name=%s\nsource-ref=%s\n",
+		plan.Pack, plan.Publish, plan.Tag, plan.Version, plan.AssetName, plan.SourceRef)
 	return 0
 }
 
@@ -133,7 +132,7 @@ func planUnityPackageRelease(ctx context.Context, log io.Writer, options unityPa
 	if !unityPackageReleaseTagPattern.MatchString(tag) {
 		return unityPackageReleasePlan{}, fmt.Errorf("manifest version %q does not make a Unity package release tag (expected <major>.<minor>.<patch>)", version)
 	}
-	plan := unityPackageReleasePlan{Tag: tag, Version: version, AssetName: signedUnityPackageAssetName(version)}
+	plan := unityPackageReleasePlan{Tag: tag, Version: version, AssetName: unityPackageAssetName(version)}
 
 	release, published, err := lookupPublishedRelease(ctx, deps.runOutput, options.Repository, tag)
 	if err != nil {
@@ -152,13 +151,13 @@ func planPublishedUnityPackageRelease(plan unityPackageReleasePlan, release publ
 	plan.SourceRef = "refs/tags/" + plan.Tag
 	switch {
 	case dryRun:
-		plan.Sign = true
-		plan.Reason = fmt.Sprintf("Dry run: signing published release %s from its tag without changing it.", plan.Tag)
+		plan.Pack = true
+		plan.Reason = fmt.Sprintf("Dry run: packing published release %s from its tag without changing it.", plan.Tag)
 	case release.hasNonEmptyAsset(plan.AssetName):
 		plan.Reason = fmt.Sprintf("Release %s is already published with %s.", plan.Tag, plan.AssetName)
 	default:
 		plan.Annotation = "warning"
-		plan.Reason = fmt.Sprintf("Release %s was published without %s; a published release is immutable, so it stays unsigned.", plan.Tag, plan.AssetName)
+		plan.Reason = fmt.Sprintf("Release %s was published without %s; a published release is immutable, so it stays unpacked.", plan.Tag, plan.AssetName)
 	}
 	return plan
 }
@@ -183,13 +182,13 @@ func planDueUnityPackageRelease(ctx context.Context, log io.Writer, plan unityPa
 	if !releaseCommitPattern.MatchString(commit) {
 		return unityPackageReleasePlan{}, fmt.Errorf("readiness check for release %s named %q, not a release commit SHA", plan.Tag, commit)
 	}
-	plan.Sign = true
+	plan.Pack = true
 	plan.Publish = !dryRun
 	plan.SourceRef = commit
 	if dryRun {
-		plan.Reason = fmt.Sprintf("Dry run: signing release %s from release commit %s without creating it.", plan.Tag, commit)
+		plan.Reason = fmt.Sprintf("Dry run: packing release %s from release commit %s without creating it.", plan.Tag, commit)
 		return plan, nil
 	}
-	plan.Reason = fmt.Sprintf("Release %s is due; signing release commit %s, then creating the release with %s.", plan.Tag, commit, plan.AssetName)
+	plan.Reason = fmt.Sprintf("Release %s is due; packing release commit %s, then creating the release with %s.", plan.Tag, commit, plan.AssetName)
 	return plan, nil
 }

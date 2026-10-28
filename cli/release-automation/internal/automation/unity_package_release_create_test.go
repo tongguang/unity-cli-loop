@@ -44,7 +44,7 @@ func unityPackageReleaseTestCreateResponses(overrides map[string][]fakeUnityPack
 	return responses
 }
 
-// writeUnityPackageReleaseTestAsset writes a signed tarball stand-in under the asset name.
+// writeUnityPackageReleaseTestAsset writes a tarball stand-in under the asset name.
 func writeUnityPackageReleaseTestAsset(t *testing.T, name string, content string) string {
 	t.Helper()
 	path := filepath.Join(t.TempDir(), name)
@@ -249,7 +249,7 @@ func TestCreateUnityPackageReleaseStopsBeforeAnyWrite(t *testing.T) {
 		},
 		{
 			name:      "published release without the tarball is never recreated",
-			overrides: map[string][]fakeUnityPackageReleaseResponse{"release": {{output: unityPackageReleaseTestUnsigned}}},
+			overrides: map[string][]fakeUnityPackageReleaseResponse{"release": {{output: unityPackageReleaseTestMissingAsset}}},
 			wantCode:  1,
 		},
 		{
@@ -398,7 +398,7 @@ func TestCreateUnityPackageReleaseFailsAfterWrites(t *testing.T) {
 		},
 		{
 			name:       "release without its tarball fails",
-			overrides:  map[string][]fakeUnityPackageReleaseResponse{"release": {unityPackageReleaseTestNotFound, {output: unityPackageReleaseTestUnsigned}}},
+			overrides:  map[string][]fakeUnityPackageReleaseResponse{"release": {unityPackageReleaseTestNotFound, {output: unityPackageReleaseTestMissingAsset}}},
 			wantWrites: []string{"ref", "create"},
 			wantSleeps: 2,
 		},

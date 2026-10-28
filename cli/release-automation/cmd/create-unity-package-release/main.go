@@ -1,5 +1,5 @@
 // create-unity-package-release creates and publishes the Unity package release
-// with its signed tarball attached in one step, after creating its tag at the
+// with its tarball attached in one step, after creating its tag at the
 // release commit. Every reason not to create it is found before the first
 // write, and a rerun after the release is published does nothing.
 package main

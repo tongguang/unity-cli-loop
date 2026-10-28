@@ -118,7 +118,7 @@ jobs:
       # something unchecked.
       - name: Mint package release merge token
         id: package-merge-token
-        if: steps.target.outputs.branch == 'main' && steps.release_commit.outputs.skip != 'true' && steps.release.outputs.prs_created == 'true' && !cancelled() && (steps.release_pr_checks.outcome == 'success' || steps.release_pr_checks.outcome == 'failure')
+        if: steps.target.outputs.branch == 'main' && steps.release_commit.outputs.skip != 'true' && steps.release.outputs.prs_created == 'true' && !cancelled() && (steps.release_pr_checks.outcome == 'success' || steps.release_pr_checks.outcome == 'failure') && vars.DISPATCHER_PIN_APP_ID != ''
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
         with:
           app-id: ${{ vars.DISPATCHER_PIN_APP_ID }}
@@ -134,7 +134,7 @@ jobs:
       # covers the run listing lagging the completion the previous step just
       # watched; without it a green head is left draft until the next push.
       - name: Merge the Unity package release pull request when no dispatcher release is pending
-        if: steps.target.outputs.branch == 'main' && steps.release_commit.outputs.skip != 'true' && steps.release.outputs.prs_created == 'true' && !cancelled() && (steps.release_pr_checks.outcome == 'success' || steps.release_pr_checks.outcome == 'failure')
+        if: steps.target.outputs.branch == 'main' && steps.release_commit.outputs.skip != 'true' && steps.release.outputs.prs_created == 'true' && !cancelled() && (steps.release_pr_checks.outcome == 'success' || steps.release_pr_checks.outcome == 'failure') && vars.DISPATCHER_PIN_APP_ID != ''
         working-directory: cli/release-automation
         env:
           GH_TOKEN: ${{ steps.package-merge-token.outputs.token }}

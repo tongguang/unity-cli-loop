@@ -2,6 +2,11 @@
 
 Date: 2026-10-10
 
+Tuanjie branch override (2026-10-28): the user explicitly chose ordinary UPM
+tarballs without Unity Cloud signatures. Packing and source completeness checks
+replace signing; the single publishing workflow, dependency checks, and complete
+asset before publication rules remain. Current flow: `docs/unity-package-release.md`.
+
 ## Decision
 
 The Unity package release (`v<version>`) is created by one workflow, `unity-package-release.yml`,

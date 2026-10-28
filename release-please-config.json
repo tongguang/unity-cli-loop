@@ -5,6 +5,7 @@
   "packages": {
     "Packages/src": {
       "component": "unity-package",
+      "initial-version": "3.22.0",
       "release-type": "go",
       "include-v-in-tag": true,
       "include-component-in-tag": false,
@@ -19,6 +20,7 @@
     },
     "cli/dispatcher": {
       "component": "dispatcher",
+      "initial-version": "3.14.0",
       "release-type": "go",
       "include-v-in-tag": true,
       "include-component-in-tag": true,
@@ -33,6 +35,7 @@
     },
     "cli/project-runner": {
       "component": "tloop-project-runner",
+      "initial-version": "3.13.0",
       "release-type": "go",
       "include-v-in-tag": true,
       "include-component-in-tag": true,
@@ -55,5 +58,6 @@
         }
       ]
     }
-  }
+  },
+  "bootstrap-sha": "7a4ff34b4c5f6ff7d123d5284cbfece5e1c95989"
 }

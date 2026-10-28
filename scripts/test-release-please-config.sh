@@ -131,6 +131,12 @@ assert_json_value '.["separate-pull-requests"]' 'true'
 # keep the manifest conflict the dispatcher release merge creates.
 assert_json_value '.["always-update"]' 'true'
 
+# A fork with no release tags starts after the import and keeps its inherited version series.
+assert_json_value '.["bootstrap-sha"]' '7a4ff34b4c5f6ff7d123d5284cbfece5e1c95989'
+assert_json_value '.packages["Packages/src"]["initial-version"]' '3.22.0'
+assert_json_value '.packages["cli/dispatcher"]["initial-version"]' '3.14.0'
+assert_json_value '.packages["cli/project-runner"]["initial-version"]' '3.13.0'
+
 # Package roots are the release boundary: the repository root must not be a
 # package, otherwise unrelated root-level changes leak into unity-package releases.
 assert_json_value '.packages | keys | sort | join(",")' 'Packages/src,cli/dispatcher,cli/project-runner'

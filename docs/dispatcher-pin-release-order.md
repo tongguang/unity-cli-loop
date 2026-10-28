@@ -28,6 +28,21 @@ lagging pin, and failing there would only hide the state that `main` alone can
 fix. The schedule exists because a dispatcher release can be published without
 any later push to `main`.
 
+## Tuanjie fork without a GitHub App
+
+The App-based pin push and package merge steps run only when
+`DISPATCHER_PIN_APP_ID` is configured. A fork without that setup can still build
+and publish native releases. For its initial release, use the existing
+`stamp-dispatcher-pin` helper against the published stable dispatcher, verify
+the result with `check-dispatcher-pin`, commit the generated pin and its mirror,
+and push it to main. After the package release PR has all required successful
+checks and the correct pin, run `merge-package-release-pr` with an authenticated
+account. Do not bypass its pin and check validation or publish the package by hand.
+
+If Actions cannot create PRs under repository policy, an authenticated account
+can create the release PRs from release-please's generated component branches.
+This does not require enabling workflow PR approval permissions.
+
 ## Release pull requests
 
 release-please opens **one release pull request per component**: `unity-package`,

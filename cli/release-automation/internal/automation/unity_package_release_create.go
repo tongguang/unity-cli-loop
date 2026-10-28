@@ -25,7 +25,7 @@ const (
 )
 
 // unityPackageReleaseCreateOptions names the release to create: its tag, the release commit the
-// tag must point at, and the signed tarball attached to it. RepoRoot is the git checkout the
+// tag must point at, and the tarball attached to it. RepoRoot is the git checkout the
 // changelog of the release commit is read from.
 type unityPackageReleaseCreateOptions struct {
 	Repository string
@@ -64,7 +64,7 @@ type unityPackageReleaseState struct {
 }
 
 // RunCreateUnityPackageRelease creates the Unity package release of --tag at --commit with the
-// signed tarball --asset attached, and publishes it in the same step, because a published release
+// tarball --asset attached, and publishes it in the same step, because a published release
 // is immutable. Every reason not to create it is found before the first write. A rerun after the
 // release is published with the tarball does nothing.
 func RunCreateUnityPackageRelease(ctx context.Context, stdout io.Writer, stderr io.Writer, args []string) int {
@@ -83,7 +83,7 @@ func parseUnityPackageReleaseCreateOptions(ctx context.Context, args []string, l
 	repoRoot := flags.String("repo-root", "", "git checkout holding the release commit (default: the current git repository root)")
 	tag := flags.String("tag", "", "Unity package release tag to create")
 	commit := flags.String("commit", "", "full SHA of the release commit the tag points at")
-	asset := flags.String("asset", "", "signed tarball to attach")
+	asset := flags.String("asset", "", "tarball to attach")
 	if err := flags.Parse(args); err != nil {
 		return unityPackageReleaseCreateOptions{}, err
 	}
@@ -127,7 +127,7 @@ func validateUnityPackageReleaseCreateOptions(options unityPackageReleaseCreateO
 	if !releaseCommitPattern.MatchString(options.Commit) {
 		return fmt.Errorf("--commit %q is not a full commit SHA", options.Commit)
 	}
-	wantName := signedUnityPackageAssetName(strings.TrimPrefix(options.Tag, "v"))
+	wantName := unityPackageAssetName(strings.TrimPrefix(options.Tag, "v"))
 	if filepath.Base(options.Asset) != wantName {
 		return fmt.Errorf("--asset %s is not named %s, the asset OpenUPM looks for", options.Asset, wantName)
 	}
@@ -191,7 +191,7 @@ func readUnityPackageReleaseState(ctx context.Context, options unityPackageRelea
 
 // prepareUnityPackageReleaseTag deletes the drafts an interrupted run left behind and creates the
 // tag at the release commit. The tag is created explicitly rather than by the release, because
-// the release then attaches to a tag already known to point at the signed commit.
+// the release then attaches to a tag already known to point at the packaged commit.
 func prepareUnityPackageReleaseTag(ctx context.Context, stdout io.Writer, options unityPackageReleaseCreateOptions, state unityPackageReleaseState, deps unityPackageReleaseCreateDeps) error {
 	for _, draftID := range state.draftIDs {
 		if _, err := deps.runOutput(ctx, "gh", "api", "-X", "DELETE", "repos/"+options.Repository+"/releases/"+strconv.FormatInt(draftID, 10)); err != nil {

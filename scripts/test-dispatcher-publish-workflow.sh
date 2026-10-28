@@ -280,7 +280,7 @@ test_winget_pull_request_follows_homebrew_update_for_stable_releases() {
   assert_winget_pull_request_contains "          go run ./cmd/update-winget-manifest"
   assert_winget_pull_request_contains '          --repo "${GITHUB_REPOSITORY}"'
   assert_winget_pull_request_contains '          --tag "${RELEASE_TAG}"'
-  assert_winget_pull_request_contains "          --fork-repo hatayama/winget-pkgs"
+  assert_winget_pull_request_contains "          --fork-repo tongguang/winget-pkgs"
   assert_before "      - name: Update Homebrew formula" "      - name: Open winget-pkgs pull request"
 }
 
@@ -375,7 +375,7 @@ assert_pin_push_contains() {
 # releases, must carry Contents write and nothing else, and the push step must
 # never fall back to GITHUB_TOKEN or hold pull request permissions.
 test_dispatcher_pin_is_pushed_to_main_with_the_app_token() {
-  stable_release_guard="        if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true'"
+  stable_release_guard="        if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true' && vars.DISPATCHER_PIN_APP_ID != ''"
   assert_contains "      - name: Mint dispatcher pin push token"
   assert_pin_token_contains "$stable_release_guard"
   assert_pin_token_contains "        id: dispatcher-pin-token"
@@ -409,7 +409,7 @@ test_dispatcher_pin_is_pushed_to_main_with_the_app_token() {
 
 # Verifies the Unity package release pull request is merged with the App token, and only after the pin stamp reaches main.
 test_package_release_pr_is_merged_after_the_pin_stamp() {
-  stable_release_guard="        if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true'"
+  stable_release_guard="        if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true' && vars.DISPATCHER_PIN_APP_ID != ''"
   assert_contains "      - name: Merge the Unity package release pull request now that the pin records this dispatcher"
   assert_post_publish_before \
     "      - name: Push dispatcher pin stamp to main" \

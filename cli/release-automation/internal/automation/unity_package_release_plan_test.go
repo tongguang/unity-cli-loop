@@ -12,12 +12,12 @@ import (
 )
 
 const (
-	unityPackageReleaseTestWaitingFor  = "Project runner release tloop-project-runner-v3.10.0 is not published with complete assets yet; the Unity package release v3.14.0 waits for it."
-	unityPackageReleaseTestTagRef      = "refs/tags/v3.14.0"
-	unityPackageReleaseTestPublished   = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "io.github.tongguang.tloop-3.14.0.tgz", "size": 2048}]}`
-	unityPackageReleaseTestUnsigned    = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "notes.txt", "size": 10}]}`
-	unityPackageReleaseTestEmptyAsset  = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "io.github.tongguang.tloop-3.14.0.tgz", "size": 0}]}`
-	unityPackageReleaseTestPlanVersion = `{"Packages/src": "3.14.0", "cli/dispatcher": "3.8.1"}`
+	unityPackageReleaseTestWaitingFor   = "Project runner release tloop-project-runner-v3.10.0 is not published with complete assets yet; the Unity package release v3.14.0 waits for it."
+	unityPackageReleaseTestTagRef       = "refs/tags/v3.14.0"
+	unityPackageReleaseTestPublished    = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "io.github.tongguang.tloop-3.14.0.tgz", "size": 2048}]}`
+	unityPackageReleaseTestMissingAsset = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "notes.txt", "size": 10}]}`
+	unityPackageReleaseTestEmptyAsset   = `{"tag_name": "v3.14.0", "draft": false, "assets": [{"name": "io.github.tongguang.tloop-3.14.0.tgz", "size": 0}]}`
+	unityPackageReleaseTestPlanVersion  = `{"Packages/src": "3.14.0", "cli/dispatcher": "3.8.1"}`
 )
 
 func writeUnityPackageReleaseManifest(t *testing.T, content string) string {
@@ -41,7 +41,7 @@ func runPlanUnityPackageReleaseForTest(fake *fakeUnityPackageReleaseCommands, re
 }
 
 // Verifies the plan creates a release only when none is published and the readiness check names
-// its release commit, never touches a published release except to dry-run sign it from its tag,
+// its release commit, never touches a published release except to dry-run pack it from its tag,
 // runs the check only for a release that is not published yet, reports what a release that is
 // not due waits for in its notice, and keeps what the check reports out of GITHUB_OUTPUT.
 func TestPlanUnityPackageReleaseDecidesFromReleaseState(t *testing.T) {
@@ -50,7 +50,7 @@ func TestPlanUnityPackageReleaseDecidesFromReleaseState(t *testing.T) {
 		release        fakeUnityPackageReleaseResponse
 		readiness      unityPackageReleaseReadiness
 		dryRun         bool
-		wantSign       bool
+		wantPack       bool
 		wantPublish    bool
 		wantSourceRef  string
 		wantAnnotation string
@@ -62,15 +62,15 @@ func TestPlanUnityPackageReleaseDecidesFromReleaseState(t *testing.T) {
 			wantSourceRef: unityPackageReleaseTestTagRef,
 		},
 		{
-			name:          "dry run signs a published release from its tag",
+			name:          "dry run packs a published release from its tag",
 			release:       fakeUnityPackageReleaseResponse{output: unityPackageReleaseTestPublished},
 			dryRun:        true,
-			wantSign:      true,
+			wantPack:      true,
 			wantSourceRef: unityPackageReleaseTestTagRef,
 		},
 		{
 			name:           "published release without the tarball warns",
-			release:        fakeUnityPackageReleaseResponse{output: unityPackageReleaseTestUnsigned},
+			release:        fakeUnityPackageReleaseResponse{output: unityPackageReleaseTestMissingAsset},
 			wantSourceRef:  unityPackageReleaseTestTagRef,
 			wantAnnotation: "::warning::",
 		},
@@ -81,27 +81,27 @@ func TestPlanUnityPackageReleaseDecidesFromReleaseState(t *testing.T) {
 			wantAnnotation: "::warning::",
 		},
 		{
-			name:          "dry run signs a published release without the tarball from its tag",
-			release:       fakeUnityPackageReleaseResponse{output: unityPackageReleaseTestUnsigned},
+			name:          "dry run packs a published release without the tarball from its tag",
+			release:       fakeUnityPackageReleaseResponse{output: unityPackageReleaseTestMissingAsset},
 			dryRun:        true,
-			wantSign:      true,
+			wantPack:      true,
 			wantSourceRef: unityPackageReleaseTestTagRef,
 		},
 		{
-			name:           "due release is signed and published from its release commit",
+			name:           "due release is packed and published from its release commit",
 			release:        unityPackageReleaseTestNotFound,
 			readiness:      unityPackageReleaseReadiness{ReleaseCommit: unityPackageReleaseTestCommit},
-			wantSign:       true,
+			wantPack:       true,
 			wantPublish:    true,
 			wantSourceRef:  unityPackageReleaseTestCommit,
 			wantCheckCalls: 1,
 		},
 		{
-			name:           "dry run signs a due release without publishing",
+			name:           "dry run packs a due release without publishing",
 			release:        unityPackageReleaseTestNotFound,
 			readiness:      unityPackageReleaseReadiness{ReleaseCommit: unityPackageReleaseTestCommit},
 			dryRun:         true,
-			wantSign:       true,
+			wantPack:       true,
 			wantSourceRef:  unityPackageReleaseTestCommit,
 			wantCheckCalls: 1,
 		},
@@ -130,7 +130,7 @@ func TestPlanUnityPackageReleaseDecidesFromReleaseState(t *testing.T) {
 			if code != 0 {
 				t.Fatalf("exit code = %d, stderr = %s", code, stderr)
 			}
-			want := fmt.Sprintf("sign=%t\npublish=%t\n", test.wantSign, test.wantPublish) +
+			want := fmt.Sprintf("pack=%t\npublish=%t\n", test.wantPack, test.wantPublish) +
 				"tag=v3.14.0\n" +
 				"version=3.14.0\n" +
 				"asset-name=io.github.tongguang.tloop-3.14.0.tgz\n" +
@@ -170,7 +170,7 @@ func TestPlanUnityPackageReleaseDecidesFromReleaseState(t *testing.T) {
 }
 
 // Verifies every input the plan cannot act on fails the run without GITHUB_OUTPUT lines, so the
-// workflow never signs a guessed release commit, and that a failed release lookup is never
+// workflow never packs a guessed release commit, and that a failed release lookup is never
 // mistaken for a release that does not exist yet: the readiness check is not run after it.
 func TestPlanUnityPackageReleaseFailsWithoutOutput(t *testing.T) {
 	tests := []struct {
