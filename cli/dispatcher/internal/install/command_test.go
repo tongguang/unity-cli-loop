@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-func TestCommandForWindowsConfiguresUserPathAndLegacyCleanup(t *testing.T) {
-	// Verifies Windows install delegates PATH and legacy npm cleanup to the native setup command.
+func TestCommandForWindowsConfiguresUserPath(t *testing.T) {
+	// Verifies Windows install delegates User PATH setup and shadowing reports to the native setup command.
 	command, err := CommandForOS("windows", Options{
 		InstallDir: `C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin`,
 	})
@@ -30,13 +30,6 @@ func TestCommandForWindowsConfiguresUserPathAndLegacyCleanup(t *testing.T) {
 	setupScript := windowsInstallScript(command.InstallDir, command.TargetPath)
 	for _, expected := range []string{
 		"[Environment]::SetEnvironmentVariable('Path', $NewUserPath, 'User')",
-		"GetExtension($CommandPath), '.exe'",
-		"$CommandContent = Get-Content -Path $CommandPath -Raw -ErrorAction SilentlyContinue",
-		"if ($null -eq $CommandContent) {\n        return $false\n    }",
-		"foreach ($ShimName in @('tloop', 'tloop.cmd', 'tloop.ps1'))",
-		"Invoke-AllLegacyNpmPackageRemoval -ExpectedUloopPath $ExpectedUloopPath",
-		"$NpmArgs = @('uninstall', '-g', '--prefix', $LegacyPrefix, 'tloop-cli')",
-		"$null = & $NpmCommand.Source @('uninstall', '-g', 'tloop-cli')",
 		"Report-PathShadowing",
 		"function Get-FirstUloopCommandFromPath",
 		"$NormalizedPathEntry = & $NormalizePath $PathEntry",
@@ -44,9 +37,6 @@ func TestCommandForWindowsConfiguresUserPathAndLegacyCleanup(t *testing.T) {
 		"$CandidatePath = Join-Path $NormalizedPathEntry $ShimName",
 		"$MachinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')",
 		"$ResolvedPath = Get-FirstUloopCommandFromPath -PathValue ([string]::Join(';', @($MachinePath, $UserPath)))",
-		"function Write-LegacyNpmMultilineArgumentWarning",
-		"if (Test-LegacyNpmUloopPath -CommandPath $ResolvedPath) {\n        Write-LegacyNpmMultilineArgumentWarning\n    }",
-		"Legacy npm shims can alter multiline PowerShell arguments before the native CLI receives them.",
 	} {
 		if !strings.Contains(setupScript, expected) {
 			t.Fatalf("expected %s in setup script: %s", expected, setupScript)
@@ -55,34 +45,19 @@ func TestCommandForWindowsConfiguresUserPathAndLegacyCleanup(t *testing.T) {
 	if !command.UpdatesPath {
 		t.Fatal("windows install should update User PATH")
 	}
-	if !command.CleansLegacy {
-		t.Fatal("windows install should clean legacy launchers")
-	}
 	if command.TargetPath != `C:\Users\ExampleUser\AppData\Local\Programs\tloop\bin\tloop.exe` {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
-	}
-	if strings.Contains(setupScript, "foreach ($ShimName in @('tloop', 'tloop.cmd', 'tloop.ps1', 'tloop.exe'))") {
-		t.Fatal("legacy npm shim detection should not content-scan native exe files")
-	}
-	if count := strings.Count(setupScript, "Legacy npm shims can alter multiline PowerShell arguments before the native CLI receives them."); count != 1 {
-		t.Fatalf("legacy npm multiline warning should have one message definition, got %d", count)
-	}
-	if count := strings.Count(setupScript, "Write-LegacyNpmMultilineArgumentWarning"); count != 2 {
-		t.Fatalf("legacy npm multiline warning should be centralized and called from one site, got %d occurrences", count)
-	}
-	if strings.Contains(setupScript, "Failed to remove the legacy npm tloop-cli package.") {
-		t.Fatal("legacy npm cleanup failure should not fail installation")
 	}
 	if strings.Contains(setupScript, "Get-Command tloop -ErrorAction SilentlyContinue") {
 		t.Fatal("Windows path shadowing should inspect persisted PATH instead of the current process PATH")
 	}
-	if strings.Contains(setupScript, "$RemovedAll") {
-		t.Fatal("legacy npm cleanup aggregate result should not be tracked when it is intentionally ignored")
+	if strings.Contains(setupScript, "npm") {
+		t.Fatal("install setup must not run npm: no tloop npm package exists, so an uninstall could only hit a package this project does not own")
 	}
 }
 
-func TestCommandForMacConfiguresShellPathAndLegacyCleanup(t *testing.T) {
-	// Verifies macOS install delegates shell PATH setup and legacy npm cleanup to the native setup command.
+func TestCommandForMacConfiguresShellPath(t *testing.T) {
+	// Verifies macOS install delegates shell PATH setup and shadowing reports to the native setup command.
 	command, err := CommandForOS("darwin", Options{
 		InstallDir: "/Users/ExampleUser/.local/bin",
 	})
@@ -103,8 +78,6 @@ func TestCommandForMacConfiguresShellPathAndLegacyCleanup(t *testing.T) {
 		"# <<< tloop PATH <<<",
 		"fish_add_path --move",
 		`tmp_path=$(mktemp "$profile_dir/.tloop_path.XXXXXX" 2>/dev/null || true)`,
-		"npm uninstall -g --prefix",
-		"npm uninstall -g tloop-cli",
 		"report_path_shadowing",
 	} {
 		if !strings.Contains(setupScript, expected) {
@@ -114,16 +87,16 @@ func TestCommandForMacConfiguresShellPathAndLegacyCleanup(t *testing.T) {
 	if !command.UpdatesPath {
 		t.Fatal("macOS install should update shell PATH")
 	}
-	if !command.CleansLegacy {
-		t.Fatal("macOS install should clean legacy launchers")
-	}
 	if command.TargetPath != "/Users/ExampleUser/.local/bin/tloop" {
 		t.Fatalf("target path mismatch: %s", command.TargetPath)
 	}
+	if strings.Contains(setupScript, "npm") {
+		t.Fatal("install setup must not run npm: no tloop npm package exists, so an uninstall could only hit a package this project does not own")
+	}
 }
 
-func TestCommandForLinuxConfiguresShellPathAndLegacyCleanup(t *testing.T) {
-	// Verifies Linux install uses the same POSIX setup command as macOS, including PATH setup and legacy cleanup.
+func TestCommandForLinuxConfiguresShellPath(t *testing.T) {
+	// Verifies Linux install uses the same POSIX setup command as macOS, including PATH setup.
 	command, err := CommandForOS("linux", Options{
 		InstallDir: "/home/tester/.local/bin",
 	})
@@ -139,9 +112,6 @@ func TestCommandForLinuxConfiguresShellPathAndLegacyCleanup(t *testing.T) {
 	}
 	if !command.UpdatesPath {
 		t.Fatal("Linux install should update shell PATH")
-	}
-	if !command.CleansLegacy {
-		t.Fatal("Linux install should clean legacy launchers")
 	}
 }
 
@@ -567,186 +537,6 @@ func TestPosixInstallScriptSucceedsWhenShellProfileIsUnknown(t *testing.T) {
 	}
 	if !strings.Contains(outputText, installDir) {
 		t.Fatalf("manual PATH guidance should include install dir:\n%s", outputText)
-	}
-}
-
-func TestPosixInstallScriptRemovesAbsoluteLegacyNpmShimBeforePrependingPath(t *testing.T) {
-	// Verifies macOS legacy cleanup sees the old npm shim before the native path is prepended.
-	if runtime.GOOS == "windows" {
-		t.Skip("POSIX shell setup is not available on Windows")
-	}
-
-	home := t.TempDir()
-	installDir := filepath.Join(home, ".local", "bin")
-	legacyPrefix := filepath.Join(home, "npm-global")
-	legacyBin := filepath.Join(legacyPrefix, "bin")
-	mockBin := filepath.Join(home, "mock-bin")
-	npmLog := filepath.Join(home, "npm.log")
-	for _, dir := range []string{installDir, legacyBin, mockBin} {
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			t.Fatalf("failed to create test directory: %v", err)
-		}
-	}
-	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native tloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write native tloop: %v", err)
-	}
-	if err := os.WriteFile(filepath.Join(legacyBin, PosixCommandName), []byte("#!/bin/sh\n# node_modules/tloop-cli legacy shim\necho legacy tloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write legacy tloop: %v", err)
-	}
-	if err := os.WriteFile(filepath.Join(mockBin, "npm"), []byte("#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$NPM_LOG\"\n"), 0o755); err != nil {
-		t.Fatalf("failed to write mock npm: %v", err)
-	}
-
-	command, err := CommandForOS("darwin", Options{
-		InstallDir: installDir,
-	})
-	if err != nil {
-		t.Fatalf("CommandForOS failed: %v", err)
-	}
-
-	process := exec.Command(command.Name, command.Args...)
-	process.Env = []string{
-		"HOME=" + home,
-		"ZDOTDIR=" + home,
-		"SHELL=/bin/zsh",
-		"NPM_LOG=" + npmLog,
-		"PATH=" + legacyBin + ":" + mockBin + ":/usr/bin:/bin:/usr/sbin:/sbin",
-	}
-	output, err := process.CombinedOutput()
-	if err != nil {
-		t.Fatalf("POSIX setup failed: %v\n%s", err, output)
-	}
-
-	npmLogContent, err := os.ReadFile(npmLog)
-	if err != nil {
-		t.Fatalf("failed to read npm log: %v\n%s", err, output)
-	}
-	expected := "uninstall -g --prefix " + legacyPrefix + " tloop-cli"
-	if !strings.Contains(string(npmLogContent), expected) {
-		t.Fatalf("npm log missing %q:\n%s", expected, npmLogContent)
-	}
-}
-
-func TestPosixInstallScriptSilencesLegacyFailureWhenLegacyShimRemains(t *testing.T) {
-	// Verifies macOS legacy cleanup stays quiet when npm leaves the old shim behind.
-	if runtime.GOOS == "windows" {
-		t.Skip("POSIX shell setup is not available on Windows")
-	}
-
-	home := t.TempDir()
-	installDir := filepath.Join(home, ".local", "bin")
-	legacyPrefix := filepath.Join(home, "npm-global")
-	legacyBin := filepath.Join(legacyPrefix, "bin")
-	mockBin := filepath.Join(home, "mock-bin")
-	for _, dir := range []string{installDir, legacyBin, mockBin} {
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			t.Fatalf("failed to create test directory: %v", err)
-		}
-	}
-	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native tloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write native tloop: %v", err)
-	}
-	legacyUloop := filepath.Join(legacyBin, PosixCommandName)
-	if err := os.WriteFile(legacyUloop, []byte("#!/bin/sh\n# node_modules/tloop-cli legacy shim\necho legacy tloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write legacy tloop: %v", err)
-	}
-	if err := os.WriteFile(filepath.Join(mockBin, "npm"), []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
-		t.Fatalf("failed to write mock npm: %v", err)
-	}
-
-	command, err := CommandForOS("darwin", Options{
-		InstallDir: installDir,
-	})
-	if err != nil {
-		t.Fatalf("CommandForOS failed: %v", err)
-	}
-
-	process := exec.Command(command.Name, command.Args...)
-	process.Env = []string{
-		"HOME=" + home,
-		"ZDOTDIR=" + home,
-		"SHELL=/bin/zsh",
-		"PATH=" + legacyBin + ":" + mockBin + ":/usr/bin:/bin:/usr/sbin:/sbin",
-	}
-	output, err := process.CombinedOutput()
-	if err != nil {
-		t.Fatalf("POSIX setup failed: %v\n%s", err, output)
-	}
-
-	outputText := string(output)
-	if strings.Contains(outputText, "Removed legacy npm package: tloop-cli") {
-		t.Fatalf("cleanup should not report success while the legacy shim remains:\n%s", outputText)
-	}
-	if strings.Contains(outputText, "Could not remove the legacy npm package automatically.") {
-		t.Fatalf("cleanup should not report legacy npm removal failure:\n%s", outputText)
-	}
-	if strings.Contains(outputText, "npm uninstall -g --prefix \""+legacyPrefix+"\" tloop-cli") {
-		t.Fatalf("cleanup should not print manual removal guidance:\n%s", outputText)
-	}
-	if _, err := os.Stat(legacyUloop); err != nil {
-		t.Fatalf("legacy tloop should remain for this scenario: %v", err)
-	}
-}
-
-func TestPosixInstallScriptSkipsDefaultNpmCleanupForInstallPrefix(t *testing.T) {
-	// Verifies default npm cleanup does not remove the freshly installed native dispatcher.
-	if runtime.GOOS == "windows" {
-		t.Skip("POSIX shell setup is not available on Windows")
-	}
-
-	home := t.TempDir()
-	npmPrefix := filepath.Join(home, "npm-global")
-	installDir := filepath.Join(npmPrefix, "bin")
-	mockBin := filepath.Join(home, "mock-bin")
-	npmLog := filepath.Join(home, "npm.log")
-	for _, dir := range []string{installDir, mockBin} {
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			t.Fatalf("failed to create test directory: %v", err)
-		}
-	}
-	if err := os.WriteFile(filepath.Join(installDir, PosixCommandName), []byte("#!/bin/sh\necho native tloop\n"), 0o755); err != nil {
-		t.Fatalf("failed to write native tloop: %v", err)
-	}
-	npmScript := "#!/bin/sh\n" +
-		"if [ \"$1\" = \"prefix\" ] && [ \"$2\" = \"-g\" ]; then\n" +
-		"  echo \"$NPM_PREFIX\"\n" +
-		"  exit 0\n" +
-		"fi\n" +
-		"printf '%s\\n' \"$*\" >> \"$NPM_LOG\"\n"
-	if err := os.WriteFile(filepath.Join(mockBin, "npm"), []byte(npmScript), 0o755); err != nil {
-		t.Fatalf("failed to write mock npm: %v", err)
-	}
-
-	command, err := CommandForOS("darwin", Options{
-		InstallDir: installDir,
-	})
-	if err != nil {
-		t.Fatalf("CommandForOS failed: %v", err)
-	}
-
-	process := exec.Command(command.Name, command.Args...)
-	process.Env = []string{
-		"HOME=" + home,
-		"ZDOTDIR=" + home,
-		"SHELL=/bin/zsh",
-		"NPM_LOG=" + npmLog,
-		"NPM_PREFIX=" + npmPrefix,
-		"PATH=" + installDir + ":" + mockBin + ":/usr/bin:/bin:/usr/sbin:/sbin",
-	}
-	output, err := process.CombinedOutput()
-	if err != nil {
-		t.Fatalf("POSIX setup failed: %v\n%s", err, output)
-	}
-
-	npmLogContent, err := os.ReadFile(npmLog)
-	if err != nil && !os.IsNotExist(err) {
-		t.Fatalf("failed to read npm log: %v\n%s", err, output)
-	}
-	if strings.Contains(string(npmLogContent), "uninstall -g tloop-cli") {
-		t.Fatalf("default npm cleanup should be skipped:\n%s", npmLogContent)
-	}
-	if _, err := os.Stat(filepath.Join(installDir, PosixCommandName)); err != nil {
-		t.Fatalf("native tloop should remain installed: %v", err)
 	}
 }
 

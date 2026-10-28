@@ -24,7 +24,7 @@ func TestRunDispatcherInstallHelpDoesNotRequireUnityProject(t *testing.T) {
 		t.Fatalf("install help failed: code=%d stderr=%s", code, stderr.String())
 	}
 	output := stdout.String()
-	for _, expected := range []string{"Usage:", "tloop install", "--dir <install-dir>", "shell PATH", "legacy npm"} {
+	for _, expected := range []string{"Usage:", "tloop install", "--dir <install-dir>", "shell PATH"} {
 		if !strings.Contains(output, expected) {
 			t.Fatalf("install help missing %q:\n%s", expected, output)
 		}
@@ -59,45 +59,48 @@ func TestResolveNativeInstallDirForWindowsUsesLocalAppData(t *testing.T) {
 	}
 }
 
-func TestWriteInstallCompletionForWindowsMentionsPathAndLegacyCleanup(t *testing.T) {
-	// Verifies Windows install output explains both native setup responsibilities.
+func TestWriteInstallCompletionForWindowsMentionsPath(t *testing.T) {
+	// Verifies Windows install output reports the User PATH setup.
 	var stdout bytes.Buffer
 
 	writeInstallCompletion(&stdout, "windows")
 
 	output := stdout.String()
-	for _, expected := range []string{"User PATH", "Legacy npm tloop-cli"} {
-		if !strings.Contains(output, expected) {
-			t.Fatalf("install completion missing %q:\n%s", expected, output)
-		}
+	if !strings.Contains(output, "User PATH") {
+		t.Fatalf("install completion missing User PATH:\n%s", output)
+	}
+	if strings.Contains(output, "npm") {
+		t.Fatalf("install completion must not mention npm:\n%s", output)
 	}
 }
 
-func TestWriteInstallCompletionForMacMentionsPathAndLegacyCleanup(t *testing.T) {
-	// Verifies macOS install output explains both native setup responsibilities.
+func TestWriteInstallCompletionForMacMentionsPath(t *testing.T) {
+	// Verifies macOS install output reports the shell PATH setup.
 	var stdout bytes.Buffer
 
 	writeInstallCompletion(&stdout, "darwin")
 
 	output := stdout.String()
-	for _, expected := range []string{"shell PATH", "Legacy npm tloop-cli"} {
-		if !strings.Contains(output, expected) {
-			t.Fatalf("install completion missing %q:\n%s", expected, output)
-		}
+	if !strings.Contains(output, "shell PATH") {
+		t.Fatalf("install completion missing shell PATH:\n%s", output)
+	}
+	if strings.Contains(output, "npm") {
+		t.Fatalf("install completion must not mention npm:\n%s", output)
 	}
 }
 
-func TestWriteInstallCompletionForLinuxMentionsPathAndLegacyCleanup(t *testing.T) {
-	// Verifies Linux install output explains both native setup responsibilities.
+func TestWriteInstallCompletionForLinuxMentionsPath(t *testing.T) {
+	// Verifies Linux install output reports the shell PATH setup.
 	var stdout bytes.Buffer
 
 	writeInstallCompletion(&stdout, "linux")
 
 	output := stdout.String()
-	for _, expected := range []string{"shell PATH", "Legacy npm tloop-cli"} {
-		if !strings.Contains(output, expected) {
-			t.Fatalf("install completion missing %q:\n%s", expected, output)
-		}
+	if !strings.Contains(output, "shell PATH") {
+		t.Fatalf("install completion missing shell PATH:\n%s", output)
+	}
+	if strings.Contains(output, "npm") {
+		t.Fatalf("install completion must not mention npm:\n%s", output)
 	}
 }
 

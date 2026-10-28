@@ -137,12 +137,10 @@ func duplicateInstallDirOptionError(option string) error {
 func writeInstallCompletion(stdout io.Writer, goos string) {
 	if goos == "windows" {
 		clicore.WriteLine(stdout, "The package-owned User PATH entry was configured.")
-		clicore.WriteLine(stdout, "Legacy npm tloop-cli launchers were cleaned up when detected.")
 		return
 	}
 	if goos == "darwin" || goos == "linux" {
 		clicore.WriteLine(stdout, "The package-owned shell PATH entry was configured.")
-		clicore.WriteLine(stdout, "Legacy npm tloop-cli launchers were cleaned up when detected.")
 		return
 	}
 
@@ -155,9 +153,9 @@ func printInstallHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Configures the global tloop dispatcher after the installer places the binary.")
 	clicore.WriteLine(stdout, "Set TLOOP_INSTALL_DIR or pass --dir to choose the install directory.")
-	clicore.WriteLine(stdout, "On Windows, updates User PATH and removes legacy npm tloop-cli launchers.")
-	clicore.WriteLine(stdout, "On macOS, updates shell PATH and removes legacy npm tloop-cli launchers.")
-	clicore.WriteLine(stdout, "On Linux, updates shell PATH and removes legacy npm tloop-cli launchers.")
+	clicore.WriteLine(stdout, "On Windows, updates User PATH.")
+	clicore.WriteLine(stdout, "On macOS, updates shell PATH.")
+	clicore.WriteLine(stdout, "On Linux, updates shell PATH.")
 }
 
 func resolveNativeInstallDir(goos string, explicitInstallDir string) (string, error) {

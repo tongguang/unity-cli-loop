@@ -12,7 +12,7 @@ MCP対応は削除され、CLIとSkillsが唯一の連携方法になりまし�
 
 ## アップグレード方法
 
-ほとんどのユーザーにとって、アップグレードは3ステップで完了します。Unityパッケージのバージョンを上げ、`Window > Tuanjie CLI Loop > Settings` を開いて **Install CLI**（または **Update CLI**）を押し、古いnpm版CLIをネイティブ版の `tloop` コマンドに置き換えます。最後に同じウィンドウで **Install Skills**（または **Update Skills**）を押し、インストール済みのSkillsをV3の内容に更新してください。インストーラは古いnpmパッケージを `npm uninstall -g tloop-cli` で自動削除しようとし、削除できなかった場合は手動で実行するコマンドを表示します。
+ほとんどのユーザーにとって、アップグレードは3ステップで完了します。Unityパッケージのバージョンを上げ、`Window > Tuanjie CLI Loop > Settings` を開いて **Install CLI**（または **Update CLI**）を押し、最後に同じウィンドウで **Install Skills**（または **Update Skills**）を押して、インストール済みのSkillsをV3の内容に更新してください。
 
 移行ガイドが必要なのは、独自の連携を作り込んでいる場合だけです。具体的には、V2の拡張APIで書いたC#カスタムツールがある場合か、`tloop` を呼び出す自作の `SKILL.md`・Markdownドキュメント・シェルスクリプト・PowerShellスクリプトがある場合です。該当する場合は、手作業で直し始める前に [カスタムツール／スキルのV3移行ガイド](migration-v2-to-v3_ja.md) を読んでください。
 
@@ -60,7 +60,7 @@ tloop clear-pause-point --id "Assets/Scripts/Enemy.cs:42"
 
 ## CLI・配布方法の変更
 
-- **npmパッケージからネイティブバイナリへ** — CLIはnpm経由ではなく、プラットフォーム別のネイティブバイナリとして配布されます。V3プロジェクトを動かすのにNode.js 22以降は不要になりました。V2の `tloop-cli` npmパッケージは不要になったので、インストーラが削除できなかった場合は `npm uninstall -g tloop-cli` で削除してください。
+- **npmパッケージからネイティブバイナリへ** — CLIはnpm経由ではなく、プラットフォーム別のネイティブバイナリとして配布されます。V3プロジェクトを動かすのにNode.jsは不要になりました。
 - **ポート管理の廃止** — CLIはUnixドメインソケット（macOS/Linux）または名前付きパイプ（Windows）でUnityに接続します。設定すべきポートは存在せず、他のEditorインスタンスとポートが衝突することもありません。
 - **2層構成、runnerはUnityパッケージに自動追随** — `PATH` 上に置かれるグローバルな `tloop` コマンド（dispatcher）が1つあり、プロジェクトごとの `tloop-project-runner` に処理を委譲します。runnerのバージョンは各プロジェクトの `.tloop/project-runner-pin.json` から決まり、バージョン別のユーザーキャッシュへ自動的にダウンロードされます。Unityパッケージの更新にrunnerが自動で追随するため、プロジェクトごとにCLIのバージョンを合わせる作業は不要で、バージョンの異なる複数プロジェクトも1台のマシンで共存できます。
 - **インストーラの真正性検証** — リリース成果物にはsigstoreのattestationが付いています。インストーラは、ダウンロードしたアーカイブをリポジトリに固定されたダイジェストと照合してから実行します。

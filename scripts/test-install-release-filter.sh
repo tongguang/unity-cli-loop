@@ -267,7 +267,8 @@ if [ "${1:-}" = "install" ]; then
       exit 0
     fi
     echo "mock install help"
-    echo "On macOS, updates shell PATH and removes legacy npm tloop-cli launchers."
+    echo "On macOS, updates shell PATH."
+    echo "On Linux, updates shell PATH."
     exit 0
   fi
   if [ -n "${NATIVE_INSTALL_LOG:-}" ]; then
@@ -326,7 +327,7 @@ if [ "${1:-}" = "install" ]; then
       exit 0
     fi
     echo "mock install help"
-    echo "On Windows, updates User PATH and removes legacy npm tloop-cli launchers."
+    echo "On Windows, updates User PATH."
     exit 0
   fi
   if [ -n "${NATIVE_INSTALL_LOG:-}" ]; then
@@ -380,23 +381,6 @@ write_pin_json() {
   "projectRunnerVersion": "3.0.0-beta.64"
 }
 PIN
-}
-
-write_legacy_npm_tloop_shim() {
-  legacy_tloop=$1
-  target=$2
-
-  if ln -s "$target" "$legacy_tloop" 2>/dev/null && [ -L "$legacy_tloop" ]; then
-    return
-  fi
-
-  rm -f "$legacy_tloop"
-  cat > "$legacy_tloop" <<'SHIM'
-#!/bin/sh
-# node_modules/tloop-cli shim marker
-echo "legacy tloop"
-SHIM
-  chmod +x "$legacy_tloop"
 }
 
 write_required_tool_links() {
@@ -515,40 +499,31 @@ write_isolated_command_link() {
 test_posix_latest_skips_prerelease_assets() {
   work_dir="$TMP_DIR/posix-latest"
   mock_bin="$work_dir/bin"
-  legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
   install_dir="$work_dir/install"
   releases_json="$work_dir/releases.json"
   curl_log="$work_dir/curl.log"
   npm_log="$work_dir/npm.log"
-  legacy_tloop="$legacy_bin/tloop"
-  mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist"
+  mkdir -p "$work_dir"
   : > "$curl_log"
   : > "$npm_log"
-  printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
-  chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
   write_releases_json "$releases_json"
   write_mock_commands "$mock_bin"
 
-  PATH="$legacy_bin:$mock_bin:$ORIGINAL_PATH" \
+  PATH="$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
     TLOOP_VERSION=latest \
     TLOOP_INSTALL_DIR="$install_dir" \
     RELEASES_JSON="$releases_json" \
     CURL_LOG="$curl_log" \
     NPM_LOG="$npm_log" \
     MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_TLOOP="$legacy_tloop" \
+    LEGACY_TLOOP="" \
     "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
 
   assert_contains "$curl_log" "dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz"
   assert_contains "$curl_log" "dispatcher-v2.0.0/tloop-dispatcher-darwin-arm64.tar.gz.sha256"
   assert_not_contains "$curl_log" "dispatcher-v3.0.0-beta.2"
-  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global tloop-cli"
-  if [ -e "$legacy_tloop" ]; then
-    echo "Expected mocked npm uninstall to remove the legacy Node tloop shim: $legacy_tloop" >&2
-    exit 1
-  fi
+  assert_not_contains "$npm_log" "uninstall -g tloop-cli"
+  assert_not_contains "$ROOT_DIR/scripts/install.sh" "tloop-cli"
 }
 
 test_posix_latest_beta_selects_prerelease_assets() {
@@ -676,45 +651,6 @@ test_posix_native_failure_uses_fallback() {
   assert_contains "$work_dir/stderr.txt" "Native install setup failed."
   assert_contains "$work_dir/output.txt" "Installed tloop to $install_dir, but that directory is not in PATH."
   assert_contains "$work_dir/output.txt" "tloop mock version"
-}
-
-test_posix_native_path_cleans_preinstall_legacy_shim() {
-  work_dir="$TMP_DIR/posix-native-preinstall-legacy"
-  mock_bin="$work_dir/bin"
-  legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
-  install_dir="$work_dir/install"
-  releases_json="$work_dir/releases.json"
-  curl_log="$work_dir/curl.log"
-  npm_log="$work_dir/npm.log"
-  native_install_log="$work_dir/native-install.log"
-  legacy_tloop="$legacy_bin/tloop"
-  mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist" "$install_dir"
-  : > "$curl_log"
-  : > "$npm_log"
-  : > "$native_install_log"
-  printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
-  chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
-  write_releases_json "$releases_json"
-  write_mock_commands "$mock_bin"
-
-  PATH="$install_dir:$legacy_bin:$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    TLOOP_VERSION=latest \
-    TLOOP_INSTALL_DIR="$install_dir" \
-    RELEASES_JSON="$releases_json" \
-    CURL_LOG="$curl_log" \
-    NPM_LOG="$npm_log" \
-    NATIVE_INSTALL_LOG="$native_install_log" \
-    LEGACY_TLOOP="$legacy_tloop" \
-    "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
-
-  assert_contains "$native_install_log" "install --dir $install_dir"
-  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global tloop-cli"
-  if [ -e "$legacy_tloop" ]; then
-    echo "Expected pre-install legacy npm shim to be removed: $legacy_tloop" >&2
-    exit 1
-  fi
 }
 
 test_posix_prints_zsh_path_guidance_without_writing_profile() {
@@ -858,190 +794,6 @@ test_posix_prints_generic_path_guidance_for_unknown_shell() {
   assert_file_not_exists "$home_dir/.kshrc"
 }
 
-test_posix_skips_default_npm_cleanup_when_native_command_is_first() {
-  work_dir="$TMP_DIR/posix-native-first"
-  mock_bin="$work_dir/bin"
-  legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
-  install_dir="$work_dir/install"
-  releases_json="$work_dir/releases.json"
-  curl_log="$work_dir/curl.log"
-  npm_log="$work_dir/npm.log"
-  legacy_tloop="$legacy_bin/tloop"
-  native_tloop="$install_dir/tloop"
-  mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist" "$install_dir"
-  : > "$curl_log"
-  : > "$npm_log"
-  printf '%s\n' '#!/bin/sh' 'echo v3.0.0-beta.2' > "$native_tloop"
-  chmod +x "$native_tloop"
-  printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
-  chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
-  write_releases_json "$releases_json"
-  write_mock_commands "$mock_bin"
-
-  PATH="$install_dir:$legacy_bin:$mock_bin:$ORIGINAL_PATH" \
-    TLOOP_VERSION=latest \
-    TLOOP_INSTALL_DIR="$install_dir" \
-    RELEASES_JSON="$releases_json" \
-    CURL_LOG="$curl_log" \
-    NPM_LOG="$npm_log" \
-    MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_TLOOP="$legacy_tloop" \
-    DEFAULT_LEGACY_TLOOP="$legacy_tloop" \
-    "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
-
-  assert_not_contains "$npm_log" "uninstall -g tloop-cli"
-  assert_not_contains "$npm_log" "uninstall -g --prefix $install_dir tloop-cli"
-  if [ ! -e "$legacy_tloop" ]; then
-    echo "Expected hidden npm shim to remain when the detected command is native: $legacy_tloop" >&2
-    exit 1
-  fi
-}
-
-test_posix_does_not_infer_npm_prefix_from_non_npm_command() {
-  work_dir="$TMP_DIR/posix-non-npm-first"
-  mock_bin="$work_dir/bin"
-  non_npm_prefix="$work_dir/homebrew"
-  non_npm_bin="$non_npm_prefix/bin"
-  install_dir="$work_dir/install"
-  releases_json="$work_dir/releases.json"
-  curl_log="$work_dir/curl.log"
-  npm_log="$work_dir/npm.log"
-  non_npm_tloop="$non_npm_bin/tloop"
-  mkdir -p "$work_dir" "$non_npm_bin"
-  : > "$curl_log"
-  : > "$npm_log"
-  printf '%s\n' '#!/bin/sh' 'echo non npm tloop' > "$non_npm_tloop"
-  chmod +x "$non_npm_tloop"
-  write_releases_json "$releases_json"
-  write_mock_commands "$mock_bin"
-
-  PATH="$non_npm_bin:$mock_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
-    TLOOP_VERSION=latest \
-    TLOOP_INSTALL_DIR="$install_dir" \
-    RELEASES_JSON="$releases_json" \
-    CURL_LOG="$curl_log" \
-    NPM_LOG="$npm_log" \
-    MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_TLOOP="" \
-    "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
-
-  assert_not_contains "$npm_log" "uninstall -g tloop-cli"
-  assert_not_contains "$npm_log" "--prefix $non_npm_prefix"
-  if [ ! -x "$non_npm_tloop" ]; then
-    echo "Expected non-npm tloop command to remain untouched: $non_npm_tloop" >&2
-    exit 1
-  fi
-}
-
-test_posix_silences_legacy_cleanup_when_npm_is_unavailable() {
-  work_dir="$TMP_DIR/posix-no-npm"
-  mock_bin="$work_dir/bin"
-  tool_bin="$work_dir/tools"
-  legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
-  install_dir="$work_dir/install"
-  releases_json="$work_dir/releases.json"
-  curl_log="$work_dir/curl.log"
-  npm_log="$work_dir/npm.log"
-  legacy_tloop="$legacy_bin/tloop"
-  mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist"
-  : > "$curl_log"
-  : > "$npm_log"
-  printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
-  chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
-  write_releases_json "$releases_json"
-  write_mock_commands "$mock_bin"
-  rm -f "$mock_bin/npm"
-  write_required_tool_links "$tool_bin"
-
-  PATH="$legacy_bin:$mock_bin:$tool_bin" \
-    TLOOP_VERSION=latest \
-    TLOOP_INSTALL_DIR="$install_dir" \
-    RELEASES_JSON="$releases_json" \
-    CURL_LOG="$curl_log" \
-    NPM_LOG="$npm_log" \
-    MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_TLOOP="$legacy_tloop" \
-    "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
-
-  assert_not_contains "$work_dir/output.txt" "Could not remove the legacy npm package automatically."
-  assert_not_contains "$work_dir/output.txt" "npm uninstall -g --prefix \"$work_dir/npm-global\" tloop-cli"
-  assert_not_contains "$work_dir/output.txt" "Run this manually if the old npm command still shadows the native CLI:"
-}
-
-test_posix_silences_legacy_cleanup_when_npm_prefix_cannot_be_inferred() {
-  work_dir="$TMP_DIR/posix-unknown-npm-prefix"
-  mock_bin="$work_dir/bin"
-  legacy_bin="$work_dir/custom-shims"
-  install_dir="$work_dir/install"
-  releases_json="$work_dir/releases.json"
-  curl_log="$work_dir/curl.log"
-  npm_log="$work_dir/npm.log"
-  legacy_tloop="$legacy_bin/tloop"
-  mkdir -p "$work_dir" "$legacy_bin"
-  : > "$curl_log"
-  : > "$npm_log"
-  printf '%s\n' '#!/bin/sh' '# node_modules/tloop-cli custom shim' 'echo legacy tloop' > "$legacy_tloop"
-  chmod +x "$legacy_tloop"
-  write_releases_json "$releases_json"
-  write_mock_commands "$mock_bin"
-
-  PATH="$legacy_bin:$mock_bin:$ORIGINAL_PATH" \
-    TLOOP_VERSION=latest \
-    TLOOP_INSTALL_DIR="$install_dir" \
-    RELEASES_JSON="$releases_json" \
-    CURL_LOG="$curl_log" \
-    NPM_LOG="$npm_log" \
-    MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_TLOOP="$legacy_tloop" \
-    "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
-
-  assert_not_contains "$npm_log" "uninstall -g tloop-cli"
-  assert_not_contains "$npm_log" "uninstall -g --prefix"
-  assert_not_contains "$work_dir/output.txt" "Could not remove the legacy npm package automatically."
-  assert_not_contains "$work_dir/output.txt" "Legacy tloop command: $legacy_tloop"
-  assert_not_contains "$work_dir/output.txt" "Run this manually if the old npm command still shadows the native CLI:"
-}
-
-test_posix_removes_npm_package_before_replacing_same_bin_path() {
-  work_dir="$TMP_DIR/posix-same-bin"
-  mock_bin="$work_dir/bin"
-  legacy_bin="$work_dir/npm-global/bin"
-  legacy_package_dist="$work_dir/npm-global/lib/node_modules/tloop-cli/dist"
-  releases_json="$work_dir/releases.json"
-  curl_log="$work_dir/curl.log"
-  npm_log="$work_dir/npm.log"
-  legacy_tloop="$legacy_bin/tloop"
-  mkdir -p "$work_dir" "$legacy_bin" "$legacy_package_dist"
-  : > "$curl_log"
-  : > "$npm_log"
-  printf '%s\n' 'legacy node cli bundle' > "$legacy_package_dist/cli.bundle.cjs"
-  chmod +x "$legacy_package_dist/cli.bundle.cjs"
-  write_legacy_npm_tloop_shim "$legacy_tloop" "../lib/node_modules/tloop-cli/dist/cli.bundle.cjs"
-  write_releases_json "$releases_json"
-  write_mock_commands "$mock_bin"
-
-  PATH="$legacy_bin:$mock_bin:$ORIGINAL_PATH" \
-    TLOOP_VERSION=latest \
-    TLOOP_INSTALL_DIR="$legacy_bin" \
-    RELEASES_JSON="$releases_json" \
-    CURL_LOG="$curl_log" \
-    NPM_LOG="$npm_log" \
-    MOCK_NATIVE_INSTALL_UNSUPPORTED=1 \
-    LEGACY_TLOOP="$legacy_tloop" \
-    "$ROOT_DIR/scripts/install.sh" > "$work_dir/output.txt" 2> "$work_dir/stderr.txt"
-
-  assert_contains "$npm_log" "uninstall -g --prefix $work_dir/npm-global tloop-cli"
-  if [ ! -x "$legacy_tloop" ]; then
-    echo "Expected native tloop to remain installed after same-bin npm removal: $legacy_tloop" >&2
-    exit 1
-  fi
-  assert_contains "$work_dir/output.txt" "tloop mock version"
-}
-
 test_powershell_latest_skips_prerelease_assets() {
   assert_contains "$ROOT_DIR/scripts/install.ps1" '$LatestBetaVersion = "latest-beta"'
   assert_contains "$ROOT_DIR/scripts/install.ps1" 'if ($ReleaseChannel -eq "stable" -and $Release.prerelease) {'
@@ -1062,6 +814,7 @@ test_powershell_latest_skips_prerelease_assets() {
   assert_contains "$ROOT_DIR/scripts/install.ps1" 'raw.githubusercontent.com/$Repository/$PinRef/Packages/src/project-runner-pin.json'
   assert_contains "$ROOT_DIR/scripts/install.ps1" '$DefaultPinRef = "main"'
   assert_not_contains "$ROOT_DIR/scripts/install.ps1" "TLOOP_REMOVE_LEGACY"
+  assert_not_contains "$ROOT_DIR/scripts/install.ps1" "tloop-cli"
 }
 
 test_git_bash_latest_installs_windows_zip_asset() {
@@ -1722,16 +1475,10 @@ test_posix_latest_beta_selects_prerelease_assets
 test_posix_invokes_native_install_setup
 test_posix_help_only_native_probe_uses_fallback
 test_posix_native_failure_uses_fallback
-test_posix_native_path_cleans_preinstall_legacy_shim
 test_posix_prints_zsh_path_guidance_without_writing_profile
 test_posix_prints_bash_path_guidance_without_modifying_existing_profile
 test_posix_prints_fish_path_guidance_without_writing_profile
 test_posix_prints_generic_path_guidance_for_unknown_shell
-test_posix_skips_default_npm_cleanup_when_native_command_is_first
-test_posix_does_not_infer_npm_prefix_from_non_npm_command
-test_posix_silences_legacy_cleanup_when_npm_is_unavailable
-test_posix_silences_legacy_cleanup_when_npm_prefix_cannot_be_inferred
-test_posix_removes_npm_package_before_replacing_same_bin_path
 test_powershell_latest_skips_prerelease_assets
 test_git_bash_latest_installs_windows_zip_asset
 test_git_bash_extracts_windows_zip_without_unzip

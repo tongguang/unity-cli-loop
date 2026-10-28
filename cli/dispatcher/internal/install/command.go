@@ -20,12 +20,11 @@ type Options struct {
 }
 
 type Command struct {
-	Name         string
-	Args         []string
-	TargetPath   string
-	InstallDir   string
-	UpdatesPath  bool
-	CleansLegacy bool
+	Name        string
+	Args        []string
+	TargetPath  string
+	InstallDir  string
+	UpdatesPath bool
 }
 
 func CommandForOS(goos string, options Options) (Command, error) {
@@ -38,23 +37,21 @@ func CommandForOS(goos string, options Options) (Command, error) {
 		installDir := nativepath.TrimInstallDir(goos, options.InstallDir)
 		targetPath := nativepath.CommandPath(goos, installDir, PosixCommandName, WindowsCommandName)
 		return Command{
-			Name:         "sh",
-			Args:         posixInstallArgs(installDir, targetPath),
-			TargetPath:   targetPath,
-			InstallDir:   installDir,
-			UpdatesPath:  true,
-			CleansLegacy: true,
+			Name:        "sh",
+			Args:        posixInstallArgs(installDir, targetPath),
+			TargetPath:  targetPath,
+			InstallDir:  installDir,
+			UpdatesPath: true,
 		}, nil
 	case "windows":
 		installDir := nativepath.TrimInstallDir(goos, options.InstallDir)
 		targetPath := nativepath.CommandPath(goos, installDir, PosixCommandName, WindowsCommandName)
 		return Command{
-			Name:         "powershell",
-			Args:         windowsInstallArgs(installDir, targetPath),
-			TargetPath:   targetPath,
-			InstallDir:   installDir,
-			UpdatesPath:  true,
-			CleansLegacy: true,
+			Name:        "powershell",
+			Args:        windowsInstallArgs(installDir, targetPath),
+			TargetPath:  targetPath,
+			InstallDir:  installDir,
+			UpdatesPath: true,
 		}, nil
 	default:
 		return Command{}, errors.New(UnsupportedOSMessage)

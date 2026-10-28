@@ -12,7 +12,7 @@ MCP support has been removed; the CLI plus Skills is now the only integration pa
 
 ## Upgrading
 
-For most users the upgrade is three steps. Raise the Unity package version, open `Window > Tuanjie CLI Loop > Settings` and press **Install CLI** (or **Update CLI**) to replace the old npm CLI with the native `tloop` command, and finally press **Install Skills** (or **Update Skills**) in the same window to refresh your installed Skills to the V3 content. The installer attempts to remove the obsolete npm package with `npm uninstall -g tloop-cli` and prints the command to run manually when it cannot.
+For most users the upgrade is three steps. Raise the Unity package version, open `Window > Tuanjie CLI Loop > Settings` and press **Install CLI** (or **Update CLI**), and finally press **Install Skills** (or **Update Skills**) in the same window to refresh your installed Skills to the V3 content.
 
 You only need the migration guide if you wrote your own integrations: C# custom tools built on the V2 extension API, or your own `SKILL.md` files, Markdown docs, shell scripts, or PowerShell scripts that invoke `tloop`. In that case read [Migrating Custom Tools and Skills to V3](migration-v2-to-v3.md) before you start fixing anything by hand.
 
@@ -60,7 +60,7 @@ tloop clear-pause-point --id "Assets/Scripts/Enemy.cs:42"
 
 ## CLI and Distribution Changes
 
-- **npm package to native binary** — the CLI is distributed as platform-native binaries rather than through npm. Node.js 22+ is no longer a requirement for running V3 projects. The V2 `tloop-cli` npm package is obsolete; remove it with `npm uninstall -g tloop-cli` if the installer could not.
+- **npm package to native binary** — the CLI is distributed as platform-native binaries rather than through npm. Node.js is no longer a requirement for running V3 projects.
 - **No more port management** — the CLI reaches Unity over a Unix domain socket (macOS/Linux) or a named pipe (Windows). There is no port to configure, and no port to collide with another Editor instance.
 - **Two-layer architecture, with the runner tracking the Unity package automatically** — a single global `tloop` command (the dispatcher) lives on your `PATH` and delegates to a per-project `tloop-project-runner`. The runner version comes from `.tloop/project-runner-pin.json` in each project and is downloaded into a per-version user cache automatically. Because the runner follows Unity package updates on its own, there is no per-project CLI version to manage, and projects on different versions coexist on one machine.
 - **Installer authenticity verification** — release assets carry sigstore attestations, and the installer verifies the downloaded archive against the digests pinned in the repository before running anything.

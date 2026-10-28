@@ -192,80 +192,6 @@ configure_shell_path() {
     esac
 }
 
-infer_npm_prefix_from_tloop_path() {
-    command_path=$1
-    case "$command_path" in
-        */bin/tloop|*/bin/tloop.exe)
-            bin_dir=${command_path%/*}
-            echo "${bin_dir%/bin}"
-            ;;
-        *)
-            echo ""
-            ;;
-    esac
-}
-
-is_legacy_npm_tloop_path() {
-    command_path=$1
-    if [ -z "$command_path" ]; then
-        return 1
-    fi
-    if [ "$command_path" = "$ExpectedUloopPath" ]; then
-        return 1
-    fi
-    if [ -L "$command_path" ]; then
-        link_target=$(readlink "$command_path" 2>/dev/null || true)
-        case "$link_target" in
-            *node_modules/tloop-cli*|*node_modules\\tloop-cli*) return 0 ;;
-        esac
-    fi
-    if [ -f "$command_path" ] && grep -F "node_modules/tloop-cli" "$command_path" >/dev/null 2>&1; then
-        return 0
-    fi
-    return 1
-}
-
-try_remove_legacy_npm_package() {
-    legacy_tloop=$1
-    legacy_prefix=""
-    if ! is_legacy_npm_tloop_path "$legacy_tloop"; then
-        return
-    fi
-    legacy_prefix=$(infer_npm_prefix_from_tloop_path "$legacy_tloop")
-    if [ -z "$legacy_prefix" ]; then
-        return
-    fi
-    if ! command -v npm >/dev/null 2>&1; then
-        return
-    fi
-    if npm uninstall -g --prefix "$legacy_prefix" tloop-cli; then
-        if ! is_legacy_npm_tloop_path "$legacy_tloop"; then
-            echo "Removed legacy npm package: tloop-cli"
-            return
-        fi
-    fi
-}
-
-try_remove_default_legacy_npm_package() {
-    if ! command -v npm >/dev/null 2>&1; then
-        return
-    fi
-    default_prefix=$(npm prefix -g 2>/dev/null || true)
-    if [ -n "$default_prefix" ]; then
-        default_tloop_path="$default_prefix/bin/tloop"
-        if [ "$(normalize_path "$default_tloop_path")" = "$(normalize_path "$ExpectedUloopPath")" ]; then
-            return
-        fi
-    fi
-    npm uninstall -g tloop-cli >/dev/null 2>&1 || true
-}
-
-configure_legacy_cleanup() {
-    legacy_tloop=$(command -v tloop 2>/dev/null || true)
-    try_remove_legacy_npm_package "$legacy_tloop"
-    try_remove_default_legacy_npm_package
-}
-
 report_path_shadowing() {
     resolved_tloop=$(command -v tloop 2>/dev/null || true)
     if [ -z "$resolved_tloop" ] || [ "$resolved_tloop" = "$ExpectedUloopPath" ]; then
@@ -278,7 +204,6 @@ report_path_shadowing() {
 
 shell_path_status=0
 configure_shell_path || shell_path_status=$?
-configure_legacy_cleanup
 prepend_current_path
 report_path_shadowing
 exit "$shell_path_status"
