@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.22.2](https://github.com/tongguang/unity-cli-loop/compare/v3.22.1...v3.22.2) (2026-10-28)
+
+
+### Bug Fixes
+
+* name the installed migration skill in the wizard's AI prompt ([5f3c283](https://github.com/tongguang/unity-cli-loop/commit/5f3c28396fe115f142f9b58b0327a42afd161260))
+* restore the V2 namespace that third-party tool migration detects ([4083dad](https://github.com/tongguang/unity-cli-loop/commit/4083dadeab4708c563a5341ef5dd7d90b372b981))
+
 ## [3.22.1](https://github.com/tongguang/unity-cli-loop/compare/v3.22.0...v3.22.1) (2026-10-28)
 
 
