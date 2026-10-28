@@ -130,6 +130,16 @@ The project's recorded Editor version must name a Tuanjie installation. A projec
 last saved by Unity must first be opened and saved in Tuanjie; `--editor-version`
 or `--editor-path` can also select a Tuanjie Editor explicitly.
 
+This repository's own development project uses Tuanjie 1.9.1 (`2022.3.62t9`).
+Opening it in that Editor raised Input System to the Editor-bundled `1.14.4-t1`
+and the Universal Render Pipeline to the built-in `14.2.0-t1`, and switched the
+default registry to `packages.tuanjie.cn`. The EditMode workflow still tests with
+Unity: its GameCI jobs run the Unity versions named in their matrix, and its
+Release leg downloads the Editor named in `ProjectVersion.txt` from Unity's
+servers, which serve no Tuanjie build. These jobs run only when the
+`UNITY_LICENSE` secret is set, and the Release leg cannot start against this
+project until it installs Tuanjie instead.
+
 These discovery changes do not establish compatibility with every Tuanjie release.
 Tools using private Editor APIs, the bundled compiler, or hot reload still need
 validation against the intended Editor version. Do not rewrite Unity version defines
@@ -168,6 +178,17 @@ establish that graphical startup completed.
 That project used Input System 1.7.0: the Tuanjie package registry did not provide
 the development project's Input System 1.14.2. Package versions in an existing
 project still need to be available from its configured registry.
+
+With Tuanjie 1.9.1 the development project opened from Tuanjie Hub reached
+`Ready` in the graphical Editor, and the released dispatcher `3.14.1` compiled it
+with zero errors and warnings. A scoped EditMode run of the third-party migration,
+pause-point, transform-worker, and hot-reload package-source tests passed 985 of
+987 tests with one skipped. The one failure,
+`CopyMigrationSkillPromptToClipboard_WritesPrompt`, read back an empty clipboard;
+PowerShell's own clipboard round trip also returned empty on that host. The
+pause-point tests need Debug code optimization, which the CI workflow sets with
+`-debugCodeOptimization`; in an Editor running in Release, run
+`tloop set-code-optimization debug` before them.
 
 The fork's release-please config uses the upstream import commit as
 `bootstrap-sha`, so its first release notes contain this fork's changes rather
