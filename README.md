@@ -29,13 +29,13 @@ CLI 与 Editor 使用本地 IPC：Windows 使用命名管道，macOS / Linux 使
 
 ## 版本与验证范围
 
-三个组件分别发布版本，project runner 由工程内的 pin 自动选择：
+三个组件分别发布。版本号见 [Releases](https://github.com/tongguang/unity-cli-loop/releases)。project runner 由工程内的 pin 自动选择。
 
-| 组件 | 当前版本 |
+| 组件 | 发行标记 |
 | --- | --- |
-| 团结 UPM 插件 | [3.22.1](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.1) |
-| CLI dispatcher | [3.14.1](https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.14.1) |
-| Project runner | [3.13.1](https://github.com/tongguang/unity-cli-loop/releases/tag/tloop-project-runner-v3.13.1) |
+| 团结 UPM 插件 | `v<version>` |
+| CLI dispatcher | `dispatcher-v<version>` |
+| Project runner | `tloop-project-runner-v<version>` |
 
 已在 Windows 上实测两个团结版本：
 
@@ -75,20 +75,22 @@ tloop --version
 在团结 Editor 的 `Window > Package Manager` 中选择 **Add package from git URL**，输入：
 
 ```text
-https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.1
+https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src
 ```
+
+这条地址跟随默认分支。
 
 也可以在已有 `Packages/manifest.json` 的 `dependencies` 中添加这一项，保留工程原有依赖：
 
 ```json
 {
   "dependencies": {
-    "io.github.tongguang.tloop": "https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.1"
+    "io.github.tongguang.tloop": "https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src"
   }
 }
 ```
 
-另一种方式是下载 [UPM 发行包](https://github.com/tongguang/unity-cli-loop/releases/download/v3.22.1/io.github.tongguang.tloop-3.22.1.tgz)，选择 **Add package from tarball**。
+另一种方式是打开 [Releases](https://github.com/tongguang/unity-cli-loop/releases) 里标记为 `v<version>` 的团结插件发布，下载 `io.github.tongguang.tloop-<version>.tgz`，选择 **Add package from tarball**。
 
 插件按普通 UPM 包发布，无需 Unity Cloud 包签名。CLI 发行包继续使用校验和及来源证明校验。
 

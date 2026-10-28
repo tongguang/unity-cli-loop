@@ -23,13 +23,13 @@ Windows で 2 つの Tuanjie バージョンを確認しました。
 
 ## リリース
 
-| コンポーネント | バージョン |
-| --- | --- |
-| Tuanjie UPM パッケージ | [3.22.1](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.1) |
-| CLI dispatcher | [3.14.1](https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.14.1) |
-| Project runner | [3.13.1](https://github.com/tongguang/unity-cli-loop/releases/tag/tloop-project-runner-v3.13.1) |
+三つのコンポーネントは別々にリリースされます。バージョンは [Releases](https://github.com/tongguang/unity-cli-loop/releases) を参照してください。runner のバージョンはプロジェクトの pin から自動選択されます。
 
-runner のバージョンはプロジェクトの pin から自動選択されます。
+| コンポーネント | リリースタグ |
+| --- | --- |
+| Tuanjie UPM パッケージ | `v<version>` |
+| CLI dispatcher | `dispatcher-v<version>` |
+| Project runner | `tloop-project-runner-v<version>` |
 
 ## インストール
 
@@ -54,10 +54,12 @@ curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scrip
 Tuanjie の `Window > Package Manager` で **Add package from git URL** を選択し、次の URL を入力してください。
 
 ```text
-https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src#v3.22.1
+https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src
 ```
 
-または [UPM リリース](https://github.com/tongguang/unity-cli-loop/releases/tag/v3.22.1) の `.tgz` をダウンロードし、**Add package from tarball** でインストールできます。通常の UPM パッケージとして配布しており、Unity Cloud のパッケージ署名は不要です。CLI のチェックサムと来歴証明の検証は維持しています。
+この URL はデフォルトブランチを追跡します。
+
+または [Releases](https://github.com/tongguang/unity-cli-loop/releases) で `v<version>` の Tuanjie パッケージリリースを開き、`io.github.tongguang.tloop-<version>.tgz` をダウンロードして **Add package from tarball** でインストールできます。通常の UPM パッケージとして配布しており、Unity Cloud のパッケージ署名は不要です。CLI のチェックサムと来歴証明の検証は維持しています。
 
 ### 3. Skills
 
