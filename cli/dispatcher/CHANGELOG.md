@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.14.0](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.13.1...dispatcher-v3.14.0) (2026-10-28)
+
+
+### Features
+
+* make tloop a Tuanjie-only CLI ([77ee691](https://github.com/tongguang/unity-cli-loop/commit/77ee6912d7641709737d277549b0fc8efc1e6daf))
+
 ## [3.13.1](https://github.com/hatayama/unity-cli-loop/compare/dispatcher-v3.13.0...dispatcher-v3.13.1) (2026-10-27)
 
 
