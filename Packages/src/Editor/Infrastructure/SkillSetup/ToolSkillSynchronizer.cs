@@ -199,43 +199,5 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
                 return new SkillInstallResult(targetArray.Length, succeeded);
             }, ct);
         }
-
-        internal static SkillInstallState GetV3MigrationSkillInstallStateAtInstallRoot(
-            string installRoot,
-            SkillTargetInfo target,
-            bool groupSkillsUnderUnityCliLoop)
-        {
-            return V3MigrationSkillInstaller.GetV3MigrationSkillInstallStateAtInstallRoot(
-                installRoot,
-                target,
-                groupSkillsUnderUnityCliLoop);
-        }
-
-        internal static async Task<SkillInstallResult> InstallV3MigrationSkillFilesAtInstallRoot(
-            string installRoot,
-            IEnumerable<SkillTargetInfo> targets,
-            bool groupSkillsUnderUnityCliLoop,
-            CancellationToken ct)
-        {
-            return await V3MigrationSkillInstaller.InstallV3MigrationSkillFilesAtInstallRoot(
-                installRoot,
-                targets,
-                groupSkillsUnderUnityCliLoop,
-                ct);
-        }
-
-        internal static async Task<SkillInstallResult> RemoveV3MigrationSkillFilesAtInstallRoot(
-            string installRoot,
-            IEnumerable<SkillTargetInfo> targets,
-            bool groupSkillsUnderUnityCliLoop,
-            CancellationToken ct)
-        {
-            return await V3MigrationSkillInstaller.RemoveV3MigrationSkillFilesAtInstallRoot(
-                installRoot,
-                targets,
-                groupSkillsUnderUnityCliLoop,
-                ct);
-        }
-
     }
 }

@@ -1,30 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 
 using io.github.hatayama.UnityCliLoop.Application;
 using io.github.hatayama.UnityCliLoop.Domain;
 using io.github.hatayama.UnityCliLoop.Presentation;
-using io.github.hatayama.UnityCliLoop.ToolContracts;
 
 namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 {
     /// <summary>
-    /// Verifies the migration wizard workflow controller's synchronous state transitions, the
-    /// migration skill install/remove toggle, and the superseding of in-flight operation tokens.
+    /// Verifies the migration wizard workflow controller's synchronous state transitions and the
+    /// superseding of in-flight operation tokens.
     /// </summary>
     public sealed class ThirdPartyToolMigrationWizardWorkflowStateTests
     {
         private VisualElement _root;
-        private RecordingMigrationSkillPort _skillPort;
-        private RecordingPresentationDialogs _dialogs;
         private int _resizeCount;
         private ThirdPartyToolMigrationWizardWorkflowController _controller;
 
@@ -32,30 +26,24 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void SetUp()
         {
             _root = new VisualElement();
-            _skillPort = new RecordingMigrationSkillPort();
-            _dialogs = new RecordingPresentationDialogs();
             _resizeCount = 0;
             ThirdPartyToolMigrationWizardView view = ThirdPartyToolMigrationWizardView.Create(
                 _root,
                 () => { },
                 () => { },
-                _ => { },
-                () => { },
                 () => { });
             _controller = new ThirdPartyToolMigrationWizardWorkflowController(
                 view,
-                new SkillSetupUseCase(_skillPort),
                 new ThirdPartyToolMigrationUseCase(new UnusedMigrationPort()),
                 new List<string> { "Assets/Seed.cs" },
                 () => _resizeCount++,
-                _dialogs);
+                new RecordingPresentationDialogs());
         }
 
         [TearDown]
         public void TearDown()
         {
             _controller.CancelMigrationOperation();
-            _controller.CancelMigrationSkillOperation();
         }
 
         /// <summary>
@@ -141,164 +129,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies switching the skill target re-reads that target's install state, flat, at the project root,
-        /// and renders the remove action for an installed skill.
-        /// </summary>
-        [Test]
-        public void HandleMigrationSkillTargetChanged_QueriesTheNewTargetAtTheProjectRoot()
-        {
-            _skillPort.InstallState = SkillInstallState.Installed;
-
-            _controller.HandleMigrationSkillTargetChanged(SkillsTarget.Codex);
-
-            Assert.That(_skillPort.StateQueries.Count, Is.EqualTo(1));
-            Assert.That(_skillPort.StateQueries[0].ProjectRoot, Is.EqualTo(UnityCliLoopPathResolver.GetProjectRoot()));
-            Assert.That(_skillPort.StateQueries[0].Target.DirName, Is.EqualTo(".codex"));
-            Assert.That(_skillPort.StateQueries[0].Target.InstallFlag, Is.EqualTo("--codex"));
-            Assert.That(_skillPort.StateQueries[0].GroupSkillsUnderUnityCliLoop, Is.False);
-            Assert.That(
-                GetMigrationSkillButtonText(),
-                Is.EqualTo(ThirdPartyToolMigrationWizardText.GetMigrationSkillButtonText(false, SkillInstallState.Installed)));
-        }
-
-        /// <summary>
-        /// Verifies the migration skill target names the selected agent directory and starts as missing.
-        /// </summary>
-        [TestCase(SkillsTarget.Claude, "Claude Code", ".claude", "--claude")]
-        [TestCase(SkillsTarget.Codex, "Codex CLI", ".codex", "--codex")]
-        [TestCase(SkillsTarget.Agents, "Common", ".agents", "--agents")]
-        public void CreateMigrationSkillTargetInfo_DescribesAMissingFlatTarget(
-            SkillsTarget target,
-            string expectedDisplayName,
-            string expectedDirectoryName,
-            string expectedInstallFlag)
-        {
-            SkillSetupTargetInfo info =
-                ThirdPartyToolMigrationWizardWorkflowController.CreateMigrationSkillTargetInfo(target);
-
-            Assert.That(info.DisplayName, Is.EqualTo(expectedDisplayName));
-            Assert.That(info.DirName, Is.EqualTo(expectedDirectoryName));
-            Assert.That(info.InstallFlag, Is.EqualTo(expectedInstallFlag));
-            Assert.That(info.HasSkillsDirectory, Is.True);
-            Assert.That(info.InstallState, Is.EqualTo(SkillInstallState.Missing));
-        }
-
-        /// <summary>
-        /// Verifies the toggle installs a missing migration skill for the selected target and then re-reads the
-        /// install state.
-        /// </summary>
-        [Test]
-        public async Task HandleToggleMigrationSkill_WhenMissing_InstallsTheSelectedTarget()
-        {
-            _skillPort.InstallState = SkillInstallState.Missing;
-
-            await _controller.HandleToggleMigrationSkill();
-
-            Assert.That(_skillPort.InstallCalls.Count, Is.EqualTo(1));
-            Assert.That(_skillPort.RemoveCalls.Count, Is.EqualTo(0));
-            Assert.That(_skillPort.InstallCalls[0].ProjectRoot, Is.EqualTo(UnityCliLoopPathResolver.GetProjectRoot()));
-            Assert.That(_skillPort.InstallCalls[0].Targets.Count, Is.EqualTo(1));
-            Assert.That(_skillPort.InstallCalls[0].Targets[0].DirName, Is.EqualTo(".claude"));
-            Assert.That(_skillPort.InstallCalls[0].GroupSkillsUnderUnityCliLoop, Is.False);
-            Assert.That(_skillPort.StateQueries.Count, Is.EqualTo(2));
-        }
-
-        /// <summary>
-        /// Verifies the toggle explains an unavailable Git repository install root in a dialog instead of
-        /// attempting the install.
-        /// </summary>
-        [Test]
-        public async Task HandleToggleMigrationSkill_WhenInstallRootIsUnavailable_ShowsDialogWithoutInstalling()
-        {
-            _skillPort.InstallState = SkillInstallState.Missing;
-            _skillPort.InstallRootSelection = new SkillInstallRootSelection(
-                SkillInstallRoot.GitRepositoryRoot,
-                UnityCliLoopPathResolver.GetProjectRoot(),
-                null);
-
-            await _controller.HandleToggleMigrationSkill();
-
-            Assert.That(_skillPort.InstallCalls, Is.Empty);
-            Assert.That(_dialogs.MessageTitles, Is.EqualTo(new[] { SkillsInstallRootText.UnavailableDialogTitle }));
-            Assert.That(
-                GetMigrationSkillButtonText(),
-                Is.EqualTo(ThirdPartyToolMigrationWizardText.GetMigrationSkillButtonText(false, SkillInstallState.Missing)));
-        }
-
-        /// <summary>
-        /// Verifies the toggle removes an installed or outdated migration skill instead of reinstalling it.
-        /// </summary>
-        [TestCase(SkillInstallState.Installed)]
-        [TestCase(SkillInstallState.Outdated)]
-        public async Task HandleToggleMigrationSkill_WhenPresent_RemovesTheSelectedTarget(SkillInstallState installState)
-        {
-            _skillPort.InstallState = installState;
-            _controller.HandleMigrationSkillTargetChanged(SkillsTarget.Agents);
-
-            await _controller.HandleToggleMigrationSkill();
-
-            Assert.That(_skillPort.RemoveCalls.Count, Is.EqualTo(1));
-            Assert.That(_skillPort.InstallCalls.Count, Is.EqualTo(0));
-            Assert.That(_skillPort.RemoveCalls[0].Targets[0].DirName, Is.EqualTo(".agents"));
-            Assert.That(_skillPort.RemoveCalls[0].GroupSkillsUnderUnityCliLoop, Is.False);
-        }
-
-        /// <summary>
-        /// Verifies an install failure is logged and the button leaves its updating state by re-reading the
-        /// on-disk install state.
-        /// </summary>
-        [Test]
-        public async Task HandleToggleMigrationSkill_WhenTheInstallFails_LogsAndShowsTheRefreshedState()
-        {
-            _skillPort.InstallState = SkillInstallState.Missing;
-            _skillPort.InstallFailure = new InvalidOperationException("install failed for test");
-            LogAssert.Expect(LogType.Exception, new Regex("install failed for test"));
-
-            await _controller.HandleToggleMigrationSkill();
-
-            Assert.That(_skillPort.StateQueries.Count, Is.EqualTo(2));
-            Assert.That(
-                GetMigrationSkillButtonText(),
-                Is.EqualTo(ThirdPartyToolMigrationWizardText.GetMigrationSkillButtonText(false, SkillInstallState.Missing)));
-        }
-
-        /// <summary>
-        /// Verifies a toggle whose operation was canceled while installing does not re-read or touch the install
-        /// state afterwards.
-        /// </summary>
-        [Test]
-        public async Task HandleToggleMigrationSkill_WhenCanceled_SkipsTheRefresh()
-        {
-            _skillPort.InstallState = SkillInstallState.Missing;
-            _skillPort.ObservesCancellation = true;
-            _skillPort.OnInstall = () => _controller.CancelMigrationSkillOperation();
-
-            await _controller.HandleToggleMigrationSkill();
-
-            Assert.That(_skillPort.StateQueries.Count, Is.EqualTo(1));
-            Assert.That(
-                GetMigrationSkillButtonText(),
-                Is.EqualTo(ThirdPartyToolMigrationWizardText.GetMigrationSkillButtonText(true, SkillInstallState.Missing)));
-        }
-
-        /// <summary>
-        /// Verifies a toggle superseded by a newer skill operation while installing does not re-read the install
-        /// state for the stale operation. The installer here ignores the cancellation, which models the race
-        /// where the newer toggle arrives after the installer's last cancellation check.
-        /// </summary>
-        [Test]
-        public async Task HandleToggleMigrationSkill_WhenSupersededDuringInstall_LeavesTheRefreshToTheNewerToggle()
-        {
-            _skillPort.InstallState = SkillInstallState.Missing;
-            _skillPort.OnInstall = () => _controller.BeginMigrationSkillOperation();
-
-            await _controller.HandleToggleMigrationSkill();
-
-            Assert.That(_skillPort.InstallCalls.Count, Is.EqualTo(1));
-            Assert.That(_skillPort.StateQueries.Count, Is.EqualTo(1));
-        }
-
-        /// <summary>
         /// Verifies a new migration operation cancels the previous one, which then can no longer complete the
         /// newer operation.
         /// </summary>
@@ -330,23 +160,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         /// <summary>
-        /// Verifies a new skill operation cancels the previous one, which then can no longer complete the newer
-        /// operation.
-        /// </summary>
-        [Test]
-        public void BeginMigrationSkillOperation_CancelsAndDeactivatesThePreviousToken()
-        {
-            CancellationToken first = _controller.BeginMigrationSkillOperation();
-            CancellationToken second = _controller.BeginMigrationSkillOperation();
-
-            _controller.CompleteMigrationSkillOperation(first);
-
-            Assert.That(first.IsCancellationRequested, Is.True);
-            Assert.That(_controller.IsMigrationSkillOperationActive(first), Is.False);
-            Assert.That(_controller.IsMigrationSkillOperationActive(second), Is.True);
-        }
-
-        /// <summary>
         /// Verifies the controller's progress reporter renders progress for the active scan and drops it once that
         /// scan has ended, even though its token was never canceled.
         /// </summary>
@@ -375,139 +188,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         private string GetStatusText()
         {
             return _root.Query<TextField>(className: "setup-step__status-label--standalone").First().value;
-        }
-
-        private string GetMigrationSkillButtonText()
-        {
-            // The skill button is the primary button in the same action section as the target dropdown.
-            VisualElement skillActionSection = _root.Q<EnumField>().parent.parent;
-            return skillActionSection.Q<Button>(className: "setup-button--primary").text;
-        }
-
-        private readonly struct StateQuery
-        {
-            internal readonly string ProjectRoot;
-            internal readonly SkillSetupTargetInfo Target;
-            internal readonly bool GroupSkillsUnderUnityCliLoop;
-
-            internal StateQuery(string projectRoot, SkillSetupTargetInfo target, bool groupSkillsUnderUnityCliLoop)
-            {
-                ProjectRoot = projectRoot;
-                Target = target;
-                GroupSkillsUnderUnityCliLoop = groupSkillsUnderUnityCliLoop;
-            }
-        }
-
-        private readonly struct MigrationSkillFilesCall
-        {
-            internal readonly string ProjectRoot;
-            internal readonly List<SkillSetupTargetInfo> Targets;
-            internal readonly bool GroupSkillsUnderUnityCliLoop;
-
-            internal MigrationSkillFilesCall(
-                string projectRoot,
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop)
-            {
-                ProjectRoot = projectRoot;
-                Targets = targets;
-                GroupSkillsUnderUnityCliLoop = groupSkillsUnderUnityCliLoop;
-            }
-        }
-
-        private sealed class RecordingMigrationSkillPort : ISkillSetupPort
-        {
-            internal SkillInstallState InstallState { get; set; } = SkillInstallState.Missing;
-            internal Exception InstallFailure { get; set; }
-            internal Action OnInstall { get; set; }
-            internal bool ObservesCancellation { get; set; }
-            internal List<StateQuery> StateQueries { get; } = new List<StateQuery>();
-            internal List<MigrationSkillFilesCall> InstallCalls { get; } = new List<MigrationSkillFilesCall>();
-            internal List<MigrationSkillFilesCall> RemoveCalls { get; } = new List<MigrationSkillFilesCall>();
-
-            public SkillInstallState GetV3MigrationSkillInstallStateAtProjectRoot(
-                string projectRoot,
-                SkillSetupTargetInfo target,
-                bool groupSkillsUnderUnityCliLoop)
-            {
-                StateQueries.Add(new StateQuery(projectRoot, target, groupSkillsUnderUnityCliLoop));
-                return InstallState;
-            }
-
-            public Task InstallV3MigrationSkillFilesAsync(
-                string projectRoot,
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct)
-            {
-                InstallCalls.Add(new MigrationSkillFilesCall(projectRoot, targets, groupSkillsUnderUnityCliLoop));
-                OnInstall?.Invoke();
-                if (ObservesCancellation && ct.IsCancellationRequested)
-                {
-                    // Mirrors the production installer, whose only cancellation is ct.ThrowIfCancellationRequested.
-                    return Task.FromCanceled(ct);
-                }
-
-                return InstallFailure == null ? Task.CompletedTask : Task.FromException(InstallFailure);
-            }
-
-            public Task RemoveV3MigrationSkillFilesAsync(
-                string projectRoot,
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct)
-            {
-                RemoveCalls.Add(new MigrationSkillFilesCall(projectRoot, targets, groupSkillsUnderUnityCliLoop));
-                return Task.CompletedTask;
-            }
-
-            internal SkillInstallRootSelection? InstallRootSelection { get; set; }
-
-            public SkillInstallRootSelection GetSkillInstallRootSelection(string projectRoot) =>
-                InstallRootSelection ?? new(SkillInstallRoot.UnityProjectRoot, projectRoot, null);
-
-            public void SaveSkillInstallRoot(string projectRoot, SkillInstallRoot root) =>
-                throw new NotSupportedException();
-
-            public void RemoveSkillFiles(string toolName)
-            {
-                throw new NotSupportedException();
-            }
-
-            public bool IsSkillInstalled(string toolName)
-            {
-                throw new NotSupportedException();
-            }
-
-            public List<SkillSetupTargetInfo> DetectSkillTargetsForLayoutAtProjectRoot(
-                string projectRoot,
-                bool groupSkillsUnderUnityCliLoop)
-            {
-                throw new NotSupportedException();
-            }
-
-            public List<SkillSetupTargetInfo> DetectSkillTargetsForLayoutFastAtProjectRoot(
-                string projectRoot,
-                bool groupSkillsUnderUnityCliLoop)
-            {
-                throw new NotSupportedException();
-            }
-
-            public Task InstallSkillFilesAsync(
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct)
-            {
-                throw new NotSupportedException();
-            }
-
-            public Task InstallSkillFilesForToolAsync(
-                string toolName,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct)
-            {
-                throw new NotSupportedException();
-            }
         }
 
         private sealed class UnusedMigrationPort : IThirdPartyToolMigrationPort

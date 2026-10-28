@@ -182,13 +182,10 @@ project still need to be available from its configured registry.
 With Tuanjie 1.9.1 the development project opened from Tuanjie Hub reached
 `Ready` in the graphical Editor, and the released dispatcher `3.14.1` compiled it
 with zero errors and warnings. A scoped EditMode run of the third-party migration,
-pause-point, transform-worker, and hot-reload package-source tests passed 985 of
-987 tests with one skipped. The one failure,
-`CopyMigrationSkillPromptToClipboard_WritesPrompt`, read back an empty clipboard;
-PowerShell's own clipboard round trip also returned empty on that host. The
-pause-point tests need Debug code optimization, which the CI workflow sets with
-`-debugCodeOptimization`; in an Editor running in Release, run
-`tloop set-code-optimization debug` before them.
+pause-point, transform-worker, and hot-reload package-source tests passed 957 of
+958 tests with one skipped and none failed. The pause-point tests need Debug code
+optimization, which the CI workflow sets with `-debugCodeOptimization`; in an
+Editor running in Release, run `tloop set-code-optimization debug` before them.
 
 The fork's release-please config uses the upstream import commit as
 `bootstrap-sha`, so its first release notes contain this fork's changes rather

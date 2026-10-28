@@ -10,7 +10,7 @@
 次のどちらかに当てはまる場合は、続きを読んでください。
 
 - **V2 APIで書いたC#カスタムツールがある** — V2のツール基底型を継承したクラスや、`io.github.hatayama.uLoopMCP` 名前空間をimportしているコードがある場合です。Step 1〜Step 2に従ってください。移行ウィザードが自動で書き換えます。
-- **`tloop` を呼び出す `SKILL.md`・Markdownドキュメント・POSIXシェルスクリプト・PowerShellスクリプトがある** — V3ではbooleanオプションの書式が変わり、いくつかのコマンドが削除されたため、既存の呼び出しが気づかないうちに壊れる可能性があります。Step 3以降に従ってください。
+- **`tloop` を呼び出す `SKILL.md`・Markdownドキュメント・POSIXシェルスクリプト・PowerShellスクリプトがある** — V3ではbooleanオプションの書式が変わり、いくつかのコマンドが削除されたため、既存の呼び出しが気づかないうちに壊れる可能性があります。Step 3に従ってください。
 
 両方に当てはまる場合は、このガイドを上から順に進めてください。
 
@@ -44,7 +44,7 @@ CLIから起動してもこのダイアログは回避できません。`tloop l
 
 Editorが起動すると、`Tuanjie CLI Loop Migration` ウィンドウが**自動的に開きます**。この自動オープンは、パッケージのメジャーバージョンがV2からV3になった最初の起動時に発火します。つまり一度きりのイベントで、再起動すればまた出せるというものではありません。**自動で開かなかった場合**は、`Window > Tuanjie CLI Loop > Custom Tool Migration` から手動で開いてください。
 
-![Tuanjie CLI Loop Migrationウィンドウ。C# Source Structure MigrationとAI Skill and Script Migrationの2セクションが表示され、検出結果とMigrateボタンが見える](images/migration-wizard-detected.png)
+![Tuanjie CLI Loop Migrationウィンドウ。C# Source Structure Migrationセクションに検出結果とMigrateボタンが表示されている](images/migration-wizard-detected.png)
 
 `C# Source Structure Migration` セクションには、コンパイルエラー起点の検出結果が次のように表示されます（`{N}` は対象ファイル数。特定できなかった場合は件数なしの文言になります）。
 
@@ -84,22 +84,16 @@ Editorが起動すると、`Tuanjie CLI Loop Migration` ウィンドウが**自�
 - **属性** — `[McpTool]` が `[UnityCliLoopTool]` になります。`Description` 引数は削除され、`DisplayDevelopmentOnly` と `RequiredSecuritySetting` は引き継がれます。
 - **asmdefの参照** — `.asmdef` ファイル内の `uLoopMCP.Editor` と `uLoopMCP.Runtime` への参照が、V3のアセンブリに張り替えられます。
 
-## Step 3: tloopを呼び出すスキル・スクリプトを移行する
+## Step 3: tloopを呼び出すスキル・スクリプトを更新する
 
-2つ目のセクション `AI Skill and Script Migration` は、残り半分の作業を担当します。対象は、`tloop` を呼び出している `SKILL.md`・Markdownドキュメント・シェルスクリプト・PowerShellスクリプトです。
+移行ウィンドウが書き換えるのはC#ソースだけです。`tloop` を呼び出している `SKILL.md`・Markdownドキュメント・シェルスクリプト・PowerShellスクリプトは、手作業で更新してください。
 
-![AI Skill and Script Migrationセクション。Install Migration SkillボタンとPrompt for your AI agentの内容が表示されている](images/migration-wizard-ai-skill.png)
-
-**このウィンドウ自身はファイルを書き換えません。** 行うのは一時AIスキルのインストールと削除だけで、実際の編集はAIエージェントが行います。手順は次のとおりです。
-
-1. **`Install Migration Skill`** を押します。`v3-cli-invocation-migration` という名前の一時スキルがプロジェクトにインストールされます。
-2. **`Prompt for your AI agent`** の折りたたみを開き、**`Copy AI Prompt`** を押します。
-3. コピーしたプロンプトをAIエージェントに貼り付けて実行させます。このスキルは、`tloop` の呼び出しを検索し、前後の文脈を確認したうえで、本物のV2 CLI使用箇所だけを更新する手順をエージェントに教えます。C#のスニペット、enum参照、無関係なJSONは書き換えません。
-4. エージェントの変更内容をレビューします。編集したファイル、移行候補として見つかった削除済みコマンド、手動で確認すべき箇所がレポートされます。
+1. それらのファイルから `tloop` の呼び出しを検索します。
+2. 前後の文脈を確認し、次の節の表に従って本物のV2 CLI使用箇所だけを書き換えます。C#のスニペット、enum参照、無関係なJSONは変更しないでください。
 
 ## CLIオプションの変更点
 
-これらの変更はAIエージェントが自動で適用します。以下の表は、その結果を人間がレビューするための参照用です。正典は `Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill/references/first-party-v2-to-v3.md` です。
+見つかったV2の呼び出しすべてに、以下の変更を適用してください。
 
 ### booleanオプションの変換ルール
 
@@ -154,20 +148,7 @@ V3のbooleanオプションは値を取りません。V2の呼び出しをどう
 | `tloop get-project-info` | 削除。必要なプロジェクト情報は `tloop execute-dynamic-code` で取得する。 |
 | `tloop record-input` | V3で削除。入力記録は Unity Editor の **Window > Tuanjie CLI Loop > Recordings** で行う。 |
 
-移行スキルはこれらを自動で書き換えず、移行候補として報告するだけです。スクリプトが何をしていたかによって適切な代替手段が変わるためです。
-
-## Step 4: 一時スキルを削除する
-
-ドキュメントとスクリプトの移行が終わったら、一時スキルを削除してください。画面にも明示されています。
-
-> This skill is temporary. Remove it once your docs and scripts are migrated to V3 CLI syntax.
-
-ウィザードの **`Remove Migration Skill`** を押すか、インストールした対象ごとにCLIから削除します。
-
-```bash
-tloop skills uninstall-v3-migration --claude
-tloop skills uninstall-v3-migration --codex
-```
+これらには機械的な置き換えがありません。スクリプトが何をしていたかに合わせて代替手段を選んでください。
 
 ## 動作確認
 
@@ -214,5 +195,3 @@ tloop list
 **ウィザードが自動で開かない。** まず、EditorがV3のパッケージで起動し直されたかを確認してください。自動オープンは起動時、しかもメジャーバージョンがV2からV3になった最初の起動時に発火します。Unityを起動したままPackage Managerで更新したセッションは対象外なので、Editorを再起動してください。開かない場合は `Window > Tuanjie CLI Loop > Custom Tool Migration` から手動で開いてください。手動で開いても、Step 2以降の手順はまったく同じです。
 
 **`Migrate` 実行後もコンパイルエラーが残る。** まず残っているエラーの内容を読んでください。カスタムロジックとV2 API呼び出しが混在しているソースは、置換ルールでカバーできず手直しが必要な場合があります。VCSのdiffでウィザードが何を変更したかを確認し、やり直したい場合はcommitやバックアップから戻したうえで、上記の「手動移行のリファレンス」を使って残りを対処してください。
-
-**AIエージェントから一時スキルが見えない。** このスキルは対象ごとにインストールされるため、実際に使っているエージェント向けにインストールしたか（`--claude`、`--codex` など）を確認してください。正しい対象を指定して `tloop skills install` を実行し直すと、インストール済みのコピーが更新されます。

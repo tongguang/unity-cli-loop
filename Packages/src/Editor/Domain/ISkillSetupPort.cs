@@ -31,19 +31,5 @@ namespace io.github.hatayama.UnityCliLoop.Domain
             string toolName,
             bool groupSkillsUnderUnityCliLoop,
             CancellationToken ct);
-        SkillInstallState GetV3MigrationSkillInstallStateAtProjectRoot(
-            string projectRoot,
-            SkillSetupTargetInfo target,
-            bool groupSkillsUnderUnityCliLoop);
-        Task InstallV3MigrationSkillFilesAsync(
-            string projectRoot,
-            List<SkillSetupTargetInfo> targets,
-            bool groupSkillsUnderUnityCliLoop,
-            CancellationToken ct);
-        Task RemoveV3MigrationSkillFilesAsync(
-            string projectRoot,
-            List<SkillSetupTargetInfo> targets,
-            bool groupSkillsUnderUnityCliLoop,
-            CancellationToken ct);
     }
 }

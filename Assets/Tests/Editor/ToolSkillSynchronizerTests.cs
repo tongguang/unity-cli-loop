@@ -1540,6 +1540,17 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 "tloop-cancel");
             WriteSkillFile(flatRetiredCancelSkillDir, "---\nname: tloop-cancel\n---\n");
             WriteSkillFile(groupedRetiredCancelSkillDir, "---\nname: tloop-cancel\n---\n");
+            string flatRetiredMigrationSkillDir = Path.Combine(
+                targetRoot,
+                SkillInstallLayout.SkillsDirName,
+                "tloop-v3-cli-invocation-migration");
+            string groupedRetiredMigrationSkillDir = Path.Combine(
+                targetRoot,
+                SkillInstallLayout.SkillsDirName,
+                SkillInstallLayout.ManagedSkillsDirName,
+                "tloop-v3-cli-invocation-migration");
+            WriteSkillFile(flatRetiredMigrationSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
+            WriteSkillFile(groupedRetiredMigrationSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
 
             ToolSkillSynchronizer.SkillTargetInfo target = new(
                 "Claude Code",
@@ -1571,6 +1582,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(Directory.Exists(groupedRetiredRecordInputSkillDir), Is.False);
             Assert.That(Directory.Exists(flatRetiredCancelSkillDir), Is.False);
             Assert.That(Directory.Exists(groupedRetiredCancelSkillDir), Is.False);
+            Assert.That(Directory.Exists(flatRetiredMigrationSkillDir), Is.False);
+            Assert.That(Directory.Exists(groupedRetiredMigrationSkillDir), Is.False);
             Assert.That(File.Exists(Path.Combine(installedSkillDir, SkillInstallLayout.SkillFileName)), Is.True);
             Assert.That(File.ReadAllText(Path.Combine(installedSkillDir, "reference.md")), Is.EqualTo("reference"));
         }
@@ -1674,52 +1687,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         }
 
         [Test]
-        public async Task InstallSpecificSkillFilesAtProjectRoot_WhenSingleSkillSourceIsProvided_InstallsOnlyThatSkill()
-        {
-            // Tests that temporary migration skill installation can reuse the synchronizer without installing normal skills.
-            string temporaryRoot = CreateTemporaryProjectRoot();
-            ToolSkillSynchronizer.SkillTargetInfo target = new(
-                "Codex CLI",
-                ".codex",
-                "--codex",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-            SkillInstallLayout.SkillSourceInfo skill = new(
-                CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME,
-                string.Empty,
-                new Dictionary<string, byte[]>
-                {
-                    [SkillInstallLayout.SkillFileName] = Encoding.UTF8.GetBytes(
-                        "---\nname: tloop-v3-cli-invocation-migration\n---\n"),
-                    ["scripts/detect.sh"] = Encoding.UTF8.GetBytes("#!/bin/sh\n")
-                });
-
-            ToolSkillSynchronizer.SkillInstallResult result =
-                await V3MigrationSkillInstaller.InstallSpecificSkillFilesAtInstallRoot(
-                    temporaryRoot,
-                    new[] { target },
-                    skill,
-                    groupSkillsUnderUnityCliLoop: false,
-                    ct: CancellationToken.None);
-
-            string installedSkillDir = Path.Combine(
-                temporaryRoot,
-                ".codex",
-                SkillInstallLayout.SkillsDirName,
-                CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME);
-            SkillInstallState installState = V3MigrationSkillInstaller.GetSkillInstallStateAtInstallRoot(
-                temporaryRoot,
-                target,
-                skill,
-                groupSkillsUnderUnityCliLoop: false);
-
-            Assert.That(result.IsSuccessful, Is.True);
-            Assert.That(File.Exists(Path.Combine(installedSkillDir, SkillInstallLayout.SkillFileName)), Is.True);
-            Assert.That(File.Exists(Path.Combine(installedSkillDir, "scripts", "detect.sh")), Is.True);
-            Assert.That(installState, Is.EqualTo(SkillInstallState.Installed));
-        }
-
-        [Test]
         public void InstallSpecificSkillsForTarget_WhenCancellationRequested_DoesNotWriteSkill()
         {
             // Tests that target installation observes cancellation before writing managed skill files.
@@ -1756,201 +1723,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     SkillInstallLayout.SkillsDirName,
                     "tloop-cancelled-skill")),
                 Is.False);
-        }
-
-        [Test]
-        public void ValidateV3MigrationSkillSourceName_WhenNameDiffers_Throws()
-        {
-            // Tests that the packaged migration skill is rejected if its frontmatter name violates the contract.
-            SkillInstallLayout.SkillSourceInfo skill = new(
-                "unexpected-migration-skill",
-                string.Empty,
-                new Dictionary<string, byte[]>
-                {
-                    [SkillInstallLayout.SkillFileName] = Encoding.UTF8.GetBytes(
-                        "---\nname: unexpected-migration-skill\n---\n")
-                });
-
-            InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
-                V3MigrationSkillInstaller.ValidateV3MigrationSkillSourceName(skill));
-
-            Assert.That(exception.Message, Does.Contain(CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME));
-        }
-
-        [Test]
-        public async Task GetV3MigrationSkillInstallStateAtProjectRoot_WhenSkillExistsInAlternateLayout_ReturnsInstalled()
-        {
-            // Tests that the temporary migration skill is detected even when it exists in the alternate layout.
-            string temporaryRoot = CreateTemporaryProjectRoot();
-            ToolSkillSynchronizer.SkillTargetInfo target = new(
-                "Claude Code",
-                ".claude",
-                "--claude",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-
-            ToolSkillSynchronizer.SkillInstallResult result =
-                await V3MigrationSkillInstaller.InstallV3MigrationSkillFilesAtInstallRoot(
-                    temporaryRoot,
-                    new[] { target },
-                    groupSkillsUnderUnityCliLoop: true,
-                    ct: CancellationToken.None);
-
-            SkillInstallState installState = V3MigrationSkillInstaller.GetV3MigrationSkillInstallStateAtInstallRoot(
-                temporaryRoot,
-                target,
-                groupSkillsUnderUnityCliLoop: false);
-
-            Assert.That(result.IsSuccessful, Is.True);
-            Assert.That(installState, Is.EqualTo(SkillInstallState.Installed));
-        }
-
-        [Test]
-        public void GetV3MigrationSkillInstallStateAtProjectRoot_WhenSkillDirectoryLacksSkillFile_ReturnsMissing()
-        {
-            // Tests that a leftover migration skill directory without SKILL.md is not treated as installed.
-            string temporaryRoot = CreateTemporaryProjectRoot();
-            ToolSkillSynchronizer.SkillTargetInfo target = new(
-                "Codex CLI",
-                ".codex",
-                "--codex",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-            string targetRoot = Path.Combine(temporaryRoot, ".codex");
-            string migrationSkillDir = SkillInstallLayout.GetInstalledSkillDirectoryPathForLayout(
-                targetRoot,
-                CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME,
-                groupSkillsUnderUnityCliLoop: false);
-            Directory.CreateDirectory(Path.Combine(migrationSkillDir, "references"));
-
-            SkillInstallState installState = V3MigrationSkillInstaller.GetV3MigrationSkillInstallStateAtInstallRoot(
-                temporaryRoot,
-                target,
-                groupSkillsUnderUnityCliLoop: false);
-
-            Assert.That(installState, Is.EqualTo(SkillInstallState.Missing));
-        }
-
-        [Test]
-        public async Task RemoveSpecificSkillFilesAtProjectRoot_WhenSkillExists_RemovesOnlyThatSkill()
-        {
-            // Tests that temporary migration skill removal leaves unrelated installed skills in place.
-            string temporaryRoot = CreateTemporaryProjectRoot();
-            ToolSkillSynchronizer.SkillTargetInfo target = new(
-                "Codex CLI",
-                ".codex",
-                "--codex",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-            string targetRoot = Path.Combine(temporaryRoot, ".codex");
-            string migrationSkillDir = Path.Combine(
-                targetRoot,
-                SkillInstallLayout.SkillsDirName,
-                CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME);
-            string unrelatedSkillDir = Path.Combine(
-                targetRoot,
-                SkillInstallLayout.SkillsDirName,
-                "tloop-compile");
-            WriteSkillFile(migrationSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
-            WriteSkillFile(unrelatedSkillDir, "---\nname: tloop-compile\n---\n");
-
-            ToolSkillSynchronizer.SkillInstallResult result =
-                await V3MigrationSkillInstaller.RemoveSpecificSkillFilesAtInstallRoot(
-                    temporaryRoot,
-                    new[] { target },
-                    CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME,
-                    groupSkillsUnderUnityCliLoop: false,
-                    ct: CancellationToken.None);
-
-            Assert.That(result.IsSuccessful, Is.True);
-            Assert.That(Directory.Exists(migrationSkillDir), Is.False);
-            Assert.That(Directory.Exists(unrelatedSkillDir), Is.True);
-        }
-
-        [Test]
-        public async Task RemoveSpecificSkillFilesAtProjectRoot_WithMultipleTargets_ReportsAllTargetsSucceeded()
-        {
-            // Tests that migration skill removal reports one successful result per requested target.
-            string temporaryRoot = CreateTemporaryProjectRoot();
-            ToolSkillSynchronizer.SkillTargetInfo codexTarget = new(
-                "Codex CLI",
-                ".codex",
-                "--codex",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-            ToolSkillSynchronizer.SkillTargetInfo claudeTarget = new(
-                "Claude Code",
-                ".claude",
-                "--claude",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-            string codexSkillDir = Path.Combine(
-                temporaryRoot,
-                ".codex",
-                SkillInstallLayout.SkillsDirName,
-                CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME);
-            string claudeSkillDir = Path.Combine(
-                temporaryRoot,
-                ".claude",
-                SkillInstallLayout.SkillsDirName,
-                CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME);
-            WriteSkillFile(codexSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
-            WriteSkillFile(claudeSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
-
-            ToolSkillSynchronizer.SkillInstallResult result =
-                await V3MigrationSkillInstaller.RemoveSpecificSkillFilesAtInstallRoot(
-                    temporaryRoot,
-                    new[] { codexTarget, claudeTarget },
-                    CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME,
-                    groupSkillsUnderUnityCliLoop: false,
-                    ct: CancellationToken.None);
-
-            Assert.That(result.AttemptedTargets, Is.EqualTo(2));
-            Assert.That(result.SucceededTargets, Is.EqualTo(2));
-            Assert.That(result.IsSuccessful, Is.True);
-            Assert.That(Directory.Exists(codexSkillDir), Is.False);
-            Assert.That(Directory.Exists(claudeSkillDir), Is.False);
-        }
-
-        [Test]
-        public async Task RemoveV3MigrationSkillFilesAtProjectRoot_WhenSkillExistsInBothLayouts_RemovesBothLayouts()
-        {
-            // Tests that temporary migration skill removal cleans up both supported install layouts.
-            string temporaryRoot = CreateTemporaryProjectRoot();
-            ToolSkillSynchronizer.SkillTargetInfo target = new(
-                "Claude Code",
-                ".claude",
-                "--claude",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-            string targetRoot = Path.Combine(temporaryRoot, ".claude");
-            string flatMigrationSkillDir = SkillInstallLayout.GetInstalledSkillDirectoryPathForLayout(
-                targetRoot,
-                CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME,
-                groupSkillsUnderUnityCliLoop: false);
-            string groupedMigrationSkillDir = SkillInstallLayout.GetInstalledSkillDirectoryPathForLayout(
-                targetRoot,
-                CliConstants.V3_CLI_INVOCATION_MIGRATION_SKILL_NAME,
-                groupSkillsUnderUnityCliLoop: true);
-            string unrelatedSkillDir = Path.Combine(
-                targetRoot,
-                SkillInstallLayout.SkillsDirName,
-                "tloop-compile");
-            WriteSkillFile(flatMigrationSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
-            WriteSkillFile(groupedMigrationSkillDir, "---\nname: tloop-v3-cli-invocation-migration\n---\n");
-            WriteSkillFile(unrelatedSkillDir, "---\nname: tloop-compile\n---\n");
-
-            ToolSkillSynchronizer.SkillInstallResult result =
-                await V3MigrationSkillInstaller.RemoveV3MigrationSkillFilesAtInstallRoot(
-                    temporaryRoot,
-                    new[] { target },
-                    groupSkillsUnderUnityCliLoop: false,
-                    ct: CancellationToken.None);
-
-            Assert.That(result.IsSuccessful, Is.True);
-            Assert.That(Directory.Exists(flatMigrationSkillDir), Is.False);
-            Assert.That(Directory.Exists(groupedMigrationSkillDir), Is.False);
-            Assert.That(Directory.Exists(unrelatedSkillDir), Is.True);
         }
 
         private string CreateTemporaryProjectRoot()

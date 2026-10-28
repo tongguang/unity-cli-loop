@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -161,58 +159,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 groupSkillsUnderUnityCliLoop: false);
 
             Assert.That(targets, Is.Empty);
-        }
-
-        /// <summary>
-        /// Verifies that installing the migration skill into an unavailable Git repository root fails without writing files.
-        /// </summary>
-        [Test]
-        public void InstallV3MigrationSkillFiles_WhenGitRootIsUnavailable_ThrowsWithoutWriting()
-        {
-            string projectRoot = CreateNestedProject(withGitDirectory: false);
-            ToolSkillSetupService service = new(new NoDisabledToolsPort());
-            service.SaveSkillInstallRoot(projectRoot, SkillInstallRoot.GitRepositoryRoot);
-            SkillSetupTargetInfo target = new(
-                "Claude Code",
-                ".claude",
-                "--claude",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-
-            Assert.ThrowsAsync<InvalidOperationException>(() => service.InstallV3MigrationSkillFilesAsync(
-                projectRoot,
-                new List<SkillSetupTargetInfo> { target },
-                groupSkillsUnderUnityCliLoop: false,
-                CancellationToken.None));
-            Assert.That(Directory.Exists(Path.Combine(projectRoot, ".claude")), Is.False);
-        }
-
-        /// <summary>
-        /// Verifies that the migration skill is installed under the Git repository root when it is saved.
-        /// </summary>
-        [Test]
-        public async Task InstallV3MigrationSkillFiles_WhenGitRootIsSaved_InstallsUnderRepositoryRoot()
-        {
-            string projectRoot = CreateNestedProject(withGitDirectory: true);
-            ToolSkillSetupService service = new(new NoDisabledToolsPort());
-            service.SaveSkillInstallRoot(projectRoot, SkillInstallRoot.GitRepositoryRoot);
-            SkillSetupTargetInfo target = new(
-                "Claude Code",
-                ".claude",
-                "--claude",
-                hasSkillsDirectory: true,
-                hasExistingSkills: false);
-
-            await service.InstallV3MigrationSkillFilesAsync(
-                projectRoot,
-                new List<SkillSetupTargetInfo> { target },
-                groupSkillsUnderUnityCliLoop: false,
-                CancellationToken.None);
-
-            Assert.That(
-                File.Exists(Path.Combine(_temporaryRoot, ".claude", "skills", "tloop-v3-cli-invocation-migration", "SKILL.md")),
-                Is.True);
-            Assert.That(Directory.Exists(Path.Combine(projectRoot, ".claude")), Is.False);
         }
 
         // Builds <temporaryRoot>/unity as the Unity project, optionally with .git at the temporary root.

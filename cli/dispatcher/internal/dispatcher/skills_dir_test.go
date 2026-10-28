@@ -811,42 +811,14 @@ func TestRunSkillsDirListShowsStatuses(t *testing.T) {
 	}
 }
 
-// Tests that the v3 migration subcommands reject the --output-dir option.
-func TestTryHandleSkillsRequestRejectsDirForV3Migration(t *testing.T) {
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
-
-	handled, code := tryHandleSkillsRequest(
-		[]string{"skills", "install-v3-migration", "--output-dir", t.TempDir()},
-		t.TempDir(),
-		"",
-		stdout,
-		stderr,
-	)
-
-	if !handled {
-		t.Fatal("skills request should be handled")
-	}
-	if code != 1 {
-		t.Fatalf("v3 migration with --output-dir should fail: code=%d", code)
-	}
-	if !strings.Contains(stderr.String(), "--output-dir") {
-		t.Fatalf("error should name the rejected option:\n%s", stderr.String())
-	}
-}
-
-// Tests that subcommand help advertises --output-dir for standard subcommands only.
+// Tests that list, install, and uninstall help all advertise --output-dir.
 func TestPrintSkillsSubcommandHelpShowsDirOptionForStandardSubcommands(t *testing.T) {
-	stdout := &bytes.Buffer{}
-	printSkillsSubcommandHelp("install", stdout)
-	if !strings.Contains(stdout.String(), "--output-dir <path>") {
-		t.Fatalf("install help should list --output-dir:\n%s", stdout.String())
-	}
-
-	stdout.Reset()
-	printSkillsSubcommandHelp("install-v3-migration", stdout)
-	if strings.Contains(stdout.String(), "--output-dir") {
-		t.Fatalf("v3 migration help should not list --output-dir:\n%s", stdout.String())
+	for _, subcommand := range []string{"list", "install", "uninstall"} {
+		stdout := &bytes.Buffer{}
+		printSkillsSubcommandHelp(subcommand, stdout)
+		if !strings.Contains(stdout.String(), "--output-dir <path>") {
+			t.Fatalf("%s help should list --output-dir:\n%s", subcommand, stdout.String())
+		}
 	}
 }
 

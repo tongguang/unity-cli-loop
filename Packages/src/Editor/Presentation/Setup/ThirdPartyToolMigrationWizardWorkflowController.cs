@@ -17,10 +17,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
     /// </summary>
     internal sealed class ThirdPartyToolMigrationWizardWorkflowController
     {
-        private const bool GroupMigrationSkillUnderUnityCliLoop = false;
-
         private readonly ThirdPartyToolMigrationWizardView _view;
-        private readonly SkillSetupUseCase _skillSetupUseCase;
         private readonly ThirdPartyToolMigrationUseCase _thirdPartyToolMigrationUseCase;
         private readonly Action _scheduleResize;
         private readonly IPresentationDialogs _dialogs;
@@ -32,20 +29,15 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
         private readonly List<string> _autoScanSeedFilePaths;
 
         private bool _isMigrating;
-        private bool _isUpdatingMigrationSkill;
-        private SkillsTarget _migrationSkillTarget = SkillsTarget.Claude;
-        private SkillInstallState _migrationSkillInstallState = SkillInstallState.Missing;
         private string[] _pendingMigrationFilePaths = Array.Empty<string>();
         // True once _pendingMigrationFilePaths came from a full-project scan (RefreshUI); false right
         // after an auto-scan detected state, where the count is only a seed estimate that a cascading
         // compile-skip could undercount. The confirm dialog must not assert an exact count in that case.
         private bool _hasVerifiedPendingFileCount = true;
         private CancellationTokenSource _migrationOperationCts;
-        private CancellationTokenSource _migrationSkillOperationCts;
 
         internal ThirdPartyToolMigrationWizardWorkflowController(
             ThirdPartyToolMigrationWizardView view,
-            SkillSetupUseCase skillSetupUseCase,
             ThirdPartyToolMigrationUseCase thirdPartyToolMigrationUseCase,
             List<string> autoScanSeedFilePaths,
             Action scheduleResize,
@@ -53,7 +45,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             IBackgroundWorkRunner backgroundWorkRunner = null)
         {
             Debug.Assert(view != null, "view must not be null");
-            Debug.Assert(skillSetupUseCase != null, "skillSetupUseCase must not be null");
             Debug.Assert(
                 thirdPartyToolMigrationUseCase != null,
                 "thirdPartyToolMigrationUseCase must not be null");
@@ -61,8 +52,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             Debug.Assert(scheduleResize != null, "scheduleResize must not be null");
 
             _view = view ?? throw new ArgumentNullException(nameof(view));
-            _skillSetupUseCase = skillSetupUseCase
-                ?? throw new ArgumentNullException(nameof(skillSetupUseCase));
             _thirdPartyToolMigrationUseCase = thirdPartyToolMigrationUseCase
                 ?? throw new ArgumentNullException(nameof(thirdPartyToolMigrationUseCase));
             _autoScanSeedFilePaths = autoScanSeedFilePaths
@@ -295,122 +284,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             _view.ShowCheckingState(progress, _isMigrating);
         }
 
-        internal void RefreshMigrationSkillState()
-        {
-            string projectRoot = UnityCliLoopPathResolver.GetProjectRoot();
-            SkillSetupTargetInfo target = CreateMigrationSkillTargetInfo(_migrationSkillTarget);
-            _migrationSkillInstallState = _skillSetupUseCase.GetV3MigrationSkillInstallStateAtProjectRoot(
-                projectRoot,
-                target,
-                GroupMigrationSkillUnderUnityCliLoop);
-            UpdateMigrationSkillState();
-        }
-
-        internal void UpdateMigrationSkillState()
-        {
-            _view.SetMigrationSkillState(
-                _migrationSkillTarget,
-                _migrationSkillInstallState,
-                _isUpdatingMigrationSkill);
-        }
-
-        internal void HandleMigrationSkillTargetChanged(SkillsTarget target)
-        {
-            _migrationSkillTarget = target;
-            RefreshMigrationSkillState();
-        }
-
-        internal async Task HandleToggleMigrationSkill()
-        {
-            CancellationToken ct = BeginMigrationSkillOperation();
-            string projectRoot = UnityCliLoopPathResolver.GetProjectRoot();
-            SkillSetupTargetInfo target = CreateMigrationSkillTargetInfo(_migrationSkillTarget);
-            SkillInstallState currentInstallState =
-                _skillSetupUseCase.GetV3MigrationSkillInstallStateAtProjectRoot(
-                    projectRoot,
-                    target,
-                    GroupMigrationSkillUnderUnityCliLoop);
-            bool shouldRemoveMigrationSkill =
-                ThirdPartyToolMigrationWizardWindow.ShouldRemoveMigrationSkill(currentInstallState);
-            // Checked before installing because the install would otherwise throw from the skill setup port.
-            SkillInstallRootSelection installRootSelection =
-                _skillSetupUseCase.GetSkillInstallRootSelection(projectRoot);
-            if (!shouldRemoveMigrationSkill && !installRootSelection.IsSelectedRootAvailable)
-            {
-                CompleteMigrationSkillOperation(ct);
-                _dialogs.ShowMessage(
-                    SkillsInstallRootText.UnavailableDialogTitle,
-                    SkillsInstallRootText.UnavailableDialogMessage);
-                _migrationSkillInstallState = currentInstallState;
-                UpdateMigrationSkillState();
-                return;
-            }
-
-            List<SkillSetupTargetInfo> targets = new List<SkillSetupTargetInfo> { target };
-            _migrationSkillInstallState = currentInstallState;
-            _isUpdatingMigrationSkill = true;
-            UpdateMigrationSkillState();
-
-            try
-            {
-                if (shouldRemoveMigrationSkill)
-                {
-                    await _skillSetupUseCase.RemoveV3MigrationSkillFilesAsync(
-                        projectRoot,
-                        targets,
-                        GroupMigrationSkillUnderUnityCliLoop,
-                        ct);
-                }
-                else
-                {
-                    await _skillSetupUseCase.InstallV3MigrationSkillFilesAsync(
-                        projectRoot,
-                        targets,
-                        GroupMigrationSkillUnderUnityCliLoop,
-                        ct);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // The window is closing or a newer toggle superseded this one; do not touch its UI.
-                return;
-            }
-            catch (Exception ex)
-            {
-                // Fall through so the tail refresh shows the real on-disk install state after a failure.
-                Debug.LogException(ex);
-            }
-            finally
-            {
-                _isUpdatingMigrationSkill = false;
-            }
-
-            // The use case may complete off the main thread; UI Toolkit access below requires it.
-            await MainThreadSwitcher.SwitchToMainThread();
-            if (!IsMigrationSkillOperationActive(ct))
-            {
-                return;
-            }
-
-            CompleteMigrationSkillOperation(ct);
-            RefreshMigrationSkillState();
-        }
-
-        internal static SkillSetupTargetInfo CreateMigrationSkillTargetInfo(SkillsTarget target)
-        {
-            SkillsTargetSelection selection = SkillsTargetSelectionResolver.Resolve(
-                target,
-                GroupMigrationSkillUnderUnityCliLoop);
-            return new SkillSetupTargetInfo(
-                selection.DisplayName,
-                selection.DirectoryName,
-                selection.InstallFlag,
-                hasSkillsDirectory: true,
-                hasExistingSkills: false,
-                hasDifferentLayoutSkills: false,
-                SkillInstallState.Missing);
-        }
-
         internal CancellationToken BeginMigrationOperation()
         {
             CancelMigrationOperation();
@@ -431,26 +304,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             _migrationOperationCts = null;
         }
 
-        internal CancellationToken BeginMigrationSkillOperation()
-        {
-            CancelMigrationSkillOperation();
-            CancellationTokenSource cts = new CancellationTokenSource();
-            _migrationSkillOperationCts = cts;
-            return cts.Token;
-        }
-
-        internal void CancelMigrationSkillOperation()
-        {
-            if (_migrationSkillOperationCts == null)
-            {
-                return;
-            }
-
-            _migrationSkillOperationCts.Cancel();
-            _migrationSkillOperationCts.Dispose();
-            _migrationSkillOperationCts = null;
-        }
-
         internal void CompleteMigrationOperation(CancellationToken ct)
         {
             if (!IsMigrationOperationActive(ct))
@@ -465,22 +318,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
         internal bool IsMigrationOperationActive(CancellationToken ct)
         {
             return _migrationOperationCts != null && _migrationOperationCts.Token.Equals(ct);
-        }
-
-        internal void CompleteMigrationSkillOperation(CancellationToken ct)
-        {
-            if (!IsMigrationSkillOperationActive(ct))
-            {
-                return;
-            }
-
-            _migrationSkillOperationCts.Dispose();
-            _migrationSkillOperationCts = null;
-        }
-
-        internal bool IsMigrationSkillOperationActive(CancellationToken ct)
-        {
-            return _migrationSkillOperationCts != null && _migrationSkillOperationCts.Token.Equals(ct);
         }
     }
 }

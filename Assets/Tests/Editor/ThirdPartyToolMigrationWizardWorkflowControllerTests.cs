@@ -308,15 +308,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 root,
                 () => { },
                 () => { },
-                _ => { },
-                () => { },
                 () => { });
-            SkillSetupUseCase skillSetupUseCase = new(new NoOpSkillSetupPort());
             ThirdPartyToolMigrationUseCase migrationUseCase = new(port);
 
             return new ThirdPartyToolMigrationWizardWorkflowController(
                 view,
-                skillSetupUseCase,
                 migrationUseCase,
                 autoScanSeedFilePaths,
                 () => { },
@@ -391,80 +387,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
                 // An unchanged result keeps the controller away from AssetDatabase.Refresh.
                 return Task.FromResult(new ThirdPartyToolMigrationResult(0, 0, Array.Empty<string>()));
-            }
-        }
-
-        private sealed class NoOpSkillSetupPort : ISkillSetupPort
-        {
-            public SkillInstallRootSelection GetSkillInstallRootSelection(string projectRoot) =>
-                new(SkillInstallRoot.UnityProjectRoot, projectRoot, null);
-
-            public void SaveSkillInstallRoot(string projectRoot, SkillInstallRoot root) =>
-                throw new NotSupportedException();
-
-            public void RemoveSkillFiles(string toolName)
-            {
-            }
-
-            public bool IsSkillInstalled(string toolName)
-            {
-                return false;
-            }
-
-            public List<SkillSetupTargetInfo> DetectSkillTargetsForLayoutAtProjectRoot(
-                string projectRoot,
-                bool groupSkillsUnderUnityCliLoop)
-            {
-                return new List<SkillSetupTargetInfo>();
-            }
-
-            public List<SkillSetupTargetInfo> DetectSkillTargetsForLayoutFastAtProjectRoot(
-                string projectRoot,
-                bool groupSkillsUnderUnityCliLoop)
-            {
-                return new List<SkillSetupTargetInfo>();
-            }
-
-            public Task InstallSkillFilesAsync(
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct)
-            {
-                return Task.CompletedTask;
-            }
-
-            public Task InstallSkillFilesForToolAsync(
-                string toolName,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct)
-            {
-                return Task.CompletedTask;
-            }
-
-            public SkillInstallState GetV3MigrationSkillInstallStateAtProjectRoot(
-                string projectRoot,
-                SkillSetupTargetInfo target,
-                bool groupSkillsUnderUnityCliLoop)
-            {
-                return SkillInstallState.Missing;
-            }
-
-            public Task InstallV3MigrationSkillFilesAsync(
-                string projectRoot,
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct)
-            {
-                return Task.CompletedTask;
-            }
-
-            public Task RemoveV3MigrationSkillFilesAsync(
-                string projectRoot,
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct)
-            {
-                return Task.CompletedTask;
             }
         }
     }

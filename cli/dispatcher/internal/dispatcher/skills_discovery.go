@@ -1,7 +1,6 @@
 package dispatcher
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"sort"
@@ -30,30 +29,6 @@ func collectSkillDefinitions(projectRoot string) ([]skillDefinition, error) {
 		return skills[left].name < skills[right].name
 	})
 	return skills, nil
-}
-
-func collectV3MigrationSkillDefinition(projectRoot string) ([]skillDefinition, error) {
-	packageRoot := skillscan.ResolvePackageRoot(projectRoot)
-	if packageRoot == "" {
-		return nil, errors.New("the Tuanjie CLI Loop package root was not found")
-	}
-
-	skillDirectory := filepath.Join(
-		packageRoot,
-		"TemporarySkills~",
-		v3MigrationSkillName,
-		"Skill")
-	skill, ok, err := readSkillDefinition(skillDirectory)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		return nil, errors.New("v3 CLI invocation migration skill source was not found")
-	}
-	if skill.name != v3MigrationSkillName {
-		return nil, errors.New("v3 CLI invocation migration skill source has an unexpected name")
-	}
-	return []skillDefinition{skill}, nil
 }
 
 func scanSkillSourceRoot(sourceRoot skillscan.SkillSourceRoot) ([]skillDefinition, error) {

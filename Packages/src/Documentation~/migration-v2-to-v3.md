@@ -10,7 +10,7 @@ English | [日本語](migration-v2-to-v3_ja.md)
 Read on if either of these applies to your project:
 
 - **You have C# custom tools written against the V2 API** — classes deriving from the V2 tool base type, or anything else importing the `io.github.hatayama.uLoopMCP` namespace. Follow Step 1 through Step 2; the migration wizard rewrites them for you.
-- **You have `SKILL.md` files, Markdown docs, POSIX shell scripts, or PowerShell scripts that invoke `tloop`** — V3 changed the boolean option syntax and removed several commands, so existing invocations can silently break. Follow Step 3 onward.
+- **You have `SKILL.md` files, Markdown docs, POSIX shell scripts, or PowerShell scripts that invoke `tloop`** — V3 changed the boolean option syntax and removed several commands, so existing invocations can silently break. Follow Step 3.
 
 If both apply, work through the guide from the top in order.
 
@@ -44,7 +44,7 @@ Launching from the CLI does not avoid this dialog. `tloop launch` shows the same
 
 Once the Editor is up, the `Tuanjie CLI Loop Migration` window **opens by itself**. This automatic open fires on the first startup after the package major version goes from V2 to V3, so it is a one-time event rather than something you can trigger again by restarting. **If the window did not open on its own**, open it manually from `Window > Tuanjie CLI Loop > Custom Tool Migration`.
 
-![The Tuanjie CLI Loop Migration window, showing both the C# Source Structure Migration and AI Skill and Script Migration sections, with the detection status and the Migrate button](images/migration-wizard-detected.png)
+![The Tuanjie CLI Loop Migration window, showing the C# Source Structure Migration section with the detection status and the Migrate button](images/migration-wizard-detected.png)
 
 The `C# Source Structure Migration` section reports the detection from the compile error like this (`{N}` is the number of affected files; the wording drops the count when it could not be determined):
 
@@ -84,22 +84,16 @@ At that point the rewritten sources compile, and the errors you saw on startup a
 - **Attribute** — `[McpTool]` becomes `[UnityCliLoopTool]`. The `Description` argument is dropped, while `DisplayDevelopmentOnly` and `RequiredSecuritySetting` are carried over.
 - **Assembly definition references** — `uLoopMCP.Editor` and `uLoopMCP.Runtime` references in your `.asmdef` files are repointed at the V3 assemblies.
 
-## Step 3: Migrate skills and scripts that call tloop
+## Step 3: Update skills and scripts that call tloop
 
-The second section, `AI Skill and Script Migration`, covers the other half of the job: your `SKILL.md` files, Markdown docs, shell scripts, and PowerShell scripts that invoke `tloop`.
+The migration window rewrites C# sources only. Your `SKILL.md` files, Markdown docs, shell scripts, and PowerShell scripts that invoke `tloop` need to be updated by hand:
 
-![The AI Skill and Script Migration section, showing the Install Migration Skill button and the Prompt for your AI agent contents](images/migration-wizard-ai-skill.png)
-
-**This window does not rewrite those files itself.** It only installs and removes a temporary AI skill; your AI agent does the actual editing. The workflow is:
-
-1. Press **`Install Migration Skill`**. This installs a temporary skill named `v3-cli-invocation-migration` into your project.
-2. Expand the **`Prompt for your AI agent`** foldout and press **`Copy AI Prompt`**.
-3. Paste that prompt into your AI agent and let it run. The skill teaches the agent to search for `tloop` invocations, read the surrounding context, and update only genuine V2 CLI usage — leaving C# snippets, enum references, and unrelated JSON alone.
-4. Review the agent's changes. It reports which files it edited, which removed commands it found as migration candidates, and what you should verify by hand.
+1. Search them for `tloop` invocations.
+2. Read the surrounding context and change only genuine V2 CLI usage, following the tables in the next section — leave C# snippets, enum references, and unrelated JSON alone.
 
 ## CLI option changes
 
-The AI agent applies these changes for you. This table is here so you can review its work — the canonical source is `Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration/Skill/references/first-party-v2-to-v3.md`.
+Apply these changes to every V2 invocation you find.
 
 ### Boolean argument rules
 
@@ -154,20 +148,7 @@ The six commands from `capture-window` through `get-menu-items` were already rem
 | `tloop get-project-info` | Removed. Use `tloop execute-dynamic-code` to read the project metadata you need. |
 | `tloop record-input` | Removed in V3. Record input in the Unity Editor from **Window > Tuanjie CLI Loop > Recordings**. |
 
-The migration skill reports these as candidates rather than rewriting them, because the replacement depends on what your script was doing.
-
-## Step 4: Clean up the temporary skill
-
-Once your docs and scripts are migrated, remove the temporary skill. The window states this explicitly:
-
-> This skill is temporary. Remove it once your docs and scripts are migrated to V3 CLI syntax.
-
-Press **`Remove Migration Skill`** in the wizard, or remove it from the CLI for each target you installed it to:
-
-```bash
-tloop skills uninstall-v3-migration --claude
-tloop skills uninstall-v3-migration --codex
-```
+None of these has a mechanical replacement: pick one based on what your script was doing.
 
 ## Verify
 
@@ -214,5 +195,3 @@ If you prefer to migrate by hand, these are the concrete replacements the wizard
 **The wizard did not open automatically.** First confirm the Editor actually went through a fresh startup on V3 — the automatic open happens during startup, on the first launch after the major version goes from V2 to V3. If you updated from Package Manager while Unity was running, that session does not count; restart the Editor. Open it manually from `Window > Tuanjie CLI Loop > Custom Tool Migration`; everything in Step 2 onward works the same way from the manual route.
 
 **Compile errors remain after `Migrate` finishes.** Read the remaining errors before doing anything else: sources that mix custom logic with V2 API calls can need a manual touch-up that the rules do not cover. Use your VCS diff to see what the wizard changed, restore from your commit or backup if you want a clean slate, and work through the Manual migration reference above for whatever is left.
-
-**Your AI agent cannot see the temporary skill.** The skill is installed per target, so check that you installed it for the agent you are actually using (`--claude`, `--codex`, and so on) rather than a different one. Re-running `tloop skills install` for the right target refreshes the installed copies.

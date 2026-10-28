@@ -15,7 +15,6 @@ import (
 
 const (
 	managedSkillsDir     = "tuanjie-cli-loop"
-	v3MigrationSkillName = "tloop-v3-cli-invocation-migration"
 	groupSkillsByDefault = false
 
 	utf16LittleEndianBOMFirstByte  = 0xff
@@ -29,8 +28,7 @@ const (
 
 // deprecatedSkillNames lists previously installed skill directory names that
 // skills install/uninstall runs clean up. Keep cleanup names here and in the
-// Unity-side SkillTargetInstaller; agent-facing V2-to-V3 CLI migration
-// guidance lives in Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration.
+// Unity-side SkillTargetInstaller.
 var deprecatedSkillNames = []string{
 	"tloop-wait-for-pause-point",
 	"tloop-capture-window",
@@ -42,6 +40,7 @@ var deprecatedSkillNames = []string{
 	"tloop-raycast",
 	"tloop-record-input",
 	"tloop-cancel",
+	"tloop-v3-cli-invocation-migration",
 }
 
 type skillTarget struct {
@@ -113,10 +112,6 @@ func tryHandleSkillsRequest(args []string, startPath string, globalProjectPath s
 		return true, 1
 	}
 
-	if isV3MigrationSkillSubcommand(subcommand) {
-		return true, runV3MigrationSkillsSubcommand(subcommand, projectRoot, options, stdout, stderr)
-	}
-
 	skills, err := collectSkillDefinitions(projectRoot)
 	if err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.SkillsCommandName})
@@ -128,7 +123,7 @@ func tryHandleSkillsRequest(args []string, startPath string, globalProjectPath s
 
 func isKnownSkillsSubcommand(subcommand string) bool {
 	switch subcommand {
-	case "list", "install", "uninstall", "install-v3-migration", "uninstall-v3-migration":
+	case "list", "install", "uninstall":
 		return true
 	default:
 		return false
@@ -143,15 +138,6 @@ func isKnownSkillsSubcommand(subcommand string) bool {
 func skillsSubcommandSupportsOutputDir(subcommand string) bool {
 	switch subcommand {
 	case "list", "install", "uninstall":
-		return true
-	default:
-		return false
-	}
-}
-
-func isV3MigrationSkillSubcommand(subcommand string) bool {
-	switch subcommand {
-	case "install-v3-migration", "uninstall-v3-migration":
 		return true
 	default:
 		return false

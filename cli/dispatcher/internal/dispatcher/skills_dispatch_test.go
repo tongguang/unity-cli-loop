@@ -233,32 +233,6 @@ func TestTryHandleSkillsRequestUsesExplicitProjectPath(t *testing.T) {
 	}
 }
 
-func TestTryHandleSkillsRequestInstallsV3MigrationSkill(t *testing.T) {
-	// Verifies install-v3-migration installs the temporary migration skill from the package root.
-	projectRoot := createDispatcherUnityProject(t)
-	writeV3MigrationSkillFixture(t, projectRoot, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
-
-	code, stdout, stderr := runSkillsRequestForTest(t, projectRoot, "install-v3-migration", "--claude")
-
-	if code != 0 {
-		t.Fatalf("migration install failed: code=%d stdout=%s stderr=%s", code, stdout, stderr)
-	}
-	if !fileExists(filepath.Join(projectRoot, ".claude", "skills", v3MigrationSkillName, "SKILL.md")) {
-		t.Fatal("migration skill must be installed")
-	}
-}
-
-func TestTryHandleSkillsRequestReportsMissingV3MigrationSource(t *testing.T) {
-	// Verifies install-v3-migration fails with code 1 when the package root holding the migration skill is missing.
-	projectRoot := createDispatcherUnityProject(t)
-
-	code, stdout, stderr := runSkillsRequestForTest(t, projectRoot, "install-v3-migration", "--claude")
-
-	if code != 1 || !strings.Contains(stderr, "package root was not found") {
-		t.Fatalf("expected a missing package root error: code=%d stdout=%s stderr=%s", code, stdout, stderr)
-	}
-}
-
 func TestRunSkillsSubcommandRejectsUnroutedSubcommands(t *testing.T) {
 	// Verifies subcommands that bypassed routing fail with code 1 without running any handler.
 	options := skillCommandOptions{targets: []skillTarget{targetConfigs["claude"]}}
@@ -270,9 +244,6 @@ func TestRunSkillsSubcommandRejectsUnroutedSubcommands(t *testing.T) {
 	}{
 		{name: "project mode", run: func(stdout *bytes.Buffer, stderr *bytes.Buffer) int {
 			return runSkillsSubcommand("bogus", projectRoot, nil, options, stdout, stderr)
-		}},
-		{name: "v3 migration", run: func(stdout *bytes.Buffer, stderr *bytes.Buffer) int {
-			return runV3MigrationSkillsSubcommand("bogus", projectRoot, options, stdout, stderr)
 		}},
 		{name: "dir mode", wantStderr: "The bogus subcommand does not support", run: func(stdout *bytes.Buffer, stderr *bytes.Buffer) int {
 			return runSkillsDirSubcommand("bogus", projectRoot, nil, t.TempDir(), stdout, stderr)

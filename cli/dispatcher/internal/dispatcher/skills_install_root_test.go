@@ -287,29 +287,6 @@ func TestTryHandleSkillsRequestListsGitRootInstall(t *testing.T) {
 	}
 }
 
-// Tests that the V3 migration skill honors --root git like the regular skills.
-func TestTryHandleSkillsRequestInstallsV3MigrationAtGitRoot(t *testing.T) {
-	repositoryRoot := t.TempDir()
-	mustMkdir(t, filepath.Join(repositoryRoot, ".git"))
-	projectRoot := filepath.Join(repositoryRoot, "unity")
-	writeUnityProjectWithSkills(t, projectRoot)
-	writeV3MigrationSkillFixture(t, projectRoot, "---\nname: tloop-v3-cli-invocation-migration\n---\n")
-
-	stderr := &bytes.Buffer{}
-	_, code := tryHandleSkillsRequest(
-		[]string{"skills", "install-v3-migration", "--claude", "--root", "git"},
-		"",
-		projectRoot,
-		&bytes.Buffer{},
-		stderr)
-
-	if code != 0 {
-		t.Fatalf("install-v3-migration should succeed: code=%d stderr=%s", code, stderr.String())
-	}
-	assertSkillInstalledAt(t, repositoryRoot, v3MigrationSkillName)
-	assertSkillAbsentAt(t, projectRoot, v3MigrationSkillName)
-}
-
 // setUpNestedUnityProjectWithSkills builds a Git repository whose Unity project
 // sits one level below the repository root, with one enabled and one disabled skill.
 func setUpNestedUnityProjectWithSkills(t *testing.T) (string, string) {

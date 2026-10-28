@@ -12,8 +12,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
     {
         // Cleanup names for previously installed skill directories. Keep them here
         // and in the dispatcher's deprecatedSkillNames (cli/dispatcher/internal/
-        // dispatcher/skills.go); agent-facing V2-to-V3 CLI migration guidance lives
-        // in Packages/src/TemporarySkills~/tloop-v3-cli-invocation-migration.
+        // dispatcher/skills.go).
         private static readonly string[] DeprecatedSkillNames =
         {
             "tloop-wait-for-pause-point",
@@ -25,7 +24,8 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
             "tloop-execute-menu-item",
             "tloop-raycast",
             "tloop-record-input",
-            "tloop-cancel"
+            "tloop-cancel",
+            "tloop-v3-cli-invocation-migration"
         };
 
         private enum SkillSyncScope

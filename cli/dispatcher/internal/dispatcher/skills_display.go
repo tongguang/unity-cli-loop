@@ -73,8 +73,6 @@ func printSkillsHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "  tloop skills list [options]")
 	clicore.WriteLine(stdout, "  tloop skills install [options]")
 	clicore.WriteLine(stdout, "  tloop skills uninstall [options]")
-	clicore.WriteLine(stdout, "  tloop skills install-v3-migration [options]")
-	clicore.WriteLine(stdout, "  tloop skills uninstall-v3-migration [options]")
 	clicore.WriteLine(stdout, "")
 	printGlobalOptionsHelp(stdout)
 }
@@ -108,14 +106,6 @@ func printSkillsSubcommandHelp(command string, stdout io.Writer) {
 		clicore.WriteLine(stdout, "while source-owned directories such as references/ are replaced wholly on")
 		clicore.WriteLine(stdout, "update. Skills are sourced from the Unity project, so run this inside a")
 		clicore.WriteLine(stdout, "Unity project or pass --project-path.")
-		clicore.WriteLine(stdout, "")
-	}
-	if command == "install-v3-migration" {
-		clicore.WriteLine(stdout, "Installs only the temporary V3 CLI invocation migration skill.")
-		clicore.WriteLine(stdout, "")
-	}
-	if command == "uninstall-v3-migration" {
-		clicore.WriteLine(stdout, "Removes only the temporary V3 CLI invocation migration skill.")
 		clicore.WriteLine(stdout, "")
 	}
 	printGlobalOptionsHelp(stdout)

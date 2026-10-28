@@ -184,115 +184,23 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(label, Is.EqualTo(expectedLabel));
         }
 
-        [TestCase(false, SkillInstallState.Missing, "Install Migration Skill")]
-        [TestCase(false, SkillInstallState.Checking, "Install Migration Skill")]
-        [TestCase(false, SkillInstallState.Installed, "Remove Migration Skill")]
-        [TestCase(false, SkillInstallState.Outdated, "Remove Migration Skill")]
-        [TestCase(true, SkillInstallState.Installed, "Updating...")]
-        public void GetMigrationSkillButtonText_ReturnsExpectedLabel(
-            bool isUpdating,
-            SkillInstallState installState,
-            string expectedLabel)
-        {
-            // Verifies that the migration skill action reflects install, remove, and busy states.
-            string label = ThirdPartyToolMigrationWizardWindow.GetMigrationSkillButtonText(
-                isUpdating,
-                installState);
-
-            Assert.That(label, Is.EqualTo(expectedLabel));
-        }
-
         [Test]
-        public void GetMigrationSkillPromptText_ReturnsActionablePrompt()
+        public void Create_ShowsOnlyTheCSharpMigrationActions()
         {
-            // Verifies that the wizard provides a copyable prompt for asking an AI agent to run the skill.
-            string prompt = ThirdPartyToolMigrationWizardWindow.GetMigrationSkillPromptText();
-
-            Assert.That(prompt, Does.Contain("tloop-v3-cli-invocation-migration"));
-            Assert.That(prompt, Does.Contain("SKILL.md, Markdown, POSIX shell scripts, and PowerShell scripts"));
-            Assert.That(prompt, Does.Contain("Do not change C# snippets"));
-            Assert.That(prompt, Does.Not.Contain("JSON output fields"));
-            Assert.That(prompt, Does.Contain("summarize changed files"));
-        }
-
-        [Test]
-        public void GetMigrationSkillPromptCopyButtonText_ReturnsClearLabel()
-        {
-            // Verifies that the copy button label describes the clipboard action.
-            string label = ThirdPartyToolMigrationWizardWindow.GetMigrationSkillPromptCopyButtonText();
-
-            Assert.That(label, Is.EqualTo("Copy AI Prompt"));
-        }
-
-        [Test]
-        public void CopyMigrationSkillPromptToClipboard_WritesPrompt()
-        {
-            // Verifies that the copy action places the AI prompt on the system clipboard.
-            string originalClipboard = EditorGUIUtility.systemCopyBuffer;
-            try
-            {
-                ThirdPartyToolMigrationWizardWindow.CopyMigrationSkillPromptToClipboard();
-
-                Assert.That(
-                    EditorGUIUtility.systemCopyBuffer,
-                    Is.EqualTo(ThirdPartyToolMigrationWizardWindow.GetMigrationSkillPromptText()));
-            }
-            finally
-            {
-                EditorGUIUtility.systemCopyBuffer = originalClipboard;
-            }
-        }
-
-        [Test]
-        public void Create_WhenMigrationSkillSectionExists_PlacesPromptAfterInstallButton()
-        {
-            // Verifies that the AI prompt is shown below the migration skill install action.
+            // Verifies that the wizard offers only the C# source migration actions and no AI skill section.
             VisualElement root = new();
             ThirdPartyToolMigrationWizardView.Create(
                 root,
                 () => { },
                 () => { },
-                _ => { },
-                () => { },
                 () => { });
 
-            Button installButton = root.Query<Button>().ToList()
-                .Find(button => button.text == "Install Migration Skill");
-            Foldout promptFoldout = root.Query<Foldout>().ToList()
-                .Find(foldout => foldout.text == "Prompt for your AI agent");
+            string[] buttonLabels = root.Query<Button>().ToList()
+                .ConvertAll(button => button.text)
+                .ToArray();
 
-            Assert.That(installButton, Is.Not.Null);
-            Assert.That(promptFoldout, Is.Not.Null);
-            Assert.That(
-                GetVisualElementIndex(root, promptFoldout),
-                Is.GreaterThan(GetVisualElementIndex(root, installButton)));
-        }
-
-        [Test]
-        public void Create_WhenMigrationSkillSectionExists_PlacesCopyButtonOutsidePromptFoldout()
-        {
-            // Verifies that the copy action remains available outside the collapsible prompt body.
-            VisualElement root = new();
-            ThirdPartyToolMigrationWizardView.Create(
-                root,
-                () => { },
-                () => { },
-                _ => { },
-                () => { },
-                () => { });
-
-            Foldout promptFoldout = root.Query<Foldout>().ToList()
-                .Find(foldout => foldout.text == "Prompt for your AI agent");
-            Button copyButton = root.Query<Button>().ToList()
-                .Find(button => button.text == "Copy AI Prompt");
-
-            Assert.That(promptFoldout, Is.Not.Null);
-            Assert.That(copyButton, Is.Not.Null);
-            System.Collections.Generic.List<Button> foldoutButtons = promptFoldout.Query<Button>().ToList();
-            Assert.That(foldoutButtons.Contains(copyButton), Is.False);
-            Assert.That(
-                GetVisualElementIndex(root, copyButton),
-                Is.GreaterThan(GetVisualElementIndex(root, promptFoldout)));
+            Assert.That(buttonLabels, Is.EquivalentTo(new[] { "Check required", "Check", "Close" }));
+            Assert.That(root.Query<Foldout>().ToList(), Is.Empty);
         }
 
         [Test]
@@ -303,8 +211,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             ThirdPartyToolMigrationWizardView view = ThirdPartyToolMigrationWizardView.Create(
                 root,
                 () => { },
-                () => { },
-                _ => { },
                 () => { },
                 () => { });
 
@@ -331,8 +237,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 root,
                 () => { },
                 () => { },
-                _ => { },
-                () => { },
                 () => { });
 
             view.ShowMigrationCompleteState(isMigrating: false);
@@ -355,8 +259,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 root,
                 () => { },
                 () => { },
-                _ => { },
-                () => { },
                 () => { });
 
             view.ShowAutoScanDetectedState(new[] { "Assets/Foo.cs" }, isMigrating: false);
@@ -368,34 +270,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             Assert.That(migrateButton.enabledSelf, Is.True);
             Assert.That(checkButton.enabledSelf, Is.False);
-        }
-
-        [TestCase(SkillInstallState.Installed, true)]
-        [TestCase(SkillInstallState.Outdated, true)]
-        [TestCase(SkillInstallState.Missing, false)]
-        [TestCase(SkillInstallState.Checking, false)]
-        public void ShouldRemoveMigrationSkill_ReturnsExpectedValue(
-            SkillInstallState installState,
-            bool expected)
-        {
-            // Verifies that the migration skill action removes only when files are detected.
-            bool shouldRemove = ThirdPartyToolMigrationWizardWindow.ShouldRemoveMigrationSkill(installState);
-
-            Assert.That(shouldRemove, Is.EqualTo(expected));
-        }
-
-        [TestCase(SkillInstallState.Installed, true)]
-        [TestCase(SkillInstallState.Outdated, true)]
-        [TestCase(SkillInstallState.Checking, true)]
-        [TestCase(SkillInstallState.Missing, false)]
-        public void ShouldShowTemporarySkillNote_ReturnsExpectedValue(
-            SkillInstallState installState,
-            bool expected)
-        {
-            // Verifies the temporary skill note shows for every non-missing install state.
-            bool shouldShow = ThirdPartyToolMigrationWizardStateRules.ShouldShowTemporarySkillNote(installState);
-
-            Assert.That(shouldShow, Is.EqualTo(expected));
         }
 
         [TestCase(0, 1, 1, 4, 1000, 100, true)]
@@ -657,15 +531,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
 
             Assert.That(resizedRect.center, Is.EqualTo(initialRect.center));
             Assert.That(resizedRect.size, Is.EqualTo(new Vector2(360f, 120f)));
-        }
-
-        private static int GetVisualElementIndex(VisualElement root, VisualElement target)
-        {
-            Debug.Assert(root != null, "root must not be null");
-            Debug.Assert(target != null, "target must not be null");
-
-            System.Collections.Generic.List<VisualElement> elements = root.Query<VisualElement>().ToList();
-            return elements.IndexOf(target);
         }
     }
 }

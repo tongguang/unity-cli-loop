@@ -12,33 +12,6 @@ import (
 	"github.com/hatayama/unity-cli-loop/common/clicore"
 )
 
-func runV3MigrationSkillsSubcommand(
-	subcommand string,
-	projectRoot string,
-	options skillCommandOptions,
-	stdout io.Writer,
-	stderr io.Writer,
-) int {
-	if len(options.targets) == 0 {
-		printSkillsTargetGuidance(subcommand, stdout)
-		return 0
-	}
-
-	switch subcommand {
-	case "install-v3-migration":
-		skills, err := collectV3MigrationSkillDefinition(projectRoot)
-		if err != nil {
-			clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.SkillsCommandName})
-			return 1
-		}
-		return runV3MigrationSkillInstall(projectRoot, skills, options, stdout, stderr)
-	case "uninstall-v3-migration":
-		return runV3MigrationSkillUninstall(projectRoot, options, stdout, stderr)
-	default:
-		return 1
-	}
-}
-
 func runSkillsSubcommand(
 	subcommand string,
 	projectRoot string,
@@ -112,8 +85,8 @@ func runSkillsDirSubcommand(
 	case "uninstall":
 		return runSkillsDirUninstall(absDir, skills, stdout, stderr)
 	default:
-		// Routing already rejects unknown and v3-migration subcommands, so this
-		// only fires when a new subcommand is added without dir-mode support.
+		// Routing already rejects unknown subcommands, so this only fires when
+		// a new subcommand is added without dir-mode support.
 		clierrors.WriteClassifiedError(stderr, &clierrors.ArgumentError{
 			Message:     "The " + subcommand + " subcommand does not support " + skillsOutputDirFlagName + ".",
 			Option:      skillsOutputDirFlagName,

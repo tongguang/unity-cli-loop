@@ -1088,23 +1088,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 string toolName,
                 bool groupSkillsUnderUnityCliLoop,
                 CancellationToken ct) => throw new NotSupportedException();
-
-            public SkillInstallState GetV3MigrationSkillInstallStateAtProjectRoot(
-                string projectRoot,
-                SkillSetupTargetInfo target,
-                bool groupSkillsUnderUnityCliLoop) => throw new NotSupportedException();
-
-            public Task InstallV3MigrationSkillFilesAsync(
-                string projectRoot,
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct) => throw new NotSupportedException();
-
-            public Task RemoveV3MigrationSkillFilesAsync(
-                string projectRoot,
-                List<SkillSetupTargetInfo> targets,
-                bool groupSkillsUnderUnityCliLoop,
-                CancellationToken ct) => throw new NotSupportedException();
         }
     }
 }

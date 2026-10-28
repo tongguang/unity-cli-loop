@@ -22,14 +22,12 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             ThirdPartyToolMigrationWizardWindowResizer.MinimumWindowSize;
         private static ISessionFlagsRepository RegisteredSessionFlagsRepository;
         private static IThirdPartyToolMigrationAutoScanSeedRepository RegisteredAutoScanSeedRepository;
-        private static SkillSetupUseCase RegisteredSkillSetupUseCase;
         private static ThirdPartyToolMigrationUseCase RegisteredThirdPartyToolMigrationUseCase;
 
         [SerializeField]
         private bool _shouldRefreshAfterCreateGui;
 
         private List<string> _autoScanSeedFilePaths = new List<string>();
-        private SkillSetupUseCase _skillSetupUseCase;
         private ThirdPartyToolMigrationUseCase _thirdPartyToolMigrationUseCase;
         private ThirdPartyToolMigrationWizardView _view;
         private ThirdPartyToolMigrationWizardWorkflowController _controller;
@@ -38,12 +36,10 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
         internal static void InitializeEditorServices(
             ISessionFlagsRepository sessionFlagsRepository,
             IThirdPartyToolMigrationAutoScanSeedRepository autoScanSeedRepository,
-            SkillSetupUseCase skillSetupUseCase,
             ThirdPartyToolMigrationUseCase thirdPartyToolMigrationUseCase)
         {
             Debug.Assert(sessionFlagsRepository != null, "sessionFlagsRepository must not be null");
             Debug.Assert(autoScanSeedRepository != null, "autoScanSeedRepository must not be null");
-            Debug.Assert(skillSetupUseCase != null, "skillSetupUseCase must not be null");
             Debug.Assert(
                 thirdPartyToolMigrationUseCase != null,
                 "thirdPartyToolMigrationUseCase must not be null");
@@ -52,8 +48,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
                 ?? throw new ArgumentNullException(nameof(sessionFlagsRepository));
             RegisteredAutoScanSeedRepository = autoScanSeedRepository
                 ?? throw new ArgumentNullException(nameof(autoScanSeedRepository));
-            RegisteredSkillSetupUseCase = skillSetupUseCase
-                ?? throw new ArgumentNullException(nameof(skillSetupUseCase));
             RegisteredThirdPartyToolMigrationUseCase = thirdPartyToolMigrationUseCase
                 ?? throw new ArgumentNullException(nameof(thirdPartyToolMigrationUseCase));
         }
@@ -146,34 +140,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
                 isMigrating,
                 hasMigrationTargets,
                 hasCheckedMigrationStatus);
-        }
-
-        internal static string GetMigrationSkillButtonText(
-            bool isUpdating,
-            SkillInstallState installState)
-        {
-            return ThirdPartyToolMigrationWizardText.GetMigrationSkillButtonText(isUpdating, installState);
-        }
-
-        internal static string GetMigrationSkillPromptText()
-        {
-            return ThirdPartyToolMigrationWizardText.AiMigrationSkillPromptText;
-        }
-
-        internal static string GetMigrationSkillPromptCopyButtonText()
-        {
-            return ThirdPartyToolMigrationWizardText.GetMigrationSkillPromptCopyButtonText();
-        }
-
-        internal static void CopyMigrationSkillPromptToClipboard()
-        {
-            EditorGUIUtility.systemCopyBuffer = GetMigrationSkillPromptText();
-        }
-
-        internal static bool ShouldRemoveMigrationSkill(SkillInstallState installState)
-        {
-            return installState == SkillInstallState.Installed
-                || installState == SkillInstallState.Outdated;
         }
 
         internal static bool ShouldReportMigrationProgress(
@@ -281,17 +247,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
             return RegisteredAutoScanSeedRepository;
         }
 
-        private static SkillSetupUseCase GetSkillSetupUseCase()
-        {
-            if (RegisteredSkillSetupUseCase == null)
-            {
-                throw new InvalidOperationException(
-                    "Migration Wizard skill setup use case is not initialized.");
-            }
-
-            return RegisteredSkillSetupUseCase;
-        }
-
         private static ThirdPartyToolMigrationUseCase GetThirdPartyToolMigrationUseCase()
         {
             if (RegisteredThirdPartyToolMigrationUseCase == null)
@@ -330,25 +285,20 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
                 rootVisualElement,
                 () => _controller.RefreshUI().Forget(),
                 () => _controller.HandleMigrateThirdPartyTools().Forget(),
-                target => _controller.HandleMigrationSkillTargetChanged(target),
-                () => _controller.HandleToggleMigrationSkill().Forget(),
                 Close);
             _resizer = new ThirdPartyToolMigrationWizardWindowResizer(this, _view.MainScrollView);
             _controller = new ThirdPartyToolMigrationWizardWorkflowController(
                 _view,
-                _skillSetupUseCase,
                 _thirdPartyToolMigrationUseCase,
                 _autoScanSeedFilePaths,
                 ScheduleResizeToContent);
 
             bool shouldStartInitialRefresh = ConsumeShouldStartInitialRefresh();
             _controller.ShowInitialState(shouldStartInitialRefresh);
-            _controller.RefreshMigrationSkillState();
         }
 
         private void InitializeApplicationServices()
         {
-            _skillSetupUseCase = GetSkillSetupUseCase();
             _thirdPartyToolMigrationUseCase = GetThirdPartyToolMigrationUseCase();
         }
 
@@ -356,7 +306,6 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
         {
             _resizer?.Pause();
             _controller?.CancelMigrationOperation();
-            _controller?.CancelMigrationSkillOperation();
         }
 
         private void ScheduleResizeToContent()
