@@ -14,9 +14,12 @@ AI エージェントから CLI を通じて Tuanjie（团结引擎）のコン�
 - Windows は名前付きパイプ、macOS / Linux は Unix domain socket を使用します。TCP ポートの設定は不要です。
 - `UnityEngine`、`UnityEditor`、既存のアセンブリ名と拡張 API 名は維持しています。
 
-Windows / **Tuanjie 1.10.3 (`2022.3.62t15`)** で、ヘッドレス環境でのインポート、IPC 接続、90 件の限定テスト、57 アセンブリのオフラインコンパイルを確認しました。
+Windows で 2 つの Tuanjie バージョンを確認しました。
 
-GUI の起動、PlayMode、hot reload、録画などは追加検証が必要です。他の Tuanjie バージョンおよび macOS / Linux の Editor 対応は未検証です。Unity の CI 結果は Tuanjie の互換性を保証しません。[検証の詳細と既知の制限](docs/tuanjie-compatibility.md) を参照してください。
+- **Tuanjie 1.10.3 (`2022.3.62t15`)**: ヘッドレス環境でのインポート、IPC 接続、90 件の限定テスト、57 アセンブリのオフラインコンパイル。
+- **Tuanjie 1.9.1 (`2022.3.62t9`)**（このリポジトリの開発プロジェクトが使うバージョン）: Tuanjie Hub から開いた GUI の Editor で IPC 接続とエラー・警告ゼロのコンパイルを確認し、987 件の限定 EditMode テストのうち 985 件が成功、1 件がスキップでした。唯一の失敗は、この環境でクリップボードの読み戻しが空になったことによるものです。
+
+`tloop launch` による起動、PlayMode、hot reload、録画などは追加検証が必要です。他の Tuanjie バージョンおよび macOS / Linux の Editor 対応は未検証です。Unity の CI 結果は Tuanjie の互換性を保証しません。[検証の詳細と既知の制限](docs/tuanjie-compatibility.md) を参照してください。
 
 ## リリース
 

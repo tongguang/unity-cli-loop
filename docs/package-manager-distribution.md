@@ -2,8 +2,11 @@
 
 ## Channel policy
 
-The Homebrew tap (`tongguang/homebrew-tap`) updates on every dispatcher release,
-including beta tags. There is no separate stable-only formula yet.
+Neither channel is live yet. The tap repository `tongguang/homebrew-tap` does
+not exist, and the `HOMEBREW_TAP_TOKEN` and `WINGET_PKGS_TOKEN` secrets are
+unset, so every dispatcher release logs a skip for both steps. Once the tap and
+its secret exist, the formula updates on every dispatcher release, including
+beta tags. There is no separate stable-only formula yet.
 
 winget receives stable dispatcher releases only. Prereleases are not submitted.
 

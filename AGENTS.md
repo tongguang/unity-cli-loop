@@ -11,7 +11,7 @@ Directory-level responsibilities. Kept deliberately coarse — check the directo
 
 - `Packages/src/` — the Unity package (C#). Each first-party tool lives in `Editor/FirstPartyTools/<Tool>/` with its implementation and agent skill (`Skill/SKILL.md`, optional `Skill/references/`).
 - `Packages/src/Editor/CliOnlyTools~/<Tool>/Skill/` — skills for CLI-only commands (launch, pause-point, etc.) that have no Unity tool class. Tilde-suffixed folders are ignored by Unity, so files there need no `.meta`; files under `FirstPartyTools` do (run `tloop compile` to let Unity generate them).
-- `Assets/` — the development/test Unity project, including custom-command samples under `Assets/Editor/CustomCommandSamples/`.
+- `Assets/` — the development/test project, opened with Tuanjie 1.9.1 (`2022.3.62t9`), including custom-command samples under `Assets/Editor/CustomCommandSamples/`.
 - `Assets/RegressionHarness/<TrapName>/` — permanent manual repro scenes for verification-round "traps" (pause-point, simulate-keyboard, physics callbacks, etc.), paired with a driver script under `scripts/regression-harness-<trap-name>.sh`. See `docs/regression-harness.md`.
 - `cli/dispatcher/` — the globally installed `tloop` entry command (also owns `tloop skills install` and skill syncing).
 - `cli/project-runner/` — the per-project CLI runner that talks to the Unity-side IPC server.
@@ -128,20 +128,24 @@ roll-forward procedure are documented in `docs/release-recovery-runbook.md`.
 
 ## Windows Compatibility Guardrails
 
-Most day-to-day development happens on macOS, but this project must keep working on Windows.
+Day-to-day development of this fork happens on Windows, while most of the code it inherits was
+written on macOS, so the project must keep working on Windows, macOS, and Linux.
 Before changing scripts, skill files, generated-file synchronization, path handling, or text
 parsing, read `docs/windows-compatibility.md` (encoding, line endings, path separators,
 PowerShell validation). Add a regression test whenever a fix depends on encoding, line endings,
-or separator normalization — a passing macOS test alone is not enough for these cases.
+or separator normalization — a test that passes on one platform alone is not enough for these cases.
 On Windows, an abrupt dispatcher exit or `UNITY_NOT_REACHABLE` can be Microsoft Defender
 quarantining `tloop.exe` rather than an IPC problem; the verification and recovery
 procedure is in `docs/windows-compatibility.md`.
 
 ## Package Manager Distribution
 
-The Homebrew tap (`tongguang/homebrew-tap`) is updated by release automation —
-never edit the tap formula by hand. Channel policy, secrets, and the planned
-winget rollout live in `docs/package-manager-distribution.md`.
+Release automation is wired to update a Homebrew tap (`tongguang/homebrew-tap`) and
+winget, but neither channel is live: the tap repository does not exist and the
+`HOMEBREW_TAP_TOKEN` and `WINGET_PKGS_TOKEN` secrets are unset, so dispatcher
+releases skip both steps. Once the tap exists, never edit its formula by hand.
+Channel policy, secrets, and the planned winget rollout live in
+`docs/package-manager-distribution.md`.
 
 This Tuanjie-only branch releases ordinary UPM tarballs without Unity Cloud signing.
 Only `unity-package-release.yml` creates that release, after packing and verifying
@@ -268,9 +272,11 @@ tests (especially anything touching async execution, cancellation, threads, or d
 runtime paths), read `docs/unity-editmode-test-guardrails.md` and follow its rules. If a new
 test makes `tloop run-tests` stall, remove or disable it instead of retrying the suite. If
 Unity freezes or stops responding to `tloop`, restart the Editor with `tloop launch -r`.
-CI runs the full EditMode suite on a schedule (and on a manual `workflow_dispatch` of
-`unity-editmode-tests.yml`); that scheduled run is the full-suite gate. Pull-request CI and local
-pre-commit verification do not run the full suite — it takes far too long. Before a commit or
+`unity-editmode-tests.yml` runs the full EditMode suite on a schedule and on a manual
+`workflow_dispatch`, but in this fork it gates nothing: its jobs run only when the
+`UNITY_LICENSE` secret is set, which it is not, and they test Unity rather than Tuanjie (see
+`docs/tuanjie-compatibility.md`). Pull-request CI and local pre-commit verification do not run
+the full suite either — it takes far too long. Before a commit or
 pull request, run only the tests that cover the code you changed, scoped with
 `--filter-type class` / `--filter-value <TestClass>` (`regex` for a few classes, `assembly` for
 one test assembly). Run the full unfiltered suite locally only when the change touches shared

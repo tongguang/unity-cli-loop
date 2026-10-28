@@ -37,9 +37,12 @@ CLI 与 Editor 使用本地 IPC：Windows 使用命名管道，macOS / Linux 使
 | CLI dispatcher | [3.14.1](https://github.com/tongguang/unity-cli-loop/releases/tag/dispatcher-v3.14.1) |
 | Project runner | [3.13.1](https://github.com/tongguang/unity-cli-loop/releases/tag/tloop-project-runner-v3.13.1) |
 
-已在 Windows 上使用 **团结 1.10.3 / `2022.3.62t15`** 完成无界面导入、IPC 连通、90 项定向测试和 57 个程序集的离线编译检查。
+已在 Windows 上实测两个团结版本：
 
-图形界面启动流程、PlayMode、热重载和录屏等功能仍需进一步验证；其他团结版本以及 macOS / Linux 上的 Editor 适配也尚未实测。已有 Unity CI 不能作为团结兼容性的证明。详细结果与已知限制见 [团结兼容性说明](docs/tuanjie-compatibility.md)。
+- **团结 1.10.3 / `2022.3.62t15`**：完成无界面导入、IPC 连通、90 项定向测试和 57 个程序集的离线编译检查。
+- **团结 1.9.1 / `2022.3.62t9`**（本仓库开发工程使用的版本）：从团结 Hub 打开的图形界面 Editor 可正常连通，编译无错误和警告；987 项定向 EditMode 测试中 985 项通过、1 项跳过，唯一失败的一项是本机剪贴板读回为空。
+
+`tloop launch` 启动流程、PlayMode、热重载和录屏等功能仍需进一步验证；其他团结版本以及 macOS / Linux 上的 Editor 适配也尚未实测。已有 Unity CI 不能作为团结兼容性的证明。详细结果与已知限制见 [团结兼容性说明](docs/tuanjie-compatibility.md)。
 
 ## 安装
 
