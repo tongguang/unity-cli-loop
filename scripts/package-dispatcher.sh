@@ -13,7 +13,7 @@ package_unix() {
   tmp_dir="$RELEASE_DIR/tmp-$platform"
   mkdir -p "$tmp_dir"
   cp "$DIST_DIR/$platform/tloop" "$tmp_dir/tloop"
-  cp "$ROOT_DIR/LICENSE.md" "$tmp_dir/LICENSE.md"
+  cp "$ROOT_DIR/cli/dispatcher/LICENSE.md" "$tmp_dir/LICENSE.md"
   chmod +x "$tmp_dir/tloop"
   (
     cd "$tmp_dir"
@@ -27,7 +27,7 @@ package_windows() {
   tmp_dir="$RELEASE_DIR/tmp-$platform"
   mkdir -p "$tmp_dir"
   cp "$DIST_DIR/$platform/tloop.exe" "$tmp_dir/tloop.exe"
-  cp "$ROOT_DIR/LICENSE.md" "$tmp_dir/LICENSE.md"
+  cp "$ROOT_DIR/cli/dispatcher/LICENSE.md" "$tmp_dir/LICENSE.md"
   (
     cd "$tmp_dir"
     zip -q "$RELEASE_DIR/tloop-dispatcher-$platform.zip" tloop.exe LICENSE.md

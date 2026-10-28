@@ -9,6 +9,16 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Verifies the independently distributed Go module preserves the upstream license.
+test_module_preserves_project_license() {
+  if ! cmp -s "$ROOT_DIR/LICENSE.md" "$ROOT_DIR/cli/dispatcher/LICENSE.md"; then
+    echo "Expected the dispatcher module to preserve the project license." >&2
+    exit 1
+  fi
+}
+
+test_module_preserves_project_license
+
 RELEASE_DIR="$TEST_ROOT/release"
 PAYLOAD_DIR="$TEST_ROOT/payload"
 mkdir -p "$RELEASE_DIR" "$PAYLOAD_DIR"
