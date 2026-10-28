@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.14.1](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.0...dispatcher-v3.14.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* include upstream license in both native CLI modules ([8f29e39](https://github.com/tongguang/unity-cli-loop/commit/8f29e399adcf55e82f91f2ac7354e0ead2b50b2d))
+
 ## [3.14.0](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.13.1...dispatcher-v3.14.0) (2026-10-28)
 
 
