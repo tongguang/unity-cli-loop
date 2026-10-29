@@ -134,6 +134,8 @@ expect_fail "reject duplicate filenames" validate_pin_manifest "${HEX64_LOWER}  
 ${HEX64_UPPER}  install.sh"
 expect_fail "reject empty manifest" validate_pin_manifest ""
 expect_fail "reject CR in expanded manifest" validate_pin_manifest "${HEX64_LOWER}  install.sh$(printf '\r')"
+expect_fail "reject CRLF between manifest entries" validate_pin_manifest "${HEX64_LOWER}  tloop.exe$(printf '\r')
+${HEX64_LOWER}  install.sh"
 
 # Ref validation takes the candidate as $1 (same interface as validate_tloop_version).
 expect_pass "accept v3-beta ref" validate_tloop_ref "v3-beta"

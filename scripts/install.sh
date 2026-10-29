@@ -363,10 +363,13 @@ unescape_pin_manifest() {
 # (A-F accepted), exactly two spaces, no whitespace in the filename, no CR,
 # no duplicates, and at least one line.
 validate_pin_manifest() {
+  # Git Bash awk can discard CR when reading a pipe in text mode.
+  case "$1" in
+    *"$(printf '\r')"*) return 1 ;;
+  esac
   printf '%s\n' "$1" | awk '
     BEGIN { count = 0 }
     {
-      if ($0 ~ /\r/) exit 1
       if ($0 == "") next
       if ($0 !~ /^[0-9a-fA-F]{64}  [^ \t]+$/) exit 1
       name = $2
