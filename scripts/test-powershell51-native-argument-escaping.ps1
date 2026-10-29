@@ -6,6 +6,13 @@ while protecting embedded quotation marks for execute-dynamic-code requests.
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# A non-ASCII byte parses on an English system but can break Windows PowerShell 5.1 on a CJK code
+# page, so the check has to run here rather than rely on the host that happens to run CI.
+[byte[]]$scriptBytes = [System.IO.File]::ReadAllBytes($PSCommandPath)
+if (@($scriptBytes | Where-Object { $_ -gt 127 }).Count -gt 0) {
+    throw "$PSCommandPath must stay ASCII so Windows PowerShell 5.1 parses it under any code page."
+}
+
 [string[]]$ScriptPaths = @(
     "scripts/run-windows-e2e.ps1",
     "scripts/check-tuanjie.ps1",
@@ -94,7 +101,13 @@ Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument '\"') 
 Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument 'C:\Users\Example Name\') -Expected 'C:\Users\Example Name\\' -Context "Trailing backslash in quoted argument"
 Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument '\\\"') -Expected '\\\\\\\"' -Context "Consecutive backslashes before quote"
 Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument 'C:\Users\Example\Project') -Expected 'C:\Users\Example\Project' -Context "Ordinary Windows path"
-Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument '日本語\パス"値') -Expected '日本語\パス\"値' -Context "Japanese text"
+# Built from code points so this file stays ASCII: Windows PowerShell 5.1 decodes a script without a
+# BOM in the system code page, and on a CJK code page such as 936 the UTF-8 bytes of a Japanese
+# literal pair up with its closing quote, leaving the string unterminated.
+[string]$japaneseDirectory = -join ([char[]](0x65E5, 0x672C, 0x8A9E))
+[string]$japanesePath = -join ([char[]](0x30D1, 0x30B9))
+[string]$japaneseValue = [string][char]0x5024
+Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument ($japaneseDirectory + '\' + $japanesePath + '"' + $japaneseValue)) -Expected ($japaneseDirectory + '\' + $japanesePath + '\"' + $japaneseValue) -Context "Japanese text"
 Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument 'C:\Users\Example\') -Expected 'C:\Users\Example\' -Context "Unquoted path with trailing backslash"
 Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument '\') -Expected '\' -Context "Unquoted standalone backslash"
 Assert-Equal -Actual (ConvertTo-WindowsPowerShellNativeArgument -Argument "C:\Users\Example\`n") -Expected "C:\Users\Example\`n" -Context "Trailing backslash before line feed"
