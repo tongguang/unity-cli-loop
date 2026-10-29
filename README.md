@@ -4,53 +4,30 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
 
-让 AI 通过命令行编译、测试和操作团结引擎项目。
+`tloop` 是一个命令行工具，让 Claude Code、Codex 等 AI 编程助手直接操作团结 Editor：编译、跑测试、读 Console 日志、截图、执行 C#。
 
-本项目基于 **Masamichi Hatayama** 的 [Unity CLI Loop (`uloop`)](https://github.com/hatayama/unity-cli-loop)，由 [tongguang](https://github.com/tongguang) 维护团结专用适配。上游的开发循环、工具实现和 skills 是本项目的基础；本分支主要调整团结 Editor 的发现、运行环境隔离和发布流程。
+AI 改完代码可以自己编译，看到报错就接着修，直到编译通过、测试变绿。你不用再把报错从 Editor 复制到聊天窗口。
 
-## 分支定位
+本项目是 Masamichi Hatayama 的 [Unity CLI Loop](https://github.com/hatayama/unity-cli-loop)（`uloop`）的团结版，由 [tongguang](https://github.com/tongguang) 维护。原版 Unity 工程请用上游的 `uloop`，两者装在同一台机器上互不影响。
 
-`tloop` 面向团结引擎。需要操作原版 Unity 工程时，请使用上游 `uloop`。
+## 能做什么
 
-两者可以安装在同一台机器上，各自使用独立的命令、缓存、环境变量、项目状态和 skills：
+- **编译和测试**：编译工程并返回错误和警告，运行 EditMode / PlayMode 测试，读取和清空 Console。
+- **快速验证改动**：热重载把 C# 修改直接应用到正在运行的 Editor，不触发域重载，PlayMode 状态也会保留。离线编译检查不连接 Editor 也能查出编译错误。
+- **查看场景**：输出场景层级，查找 GameObject，截取 Editor 窗口或 Game View，录制视频。
+- **调试运行时行为**：控制 PlayMode，模拟键盘和鼠标输入，在指定源码行暂停并读取局部变量，或统计这行代码执行了几次。
+- **执行任意 C#**：现有命令覆盖不到的操作，可以让 AI 直接在 Editor 里执行一段 C#。
+- **扩展**：用 C# 编写自己的命令，再配一份给 AI 看的 skill。
 
-| 项目 | 团结分支 |
-| --- | --- |
-| CLI 命令 | `tloop` |
-| Project runner | `tloop-project-runner` |
-| UPM 包名 | `io.github.tongguang.tloop` |
-| 环境变量 | `TLOOP_*` |
-| 项目状态和输出 | `.tloop/` |
-| 安装的 skills | `tloop-*` |
+每个命令都配有一份 skill，告诉 AI 这个命令什么时候用、怎么用。装好 skills 后，你用平常的话提需求就行，AI 会自己选命令。
 
-CLI 与 Editor 使用本地 IPC：Windows 使用命名管道，macOS / Linux 使用 Unix domain socket。端点按工程路径区分，不需要设置起始端口。
+## 快速开始
 
-团结仍提供 `UnityEngine`、`UnityEditor` 等 API。本分支保留既有程序集和扩展 API 的名称，便于已有自定义工具继续使用。
+需要：团结 Editor，以及支持 skills 的 AI 工具（如 Claude Code、Codex）。
 
-## 版本与验证范围
+**1. 安装 CLI**
 
-三个组件分别发布。版本号见 [Releases](https://github.com/tongguang/unity-cli-loop/releases)。project runner 由工程内的 pin 自动选择。
-
-| 组件 | 发行标记 |
-| --- | --- |
-| 团结 UPM 插件 | `v<version>` |
-| CLI dispatcher | `dispatcher-v<version>` |
-| Project runner | `tloop-project-runner-v<version>` |
-
-已在 Windows 上实测两个团结版本：
-
-- **团结 1.10.3 / `2022.3.62t15`**：完成无界面导入、IPC 连通、90 项定向测试和 57 个程序集的离线编译检查。
-- **团结 1.9.1 / `2022.3.62t9`**（本仓库开发工程使用的版本）：从团结 Hub 打开的图形界面 Editor 可正常连通，编译无错误和警告；958 项定向 EditMode 测试中 957 项通过、1 项跳过，无失败。
-
-`tloop launch` 启动流程、PlayMode、热重载和录屏等功能仍需进一步验证；其他团结版本以及 macOS / Linux 上的 Editor 适配也尚未实测。已有 Unity CI 不能作为团结兼容性的证明。详细结果与已知限制见 [团结兼容性说明](docs/tuanjie-compatibility.md)。
-
-## 安装
-
-需要已安装的团结 Editor，以及可加载 skills 的 AI 工具。
-
-### 1. 安装 CLI
-
-Windows PowerShell：
+Windows（PowerShell）：
 
 ```powershell
 irm https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scripts/install.ps1 | iex
@@ -62,123 +39,141 @@ macOS / Linux / Windows Git Bash：
 curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scripts/install.sh | sh
 ```
 
-检查安装结果：
+运行 `tloop --version` 确认安装成功。提示找不到命令时，重新打开终端。
+
+**2. 把插件加入工程**
+
+在团结工程根目录运行：
 
 ```sh
-tloop --version
+tloop package install
 ```
 
-本分支通过 GitHub Releases 和 Git URL 分发，不发布到 OpenUPM。Homebrew、winget 分发尚未配置。
+这条命令会把插件写进 `Packages/manifest.json`。然后用团结打开工程（已经打开的话切回 Editor），等插件导入完成。
 
-### 2. 安装团结插件
+**3. 安装 skills**
 
-在团结工程根目录运行 `tloop package install`，即可将 Git URL 写入 `Packages/manifest.json`。默认跟随 `main`；使用 `tloop package install --version <版本号>` 可固定到已发布的版本标签。
-
-在团结 Editor 的 `Window > Package Manager` 中选择 **Add package from git URL**，输入：
-
-```text
-https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src
-```
-
-这条地址跟随默认分支。
-
-也可以在已有 `Packages/manifest.json` 的 `dependencies` 中添加这一项，保留工程原有依赖：
-
-```json
-{
-  "dependencies": {
-    "io.github.tongguang.tloop": "https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src"
-  }
-}
-```
-
-另一种方式是打开 [Releases](https://github.com/tongguang/unity-cli-loop/releases) 里标记为 `v<version>` 的团结插件发布，下载 `io.github.tongguang.tloop-<version>.tgz`，选择 **Add package from tarball**。
-
-插件按普通 UPM 包发布，无需 Unity Cloud 包签名。CLI 发行包继续使用校验和及来源证明校验。
-
-### 3. 安装 skills
-
-插件本身包含 `tloop-*` skill 源文件。安装插件后，在团结工程根目录运行：
+skills 随插件一起分发，所以要等插件导入后再装。仍在工程根目录运行：
 
 ```sh
 # Claude Code
 tloop skills install --claude
 
-# Codex and other tools that read .agents/skills
+# Codex 以及其他读取 .agents/skills 的工具
 tloop skills install --agents
 ```
 
-可选安装位置：
-
-```sh
-# Install at the containing Git repository root
-tloop skills install --claude --agents --root git
-
-# Install globally
-tloop skills install --claude --global
-```
-
-也可以在 Editor 的 `Window > Tuanjie CLI Loop > Settings` 中使用 **Install CLI** 和 **Install Skills**。`tloop-*` skills 与已有的 `uloop-*` skills 使用不同名称。
-
-### 4. 连接工程
-
-先用团结打开并保存工程，让 `ProjectSettings/ProjectVersion.txt` 记录团结版本。随后在该工程根目录运行：
+**4. 试一下**
 
 ```sh
 tloop status
-tloop list
 ```
 
-Editor 未运行时，可使用 `tloop launch`。它会从工程记录的 `m_EditorVersion` 自动查找团结 Hub 注册的安装和默认安装目录。自定义安装也可以显式指定可执行文件：
+输出里出现 `"State": "Ready"`，说明 CLI 已经连上 Editor。现在可以在 AI 工具里说：
 
-```powershell
-tloop launch --editor-path 'D:\Engines\Tuanjie\Editor\Tuanjie.exe'
-```
+> 用 tloop 编译这个工程，有报错就修好。
 
-自动查找以 `2022.3.62t15` 这类 Editor 版本为准；`1.10.3` 是团结产品版本。具体规则见 [Editor 发现与本地验证](docs/tuanjie-compatibility.md#editor-discovery-and-local-validation)。
+## 常用命令
 
-## 常用操作
-
-在目标团结工程根目录执行：
+这些命令平时由 AI 调用，你在终端里手动运行也一样：
 
 ```sh
 tloop compile
 tloop get-logs --max-count 10
 tloop run-tests --filter-type class --filter-value YourTestClass
-tloop get-hierarchy
 tloop screenshot
 tloop execute-dynamic-code --code 'using UnityEngine; Debug.Log("Hello from tloop!");'
 ```
 
-| 场景 | 命令 |
+| 用途 | 命令 |
 | --- | --- |
-| 状态、取消任务 | `status`、`cancel` |
+| 查看 Editor 状态、取消正在执行的命令 | `status`、`cancel` |
+| 启动或重启 Editor | `launch` |
 | 编译、离线编译检查 | `compile`、`compile-check` |
-| 运行测试、检查 Console | `run-tests`、`get-logs`、`clear-console` |
-| 热重载、源码暂停点 | `hot-reload`、`pause-point` |
-| 场景和对象检查 | `get-hierarchy`、`find-game-objects` |
-| 动态执行 C# | `execute-dynamic-code` |
-| 窗口、截图和录屏 | `focus-window`、`screenshot`、`record-video` |
-| Game View 和设备模拟 | `set-game-view-size`、`game-view-mode` |
-| PlayMode 与输入回放 | `control-play-mode`、`simulate-mouse-ui`、`simulate-mouse-input`、`simulate-keyboard`、`replay-input` |
+| 测试和 Console | `run-tests`、`get-logs`、`clear-console` |
+| 热重载 | `hot-reload` |
+| 场景和对象 | `get-hierarchy`、`find-game-objects` |
+| 执行任意 C# | `execute-dynamic-code` |
+| 窗口、截图、录屏 | `focus-window`、`screenshot`、`record-video` |
+| Game View 和设备模拟器 | `set-game-view-size`、`game-view-mode` |
+| PlayMode 和输入 | `control-play-mode`、`simulate-keyboard`、`simulate-mouse-input`、`simulate-mouse-ui`、`replay-input` |
+| 源码暂停点和变量监视 | `enable-pause-point`、`await-pause-point`、`enable-watch`、`get-watch-values` |
 
-此表列出已有工具，具体的团结实测范围见上文。输入模拟依赖工程安装 Input System；Linux 不支持 `focus-window`。命令参数可用 `tloop <command> --help` 查看。
+`tloop list` 列出当前工程可用的全部命令，`tloop <command> --help` 查看参数。输入模拟需要工程使用 Input System 包。`focus-window` 不支持 Linux。
 
-## 扩展与参考
+## 其他安装方式
 
-- [自定义工具开发](Packages/src/Documentation~/custom-tools.md)：扩展 C# 工具及对应的 `Skill/SKILL.md`。
-- [Project runner pin](docs/project-runner-pin.md)：dispatcher 如何选择工程对应的 runner 版本。
-- [团结兼容性与运行环境隔离](docs/tuanjie-compatibility.md)。
-- [普通 UPM 包的发布流程](docs/unity-package-release.md)。
-- [Claude Code 沙箱与 IPC](docs/claude-code-sandbox.md)：连接被沙箱拒绝时的排查说明。
-- [上游功能演示](https://github.com/hatayama/unity-cli-loop#demos)：由上游作者提供，展示原版 Unity / `uloop` 的使用，不代表团结验证结果。仓库内沿用的 logo、截图和演示素材也来自上游；上游 logo 注明灵感来自 Daft Punk 的 *Human After All* 专辑封面。
+**固定插件版本**：`tloop package install` 默认跟随 `main` 分支。要固定到某个发布版本，运行 `tloop package install --version <版本号>`。版本号见 [Releases](https://github.com/tongguang/unity-cli-loop/releases)。
 
-## 开源许可与致谢
+**在 Package Manager 里添加**：在 `Window > Package Manager` 中选择 **Add package from git URL**，输入：
 
-本项目沿用上游的 **MIT License**，原始版权声明为：
+```text
+https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src
+```
 
-> Copyright (c) 2025 Masamichi Hatayama
+也可以手动在 `Packages/manifest.json` 的 `dependencies` 里加上这一项：
 
-完整版权、许可条件和免责声明保留在 [LICENSE.md](LICENSE.md)。本分支的更名和团结适配不改变上游代码的作者归属。复制、修改或再分发本项目时，请保留该版权声明及完整许可文本。
+```json
+"io.github.tongguang.tloop": "https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src"
+```
 
-包内第三方组件另见 [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md) 及相应插件目录的许可证。这些声明继续随插件分发。
+**从 tarball 安装**：在 [Releases](https://github.com/tongguang/unity-cli-loop/releases) 里找到标记为 `v<版本号>` 的插件发布，下载 `io.github.tongguang.tloop-<版本号>.tgz`，然后在 Package Manager 里选择 **Add package from tarball**。
+
+**在 Editor 里安装 CLI 和 skills**：插件导入后，也可以用 `Window > Tuanjie CLI Loop > Settings` 里的 **Install CLI** 和 **Install Skills** 按钮安装。
+
+**skills 的安装位置**：skills 默认装在团结工程根目录下。如果你在 Git 仓库根目录启动 AI 工具，而团结工程在子目录里，加上 `--root git`，skills 会装到仓库根目录。加上 `--global` 则装到用户目录，所有工程共用。
+
+本项目只通过 GitHub 分发，没有发布到 OpenUPM、Homebrew 或 winget。
+
+## 兼容性
+
+已在 Windows 上验证：
+
+- **团结 1.9.1**（Editor 版本 `2022.3.62t9`，也是本仓库开发工程使用的版本）：图形界面的 Editor 连接正常，编译和定向 EditMode 测试通过。
+- **团结 1.10.3**（Editor 版本 `2022.3.62t15`）：在 batchmode 运行的 Editor 中，插件导入、连接、定向测试和离线编译检查通过。
+
+macOS 和 Linux 上的团结 Editor、其他团结版本都还没有测试。`tloop launch`、PlayMode、热重载和录屏在团结上还需要进一步验证。测试明细和已知问题见 [团结兼容性说明](docs/tuanjie-compatibility.md)。
+
+## 常见问题
+
+**`tloop launch` 找不到 Editor**
+
+`tloop launch` 读取 `ProjectSettings/ProjectVersion.txt` 里的 `m_EditorVersion`（形如 `2022.3.62t15`），再到团结 Hub 的安装记录和默认安装目录里找对应的 Editor。注意这个值和团结的产品版本号（形如 `1.10.3`）是两回事。
+
+从 Unity 迁移过来的工程，先用团结打开并保存一次，让这个文件记录团结的版本。Editor 装在其他位置时，直接指定可执行文件：
+
+```powershell
+tloop launch --editor-path 'D:\Engines\Tuanjie\Editor\Tuanjie.exe'
+```
+
+**命令返回 Busy**
+
+一个 Editor 同一时间只执行一条 tloop 命令。等前一条结束即可。如果它一直不结束，用 `tloop cancel` 取消。
+
+**Windows 上 tloop 突然退出，或者报 `UNITY_NOT_REACHABLE`**
+
+可能是 Microsoft Defender 误报，把 `tloop.exe` 隔离了。确认和恢复的方法见 [Windows 兼容性说明](docs/windows-compatibility.md#microsoft-defender-false-positives)。
+
+**在沙箱里运行时连不上 Editor**
+
+AI 工具在沙箱里执行命令时（例如开启了沙箱的 Claude Code），本地通信可能被拦截，表现为 Editor 运行正常但命令连不上。排查方法见 [Claude Code 沙箱与 IPC](docs/claude-code-sandbox.md)。
+
+## 工作原理
+
+`tloop` 和 Editor 在本机直接通信：Windows 上用命名管道，macOS / Linux 上用 Unix domain socket，不监听网络端口。每个工程有自己的连接，同时打开多个工程也不会互相干扰。
+
+`tloop` 找到工程后，把命令交给与插件版本匹配的 project runner，由它和 Editor 通信。插件里记录了需要的 runner 版本，首次在工程里运行命令时，`tloop` 会从 GitHub Releases 下载这个版本并缓存。CLI 的发行包会经过校验和与来源证明（attestation）验证。
+
+## 扩展与文档
+
+- [自定义工具](Packages/src/Documentation~/custom-tools.md)：用 C# 编写自己的 tloop 命令，并附上 skill。程序集和扩展 API 沿用上游的名称，方便迁移已有的自定义工具。
+- [团结兼容性说明](docs/tuanjie-compatibility.md)：验证明细、Editor 查找规则，以及与 `uloop` 的隔离方式。
+- [Project runner pin](docs/project-runner-pin.md)：`tloop` 如何为工程选择 project runner 版本。
+- [插件发布流程](docs/unity-package-release.md)
+- [上游演示视频](https://github.com/hatayama/unity-cli-loop#demos)：由上游作者用原版 Unity 和 `uloop` 录制，不代表团结上的效果。
+
+## 致谢与许可
+
+`tloop` 的命令、skills 和整套开发循环都来自上游的 [Unity CLI Loop](https://github.com/hatayama/unity-cli-loop)，感谢 Masamichi Hatayama 的工作。本分支主要做团结适配：Editor 查找、与 `uloop` 的隔离，以及独立的发布流程。仓库里的 logo、截图和演示素材也来自上游。上游 logo 的设计灵感来自 Daft Punk 的专辑 *Human After All* 的封面。
+
+本项目沿用上游的 MIT 许可证，版权声明为 Copyright (c) 2025 Masamichi Hatayama，全文见 [LICENSE.md](LICENSE.md)。插件内第三方组件的许可见 [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md)。
