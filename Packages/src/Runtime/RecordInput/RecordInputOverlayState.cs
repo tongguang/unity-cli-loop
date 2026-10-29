@@ -15,9 +15,9 @@ namespace io.github.hatayama.UnityCliLoop.Runtime
     /// </summary>
     public sealed class RecordInputOverlayStateService
     {
-        private RecordInputOverlayPhase _phase;
-        private float _countdownEndTime;
-        private float _recordingStartTime;
+        private RecordInputOverlayPhase _phase = RecordInputOverlayPhase.None;
+        private float _countdownEndTime = 0f;
+        private float _recordingStartTime = 0f;
 
         public RecordInputOverlayPhase Phase => _phase;
 
@@ -46,24 +46,25 @@ namespace io.github.hatayama.UnityCliLoop.Runtime
             }
         }
 
-        public void StartCountdown(float durationSeconds)
-        {
-            _phase = RecordInputOverlayPhase.Countdown;
-            _countdownEndTime = Time.realtimeSinceStartup + durationSeconds;
-        }
-
-        public void StartRecording()
-        {
-            _phase = RecordInputOverlayPhase.Recording;
-            _recordingStartTime = Time.realtimeSinceStartup;
-        }
-
-        public void Clear()
-        {
-            _phase = RecordInputOverlayPhase.None;
-            _countdownEndTime = 0f;
-            _recordingStartTime = 0f;
-        }
+        // Disabled along with input recording and replay.
+        // public void StartCountdown(float durationSeconds)
+        // {
+        //     _phase = RecordInputOverlayPhase.Countdown;
+        //     _countdownEndTime = Time.realtimeSinceStartup + durationSeconds;
+        // }
+        //
+        // public void StartRecording()
+        // {
+        //     _phase = RecordInputOverlayPhase.Recording;
+        //     _recordingStartTime = Time.realtimeSinceStartup;
+        // }
+        //
+        // public void Clear()
+        // {
+        //     _phase = RecordInputOverlayPhase.None;
+        //     _countdownEndTime = 0f;
+        //     _recordingStartTime = 0f;
+        // }
     }
 
     /// <summary>
@@ -79,20 +80,21 @@ namespace io.github.hatayama.UnityCliLoop.Runtime
 
         public static float ElapsedSeconds => ServiceValue.ElapsedSeconds;
 
-        public static void StartCountdown(float durationSeconds)
-        {
-            ServiceValue.StartCountdown(durationSeconds);
-        }
-
-        public static void StartRecording()
-        {
-            ServiceValue.StartRecording();
-        }
-
-        public static void Clear()
-        {
-            ServiceValue.Clear();
-        }
+        // Disabled along with input recording and replay.
+        // public static void StartCountdown(float durationSeconds)
+        // {
+        //     ServiceValue.StartCountdown(durationSeconds);
+        // }
+        //
+        // public static void StartRecording()
+        // {
+        //     ServiceValue.StartRecording();
+        // }
+        //
+        // public static void Clear()
+        // {
+        //     ServiceValue.Clear();
+        // }
     }
 }
 #endif

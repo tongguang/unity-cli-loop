@@ -72,15 +72,16 @@ namespace io.github.hatayama.UnityCliLoop.Runtime
             _dragWaypoints.Add(position);
         }
 
-        public void RequestExpandAnimation()
-        {
-            _pendingExpandAnimation = true;
-        }
-
-        public void RequestDissipateAnimation()
-        {
-            _pendingDissipateAnimation = true;
-        }
+        // Disabled along with input recording and replay.
+        // public void RequestExpandAnimation()
+        // {
+        //     _pendingExpandAnimation = true;
+        // }
+        //
+        // public void RequestDissipateAnimation()
+        // {
+        //     _pendingDissipateAnimation = true;
+        // }
 
         public bool ConsumePendingExpandAnimation()
         {
@@ -156,15 +157,16 @@ namespace io.github.hatayama.UnityCliLoop.Runtime
             ServiceValue.AddWaypoint(position);
         }
 
-        public static void RequestExpandAnimation()
-        {
-            ServiceValue.RequestExpandAnimation();
-        }
-
-        public static void RequestDissipateAnimation()
-        {
-            ServiceValue.RequestDissipateAnimation();
-        }
+        // Disabled along with input recording and replay.
+        // public static void RequestExpandAnimation()
+        // {
+        //     ServiceValue.RequestExpandAnimation();
+        // }
+        //
+        // public static void RequestDissipateAnimation()
+        // {
+        //     ServiceValue.RequestDissipateAnimation();
+        // }
 
         public static bool ConsumePendingExpandAnimation()
         {

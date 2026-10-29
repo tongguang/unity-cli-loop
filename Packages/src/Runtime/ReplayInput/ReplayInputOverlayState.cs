@@ -34,13 +34,14 @@ namespace io.github.hatayama.UnityCliLoop.Runtime
             _isLooping = isLooping;
         }
 
-        public void Clear()
-        {
-            _isActive = false;
-            _currentFrame = 0;
-            _totalFrames = 0;
-            _isLooping = false;
-        }
+        // Disabled along with input recording and replay.
+        // public void Clear()
+        // {
+        //     _isActive = false;
+        //     _currentFrame = 0;
+        //     _totalFrames = 0;
+        //     _isLooping = false;
+        // }
     }
 
     /// <summary>
@@ -61,10 +62,11 @@ namespace io.github.hatayama.UnityCliLoop.Runtime
             ServiceValue.Update(currentFrame, totalFrames, isLooping);
         }
 
-        public static void Clear()
-        {
-            ServiceValue.Clear();
-        }
+        // Disabled along with input recording and replay.
+        // public static void Clear()
+        // {
+        //     ServiceValue.Clear();
+        // }
     }
 }
 #endif
