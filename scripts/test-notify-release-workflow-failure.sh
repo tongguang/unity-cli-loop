@@ -3,6 +3,7 @@ set -eu
 
 ROOT_DIR=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
 SCRIPT="$ROOT_DIR/scripts/notify-release-workflow-failure.sh"
+WORKFLOW="$ROOT_DIR/.github/workflows/release-failure-notify.yml"
 TMP_DIR=$(mktemp -d)
 ORIGINAL_PATH=$PATH
 
@@ -103,6 +104,14 @@ run_case() {
   )
 }
 
+# Verifies repositories without Issues skip the issue-based notification job.
+test_skips_when_issues_are_disabled() {
+  if ! grep -F "    if: github.event.workflow_run.conclusion == 'failure' && github.event.repository.has_issues" "$WORKFLOW" >/dev/null; then
+    echo "Expected release failure notifications to require Issues to be enabled." >&2
+    exit 1
+  fi
+}
+
 # Verifies a new issue is created when no matching release failure issue exists.
 test_creates_issue_when_missing() {
   run_case creates-issue '[]' false
@@ -132,6 +141,7 @@ test_issue_lookup_failure_stops() {
   assert_not_contains "$TMP_DIR/lookup-failure/gh.log" "issue create --title"
 }
 
+test_skips_when_issues_are_disabled
 test_creates_issue_when_missing
 test_comments_on_existing_issue
 test_issue_lookup_failure_stops
