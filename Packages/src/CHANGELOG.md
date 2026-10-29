@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.22.5](https://github.com/tongguang/unity-cli-loop/compare/v3.22.4...v3.22.5) (2026-10-29)
+
+- fix: set-game-view-size no longer reports success under the Device Simulator, and --reset removes the size entry it leaves behind (#3412) (4ecde684)
+
 ## [3.22.4](https://github.com/tongguang/unity-cli-loop/compare/v3.22.3...v3.22.4) (2026-10-29)
 
 - fix: disable retired input overlay state mutations (bd423e52)
