@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.22.3](https://github.com/tongguang/unity-cli-loop/compare/v3.22.2...v3.22.3) (2026-10-29)
+
+
+### Bug Fixes
+
+* pin Tuanjie installs to dispatcher 3.14.2 ([8b9d043](https://github.com/tongguang/unity-cli-loop/commit/8b9d04319c448e8a54e392b85343ab5c5979d3f1))
+
 ## [3.22.2](https://github.com/tongguang/unity-cli-loop/compare/v3.22.1...v3.22.2) (2026-10-28)
 
 
