@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.13.2](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.1...tloop-project-runner-v3.13.2) (2026-10-29)
+
+- feat: retire the replay-input tool and disable input recording (2745e0b2)
+- ci: simplify checks and add explicit releases (c404a0d7)
+- fix: CLI binaries ship with the Go 1.27.3 runtime (d6060e4f)
+- refactor(dispatcher): drop delegation to tloop V2 projects (db30fe6c)
+- docs(skills): name Tuanjie where the remaining skill and help text said Unity (b95b8727)
+
 ## [3.13.1](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.0...tloop-project-runner-v3.13.1) (2026-10-28)
 
 

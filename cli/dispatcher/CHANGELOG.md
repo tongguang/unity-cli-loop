@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.14.3](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.2...dispatcher-v3.14.3) (2026-10-29)
+
+- feat(verify-project): accept Tuanjie-encoded GUIDs (88b1a256)
+- feat: retire the replay-input tool and disable input recording (2745e0b2)
+- ci: simplify checks and add explicit releases (c404a0d7)
+- fix(installer): reject raw carriage returns in pin manifests (ead482c5)
+- fix: CLI binaries ship with the Go 1.27.3 runtime (d6060e4f)
+
 ## [3.14.2](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.1...dispatcher-v3.14.2) (2026-10-29)
 
 
