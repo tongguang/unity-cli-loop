@@ -170,6 +170,7 @@ AI 工具在沙箱里执行命令时（例如开启了沙箱的 Claude Code）�
 - [团结兼容性说明](docs/tuanjie-compatibility.md)：验证明细、Editor 查找规则，以及与 `uloop` 的隔离方式。
 - [Project runner pin](docs/project-runner-pin.md)：`tloop` 如何为工程选择 project runner 版本。
 - [插件发布流程](docs/unity-package-release.md)
+- [CI 与版本发布](docs/releasing.md)
 - [上游演示视频](https://github.com/hatayama/unity-cli-loop#demos)：由上游作者用原版 Unity 和 `uloop` 录制，不代表团结上的效果。
 
 ## 致谢与许可

@@ -1,0 +1,61 @@
+name: Release
+run-name: Release ${{ inputs.bump }} (${{ inputs.components }})${{ inputs.dry-run && ' - preview' || '' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version increment for the selected components
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      components:
+        description: Auto detects changed components; native releases also release the package
+        type: choice
+        options: [auto, all, dispatcher, runner, package]
+        default: auto
+      dry-run:
+        description: Preview versions without changing files or publishing
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: tloop-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
+        with:
+          go-version-file: cli/.go-version
+          cache: false
+
+      - name: Prepare, check, and publish components in order
+        working-directory: cli/release-automation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_BUMP: ${{ inputs.bump }}
+          RELEASE_COMPONENTS: ${{ inputs.components }}
+          RELEASE_DRY_RUN: ${{ inputs.dry-run }}
+          RELEASE_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: >-
+          go run ./cmd/release
+          --bump "$RELEASE_BUMP"
+          --components "$RELEASE_COMPONENTS"
+          --dry-run="$RELEASE_DRY_RUN"
+          --run-id "$RELEASE_RUN_ID"

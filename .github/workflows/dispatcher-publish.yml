@@ -1,15 +1,20 @@
 name: dispatcher-publish
 
+run-name: ${{ inputs.release-id || github.workflow }}
+
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       dry-run:
         description: "Dry run (skip release upload)"
         type: boolean
         default: false
+      expected-sha:
+        description: Expected source commit supplied by Release
+        type: string
+      release-id:
+        description: Correlation ID supplied by Release
+        type: string
 
 concurrency:
   group: dispatcher-publish-${{ github.ref }}
@@ -21,7 +26,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
-      actions: write
     outputs:
       should_publish: ${{ steps.release.outputs.publish }}
       should_release: ${{ steps.release.outputs.release }}
@@ -35,6 +39,11 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Verify requested source commit
+        env:
+          EXPECTED_SHA: ${{ inputs.expected-sha }}
+        run: test -z "$EXPECTED_SHA" || test "$EXPECTED_SHA" = "$GITHUB_SHA"
 
       - name: Resolve dispatcher release target
         id: release
@@ -125,23 +134,11 @@ jobs:
         if: steps.release.outputs.publish == 'true' && steps.release.outputs.dry_run == 'true'
         run: ls -lh dist/dispatcher-release
 
-      - name: Cancel superseded approval-waiting runs
-        if: (steps.release.outputs.publish == 'true' || steps.release.outputs.release == 'true') && steps.release.outputs.dry_run != 'true'
-        working-directory: cli/release-automation
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >-
-          go run ./cmd/cancel-superseded-waiting-runs
-          --repo "${{ github.repository }}"
-          --workflow dispatcher-publish.yml
-          --branch "${{ github.ref_name }}"
-          --current-run-id "${{ github.run_id }}"
 
   publish:
     needs: build
     if: (needs.build.outputs.should_publish == 'true' || needs.build.outputs.should_release == 'true') && needs.build.outputs.dry_run != 'true'
     runs-on: ubuntu-latest
-    environment: cli-release
     permissions:
       actions: read
       contents: write
@@ -318,7 +315,7 @@ jobs:
         run: |
           set -eu
           while IFS=' ' read -r checksum asset_path; do
-            gh attestation verify "${asset_path}" --repo "${GITHUB_REPOSITORY}" --signer-workflow "${SIGNER_WORKFLOW}"
+            gh attestation verify "${asset_path}" --repo "${GITHUB_REPOSITORY}" --signer-workflow "${SIGNER_WORKFLOW}" --source-digest "${GITHUB_SHA}"
           done < release-input/release-assets.manifest
 
       - name: Attach attestation bundles to dispatcher assets
@@ -386,130 +383,3 @@ jobs:
           else
             gh release edit "${RELEASE_TAG}" --draft=false
           fi
-
-  post-publish:
-    needs: [build, publish]
-    if: needs.build.outputs.dry_run != 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout approved event commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Setup Go
-        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
-        with:
-          go-version-file: cli/.go-version
-          cache-dependency-path: '**/go.sum'
-
-      # Fresh installs follow the package pin, so a published stable dispatcher
-      # only reaches new users once the pin records it. Pre-releases are never
-      # stamped on main. The stamp is pushed to main directly: its content is
-      # fully machine-verified against the release attestations, and the human
-      # gate for the release itself is the cli-release environment approval.
-      # GITHUB_TOKEN cannot bypass the main branch ruleset, so the push uses a
-      # GitHub App token whose App is a ruleset bypass actor
-      # (docs/dispatcher-pin-release-order.md).
-      - name: Mint dispatcher pin push token
-        if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true' && vars.DISPATCHER_PIN_APP_ID != ''
-        id: dispatcher-pin-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
-        with:
-          app-id: ${{ vars.DISPATCHER_PIN_APP_ID }}
-          private-key: ${{ secrets.DISPATCHER_PIN_APP_PRIVATE_KEY }}
-          permission-contents: write
-          permission-pull-requests: write
-
-      - name: Push dispatcher pin stamp to main
-        if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true' && vars.DISPATCHER_PIN_APP_ID != ''
-        working-directory: cli/release-automation
-        env:
-          GH_TOKEN: ${{ steps.dispatcher-pin-token.outputs.token }}
-          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
-        run: |
-          set -eu
-          # The checkout kept no credentials, so give git the App token
-          # without ever printing it.
-          gh auth setup-git
-          go run ./cmd/push-dispatcher-pin \
-            --tag "${RELEASE_TAG}" \
-            --base-branch main
-
-      # The stamp is the first commit on main from which the Unity package can
-      # release this dispatcher, so its release pull request is merged here and
-      # not earlier. The App token is required: a merge made with GITHUB_TOKEN
-      # starts no follow-up workflow run, so the package release would never be
-      # tagged (docs/adr/0007-separate-release-prs-and-package-auto-merge.md).
-      # The package release pull request stays draft until this step lifts the
-      # draft itself, so draft is not a reason to wait here. An already open
-      # release pull request for the next dispatcher cycle is not a reason to
-      # wait either: this package pin records the dispatcher published above.
-      - name: Merge the Unity package release pull request now that the pin records this dispatcher
-        if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true' && vars.DISPATCHER_PIN_APP_ID != ''
-        working-directory: cli/release-automation
-        env:
-          GH_TOKEN: ${{ steps.dispatcher-pin-token.outputs.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
-        run: >-
-          go run ./cmd/merge-package-release-pr
-          --repo "${GITHUB_REPOSITORY}"
-          --base-branch main
-          --dispatcher-tag "${RELEASE_TAG}"
-
-  # Homebrew and winget are secondary channels, so they run beside post-publish
-  # instead of inside it: a failure in either (for example a winget fork sync
-  # that needs a scope the token lacks) must not skip the pin stamp and the
-  # package release merge, and the package release merge can wait for checks
-  # long enough that it must not hold these updates back either. A failure here
-  # still fails the run, and re-running the failed job re-runs only these steps.
-  # Both write through their own tokens; GITHUB_TOKEN only reads release assets.
-  package-managers:
-    needs: [build, publish]
-    if: needs.build.outputs.dry_run != 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout approved event commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-
-      - name: Setup Go
-        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
-        with:
-          go-version-file: cli/.go-version
-          cache-dependency-path: '**/go.sum'
-
-      - name: Update Homebrew formula
-        if: needs.build.outputs.should_publish == 'true'
-        working-directory: cli/release-automation
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-        run: >-
-          go run ./cmd/update-homebrew-formula
-          --repo "${{ github.repository }}"
-          --tag "${{ needs.build.outputs.release_tag }}"
-          --tap-repo tongguang/homebrew-tap
-
-      - name: Open winget-pkgs pull request
-        if: needs.build.outputs.should_publish == 'true' && needs.build.outputs.release_prerelease != 'true'
-        working-directory: cli/release-automation
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
-          WINGET_PKGS_TOKEN: ${{ secrets.WINGET_PKGS_TOKEN }}
-        run: >-
-          go run ./cmd/update-winget-manifest
-          --repo "${GITHUB_REPOSITORY}"
-          --tag "${RELEASE_TAG}"
-          --fork-repo tongguang/winget-pkgs

@@ -5,7 +5,7 @@
 for cross-component version requirements. Its required fields:
 
 - `projectRunnerVersion` — the project runner release the dispatcher must run for this package.
-  Stamped by release-please; never edit by hand.
+  Stamped by the explicit Release workflow; never edit by hand.
 - `minimumDispatcherVersion` — the semver floor the package requires of the globally installed
   dispatcher. The dispatcher force-updates itself when it is older than this value, and the
   package reads it (via `CliPinReader`) for setup and installation checks. This is the only
@@ -13,10 +13,10 @@ for cross-component version requirements. Its required fields:
   needs a newly published dispatcher, not because the dispatcher implementation changed.
 - `dispatcherReleaseTag` and `dispatcherArchiveManifest` — the provenance-pinned dispatcher
   release used for first installation and its verified asset hashes. Stamped by automation
-  against a published release: publishing a **stable** dispatcher release makes the
-  `dispatcher-publish` workflow push the new stamp straight to `main` (pre-releases are
-  never stamped on `main`), and CI on `main` fails through `check-dispatcher-pin-freshness` for as
-  long as `dispatcherReleaseTag` lags the newest published stable dispatcher release. Never edit by hand — `VerifyDispatcherPinSubjects` requires the
+  against a published release: after native publication, the Release workflow verifies
+  its attestation and writes a later package-version commit containing the stamp.
+  The pin is checked during CI and package publication. Never edit it by hand —
+  `VerifyDispatcherPinSubjects` requires the
   manifest to match the published release's verified subjects exactly, so a hand-written value
   cannot pass CI (see `docs/dispatcher-pin-release-order.md`). Consumers: Unity's **Install CLI**
   path (via `CliPinReader` / `NativeCliCommandBuilder`) and the terminal installers
@@ -38,7 +38,7 @@ the sibling binary next to the dispatcher, the version cache, and the GitHub
 release download are all skipped. The path must point at an existing executable
 file, or the dispatcher fails with an explicit error rather than falling back.
 
-This override exists for dogfooding checkouts: release-please stamps
+This override exists for dogfooding checkouts: release preparation stamps
 `projectRunnerVersion` ahead of the matching GitHub release, so the normal
 download path 404s until the release is published. Pointing the variable at a
 locally built binary (e.g. `dist/darwin-arm64/tloop-project-runner`, refreshed

@@ -1,5 +1,9 @@
 # Dispatcher Pin Direct Push
 
+Tuanjie branch update (2026-10-29): the explicit release orchestration in
+[ADR 0020](0020-explicit-release-workflow.md) supersedes the PR/App trigger
+mechanism below. Native-before-package ordering and source verification remain.
+
 Date: 2026-09-05
 
 ## Decision

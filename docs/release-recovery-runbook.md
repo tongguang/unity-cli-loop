@@ -20,8 +20,9 @@ do not try to repair the broken release in place.
      | jq -r '.[].verificationResult.signature.certificate.sourceRepositoryDigest'
    ```
 
-2. Merge the pending release-please release PR for the affected branch. This
-   creates the next version and starts a normal head-based publish run.
+2. Start a new patch release with `gh workflow run release.yml --ref main -f bump=patch`.
+   Use `-f components=all` to roll every component forward. The explicit workflow
+   generates fresh version commits and checks and publishes those exact commits.
 
 3. Verify the new runner release and the package release that pins it. The
    runner tag commit, every asset's attestation digest, and the publish run's
@@ -72,8 +73,7 @@ If the run used an older workflow revision that lacks a required fix, or its
 head SHA differs from the intended release commit, do not rerun it. Use the
 roll-forward procedure instead.
 
-When all conditions hold, rerun the failed jobs from the original run and
-approve the `cli-release` environment if GitHub requests approval:
+When all conditions hold, rerun the failed publisher jobs from the original run:
 
 ```sh
 gh run rerun <run-id> --repo <owner>/<repo> --failed
@@ -81,33 +81,25 @@ gh run rerun <run-id> --repo <owner>/<repo> --failed
 
 ## Retrying after a cancelled or failed publish run
 
-`native-cli-publish.yml` and `dispatcher-publish.yml` only evaluate publish/
-release on push when HEAD's diff actually stamps the resolved version (the
-release-please manifest/contract entry or the component's `CHANGELOG.md`
-heading). Once a publish run is cancelled or fails, ordinary follow-up pushes
-to main/v3-beta no longer retry it, because their HEAD commits do not stamp
-that version. Recovery is limited to two paths:
+Ordinary pushes run CI and never retry publication. Start a new `Release` patch
+run from the current main to generate fresh metadata for unpublished components.
+If the native releases already succeeded, package preparation verifies their
+dispatcher pin again before committing the package. This recovers a run that
+stopped between native publication and the later pin commit.
 
-- (a) Rerun the original run, but only when the conditions in "When rerun
-  recovery is valid" above hold (its `headSha` is the intended release commit
-  and the workflow definition there is healthy).
-- (b) Trigger the workflow manually via `workflow_dispatch`, which bypasses
-  the push gate entirely and falls back to the same state-based evaluation
-  (missing release / missing assets / fully published) the gate used before
-  this change.
+The narrow publisher-only rerun above is available when the original source and
+workflow are valid. Do not rerun an entire parent release to resume its old plan:
+its source SHA may have been superseded by its own version commits. Do not
+dispatch a publisher on a newer main to rebuild a historical native tag.
 
 ## Operational notes
 
 - Do not start a new workflow run to publish a historical release. A later run
   cannot produce valid attestations for an earlier commit.
-- Cancel an older run waiting for `cli-release` approval before retrying. The
-  workflow concurrency group does not cancel it automatically, so it can block
-  the newer run indefinitely.
-- Delete a broken release only after the version bump is merged. Deleting it
-  first leaves the historical version unresolved; later push builds will not
-  attempt to recreate it on their own (see "Retrying after a cancelled or
-  failed publish run" above), so recovery still requires an explicit rerun or
-  `workflow_dispatch`.
+- Cancel obsolete waiting runs from the retired pipeline before retrying. The
+  current publishers use no approval environment.
+- Delete a broken release only after a valid roll-forward release is published.
+  Push checks do not recreate deleted releases.
 - Do not grant GitHub Actions tag-ruleset bypass permissions. That does not
   resolve the attestation invariant and expands bot authority unnecessarily.
 - A broken release may remain published while the roll-forward release is cut;

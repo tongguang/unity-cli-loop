@@ -372,7 +372,7 @@ func TestModuleEnumerationConsistency(t *testing.T) {
 	scriptsToCheck := []string{
 		filepath.Join(repositoryRoot, "scripts", "check-go-cli-source.sh"),
 		filepath.Join(repositoryRoot, "scripts", "check-code-complexity.sh"),
-		filepath.Join(repositoryRoot, ".github", "workflows", "code-complexity.yml"),
+		filepath.Join(repositoryRoot, ".github", "workflows", "build-and-test.yml"),
 	}
 	for _, moduleDir := range contractModuleDirs {
 		for _, scriptPath := range scriptsToCheck {

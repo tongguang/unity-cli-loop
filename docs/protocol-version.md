@@ -30,11 +30,12 @@ Do not touch the protocol version to "keep up with releases":
 
 - `cli/common/clicontract/contract.json` `projectRunnerVersion`, the pin files'
   `projectRunnerVersion`, and `cli/dispatcher/dispatchercontract/dispatcher-contract.json`
-  `dispatcherVersion` are stamped by release-please only. Never edit them by hand in a feature PR
+  `dispatcherVersion` are stamped by the explicit Release workflow only. Never edit them by hand in a feature PR
   (the one exception is a version series realignment; see `docs/version-series-realignment.md`).
 - When a protocol bump changes `CliConstants.REQUIRED_CLI_PROTOCOL_VERSION`, prepare the matching
   project runner release first. PR CI (`check-protocol-minimum-version`) fails until the pin's
   `projectRunnerVersion` points at a published project runner release that advertises the
-  required protocol; release-please advances that value when the runner release is cut.
+  required protocol. The explicit release generates matching native metadata first and
+  verifies the published runner before publishing the later package commit.
 - Runtime protocol mismatch guidance must use the unpinned CLI update path for older clients and
   tell newer clients to align the package and CLI releases.

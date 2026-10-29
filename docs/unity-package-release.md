@@ -1,54 +1,25 @@
-# Tuanjie Package Release
+# Tuanjie UPM Package Release
 
-This Tuanjie-only branch publishes an ordinary UPM tarball. Unity Cloud package
-signing, a Unity organization, and an installed Editor are not required. This
-policy was explicitly chosen for the Tuanjie fork; CLI archive attestations and
-the verified dispatcher pin remain required.
+`unity-package-release.yml` is the sole publisher of ordinary UPM tarballs for
+this Tuanjie-only fork. It needs no Unity Cloud signing credentials. The normal
+entry is [Release](releasing.md), which invokes it only after native dependencies
+have been published and the later package-version commit has passed CI.
 
-`unity-package-release.yml` is the only workflow that publishes the package
-release. The workflow builds the complete tarball before creating its tag and
-release, so consumers never see a published release without its package asset.
+The publisher runs on main through `workflow_dispatch`. It validates its expected
+source commit, finds the version commit from the manifest and changelog, checks
+the protocol and pin, verifies published native dependencies, and packs the
+complete `Packages/src` tree. `stage-unity-package` compares every archive entry
+with that source tree before anything is published. CLI-only skills in tilde
+folders and existing MIT notices remain in the archive.
 
-## Flow
+The tarball is uploaded as a workflow artifact before publication. The release
+is created with that tarball, so an immutable published release never waits for
+its package asset. A direct manual run defaults to preview packing:
 
-1. **Plan.** Completion of release-please, dispatcher-publish, or
-   native-cli-publish starts the workflow on main. The plan reads the current
-   release manifest, finds the package release commit, and checks that its runner
-   and dispatcher releases and verified pin are ready. Missing dependencies are
-   reported as a notice and checked again after their publish workflow completes.
-2. **Pack.** A read-only job checks out the package release commit and copies
-   `Packages/src` into the archive's `package/` directory. The tarball includes
-   every source file, asset `.meta`, and skill in tilde-suffixed directories.
-   `Packages/src/LICENSE.md` preserves the root project license and upstream
-   copyright verbatim, alongside the existing third-party notices.
-   No external package-signing binary or credentials run in this job.
-3. **Stage.** `cmd/stage-unity-package` checks the package name, release version,
-   and completeness against the source tree, then names the archive
-   `io.github.tongguang.tloop-<version>.tgz`.
-4. **Publish.** `cmd/create-unity-package-release` checks the release commit,
-   tag, and changelog, then creates the release with its complete tarball. Only
-   this job writes repository contents, and it runs only on `main`. Other branches
-   may pack for validation. Published releases are never modified.
-5. **Post-publish.** The workflow marks the package release PR tagged and starts
-   release-please, because writes made with GITHUB_TOKEN do not start follow-up
-   push workflows.
+```sh
+gh workflow run unity-package-release.yml --ref main -f dry-run=true
+```
 
-## Operations
-
-- The manual `dry-run` option defaults to true. It packs the planned release
-  source, or the tag of an already published release, and keeps the tarball as
-  the `tloop-upm-package` Actions artifact for 14 days. It publishes nothing.
-- To publish a ready release after repairing a failed run, dispatch the workflow
-  on main with `dry-run=false`. It uses the manifest version and its release
-  commit, rather than inventing a version or tagging a later commit.
-- A failure before publication leaves no published package. Repair the cause
-  and rerun the failed workflow. Do not publish a partial draft by hand.
-- A published release missing its package asset must be replaced by a new
-  version; the workflow will not patch a published release.
-- This fork distributes through Git URLs and GitHub Release tarballs, without
-  publishing to OpenUPM. `tloop package install` writes the Git dependency, using
-  `main` by default or a release tag when `--version` is supplied.
-
-No `upm-signing` environment or `UPM_*` secrets are used by this fork's package
-workflow. The historical signed-package decision is retained in ADR 0013 with
-the Tuanjie branch override recorded there.
+Use the unified Release entry for routine publication. Do not create UPM releases
+by hand. On failure, follow [release recovery](release-recovery-runbook.md).
+The package workflow starts no release-please run and updates no PR labels.

@@ -1,38 +1,28 @@
 name: unity-package-release
+run-name: ${{ inputs.release-id || github.workflow }}
 
-# Creates the Unity package's GitHub release, and is the only workflow that
-# does. The package is packed and checked for complete contents
-# first, and the release is created and published with the package tarball in
-# one step, because a published release is immutable
-# (docs/unity-package-release.md). A release can be created
-# once its release commit is on main and the runner and dispatcher releases it
-# depends on are published, so this follows every run of the three workflows
-# that make one of those happen.
+# Packs and verifies the complete UPM tree before publishing its immutable release.
 on:
-  workflow_run:
-    workflows:
-      - release-please
-      - dispatcher-publish
-      - native-cli-publish
-    types:
-      - completed
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       dry-run:
         description: "Pack without creating the release (a published release is packed from its tag), and keep the tarball as a workflow artifact"
         type: boolean
         default: true
+      expected-sha:
+        description: Expected source commit supplied by Release
+        type: string
+      release-id:
+        description: Correlation ID supplied by Release
+        type: string
 
 permissions:
   contents: read
 
 jobs:
   plan:
-    # A run that fails partway may still have published what the package
-    # release waits for, so only a cancelled run is ignored.
-    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion != 'cancelled')
+    # Release dispatches this workflow after the native dependencies are published.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -44,15 +34,17 @@ jobs:
       asset-name: ${{ steps.plan.outputs.asset-name }}
       source-ref: ${{ steps.plan.outputs.source-ref }}
     steps:
-      # The newest main commit is the right one to read: while the package
-      # release pull request is still pending, release-please opens no next
-      # release pull request, so the manifest there still names the release that
-      # is not out yet. The full history is what the release commit is found in.
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Verify requested source commit
+        env:
+          EXPECTED_SHA: ${{ inputs.expected-sha }}
+        run: test -z "$EXPECTED_SHA" || test "$EXPECTED_SHA" = "$GITHUB_SHA"
 
       - name: Setup Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
@@ -127,7 +119,7 @@ jobs:
   # tag and the release, which can, are checked again right before the writes.
   publish:
     needs: [plan, pack]
-    # Other branches may pack for validation; only main may publish a release.
+    # Only main may publish a release.
     if: needs.plan.outputs.publish == 'true' && github.ref == 'refs/heads/main'
     # Creations run one at a time, so two runs never create the same release.
     # Only this job is serialized: a run that skips, a dry run, or a run after a
@@ -173,37 +165,3 @@ jobs:
           --tag "$RELEASE_TAG"
           --commit "$RELEASE_COMMIT"
           --asset "$RUNNER_TEMP/packed/$ASSET_NAME"
-
-  # Marks the package release pull request tagged, which is what lets
-  # release-please open the next release pull requests. It is marked here
-  # because release-please skips its own label sync while the release commit is
-  # still the newest main commit, which it is whenever the release was due as
-  # soon as the pull request was merged.
-  post-publish:
-    needs: [plan, publish]
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: read
-      pull-requests: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-
-      - name: Mark the package release pull request as tagged
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.plan.outputs.tag }}
-          TARGET_SHA: ${{ needs.plan.outputs.source-ref }}
-          TARGET_BRANCH: main
-        run: scripts/mark-release-pr-tagged.sh
-
-      # A release created with GITHUB_TOKEN starts no workflow, so release-please
-      # is started here to open the release pull requests of the commits merged
-      # while this release was pending.
-      - name: Dispatch release-please after the package release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run release-please.yml --repo "$GITHUB_REPOSITORY" --ref main -f branch=main

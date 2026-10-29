@@ -1,14 +1,14 @@
 # Shared release inputs and triggers
 
-The dispatcher is released through release-please like the project runner and
-the Unity package: `cli/dispatcher/dispatchercontract/dispatcher-contract.json`
+The explicit Release workflow versions the dispatcher, project runner and
+UPM package: `cli/dispatcher/dispatchercontract/dispatcher-contract.json`
 `dispatcherVersion` and `cli/dispatcher/CHANGELOG.md` are stamped by
-release-please release PRs. Never bump `dispatcherVersion` by hand (the one
+`cli/release-automation/cmd/release`. Never bump `dispatcherVersion` by hand (the one
 exception is a version series realignment; see
 `docs/version-series-realignment.md`).
 
-release-please attributes a commit to a component only when the commit touches
-that package root (`Packages/src/`, `cli/dispatcher/`, `cli/project-runner/`).
+Release selection checks each component root and shared CLI inputs. The existing
+component-root stamps also record the shared inputs used to build the binaries.
 Shared release inputs living outside those roots therefore need explicit
 trigger updates in the same PR:
 

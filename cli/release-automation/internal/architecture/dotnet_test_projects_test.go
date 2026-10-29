@@ -31,7 +31,7 @@ func TestDotnetTestProjectsRunInPullRequestWorkflows(t *testing.T) {
 	}
 	missing := dotnetTestProjectsMissingFromPullRequestWorkflows(projects, workflows)
 	if len(missing) > 0 {
-		t.Fatalf("dotnet test projects that no pull request workflow runs:\n%s\nAdd `dotnet test <project> --configuration Release` to a workflow triggered by pull_request, as the \"Run concurrency unit tests\" step of .github/workflows/unity-compile-check-and-test-runner.yml does for the Unity-free unit test projects.", strings.Join(missing, "\n"))
+		t.Fatalf("dotnet test projects that no pull request workflow runs:\n%s\nAdd `dotnet test <project> --configuration Release` to .github/workflows/build-and-test.yml.", strings.Join(missing, "\n"))
 	}
 }
 

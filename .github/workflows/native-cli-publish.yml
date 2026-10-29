@@ -1,15 +1,24 @@
 name: native-cli-publish
 
+run-name: ${{ inputs.release-id || github.workflow }}
+
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       dry-run:
         description: "Dry run (skip release upload)"
         type: boolean
         default: false
+      expected-sha:
+        description: Expected source commit supplied by Release
+        type: string
+      release-id:
+        description: Correlation ID supplied by Release
+        type: string
+
+concurrency:
+  group: native-cli-publish-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -17,7 +26,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
-      actions: write
     outputs:
       should_publish: ${{ steps.release.outputs.publish }}
       should_release: ${{ steps.release.outputs.release }}
@@ -30,6 +38,11 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Verify requested source commit
+        env:
+          EXPECTED_SHA: ${{ inputs.expected-sha }}
+        run: test -z "$EXPECTED_SHA" || test "$EXPECTED_SHA" = "$GITHUB_SHA"
 
       - name: Resolve release target
         id: release
@@ -133,23 +146,11 @@ jobs:
         if: steps.release.outputs.publish == 'true' && steps.release.outputs.dry_run == 'true'
         run: ls -lh dist/release
 
-      - name: Cancel superseded approval-waiting runs
-        if: (steps.release.outputs.publish == 'true' || steps.release.outputs.release == 'true') && steps.release.outputs.dry_run != 'true'
-        working-directory: cli/release-automation
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >-
-          go run ./cmd/cancel-superseded-waiting-runs
-          --repo "${{ github.repository }}"
-          --workflow native-cli-publish.yml
-          --branch "${{ github.ref_name }}"
-          --current-run-id "${{ github.run_id }}"
 
   publish:
     needs: build
     if: (needs.build.outputs.should_publish == 'true' || needs.build.outputs.should_release == 'true') && needs.build.outputs.dry_run != 'true'
     runs-on: ubuntu-latest
-    environment: cli-release
     permissions:
       actions: read
       contents: write
@@ -337,7 +338,7 @@ jobs:
         run: |
           set -eu
           while IFS=' ' read -r checksum asset_path; do
-            gh attestation verify "${asset_path}" --repo "${GITHUB_REPOSITORY}" --signer-workflow "${SIGNER_WORKFLOW}"
+            gh attestation verify "${asset_path}" --repo "${GITHUB_REPOSITORY}" --signer-workflow "${SIGNER_WORKFLOW}" --source-digest "${GITHUB_SHA}"
           done < release-input/release-assets.manifest
 
       - name: Attach attestation bundles to release assets
@@ -410,7 +411,7 @@ jobs:
             downloaded_bundle_path="${asset_directory}/${bundle_name}"
             verification_output_path="${asset_directory}/verification.json"
             digest_output_path="${asset_directory}/digests.txt"
-            gh attestation verify "${downloaded_asset_path}" --repo "${GITHUB_REPOSITORY}" --bundle "${downloaded_bundle_path}" --signer-workflow "${SIGNER_WORKFLOW}" --format json > "${verification_output_path}"
+            gh attestation verify "${downloaded_asset_path}" --repo "${GITHUB_REPOSITORY}" --bundle "${downloaded_bundle_path}" --signer-workflow "${SIGNER_WORKFLOW}" --source-digest "${GITHUB_SHA}" --format json > "${verification_output_path}"
             verification_count=$(jq 'length' "${verification_output_path}")
             digest_count=$(jq '[.[].verificationResult.signature.certificate.sourceRepositoryDigest | select(type == "string" and length > 0)] | length' "${verification_output_path}")
             if [ "${verification_count}" -eq 0 ] || [ "${verification_count}" -ne "${digest_count}" ]; then
@@ -439,36 +440,3 @@ jobs:
             exit 1
           fi
           case "${RELEASE_TAG}" in *-beta.*) gh release edit "${RELEASE_TAG}" --draft=false --prerelease ;; *) gh release edit "${RELEASE_TAG}" --draft=false ;; esac
-
-  post-publish:
-    needs: [build, publish]
-    if: needs.build.outputs.dry_run != 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout approved event commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Dispatch release-please after native CLI publish
-        if: needs.build.outputs.should_publish == 'true' && github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_BRANCH: ${{ github.ref_name }}
-        run: gh workflow run release-please.yml --ref "${TARGET_BRANCH}" -f branch="${TARGET_BRANCH}"
-
-      - name: Mark release PR as tagged
-        if: github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
-          TARGET_SHA: ${{ github.sha }}
-          TARGET_BRANCH: ${{ github.ref_name }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: scripts/mark-release-pr-tagged.sh

@@ -48,7 +48,7 @@ protocol version. `protocolVersion` in `cli/common/clicontract/contract.json` an
 `CliConstants.REQUIRED_CLI_PROTOCOL_VERSION` must always stay equal — never bump one alone,
 and bump them (together, in the same PR) only when the IPC wire format becomes incompatible
 between generations; ordinary features and fixes must not bump it. Release version fields
-(`projectRunnerVersion`, `dispatcherVersion`, changelogs) are stamped by release-please only —
+(`projectRunnerVersion`, `dispatcherVersion`, changelogs) are stamped by the explicit Release workflow only —
 never edit them by hand in a feature PR (sole exception: the documented version-series
 realignment; see `docs/version-series-realignment.md`). Bump criteria and release sequencing:
 `docs/protocol-version.md`.
@@ -106,17 +106,18 @@ ban on pull-request workflows, and the Unity license guard on cache steps).
 
 ## Shared Release Inputs and Triggers
 
-All three components release through release-please; `dispatcherVersion` and component
-changelogs are stamped by release PRs — never bump them by hand (sole exception: the
+All three components release through `release.yml`; `dispatcherVersion` and component
+changelogs are stamped by `cli/release-automation/cmd/release` — never bump them by hand (sole exception: the
 documented version-series realignment; see `docs/version-series-realignment.md`). Changes to shared release
 inputs outside the package roots (non-test `cli/common/**` sources, `scripts/install.sh`,
 `scripts/install.ps1`, and structural changes to the embedded tool catalog `cli/common/tools/default-tools.json`) need matching trigger changes and a `scripts/stamp-release-inputs.sh`
 run in the same PR; description-only catalog regenerations are exempt. CI (`check-release-triggers`) fails otherwise. Rules and rationale:
 `docs/shared-release-inputs.md`.
 
-release-please opens one release pull request per component; merge the dispatcher one first. The
-unity-package one stays draft and is merged only by automation — never merge it by hand. Details:
-`docs/dispatcher-pin-release-order.md`.
+Releases are explicit: use Actions > Release or `gh workflow run release.yml --ref main`.
+No release PR, GitHub App, or extra PAT is required. Native components publish before a later
+package commit records their verified pin. Keep native publisher workflow paths unchanged: they
+are trusted signing identities. See `docs/releasing.md` and `docs/adr/0020-explicit-release-workflow.md`.
 
 ## Broken CLI Releases
 
@@ -140,12 +141,8 @@ procedure is in `docs/windows-compatibility.md`.
 
 ## Package Manager Distribution
 
-Release automation is wired to update a Homebrew tap (`tongguang/homebrew-tap`) and
-winget, but neither channel is live: the tap repository does not exist and the
-`HOMEBREW_TAP_TOKEN` and `WINGET_PKGS_TOKEN` secrets are unset, so dispatcher
-releases skip both steps. Once the tap exists, never edit its formula by hand.
-Channel policy, secrets, and the planned winget rollout live in
-`docs/package-manager-distribution.md`.
+Homebrew and winget publication are not configured; their dormant release jobs were removed.
+Native assets are distributed through GitHub Releases. Channel policy: `docs/package-manager-distribution.md`.
 
 This Tuanjie-only branch releases ordinary UPM tarballs without Unity Cloud signing.
 Only `unity-package-release.yml` creates that release, after packing and verifying
@@ -162,7 +159,7 @@ as described in `docs/dead-code-scanner.md` (commands, and what `KeptByUnityOrRe
 ## Code Complexity
 
 The repository-wide maximum cyclomatic complexity is 15, enforced by `cyclop` for Go and CA1502
-for C#. The `Code Complexity` workflow fails the pull request when findings exceed that
+for C#. The unified `CI` workflow fails the pull request when findings exceed that
 threshold. When you touch a reported function, reduce its complexity before adding behavior.
 Commands and the five places the threshold is declared: `docs/code-complexity.md`.
 
@@ -274,7 +271,7 @@ test makes `tloop run-tests` stall, remove or disable it instead of retrying the
 Unity freezes or stops responding to `tloop`, restart the Editor with `tloop launch -r`.
 No CI job runs a Tuanjie Editor, so CI runs no EditMode test. `scripts/check-tuanjie.ps1`
 compiles the project and runs a scoped EditMode test set in the open Editor; run it after
-merging upstream changes and before merging a release pull request (see
+merging upstream changes and before starting an explicit release (see
 `docs/tuanjie-compatibility.md`). Local pre-commit verification does not run the full suite
 either — it takes far too long. Before a commit or
 pull request, run only the tests that cover the code you changed, scoped with

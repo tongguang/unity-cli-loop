@@ -1,22 +1,63 @@
-name: Build and Test Tuanjie CLI Loop
+name: CI
+run-name: ${{ inputs.release-id || github.event.pull_request.title || github.event.head_commit.message || github.workflow }}
 
 on:
   push:
-    tags: ["v*", "tloop-project-runner-v*", "dispatcher-v*"]
+    branches: [main]
   pull_request:
-    branches: [main, v3-beta]
+    branches: [main]
   workflow_dispatch:
+    inputs:
+      expected-sha:
+        description: Expected source commit supplied by Release
+        type: string
+      release-id:
+        description: Correlation ID supplied by Release
+        type: string
+
+concurrency:
+  group: ci-${{ inputs.release-id || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
+  source:
+    name: Validate source
+    runs-on: ubuntu-latest
+    outputs:
+      csharp: ${{ steps.changes.outputs.csharp }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Verify requested source commit
+        env:
+          EXPECTED_SHA: ${{ inputs.expected-sha }}
+        run: test -z "$EXPECTED_SHA" || test "$EXPECTED_SHA" = "$GITHUB_SHA"
+
+      - name: Detect C# inputs
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}"; then
+            echo 'csharp=true' >> "$GITHUB_OUTPUT"
+          elif [ -n "$(git diff --name-only "$BASE_SHA" HEAD -- '*.cs' '*.csproj' '*.asmdef' '*.props' '*.targets' 'global.json' '.github/workflows/**')" ]; then
+            echo 'csharp=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'csharp=false' >> "$GITHUB_OUTPUT"
+          fi
+
   build-cli:
+    needs: source
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
-      pull-requests: read
 
     steps:
       - name: Checkout repository
@@ -40,16 +81,8 @@ jobs:
           scripts/test-resolve-dispatcher-release-target.sh
           scripts/test-is-release-please-release-commit.sh
           scripts/test-release-please-config.sh
-          scripts/test-protocol-minimum-version-workflow.sh
-          scripts/test-security-scan-workflow.sh
           scripts/test-verify-native-cli-release-assets.sh
           scripts/test-verify-dispatcher-release-assets.sh
-          scripts/test-mark-release-pr-tagged.sh
-          scripts/test-sync-published-release-pr-labels.sh
-          scripts/test-notify-release-workflow-failure.sh
-          scripts/test-native-cli-publish-workflow.sh
-          scripts/test-dispatcher-publish-workflow.sh
-          scripts/test-unity-package-release-workflow.sh
           scripts/test-distribute-attestation-bundles.sh
           scripts/test-install-release-filter.sh
           scripts/test-install-pin-manifest.sh
@@ -64,7 +97,7 @@ jobs:
         run: go run ./cmd/check-ipc-protocol-reminder --base "origin/${{ github.base_ref }}" --head HEAD
 
       - name: Check protocol minimum version bump
-        if: github.event_name == 'pull_request' && !(startsWith(github.head_ref, 'release-please--branches--') && (github.event.pull_request.user.login == 'github-actions[bot]' || github.event.pull_request.user.login == 'release-please[bot]'))
+        if: github.event_name == 'pull_request'
         working-directory: cli/release-automation
         env:
           GH_TOKEN: ${{ github.token }}
@@ -148,6 +181,7 @@ jobs:
         run: scripts/package-go-cli.sh
 
   test-windows-installers:
+    needs: source
     runs-on: windows-latest
 
     steps:
@@ -177,6 +211,10 @@ jobs:
       - name: Test install release filter in Git Bash
         shell: bash
         run: sh scripts/test-install-release-filter.sh
+
+      - name: Test pin manifest validation in Git Bash
+        shell: bash
+        run: sh scripts/test-install-pin-manifest.sh
 
       - name: Test shared-inputs stamp script in Git Bash
         shell: bash
@@ -257,12 +295,36 @@ jobs:
           jq empty package.json
           echo "✅ package.json is valid"
 
-  # Only the Unity package release branch is gated: between merging the
-  # dispatcher release PR and the post-publish pin stamp, main's manifest and
-  # the package pin legitimately disagree, so gating every pull request would
-  # turn that window red for unrelated work.
-  check-package-release-pin:
-    if: startsWith(github.head_ref || github.ref_name, 'release-please--branches--main--components--unity-package')
+  csharp-tests:
+    needs: source
+    if: needs.source.outputs.csharp == 'true'
+    name: C# Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          # Full history is required so the change-detection step can diff the
+          # PR head against its base.
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run concurrency unit tests
+        run: |
+          dotnet test tests/DynamicCodeExecutionScheduler.UnitTests/DynamicCodeExecutionScheduler.UnitTests.csproj --configuration Release
+          dotnet test tests/SharedRoslynCompilerWorker.UnitTests/SharedRoslynCompilerWorker.UnitTests.csproj --configuration Release
+          dotnet test tests/OutputFileRetention.UnitTests/OutputFileRetention.UnitTests.csproj --configuration Release
+          dotnet test tests/RunTestsExecutionTimeout.UnitTests/RunTestsExecutionTimeout.UnitTests.csproj --configuration Release
+          dotnet test tests/CompileCheckWorker.UnitTests/CompileCheckWorker.UnitTests.csproj --configuration Release
+
+  complexity:
+    needs: source
+    name: Complexity Report
     runs-on: ubuntu-latest
 
     steps:
@@ -270,7 +332,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-          fetch-depth: 0
 
       - name: Setup Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
@@ -278,6 +339,189 @@ jobs:
           go-version-file: cli/.go-version
           cache: false
 
-      - name: Check the package release commit pins the dispatcher it releases
-        working-directory: cli/release-automation
-        run: go run ./cmd/check-package-pin-consistency --ref HEAD
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install golangci-lint
+        run: |
+          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Test C# complexity host
+        run: dotnet test tests/UnityCliLoop.CodeComplexity.Tests/UnityCliLoop.CodeComplexity.Tests.csproj --configuration Release
+
+      - name: Report complexity
+        env:
+          CODE_COMPLEXITY_FAIL_ON_EXCEEDED: 'true'
+        run: scripts/check-code-complexity.sh
+
+      - name: Write complexity artifacts
+        if: always()
+        run: |
+          mkdir -p artifacts
+          for module_dir in cli/common cli/dispatcher cli/project-runner cli/release-automation; do
+            artifact_name="go-code-complexity-$(printf '%s' "$module_dir" | tr '/' '-').json"
+            (cd "$module_dir" && golangci-lint run --config "$GITHUB_WORKSPACE/cli/.golangci-complexity.yml" --issues-exit-code=0 --show-stats=false --output.json.path "$GITHUB_WORKSPACE/artifacts/$artifact_name" ./...)
+          done
+          dotnet run --project tools/UnityCliLoop.CodeComplexity/UnityCliLoop.CodeComplexity.csproj -- \
+            --root . \
+            --max-complexity 15 \
+            --format json \
+            --fail-on-exceeded false > artifacts/csharp-code-complexity.json
+
+      - name: Upload complexity artifacts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: code-complexity-results
+          path: artifacts/*.json
+
+  file-length:
+    needs: source
+    name: File Length Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
+        with:
+          go-version-file: cli/.go-version
+          cache: false
+
+      - name: Report file length
+        env:
+          CODE_FILE_LENGTH_FAIL_ON_EXCEEDED: 'true'
+        run: scripts/check-file-length.sh
+
+  dead-code:
+    needs: source
+    if: needs.source.outputs.csharp == 'true'
+    name: Dead Code Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Test dead code scanner
+        run: dotnet test tests/UnityCliLoop.DeadCodeScanner.Tests/UnityCliLoop.DeadCodeScanner.Tests.csproj --configuration Release
+
+      # Keep every explanation out of the run block below: it is a folded scalar, so YAML
+      # joins its lines into one command and a '#' would comment out everything after it.
+      # --max-public-candidates tracks the measured PublicCandidate count with no slack
+      # (docs/dead-code-scanner.md). Lower it whenever triage removes a candidate, and
+      # raise it only together with the reason the new candidate has to stay.
+      - name: Scan for dead code
+        run: >
+          scripts/check-dead-code.sh
+          --root .
+          --scope public
+          --include-types true
+          --include-members true
+          --include-locals true
+          --include-test-only true
+          --include-kept false
+          --format table
+          --fail-on high-confidence
+          --max-public-candidates 38
+
+  security-scan:
+    needs: source
+    if: needs.source.outputs.csharp == 'true'
+    name: C# Security Analysis
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
+
+    - name: Setup Go
+      uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
+      with:
+        go-version-file: cli/.go-version
+        cache: false
+
+    - name: Initialize CodeQL C# analysis
+      uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+      with:
+        languages: csharp
+        build-mode: none
+        tools: linked
+        queries: +security-extended
+        config: |
+          paths:
+            - Packages/src
+            - Assets/Tests
+
+    - name: Analyze C# security code with CodeQL
+      uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+      with:
+        category: codeql-csharp-security
+        output: ${{ runner.temp }}/codeql-results
+        upload: never
+
+    - name: Validate CodeQL SARIF
+      working-directory: cli/release-automation
+      run: go run ./cmd/check-codeql-sarif --sarif "${{ runner.temp }}/codeql-results/csharp.sarif"
+
+    - name: Upload verified CodeQL SARIF
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+      uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+      with:
+        sarif_file: ${{ runner.temp }}/codeql-results/csharp.sarif
+        category: codeql-csharp-security
+
+    - name: Explain fork pull request SARIF upload policy
+      if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork
+      run: echo "CodeQL SARIF upload is skipped for fork pull requests because their token has no security-events write permission."
+
+  go-security:
+    needs: source
+    name: Go CLI Security Analysis
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
+
+    - name: Setup Go
+      uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
+      with:
+        go-version-file: cli/.go-version
+        cache: false
+
+    - name: Install govulncheck
+      run: |
+        go install golang.org/x/vuln/cmd/govulncheck@latest
+        echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+    - name: Run govulncheck
+      run: |
+        for module_dir in cli/common cli/dispatcher cli/project-runner cli/release-automation; do
+          (cd "$module_dir" && govulncheck ./...)
+        done

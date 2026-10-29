@@ -1,5 +1,10 @@
 # Version series realignment
 
+This is a historical recovery procedure for the retired release-please pipeline.
+Normal releases now advance versions through [Release](releasing.md); do not use
+this procedure to prepare a release. Existing tag and attestation recovery rules
+still apply.
+
 Use this document when a component's release-please version series must be
 moved backward (for example, a component accidentally escaped the shared
 `3.0.0-beta` line because a bootstrap release made release-please treat a

@@ -2,6 +2,10 @@
 
 Date: 2026-07-28
 
+Tuanjie fork update: [ADR 0020](0020-explicit-release-workflow.md) replaces the
+release-please and environment-approval mechanism. The shared-input stamp guard
+remains; the explicit release planner also checks shared paths directly.
+
 ## Decision
 
 Release trigger rules resolve which components a shared input reaches at **package

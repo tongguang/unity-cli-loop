@@ -81,20 +81,20 @@ the project runner.
 The globally installed `tloop` binary. It resolves the target Unity project, ensures the
 pinned project runner release is installed (downloading it when needed), keeps itself
 up to date against the pin's `minimumDispatcherVersion`, and delegates command execution
-to the project runner. Released via release-please from `cli/dispatcher/`.
+to the project runner. Released through the explicit `Release` workflow from `cli/dispatcher/`.
 
 ### Project runner
 
 The per-project CLI binary that implements the actual commands and speaks the IPC protocol
 with the Unity package. Its release is selected by the pin's `projectRunnerVersion`, so a
 project always runs the runner generation its package was built against. Released via
-release-please from `cli/project-runner/`.
+the explicit `Release` workflow from `cli/project-runner/`.
 
 ### Pin
 
 `Packages/src/project-runner-pin.json` (mirrored byte-identically to
 `.tloop/project-runner-pin.json`), the single source for cross-component version
-requirements: `projectRunnerVersion` (stamped by release-please) and
+requirements: `projectRunnerVersion` (stamped by release automation) and
 `minimumDispatcherVersion` (the manually maintained dispatcher floor). The pin evolves
 additively only — existing fields are never deleted or renamed.
 
