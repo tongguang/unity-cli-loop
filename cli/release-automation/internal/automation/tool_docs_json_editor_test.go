@@ -1,6 +1,9 @@
 package automation
 
 import (
+	"encoding/json"
+	"errors"
+	"io"
 	"strings"
 	"testing"
 )
@@ -23,6 +26,29 @@ func TestReplaceCatalogDescriptionsRewritesOnlyCatalogDescriptions(t *testing.T)
 	}
 }
 
+// Verifies a catalog cut off mid-object or mid-value fails with a JSON decode error instead of producing a partially edited catalog.
+func TestReplaceCatalogDescriptionsRejectsTruncatedCatalogs(t *testing.T) {
+	cases := []struct {
+		name    string
+		content string
+	}{
+		{"truncated object", `{"tools":[{"description":"d"`},
+		{"truncated value", `{"tools":[{"description":`},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			_, err := replaceCatalogDescriptions([]byte(testCase.content), map[descriptionKey]string{})
+
+			// The v2-backed decoder in Go 1.27 reports a cut-off object as a *json.SyntaxError where
+			// earlier releases returned io.EOF; the failure, not its wording, is the behavior under test.
+			var syntaxErr *json.SyntaxError
+			if !errors.Is(err, io.EOF) && !errors.As(err, &syntaxErr) {
+				t.Fatalf("expected a JSON decode error, got %v", err)
+			}
+		})
+	}
+}
+
 // Verifies malformed JSON and a tool with no name field fail instead of producing a partially edited catalog.
 func TestReplaceCatalogDescriptionsRejectsUnusableCatalogs(t *testing.T) {
 	cases := []struct {
@@ -30,8 +56,6 @@ func TestReplaceCatalogDescriptionsRejectsUnusableCatalogs(t *testing.T) {
 		content string
 		wantErr string
 	}{
-		{"truncated object", `{"tools":[{"description":"d"`, "EOF"},
-		{"truncated value", `{"tools":[{"description":`, "EOF"},
 		{"invalid token", `{"tools":[{"description":"d",]}`, "invalid character"},
 		{"tool without name", `{"tools":[{"description":"d"}]}`, "tool at index 0 has no name field"},
 	}
