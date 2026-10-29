@@ -24,6 +24,7 @@ namespace io.github.hatayama.UnityCliLoop.Infrastructure
             "tloop-execute-menu-item",
             "tloop-raycast",
             "tloop-record-input",
+            "tloop-replay-input",
             "tloop-cancel",
             "tloop-v3-cli-invocation-migration"
         };

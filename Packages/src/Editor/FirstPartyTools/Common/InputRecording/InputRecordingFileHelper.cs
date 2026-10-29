@@ -1,95 +1,98 @@
-#if TLOOP_HAS_INPUT_SYSTEM
-#nullable enable
-using System;
-using System.IO;
-using System.Linq;
-using UnityEngine;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+// Input recording and replay are disabled in this fork. The original source is kept
+// below, commented out, so it can be restored by uncommenting it.
 
-namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
-{
-    /// <summary>
-    /// Provides helper operations for Input Recording File behavior.
-    /// </summary>
-    internal static class InputRecordingFileHelper
-    {
-        private const string JSON_FILE_PATTERN = "*.json";
+// #if TLOOP_HAS_INPUT_SYSTEM
+// #nullable enable
+// using System;
+// using System.IO;
+// using System.Linq;
+// using UnityEngine;
+// using Newtonsoft.Json;
+// using Newtonsoft.Json.Serialization;
 
-        private static readonly JsonSerializerSettings WRITE_SETTINGS = new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Formatting = Formatting.Indented
-        };
+// namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
+// {
+//     /// <summary>
+//     /// Provides helper operations for Input Recording File behavior.
+//     /// </summary>
+//     internal static class InputRecordingFileHelper
+//     {
+//         private const string JSON_FILE_PATTERN = "*.json";
 
-        private static readonly JsonSerializerSettings READ_SETTINGS = new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
+//         private static readonly JsonSerializerSettings WRITE_SETTINGS = new JsonSerializerSettings
+//         {
+//             ContractResolver = new CamelCasePropertyNamesContractResolver(),
+//             Formatting = Formatting.Indented
+//         };
 
-        public static void Save(InputRecordingData data, string outputPath)
-        {
-            Debug.Assert(data != null, "data must not be null");
+//         private static readonly JsonSerializerSettings READ_SETTINGS = new JsonSerializerSettings
+//         {
+//             ContractResolver = new CamelCasePropertyNamesContractResolver()
+//         };
 
-            string? directoryPath = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrEmpty(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
+//         public static void Save(InputRecordingData data, string outputPath)
+//         {
+//             Debug.Assert(data != null, "data must not be null");
 
-            string json = JsonConvert.SerializeObject(data, WRITE_SETTINGS);
-            File.WriteAllText(outputPath, json);
-        }
+//             string? directoryPath = Path.GetDirectoryName(outputPath);
+//             if (!string.IsNullOrEmpty(directoryPath))
+//             {
+//                 Directory.CreateDirectory(directoryPath);
+//             }
 
-        public static InputRecordingData? Load(string path)
-        {
-            Debug.Assert(File.Exists(path), $"Recording file must exist: {path}");
+//             string json = JsonConvert.SerializeObject(data, WRITE_SETTINGS);
+//             File.WriteAllText(outputPath, json);
+//         }
 
-            string json = File.ReadAllText(path);
-            InputRecordingData? data = JsonConvert.DeserializeObject<InputRecordingData>(json, READ_SETTINGS);
+//         public static InputRecordingData? Load(string path)
+//         {
+//             Debug.Assert(File.Exists(path), $"Recording file must exist: {path}");
 
-            if (data?.Frames == null)
-            {
-                return null;
-            }
+//             string json = File.ReadAllText(path);
+//             InputRecordingData? data = JsonConvert.DeserializeObject<InputRecordingData>(json, READ_SETTINGS);
 
-            return data;
-        }
+//             if (data?.Frames == null)
+//             {
+//                 return null;
+//             }
 
-        public static string ResolveOutputPath(string outputPath)
-        {
-            if (!string.IsNullOrEmpty(outputPath))
-            {
-                return outputPath;
-            }
+//             return data;
+//         }
 
-            string timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
-            string fileName = $"{RecordInputConstants.RECORDING_FILE_PREFIX}{timestamp}.json";
-            return Path.Combine(RecordInputConstants.DEFAULT_OUTPUT_DIR, fileName);
-        }
+//         public static string ResolveOutputPath(string outputPath)
+//         {
+//             if (!string.IsNullOrEmpty(outputPath))
+//             {
+//                 return outputPath;
+//             }
 
-        public static string ResolveLatestRecording(string inputPath)
-        {
-            if (!string.IsNullOrEmpty(inputPath))
-            {
-                return inputPath;
-            }
+//             string timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+//             string fileName = $"{RecordInputConstants.RECORDING_FILE_PREFIX}{timestamp}.json";
+//             return Path.Combine(RecordInputConstants.DEFAULT_OUTPUT_DIR, fileName);
+//         }
 
-            string outputDir = RecordInputConstants.DEFAULT_OUTPUT_DIR;
-            if (!Directory.Exists(outputDir))
-            {
-                return "";
-            }
+//         public static string ResolveLatestRecording(string inputPath)
+//         {
+//             if (!string.IsNullOrEmpty(inputPath))
+//             {
+//                 return inputPath;
+//             }
 
-            string[] files = Directory.GetFiles(outputDir, JSON_FILE_PATTERN);
-            if (files.Length == 0)
-            {
-                return "";
-            }
+//             string outputDir = RecordInputConstants.DEFAULT_OUTPUT_DIR;
+//             if (!Directory.Exists(outputDir))
+//             {
+//                 return "";
+//             }
 
-            return files.OrderByDescending(f => File.GetLastWriteTimeUtc(f)).First();
-        }
+//             string[] files = Directory.GetFiles(outputDir, JSON_FILE_PATTERN);
+//             if (files.Length == 0)
+//             {
+//                 return "";
+//             }
 
-    }
-}
-#endif
+//             return files.OrderByDescending(f => File.GetLastWriteTimeUtc(f)).First();
+//         }
+
+//     }
+// }
+// #endif

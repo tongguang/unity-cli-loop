@@ -1,300 +1,303 @@
-#if TLOOP_HAS_INPUT_SYSTEM
-using System;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
+// Input recording and replay are disabled in this fork. The original source is kept
+// below, commented out, so it can be restored by uncommenting it.
 
-using io.github.hatayama.UnityCliLoop.ToolContracts;
+// #if TLOOP_HAS_INPUT_SYSTEM
+// using System;
+// using System.Collections.Generic;
+// using UnityEditor;
+// using UnityEngine;
+// using UnityEngine.UIElements;
 
-namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
-{
-    /// <summary>
-    /// Defines the Unity Editor window for Recordings Editor workflows.
-    /// </summary>
-    public class RecordingsEditorWindow : EditorWindow
-    {
-        private const string UXML_RELATIVE_PATH = "Editor/Presentation/Recordings/RecordingsEditorWindow.uxml";
-        private const string USS_RELATIVE_PATH = "Editor/Presentation/Recordings/RecordingsEditorWindow.uss";
+// using io.github.hatayama.UnityCliLoop.ToolContracts;
 
-        private Button _recordButton;
-        private Button _replayButton;
-        private Button _openFolderButton;
-        private IntegerField _delayField;
-        private DropdownField _fileDropdown;
-        private Label _recordStatusLabel;
-        private Label _replayStatusLabel;
-        private VisualElement _recordStatusIndicator;
-        private VisualElement _replayStatusIndicator;
+// namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
+// {
+//     /// <summary>
+//     /// Defines the Unity Editor window for Recordings Editor workflows.
+//     /// </summary>
+//     public class RecordingsEditorWindow : EditorWindow
+//     {
+//         private const string UXML_RELATIVE_PATH = "Editor/Presentation/Recordings/RecordingsEditorWindow.uxml";
+//         private const string USS_RELATIVE_PATH = "Editor/Presentation/Recordings/RecordingsEditorWindow.uss";
 
-        private string[] _recordingFiles = Array.Empty<string>();
+//         private Button _recordButton;
+//         private Button _replayButton;
+//         private Button _openFolderButton;
+//         private IntegerField _delayField;
+//         private DropdownField _fileDropdown;
+//         private Label _recordStatusLabel;
+//         private Label _replayStatusLabel;
+//         private VisualElement _recordStatusIndicator;
+//         private VisualElement _replayStatusIndicator;
 
-        private bool _prevIsRecording;
-        private bool _prevIsReplaying;
-        private RecordingApplicationPhase _prevPhase;
-        private int _prevMinutes = -1;
-        private int _prevSecs = -1;
-        private int _prevReplayFrame = -1;
+//         private string[] _recordingFiles = Array.Empty<string>();
 
-        [MenuItem("Window/Tuanjie CLI Loop/Recordings", priority = 1)]
-        public static void ShowWindow()
-        {
-            RecordingsEditorWindow window = GetWindow<RecordingsEditorWindow>("Recordings");
-            window.Show();
-        }
+//         private bool _prevIsRecording;
+//         private bool _prevIsReplaying;
+//         private RecordingApplicationPhase _prevPhase;
+//         private int _prevMinutes = -1;
+//         private int _prevSecs = -1;
+//         private int _prevReplayFrame = -1;
 
-        private void CreateGUI()
-        {
-            string uxmlPath = $"{UnityCliLoopConstants.PackageAssetPath}/{UXML_RELATIVE_PATH}";
-            VisualTreeAsset uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxmlPath);
-            Debug.Assert(uxml != null, "UXML not found at " + uxmlPath);
-            uxml.CloneTree(rootVisualElement);
+//         [MenuItem("Window/Tuanjie CLI Loop/Recordings", priority = 1)]
+//         public static void ShowWindow()
+//         {
+//             RecordingsEditorWindow window = GetWindow<RecordingsEditorWindow>("Recordings");
+//             window.Show();
+//         }
 
-            string ussPath = $"{UnityCliLoopConstants.PackageAssetPath}/{USS_RELATIVE_PATH}";
-            StyleSheet uss = AssetDatabase.LoadAssetAtPath<StyleSheet>(ussPath);
-            Debug.Assert(uss != null, "USS not found at " + ussPath);
-            rootVisualElement.styleSheets.Add(uss);
+//         private void CreateGUI()
+//         {
+//             string uxmlPath = $"{UnityCliLoopConstants.PackageAssetPath}/{UXML_RELATIVE_PATH}";
+//             VisualTreeAsset uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(uxmlPath);
+//             Debug.Assert(uxml != null, "UXML not found at " + uxmlPath);
+//             uxml.CloneTree(rootVisualElement);
 
-            QueryElements();
-            BindEvents();
-            RefreshFileList();
-            UpdateRecordUI();
-            UpdateReplayUI();
-        }
+//             string ussPath = $"{UnityCliLoopConstants.PackageAssetPath}/{USS_RELATIVE_PATH}";
+//             StyleSheet uss = AssetDatabase.LoadAssetAtPath<StyleSheet>(ussPath);
+//             Debug.Assert(uss != null, "USS not found at " + ussPath);
+//             rootVisualElement.styleSheets.Add(uss);
 
-        private void OnEnable()
-        {
-            EditorApplication.update += OnEditorUpdate;
-            RecordingsApplicationFacade.AddReplayCompletedHandler(OnReplayCompleted);
-            RecordingsApplicationFacade.AddRecordingStoppedHandler(OnRecordingStopped);
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-        }
+//             QueryElements();
+//             BindEvents();
+//             RefreshFileList();
+//             UpdateRecordUI();
+//             UpdateReplayUI();
+//         }
 
-        private void OnDisable()
-        {
-            EditorApplication.update -= OnEditorUpdate;
-            RecordingsApplicationFacade.RemoveReplayCompletedHandler(OnReplayCompleted);
-            RecordingsApplicationFacade.RemoveRecordingStoppedHandler(OnRecordingStopped);
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
-            UnbindEvents();
-        }
+//         private void OnEnable()
+//         {
+//             EditorApplication.update += OnEditorUpdate;
+//             RecordingsApplicationFacade.AddReplayCompletedHandler(OnReplayCompleted);
+//             RecordingsApplicationFacade.AddRecordingStoppedHandler(OnRecordingStopped);
+//             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+//         }
 
-        private void UnbindEvents()
-        {
-            if (_recordButton != null) _recordButton.clicked -= OnRecordButtonClicked;
-            if (_replayButton != null) _replayButton.clicked -= OnReplayButtonClicked;
-            if (_openFolderButton != null) _openFolderButton.clicked -= OnOpenFolderClicked;
-        }
+//         private void OnDisable()
+//         {
+//             EditorApplication.update -= OnEditorUpdate;
+//             RecordingsApplicationFacade.RemoveReplayCompletedHandler(OnReplayCompleted);
+//             RecordingsApplicationFacade.RemoveRecordingStoppedHandler(OnRecordingStopped);
+//             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+//             UnbindEvents();
+//         }
 
-        private void QueryElements()
-        {
-            _recordButton = rootVisualElement.Q<Button>("record-button");
-            _replayButton = rootVisualElement.Q<Button>("replay-button");
-            _openFolderButton = rootVisualElement.Q<Button>("open-folder-button");
-            _delayField = rootVisualElement.Q<IntegerField>("delay-field");
-            _fileDropdown = rootVisualElement.Q<DropdownField>("file-dropdown");
-            _recordStatusLabel = rootVisualElement.Q<Label>("record-status-label");
-            _replayStatusLabel = rootVisualElement.Q<Label>("replay-status-label");
-            _recordStatusIndicator = rootVisualElement.Q("record-status-indicator");
-            _replayStatusIndicator = rootVisualElement.Q("replay-status-indicator");
-        }
+//         private void UnbindEvents()
+//         {
+//             if (_recordButton != null) _recordButton.clicked -= OnRecordButtonClicked;
+//             if (_replayButton != null) _replayButton.clicked -= OnReplayButtonClicked;
+//             if (_openFolderButton != null) _openFolderButton.clicked -= OnOpenFolderClicked;
+//         }
 
-        private void BindEvents()
-        {
-            _recordButton.clicked += OnRecordButtonClicked;
-            _replayButton.clicked += OnReplayButtonClicked;
-            _openFolderButton.clicked += OnOpenFolderClicked;
-        }
+//         private void QueryElements()
+//         {
+//             _recordButton = rootVisualElement.Q<Button>("record-button");
+//             _replayButton = rootVisualElement.Q<Button>("replay-button");
+//             _openFolderButton = rootVisualElement.Q<Button>("open-folder-button");
+//             _delayField = rootVisualElement.Q<IntegerField>("delay-field");
+//             _fileDropdown = rootVisualElement.Q<DropdownField>("file-dropdown");
+//             _recordStatusLabel = rootVisualElement.Q<Label>("record-status-label");
+//             _replayStatusLabel = rootVisualElement.Q<Label>("replay-status-label");
+//             _recordStatusIndicator = rootVisualElement.Q("record-status-indicator");
+//             _replayStatusIndicator = rootVisualElement.Q("replay-status-indicator");
+//         }
 
-        private void OnRecordButtonClicked()
-        {
-            RecordingApplicationResult result = RecordingsApplicationFacade.ToggleRecording(_delayField.value);
-            ShowDialogWhenNeeded(result);
-        }
+//         private void BindEvents()
+//         {
+//             _recordButton.clicked += OnRecordButtonClicked;
+//             _replayButton.clicked += OnReplayButtonClicked;
+//             _openFolderButton.clicked += OnOpenFolderClicked;
+//         }
 
-        private void OnReplayButtonClicked()
-        {
-            string selectedFile = GetSelectedFilePath();
-            RecordingApplicationResult result = RecordingsApplicationFacade.ToggleReplay(selectedFile);
-            ShowDialogWhenNeeded(result);
-        }
+//         private void OnRecordButtonClicked()
+//         {
+//             RecordingApplicationResult result = RecordingsApplicationFacade.ToggleRecording(_delayField.value);
+//             ShowDialogWhenNeeded(result);
+//         }
 
-        private void OnOpenFolderClicked()
-        {
-            string outputDirectory = RecordingsApplicationFacade.EnsureRecordingFolderExists();
-            EditorUtility.RevealInFinder(outputDirectory);
-        }
+//         private void OnReplayButtonClicked()
+//         {
+//             string selectedFile = GetSelectedFilePath();
+//             RecordingApplicationResult result = RecordingsApplicationFacade.ToggleReplay(selectedFile);
+//             ShowDialogWhenNeeded(result);
+//         }
 
-        private void OnRecordingStopped()
-        {
-            RefreshFileList();
-        }
+//         private void OnOpenFolderClicked()
+//         {
+//             string outputDirectory = RecordingsApplicationFacade.EnsureRecordingFolderExists();
+//             EditorUtility.RevealInFinder(outputDirectory);
+//         }
 
-        private void OnPlayModeStateChanged(PlayModeStateChange state)
-        {
-            if (state == PlayModeStateChange.EnteredPlayMode || state == PlayModeStateChange.EnteredEditMode)
-            {
-                RefreshFileList();
-            }
-        }
+//         private void OnRecordingStopped()
+//         {
+//             RefreshFileList();
+//         }
 
-        private void OnReplayCompleted()
-        {
-            UpdateReplayUI();
-        }
+//         private void OnPlayModeStateChanged(PlayModeStateChange state)
+//         {
+//             if (state == PlayModeStateChange.EnteredPlayMode || state == PlayModeStateChange.EnteredEditMode)
+//             {
+//                 RefreshFileList();
+//             }
+//         }
 
-        private void OnEditorUpdate()
-        {
-            RecordingApplicationState state = RecordingsApplicationFacade.GetCurrentState();
+//         private void OnReplayCompleted()
+//         {
+//             UpdateReplayUI();
+//         }
 
-            bool stateChanged = state.IsRecording != _prevIsRecording
-                || state.IsReplaying != _prevIsReplaying
-                || state.Phase != _prevPhase;
+//         private void OnEditorUpdate()
+//         {
+//             RecordingApplicationState state = RecordingsApplicationFacade.GetCurrentState();
 
-            if (!state.IsRecording
-                && !state.IsReplaying
-                && state.Phase == RecordingApplicationPhase.None
-                && !stateChanged)
-            {
-                return;
-            }
+//             bool stateChanged = state.IsRecording != _prevIsRecording
+//                 || state.IsReplaying != _prevIsReplaying
+//                 || state.Phase != _prevPhase;
 
-            _prevIsRecording = state.IsRecording;
-            _prevIsReplaying = state.IsReplaying;
-            _prevPhase = state.Phase;
+//             if (!state.IsRecording
+//                 && !state.IsReplaying
+//                 && state.Phase == RecordingApplicationPhase.None
+//                 && !stateChanged)
+//             {
+//                 return;
+//             }
 
-            UpdateRecordUI(state);
-            UpdateReplayUI(state);
-        }
+//             _prevIsRecording = state.IsRecording;
+//             _prevIsReplaying = state.IsReplaying;
+//             _prevPhase = state.Phase;
 
-        private void UpdateRecordUI()
-        {
-            UpdateRecordUI(RecordingsApplicationFacade.GetCurrentState());
-        }
+//             UpdateRecordUI(state);
+//             UpdateReplayUI(state);
+//         }
 
-        private void UpdateRecordUI(RecordingApplicationState state)
-        {
-            if (_recordButton == null)
-            {
-                return;
-            }
+//         private void UpdateRecordUI()
+//         {
+//             UpdateRecordUI(RecordingsApplicationFacade.GetCurrentState());
+//         }
 
-            if (state.IsRecording)
-            {
-                _recordButton.text = "Stop Recording";
-                _recordButton.RemoveFromClassList("rec-button--record");
-                _recordButton.AddToClassList("rec-button--recording");
-                float elapsed = state.RecordingElapsedSeconds;
-                int minutes = (int)(elapsed / 60f);
-                int secs = (int)(elapsed % 60f);
-                if (minutes != _prevMinutes || secs != _prevSecs)
-                {
-                    _prevMinutes = minutes;
-                    _prevSecs = secs;
-                    _recordStatusLabel.text = $"Recording {minutes:D2}:{secs:D2}";
-                }
-                SetIndicatorClass(_recordStatusIndicator, "rec-status-indicator--recording");
-            }
-            else if (state.Phase == RecordingApplicationPhase.Countdown)
-            {
-                _recordButton.text = "Cancel";
-                _recordButton.RemoveFromClassList("rec-button--recording");
-                _recordButton.AddToClassList("rec-button--record");
-                int remaining = Mathf.CeilToInt(state.CountdownRemainingSeconds);
-                _recordStatusLabel.text = $"Starting in {remaining}...";
-                SetIndicatorClass(_recordStatusIndicator, "rec-status-indicator--countdown");
-            }
-            else
-            {
-                _recordButton.text = "Start Recording";
-                _recordButton.RemoveFromClassList("rec-button--recording");
-                _recordButton.AddToClassList("rec-button--record");
-                _recordStatusLabel.text = "Idle";
-                SetIndicatorClass(_recordStatusIndicator, null);
-            }
-        }
+//         private void UpdateRecordUI(RecordingApplicationState state)
+//         {
+//             if (_recordButton == null)
+//             {
+//                 return;
+//             }
 
-        private void UpdateReplayUI()
-        {
-            UpdateReplayUI(RecordingsApplicationFacade.GetCurrentState());
-        }
+//             if (state.IsRecording)
+//             {
+//                 _recordButton.text = "Stop Recording";
+//                 _recordButton.RemoveFromClassList("rec-button--record");
+//                 _recordButton.AddToClassList("rec-button--recording");
+//                 float elapsed = state.RecordingElapsedSeconds;
+//                 int minutes = (int)(elapsed / 60f);
+//                 int secs = (int)(elapsed % 60f);
+//                 if (minutes != _prevMinutes || secs != _prevSecs)
+//                 {
+//                     _prevMinutes = minutes;
+//                     _prevSecs = secs;
+//                     _recordStatusLabel.text = $"Recording {minutes:D2}:{secs:D2}";
+//                 }
+//                 SetIndicatorClass(_recordStatusIndicator, "rec-status-indicator--recording");
+//             }
+//             else if (state.Phase == RecordingApplicationPhase.Countdown)
+//             {
+//                 _recordButton.text = "Cancel";
+//                 _recordButton.RemoveFromClassList("rec-button--recording");
+//                 _recordButton.AddToClassList("rec-button--record");
+//                 int remaining = Mathf.CeilToInt(state.CountdownRemainingSeconds);
+//                 _recordStatusLabel.text = $"Starting in {remaining}...";
+//                 SetIndicatorClass(_recordStatusIndicator, "rec-status-indicator--countdown");
+//             }
+//             else
+//             {
+//                 _recordButton.text = "Start Recording";
+//                 _recordButton.RemoveFromClassList("rec-button--recording");
+//                 _recordButton.AddToClassList("rec-button--record");
+//                 _recordStatusLabel.text = "Idle";
+//                 SetIndicatorClass(_recordStatusIndicator, null);
+//             }
+//         }
 
-        private void UpdateReplayUI(RecordingApplicationState state)
-        {
-            if (_replayButton == null)
-            {
-                return;
-            }
+//         private void UpdateReplayUI()
+//         {
+//             UpdateReplayUI(RecordingsApplicationFacade.GetCurrentState());
+//         }
 
-            if (state.IsReplaying)
-            {
-                _replayButton.text = "Stop Replay";
-                _replayButton.RemoveFromClassList("rec-button--replay");
-                _replayButton.AddToClassList("rec-button--replaying");
-                int current = state.ReplayCurrentFrame;
-                int total = state.ReplayTotalFrames;
-                if (current != _prevReplayFrame)
-                {
-                    _prevReplayFrame = current;
-                    _replayStatusLabel.text = $"Replay {current} / {total}";
-                }
-                SetIndicatorClass(_replayStatusIndicator, "rec-status-indicator--replaying");
-            }
-            else
-            {
-                _replayButton.text = "Start Replay";
-                _replayButton.RemoveFromClassList("rec-button--replaying");
-                _replayButton.AddToClassList("rec-button--replay");
-                _replayStatusLabel.text = "Idle";
-                SetIndicatorClass(_replayStatusIndicator, null);
-            }
-        }
+//         private void UpdateReplayUI(RecordingApplicationState state)
+//         {
+//             if (_replayButton == null)
+//             {
+//                 return;
+//             }
 
-        private void RefreshFileList()
-        {
-            RecordingFileList fileList = RecordingsApplicationFacade.GetRecordingFiles();
-            _recordingFiles = fileList.FilePaths;
+//             if (state.IsReplaying)
+//             {
+//                 _replayButton.text = "Stop Replay";
+//                 _replayButton.RemoveFromClassList("rec-button--replay");
+//                 _replayButton.AddToClassList("rec-button--replaying");
+//                 int current = state.ReplayCurrentFrame;
+//                 int total = state.ReplayTotalFrames;
+//                 if (current != _prevReplayFrame)
+//                 {
+//                     _prevReplayFrame = current;
+//                     _replayStatusLabel.text = $"Replay {current} / {total}";
+//                 }
+//                 SetIndicatorClass(_replayStatusIndicator, "rec-status-indicator--replaying");
+//             }
+//             else
+//             {
+//                 _replayButton.text = "Start Replay";
+//                 _replayButton.RemoveFromClassList("rec-button--replaying");
+//                 _replayButton.AddToClassList("rec-button--replay");
+//                 _replayStatusLabel.text = "Idle";
+//                 SetIndicatorClass(_replayStatusIndicator, null);
+//             }
+//         }
 
-            if (_fileDropdown != null)
-            {
-                _fileDropdown.choices = new List<string>(fileList.DisplayNames);
-                if (fileList.DisplayNames.Length > 0)
-                {
-                    _fileDropdown.index = 0;
-                }
-            }
-        }
+//         private void RefreshFileList()
+//         {
+//             RecordingFileList fileList = RecordingsApplicationFacade.GetRecordingFiles();
+//             _recordingFiles = fileList.FilePaths;
 
-        private string GetSelectedFilePath()
-        {
-            if (_fileDropdown == null || _fileDropdown.index < 0 || _fileDropdown.index >= _recordingFiles.Length)
-            {
-                return "";
-            }
-            return _recordingFiles[_fileDropdown.index];
-        }
+//             if (_fileDropdown != null)
+//             {
+//                 _fileDropdown.choices = new List<string>(fileList.DisplayNames);
+//                 if (fileList.DisplayNames.Length > 0)
+//                 {
+//                     _fileDropdown.index = 0;
+//                 }
+//             }
+//         }
 
-        private static void ShowDialogWhenNeeded(RecordingApplicationResult result)
-        {
-            if (!result.ShouldShowDialog)
-            {
-                return;
-            }
+//         private string GetSelectedFilePath()
+//         {
+//             if (_fileDropdown == null || _fileDropdown.index < 0 || _fileDropdown.index >= _recordingFiles.Length)
+//             {
+//                 return "";
+//             }
+//             return _recordingFiles[_fileDropdown.index];
+//         }
 
-            EditorUtility.DisplayDialog("Recordings", result.DialogMessage, "OK");
-        }
+//         private static void ShowDialogWhenNeeded(RecordingApplicationResult result)
+//         {
+//             if (!result.ShouldShowDialog)
+//             {
+//                 return;
+//             }
 
-        private static void SetIndicatorClass(VisualElement indicator, string activeClass)
-        {
-            indicator.RemoveFromClassList("rec-status-indicator--recording");
-            indicator.RemoveFromClassList("rec-status-indicator--replaying");
-            indicator.RemoveFromClassList("rec-status-indicator--countdown");
+//             EditorUtility.DisplayDialog("Recordings", result.DialogMessage, "OK");
+//         }
 
-            if (!string.IsNullOrEmpty(activeClass))
-            {
-                indicator.AddToClassList(activeClass);
-            }
-        }
-    }
-}
-#endif
+//         private static void SetIndicatorClass(VisualElement indicator, string activeClass)
+//         {
+//             indicator.RemoveFromClassList("rec-status-indicator--recording");
+//             indicator.RemoveFromClassList("rec-status-indicator--replaying");
+//             indicator.RemoveFromClassList("rec-status-indicator--countdown");
+
+//             if (!string.IsNullOrEmpty(activeClass))
+//             {
+//                 indicator.AddToClassList(activeClass);
+//             }
+//         }
+//     }
+// }
+// #endif

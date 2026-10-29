@@ -17,8 +17,9 @@ if (@($scriptBytes | Where-Object { $_ -gt 127 }).Count -gt 0) {
     "scripts/run-windows-e2e.ps1",
     "scripts/check-tuanjie.ps1",
     "scripts/test-simulate-mouse-demo.ps1",
-    "scripts/test-screenshot-uitoolkit-annotation.ps1",
-    "Assets/Tests/Demo/scripts/verify-replay-via-cli.ps1"
+    "scripts/test-screenshot-uitoolkit-annotation.ps1"
+    # Disabled along with input recording and replay.
+    # "Assets/Tests/Demo/scripts/verify-replay-via-cli.ps1"
 )
 
 function Get-FunctionDefinition {

@@ -206,16 +206,6 @@ Supports 3 actions: Press (one-shot tap or timed hold), KeyDown (hold key down),
 → simulate-keyboard (Action: KeyUp, Key: LeftShift)
 ```
 
-### 17. replay-input - Replay Recorded Input During PlayMode
-Replay recorded keyboard and mouse input during PlayMode. Loads a JSON recording and injects input frame-by-frame via Input System. Supports looping and progress monitoring. This tool is available only when the Input System package is installed. Create recording files first in the Unity Editor from **Window > Tuanjie CLI Loop > Recordings** using **Start Recording** and **Stop Recording**. There is no CLI command for recording input.
-
-```text
-→ replay-input (Action: start)
-→ replay-input (Action: start, InputPath: "scripts/my-play.json", Loop: true)
-→ replay-input (Action: status)
-→ replay-input (Action: stop)
-```
-
 Terminal-driven E2E coverage is available through one runner per shell family:
 
 ```bash
@@ -223,4 +213,4 @@ sh scripts/run-posix-e2e.sh --project-path /path/to/unity-project
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run-windows-e2e.ps1
 ```
 
-`run-posix-e2e.sh` uses the built native CLI binary by default, passes an explicit `--project-path` to every `tloop` invocation, and runs CLI recovery/readiness, simulate-mouse UI coverage, and UI Toolkit screenshot annotation and click coverage in one sequence (skip the last with `--skip-uitoolkit-annotation`). To verify `replay-input` against a JSON created in the Recordings window, run `verify-replay-via-cli.sh` separately.
+`run-posix-e2e.sh` uses the built native CLI binary by default, passes an explicit `--project-path` to every `tloop` invocation, and runs CLI recovery/readiness, simulate-mouse UI coverage, and UI Toolkit screenshot annotation and click coverage in one sequence (skip the last with `--skip-uitoolkit-annotation`).

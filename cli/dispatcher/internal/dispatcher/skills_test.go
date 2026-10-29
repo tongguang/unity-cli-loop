@@ -497,10 +497,17 @@ name: tloop-disabled-skill
 }
 
 // Verifies that installing skills removes each retired skill from both layouts: the Record Input
-// skill, whose tool was retired, the Cancel skill, whose command the tloop-status skill now documents,
-// and the V3 CLI invocation migration skill, which the migration wizard no longer installs.
+// and Replay Input skills, whose tools were retired, the Cancel skill, whose command the
+// tloop-status skill now documents, and the V3 CLI invocation migration skill, which the
+// migration wizard no longer installs.
 func TestInstallSkillsForTargetRemovesRetiredSkill(t *testing.T) {
-	for _, skillName := range []string{"tloop-record-input", "tloop-cancel", "tloop-v3-cli-invocation-migration"} {
+	retiredSkillNames := []string{
+		"tloop-record-input",
+		"tloop-replay-input",
+		"tloop-cancel",
+		"tloop-v3-cli-invocation-migration",
+	}
+	for _, skillName := range retiredSkillNames {
 		t.Run(skillName, func(t *testing.T) {
 			projectRoot := t.TempDir()
 			target := targetConfigs["claude"]

@@ -206,16 +206,6 @@ Input System経由でPlayMode中のキーボード入力をシミュレーショ
 → simulate-keyboard (Action: KeyUp, Key: LeftShift)
 ```
 
-### 17. replay-input - 記録された入力のPlayMode再生
-記録されたキーボード・マウス入力をPlayMode中に再生します。JSON記録を読み込み、Input System経由でフレーム単位で入力を注入します。ループ再生と進捗モニタリングに対応しています。このツールは Input System パッケージ導入時のみ利用可能です。記録ファイルは、まず Unity Editor の **Window > Tuanjie CLI Loop > Recordings** で **Start Recording** と **Stop Recording** を使って作成します。CLI に記録コマンドはありません。
-
-```text
-→ replay-input (Action: start)
-→ replay-input (Action: start, InputPath: "scripts/my-play.json", Loop: true)
-→ replay-input (Action: status)
-→ replay-input (Action: stop)
-```
-
 terminal から tloop コマンドを実行するE2Eは、shell 系統ごとに1つのrunnerから実行します:
 
 ```bash
@@ -223,4 +213,4 @@ sh scripts/run-posix-e2e.sh --project-path /path/to/unity-project
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run-windows-e2e.ps1
 ```
 
-`run-posix-e2e.sh` は、デフォルトでチェックイン済みのネイティブCLIバイナリを使い、すべての `tloop` 呼び出しに明示的な `--project-path` を渡します。CLI recovery/readiness、simulate-mouse UI、UI Toolkit のスクリーンショット注釈とクリックを1つの流れで検証します（最後のものは `--skip-uitoolkit-annotation` で省けます）。Recordingsウィンドウで作成したJSONの replay-input 検証は `verify-replay-via-cli.sh` を個別に実行します。
+`run-posix-e2e.sh` は、デフォルトでチェックイン済みのネイティブCLIバイナリを使い、すべての `tloop` 呼び出しに明示的な `--project-path` を渡します。CLI recovery/readiness、simulate-mouse UI、UI Toolkit のスクリーンショット注釈とクリックを1つの流れで検証します（最後のものは `--skip-uitoolkit-annotation` で省けます）。

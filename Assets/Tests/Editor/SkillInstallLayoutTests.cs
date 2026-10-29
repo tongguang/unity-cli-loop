@@ -326,11 +326,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(screenshotSkill.ToolName, Is.EqualTo("screenshot"));
             Assert.That(screenshotSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
-            SkillInstallLayout.SkillSourceInfo replayInputSkill = skillSources
-                .Single(skill => skill.Name == "tloop-replay-input");
+            // Disabled along with input recording and replay.
+            // SkillInstallLayout.SkillSourceInfo replayInputSkill = skillSources
+            //     .Single(skill => skill.Name == "tloop-replay-input");
 
-            Assert.That(replayInputSkill.ToolName, Is.EqualTo("replay-input"));
-            Assert.That(replayInputSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
+            // Assert.That(replayInputSkill.ToolName, Is.EqualTo("replay-input"));
+            // Assert.That(replayInputSkill.SkillFiles.Keys, Does.Contain(SkillInstallLayout.SkillFileName));
 
             SkillInstallLayout.SkillSourceInfo simulateKeyboardSkill = skillSources
                 .Single(skill => skill.Name == "tloop-simulate-keyboard");

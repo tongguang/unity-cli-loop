@@ -44,14 +44,15 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(json, Does.Contain(ExpectedJsonFragment));
         }
 
-        [Test]
-        public void ReplayInputResponse_WhenRejectedByPausePoint_SerializesTheRejectionField()
-        {
-            // Verifies replay-input reports the same structured rejection: it is a realistic --trigger target.
-            string json = JsonConvert.SerializeObject(
-                new ReplayInputResponse { Success = false, RejectedByActivePausePointId = "marker" });
+        // Disabled along with input recording and replay.
+        // [Test]
+        // public void ReplayInputResponse_WhenRejectedByPausePoint_SerializesTheRejectionField()
+        // {
+        //     // Verifies replay-input reports the same structured rejection: it is a realistic --trigger target.
+        //     string json = JsonConvert.SerializeObject(
+        //         new ReplayInputResponse { Success = false, RejectedByActivePausePointId = "marker" });
 
-            Assert.That(json, Does.Contain(ExpectedJsonFragment));
-        }
+        //     Assert.That(json, Does.Contain(ExpectedJsonFragment));
+        // }
     }
 }

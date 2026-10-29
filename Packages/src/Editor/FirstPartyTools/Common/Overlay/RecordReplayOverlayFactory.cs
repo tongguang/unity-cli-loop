@@ -1,28 +1,31 @@
-using UnityEngine;
+// Input recording and replay are disabled in this fork. The original source is kept
+// below, commented out, so it can be restored by uncommenting it.
 
-using io.github.hatayama.UnityCliLoop.Runtime;
+// using UnityEngine;
 
-namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
-{
-    /// <summary>
-    /// Creates Record Replay Overlay instances with the dependencies required by this module.
-    /// </summary>
-    internal static class RecordReplayOverlayFactory
-    {
-        public static void EnsureRecordOverlay()
-        {
-            OverlayCanvasFactory.EnsureExists();
-            InputVisualizationCanvas canvas = OverlayCanvasFactory.VisualizationCanvas;
-            Debug.Assert(canvas.RecordInputOverlayPresenter != null,
-                "RecordInputOverlayPresenter must be assigned on InputVisualizationCanvas prefab");
-        }
+// using io.github.hatayama.UnityCliLoop.Runtime;
 
-        public static void EnsureReplayOverlay()
-        {
-            OverlayCanvasFactory.EnsureExists();
-            InputVisualizationCanvas canvas = OverlayCanvasFactory.VisualizationCanvas;
-            Debug.Assert(canvas.ReplayInputOverlay != null,
-                "ReplayInputOverlay must be assigned on InputVisualizationCanvas prefab");
-        }
-    }
-}
+// namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
+// {
+//     /// <summary>
+//     /// Creates Record Replay Overlay instances with the dependencies required by this module.
+//     /// </summary>
+//     internal static class RecordReplayOverlayFactory
+//     {
+//         public static void EnsureRecordOverlay()
+//         {
+//             OverlayCanvasFactory.EnsureExists();
+//             InputVisualizationCanvas canvas = OverlayCanvasFactory.VisualizationCanvas;
+//             Debug.Assert(canvas.RecordInputOverlayPresenter != null,
+//                 "RecordInputOverlayPresenter must be assigned on InputVisualizationCanvas prefab");
+//         }
+
+//         public static void EnsureReplayOverlay()
+//         {
+//             OverlayCanvasFactory.EnsureExists();
+//             InputVisualizationCanvas canvas = OverlayCanvasFactory.VisualizationCanvas;
+//             Debug.Assert(canvas.ReplayInputOverlay != null,
+//                 "ReplayInputOverlay must be assigned on InputVisualizationCanvas prefab");
+//         }
+//     }
+// }

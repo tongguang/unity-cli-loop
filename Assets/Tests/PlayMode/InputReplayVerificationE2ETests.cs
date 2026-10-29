@@ -1,163 +1,166 @@
-#if TLOOP_HAS_INPUT_SYSTEM
-using System.Collections;
-using System.IO;
-using io.github.hatayama.UnityCliLoop.FirstPartyTools;
-using io.github.hatayama.UnityCliLoop.Runtime;
-using io.github.hatayama.UnityCliLoop.Tests.Demo;
-using NUnit.Framework;
-using UnityEditor.SceneManagement;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.TestTools;
+// Input recording and replay are disabled in this fork. The original source is kept
+// below, commented out, so it can be restored by uncommenting it.
 
-namespace io.github.hatayama.UnityCliLoop.Tests.PlayMode
-{
-    /// <summary>
-    /// Test fixture that verifies Input Replay Verification 2 E behavior.
-    /// </summary>
-    public class InputReplayVerificationE2ETests
-    {
-        private const string SCENE_PATH = "Assets/Scenes/InputReplayVerificationScene.unity";
-        private const string FIXTURE_DIR = "Assets/Tests/PlayMode/Fixtures/InputReplayVerificationScene";
-        private const float REPLAY_TIMEOUT_SECONDS = 30f;
+// #if TLOOP_HAS_INPUT_SYSTEM
+// using System.Collections;
+// using System.IO;
+// using io.github.hatayama.UnityCliLoop.FirstPartyTools;
+// using io.github.hatayama.UnityCliLoop.Runtime;
+// using io.github.hatayama.UnityCliLoop.Tests.Demo;
+// using NUnit.Framework;
+// using UnityEditor.SceneManagement;
+// using UnityEngine;
+// using UnityEngine.SceneManagement;
+// using UnityEngine.TestTools;
 
-        private bool _replayCompleted;
+// namespace io.github.hatayama.UnityCliLoop.Tests.PlayMode
+// {
+//     /// <summary>
+//     /// Test fixture that verifies Input Replay Verification 2 E behavior.
+//     /// </summary>
+//     public class InputReplayVerificationE2ETests
+//     {
+//         private const string SCENE_PATH = "Assets/Scenes/InputReplayVerificationScene.unity";
+//         private const string FIXTURE_DIR = "Assets/Tests/PlayMode/Fixtures/InputReplayVerificationScene";
+//         private const float REPLAY_TIMEOUT_SECONDS = 30f;
 
-        [UnitySetUp]
-        public IEnumerator SetUp()
-        {
-            _replayCompleted = false;
-            CleanupOverlayCanvases();
-            InputReplayer.AddReplayCompletedHandler(OnReplayCompleted);
+//         private bool _replayCompleted;
 
-            AsyncOperation loadOp = EditorSceneManager.LoadSceneAsyncInPlayMode(
-                SCENE_PATH,
-                new LoadSceneParameters(LoadSceneMode.Single));
+//         [UnitySetUp]
+//         public IEnumerator SetUp()
+//         {
+//             _replayCompleted = false;
+//             CleanupOverlayCanvases();
+//             InputReplayer.AddReplayCompletedHandler(OnReplayCompleted);
 
-            while (!loadOp.isDone)
-            {
-                yield return null;
-            }
+//             AsyncOperation loadOp = EditorSceneManager.LoadSceneAsyncInPlayMode(
+//                 SCENE_PATH,
+//                 new LoadSceneParameters(LoadSceneMode.Single));
 
-            // EditorBridge [InitializeOnLoad] subscribes on the first frame after load;
-            // second yield ensures its event hooks are active before replay starts.
-            yield return null;
-            yield return null;
-        }
+//             while (!loadOp.isDone)
+//             {
+//                 yield return null;
+//             }
 
-        [UnityTearDown]
-        public IEnumerator TearDown()
-        {
-            InputReplayer.RemoveReplayCompletedHandler(OnReplayCompleted);
+//             // EditorBridge [InitializeOnLoad] subscribes on the first frame after load;
+//             // second yield ensures its event hooks are active before replay starts.
+//             yield return null;
+//             yield return null;
+//         }
 
-            if (InputReplayer.IsReplaying)
-            {
-                InputReplayer.StopReplay();
-            }
+//         [UnityTearDown]
+//         public IEnumerator TearDown()
+//         {
+//             InputReplayer.RemoveReplayCompletedHandler(OnReplayCompleted);
 
-            CleanupLogFile(Path.Combine(
-                ReplayVerificationControllerBase.LOG_OUTPUT_DIR,
-                ReplayVerificationControllerBase.RECORDING_LOG_FILE));
-            CleanupLogFile(Path.Combine(
-                ReplayVerificationControllerBase.LOG_OUTPUT_DIR,
-                ReplayVerificationControllerBase.REPLAY_LOG_FILE));
-            CleanupOverlayCanvases();
+//             if (InputReplayer.IsReplaying)
+//             {
+//                 InputReplayer.StopReplay();
+//             }
 
-            yield return null;
-        }
+//             CleanupLogFile(Path.Combine(
+//                 ReplayVerificationControllerBase.LOG_OUTPUT_DIR,
+//                 ReplayVerificationControllerBase.RECORDING_LOG_FILE));
+//             CleanupLogFile(Path.Combine(
+//                 ReplayVerificationControllerBase.LOG_OUTPUT_DIR,
+//                 ReplayVerificationControllerBase.REPLAY_LOG_FILE));
+//             CleanupOverlayCanvases();
 
-        [UnityTest]
-        public IEnumerator StartReplay_WithShowOverlay_Should_CreateOverlayCanvas()
-        {
-            // Verifies direct input replay creates the shared overlay prefab when overlays are enabled.
-            string fixtureRecordingJson = Path.Combine(FIXTURE_DIR, "recording.json");
+//             yield return null;
+//         }
 
-            Assert.IsTrue(File.Exists(fixtureRecordingJson),
-                $"Fixture recording JSON not found: {fixtureRecordingJson}");
+//         [UnityTest]
+//         public IEnumerator StartReplay_WithShowOverlay_Should_CreateOverlayCanvas()
+//         {
+//             // Verifies direct input replay creates the shared overlay prefab when overlays are enabled.
+//             string fixtureRecordingJson = Path.Combine(FIXTURE_DIR, "recording.json");
 
-            InputRecordingData recordingData = InputRecordingFileHelper.Load(fixtureRecordingJson);
-            Debug.Assert(recordingData != null, $"Failed to load fixture: {fixtureRecordingJson}");
+//             Assert.IsTrue(File.Exists(fixtureRecordingJson),
+//                 $"Fixture recording JSON not found: {fixtureRecordingJson}");
 
-            InputReplayer.StartReplay(recordingData, loop: false, showOverlay: true);
+//             InputRecordingData recordingData = InputRecordingFileHelper.Load(fixtureRecordingJson);
+//             Debug.Assert(recordingData != null, $"Failed to load fixture: {fixtureRecordingJson}");
 
-            yield return null;
-            yield return null;
+//             InputReplayer.StartReplay(recordingData, loop: false, showOverlay: true);
 
-            InputVisualizationCanvas canvas =
-                Object.FindAnyObjectByType<InputVisualizationCanvas>();
-            Assert.IsNotNull(canvas, "InputVisualizationCanvas must exist when replay overlay is enabled.");
+//             yield return null;
+//             yield return null;
 
-            ReplayInputOverlay replayOverlay = canvas.ReplayInputOverlay;
-            Assert.IsNotNull(replayOverlay, "ReplayInputOverlay must exist on the visualization canvas.");
+//             InputVisualizationCanvas canvas =
+//                 Object.FindAnyObjectByType<InputVisualizationCanvas>();
+//             Assert.IsNotNull(canvas, "InputVisualizationCanvas must exist when replay overlay is enabled.");
 
-            CanvasGroup replayCanvasGroup = replayOverlay.GetComponent<CanvasGroup>();
-            Assert.IsNotNull(replayCanvasGroup, "ReplayInputOverlay must include a CanvasGroup.");
-            Assert.Greater(replayCanvasGroup.alpha, 0f, "ReplayInputOverlay should be visible while replay is active.");
-        }
+//             ReplayInputOverlay replayOverlay = canvas.ReplayInputOverlay;
+//             Assert.IsNotNull(replayOverlay, "ReplayInputOverlay must exist on the visualization canvas.");
 
-        [UnityTest]
-        public IEnumerator Replay_Should_ProduceIdenticalEventLog()
-        {
-            string fixtureRecordingJson = Path.Combine(FIXTURE_DIR, "recording.json");
-            string fixtureExpectedLog = Path.Combine(FIXTURE_DIR, "expected-event-log.txt");
+//             CanvasGroup replayCanvasGroup = replayOverlay.GetComponent<CanvasGroup>();
+//             Assert.IsNotNull(replayCanvasGroup, "ReplayInputOverlay must include a CanvasGroup.");
+//             Assert.Greater(replayCanvasGroup.alpha, 0f, "ReplayInputOverlay should be visible while replay is active.");
+//         }
 
-            Assert.IsTrue(File.Exists(fixtureRecordingJson),
-                $"Fixture recording JSON not found: {fixtureRecordingJson}");
-            Assert.IsTrue(File.Exists(fixtureExpectedLog),
-                $"Fixture expected event log not found: {fixtureExpectedLog}");
+//         [UnityTest]
+//         public IEnumerator Replay_Should_ProduceIdenticalEventLog()
+//         {
+//             string fixtureRecordingJson = Path.Combine(FIXTURE_DIR, "recording.json");
+//             string fixtureExpectedLog = Path.Combine(FIXTURE_DIR, "expected-event-log.txt");
 
-            // OnCompareLogs() expects recording-event-log.txt to already exist as golden reference
-            string targetRecordingLogPath = Path.Combine(
-                ReplayVerificationControllerBase.LOG_OUTPUT_DIR,
-                ReplayVerificationControllerBase.RECORDING_LOG_FILE);
-            Directory.CreateDirectory(ReplayVerificationControllerBase.LOG_OUTPUT_DIR);
-            File.Copy(fixtureExpectedLog, targetRecordingLogPath, true);
+//             Assert.IsTrue(File.Exists(fixtureRecordingJson),
+//                 $"Fixture recording JSON not found: {fixtureRecordingJson}");
+//             Assert.IsTrue(File.Exists(fixtureExpectedLog),
+//                 $"Fixture expected event log not found: {fixtureExpectedLog}");
 
-            InputRecordingData recordingData = InputRecordingFileHelper.Load(fixtureRecordingJson);
-            Debug.Assert(recordingData != null, $"Failed to load fixture: {fixtureRecordingJson}");
+//             // OnCompareLogs() expects recording-event-log.txt to already exist as golden reference
+//             string targetRecordingLogPath = Path.Combine(
+//                 ReplayVerificationControllerBase.LOG_OUTPUT_DIR,
+//                 ReplayVerificationControllerBase.RECORDING_LOG_FILE);
+//             Directory.CreateDirectory(ReplayVerificationControllerBase.LOG_OUTPUT_DIR);
+//             File.Copy(fixtureExpectedLog, targetRecordingLogPath, true);
 
-            InputReplayer.StartReplay(recordingData, loop: false, showOverlay: false);
+//             InputRecordingData recordingData = InputRecordingFileHelper.Load(fixtureRecordingJson);
+//             Debug.Assert(recordingData != null, $"Failed to load fixture: {fixtureRecordingJson}");
 
-            float timeoutAt = Time.realtimeSinceStartup + REPLAY_TIMEOUT_SECONDS;
-            yield return new WaitUntil(() =>
-                _replayCompleted || Time.realtimeSinceStartup >= timeoutAt);
+//             InputReplayer.StartReplay(recordingData, loop: false, showOverlay: false);
 
-            Assert.IsTrue(_replayCompleted,
-                $"Replay did not complete within {REPLAY_TIMEOUT_SECONDS}s");
+//             float timeoutAt = Time.realtimeSinceStartup + REPLAY_TIMEOUT_SECONDS;
+//             yield return new WaitUntil(() =>
+//                 _replayCompleted || Time.realtimeSinceStartup >= timeoutAt);
 
-            // OnCompareLogs runs synchronously inside ReplayCompleted but
-            // LastComparisonDiffCount must be read after the event dispatch completes.
-            yield return null;
+//             Assert.IsTrue(_replayCompleted,
+//                 $"Replay did not complete within {REPLAY_TIMEOUT_SECONDS}s");
 
-            ReplayVerificationControllerBase controller =
-                Object.FindAnyObjectByType<ReplayVerificationControllerBase>();
-            Assert.IsNotNull(controller, "Scene must contain a ReplayVerificationControllerBase");
-            Assert.AreEqual(0, controller.LastComparisonDiffCount,
-                $"Replay event log should match expected. Diff count: {controller.LastComparisonDiffCount}");
-        }
+//             // OnCompareLogs runs synchronously inside ReplayCompleted but
+//             // LastComparisonDiffCount must be read after the event dispatch completes.
+//             yield return null;
 
-        private void OnReplayCompleted()
-        {
-            _replayCompleted = true;
-        }
+//             ReplayVerificationControllerBase controller =
+//                 Object.FindAnyObjectByType<ReplayVerificationControllerBase>();
+//             Assert.IsNotNull(controller, "Scene must contain a ReplayVerificationControllerBase");
+//             Assert.AreEqual(0, controller.LastComparisonDiffCount,
+//                 $"Replay event log should match expected. Diff count: {controller.LastComparisonDiffCount}");
+//         }
 
-        private static void CleanupLogFile(string path)
-        {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-        }
+//         private void OnReplayCompleted()
+//         {
+//             _replayCompleted = true;
+//         }
 
-        private static void CleanupOverlayCanvases()
-        {
-            InputVisualizationCanvas[] canvases =
-                Object.FindObjectsByType<InputVisualizationCanvas>(FindObjectsSortMode.None);
-            for (int i = 0; i < canvases.Length; i++)
-            {
-                Object.DestroyImmediate(canvases[i].gameObject);
-            }
-        }
-    }
-}
-#endif
+//         private static void CleanupLogFile(string path)
+//         {
+//             if (File.Exists(path))
+//             {
+//                 File.Delete(path);
+//             }
+//         }
+
+//         private static void CleanupOverlayCanvases()
+//         {
+//             InputVisualizationCanvas[] canvases =
+//                 Object.FindObjectsByType<InputVisualizationCanvas>(FindObjectsSortMode.None);
+//             for (int i = 0; i < canvases.Length; i++)
+//             {
+//                 Object.DestroyImmediate(canvases[i].gameObject);
+//             }
+//         }
+//     }
+// }
+// #endif

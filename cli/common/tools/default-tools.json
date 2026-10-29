@@ -717,40 +717,6 @@
       }
     },
     {
-      "name": "replay-input",
-      "description": "Replay recorded PlayMode keyboard and mouse input. Use for exact gameplay reproduction, E2E runs, or consistent demos from JSON recordings.",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "Action": {
-            "type": "string",
-            "enum": [
-              "start",
-              "stop",
-              "status"
-            ],
-            "description": "start - begin replaying, stop - stop mid-way, status - check progress",
-            "default": "start"
-          },
-          "InputPath": {
-            "type": "string",
-            "description": "Path to the recording JSON. When empty, auto-detects the latest recording in .tloop/outputs/InputRecordings/",
-            "default": ""
-          },
-          "ShowOverlay": {
-            "type": "boolean",
-            "description": "Hide replay progress overlay",
-            "default": true
-          },
-          "Loop": {
-            "type": "boolean",
-            "description": "Loop continuously",
-            "default": false
-          }
-        }
-      }
-    },
-    {
       "name": "set-game-view-size",
       "description": "Set or inspect the Tuanjie Game View custom rendering resolution.",
       "inputSchema": {

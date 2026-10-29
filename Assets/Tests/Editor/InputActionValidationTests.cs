@@ -1,37 +1,40 @@
-#if TLOOP_HAS_INPUT_SYSTEM
-using System.Threading;
-using System.Threading.Tasks;
-using NUnit.Framework;
+// Input recording and replay are disabled in this fork. The original source is kept
+// below, commented out, so it can be restored by uncommenting it.
 
-using io.github.hatayama.UnityCliLoop.FirstPartyTools;
+// #if TLOOP_HAS_INPUT_SYSTEM
+// using System.Threading;
+// using System.Threading.Tasks;
+// using NUnit.Framework;
 
-namespace io.github.hatayama.UnityCliLoop.Tests.Editor
-{
-    /// <summary>
-    /// Verifies that out-of-range action enum values reaching the replay use case
-    /// surface as Success=false responses rather than JSON-RPC errors.
-    /// </summary>
-    [TestFixture]
-    public sealed class InputActionValidationTests
-    {
-        [Test]
-        public async Task ReplayInputAsync_WithUnknownAction_ReturnsValidationFailureResponse()
-        {
-            // Verifies invalid replay-input action enum values do not escape as an exception.
-            ReplayInputUseCase useCase = new();
-            ReplayInputSchema request = new()
-            {
-                Action = (ReplayInputAction)999
-            };
+// using io.github.hatayama.UnityCliLoop.FirstPartyTools;
 
-            ReplayInputResponse result =
-                await useCase.ReplayInputAsync(request, CancellationToken.None);
+// namespace io.github.hatayama.UnityCliLoop.Tests.Editor
+// {
+//     /// <summary>
+//     /// Verifies that out-of-range action enum values reaching the replay use case
+//     /// surface as Success=false responses rather than JSON-RPC errors.
+//     /// </summary>
+//     [TestFixture]
+//     public sealed class InputActionValidationTests
+//     {
+//         [Test]
+//         public async Task ReplayInputAsync_WithUnknownAction_ReturnsValidationFailureResponse()
+//         {
+//             // Verifies invalid replay-input action enum values do not escape as an exception.
+//             ReplayInputUseCase useCase = new();
+//             ReplayInputSchema request = new()
+//             {
+//                 Action = (ReplayInputAction)999
+//             };
 
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Does.Contain("Unknown replay-input action"));
-            Assert.That(result.Action, Is.EqualTo(request.Action.ToString()));
-        }
+//             ReplayInputResponse result =
+//                 await useCase.ReplayInputAsync(request, CancellationToken.None);
 
-    }
-}
-#endif
+//             Assert.That(result.Success, Is.False);
+//             Assert.That(result.Message, Does.Contain("Unknown replay-input action"));
+//             Assert.That(result.Action, Is.EqualTo(request.Action.ToString()));
+//         }
+
+//     }
+// }
+// #endif

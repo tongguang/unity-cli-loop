@@ -1,234 +1,237 @@
-#if TLOOP_HAS_INPUT_SYSTEM
-#nullable enable
-using System;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.LowLevel;
+// Input recording and replay are disabled in this fork. The original source is kept
+// below, commented out, so it can be restored by uncommenting it.
 
-using io.github.hatayama.UnityCliLoop.Runtime;
+// #if TLOOP_HAS_INPUT_SYSTEM
+// #nullable enable
+// using System;
+// using UnityEditor;
+// using UnityEngine;
+// using UnityEngine.InputSystem;
+// using UnityEngine.InputSystem.LowLevel;
 
-namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
-{
-    /// <summary>
-    /// Provides Input Replayer operations for its owning module.
-    /// </summary>
-    internal sealed class InputReplayerService
-    {
-        private readonly InputReplayEventProcessor _eventProcessor = new InputReplayEventProcessor();
-        private readonly InputReplayUiController _uiController;
+// using io.github.hatayama.UnityCliLoop.Runtime;
 
-        private bool _isReplaying;
-        private InputRecordingData? _data;
-        private int _eventIndex;
-        private int _currentFrame;
-        private bool _loop;
-        private bool _showOverlay;
+// namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
+// {
+//     /// <summary>
+//     /// Provides Input Replayer operations for its owning module.
+//     /// </summary>
+//     internal sealed class InputReplayerService
+//     {
+//         private readonly InputReplayEventProcessor _eventProcessor = new InputReplayEventProcessor();
+//         private readonly InputReplayUiController _uiController;
 
-        public InputReplayerService()
-        {
-            _uiController = new InputReplayUiController(_eventProcessor);
-        }
+//         private bool _isReplaying;
+//         private InputRecordingData? _data;
+//         private int _eventIndex;
+//         private int _currentFrame;
+//         private bool _loop;
+//         private bool _showOverlay;
 
-        public event Action? ReplayStarted;
-        public event Action? ReplayCompleted;
+//         public InputReplayerService()
+//         {
+//             _uiController = new InputReplayUiController(_eventProcessor);
+//         }
 
-        public bool IsReplaying => _isReplaying;
-        public int CurrentFrame => _currentFrame;
-        public int TotalFrames => _data?.Metadata.TotalFrames ?? 0;
+//         public event Action? ReplayStarted;
+//         public event Action? ReplayCompleted;
 
-        public float Progress
-        {
-            get
-            {
-                int total = TotalFrames;
-                return total > 0 ? (float)_currentFrame / total : 0f;
-            }
-        }
+//         public bool IsReplaying => _isReplaying;
+//         public int CurrentFrame => _currentFrame;
+//         public int TotalFrames => _data?.Metadata.TotalFrames ?? 0;
 
-        public void RegisterPlayModeCallbacks()
-        {
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-        }
+//         public float Progress
+//         {
+//             get
+//             {
+//                 int total = TotalFrames;
+//                 return total > 0 ? (float)_currentFrame / total : 0f;
+//             }
+//         }
 
-        public void StartReplay(InputRecordingData data, bool loop, bool showOverlay)
-        {
-            Debug.Assert(!_isReplaying, "Cannot start replay while already replaying");
-            Debug.Assert(EditorApplication.isPlaying, "PlayMode must be active to start replay");
-            Debug.Assert(data != null, "Recording data must not be null");
+//         public void RegisterPlayModeCallbacks()
+//         {
+//             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+//             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+//         }
 
-            _data = data;
-            _eventIndex = 0;
-            _currentFrame = 0;
-            _loop = loop;
-            _showOverlay = showOverlay;
-            if (_showOverlay)
-            {
-                RecordReplayOverlayFactory.EnsureReplayOverlay();
-            }
+//         public void StartReplay(InputRecordingData data, bool loop, bool showOverlay)
+//         {
+//             Debug.Assert(!_isReplaying, "Cannot start replay while already replaying");
+//             Debug.Assert(EditorApplication.isPlaying, "PlayMode must be active to start replay");
+//             Debug.Assert(data != null, "Recording data must not be null");
 
-            _eventProcessor.InitializeForRecording(data!);
-            _uiController.Reset();
-            if (_eventProcessor.HasMousePosition)
-            {
-                SimulateMouseInputOverlayState.Clear();
-            }
+//             _data = data;
+//             _eventIndex = 0;
+//             _currentFrame = 0;
+//             _loop = loop;
+//             _showOverlay = showOverlay;
+//             if (_showOverlay)
+//             {
+//                 RecordReplayOverlayFactory.EnsureReplayOverlay();
+//             }
 
-            _isReplaying = true;
+//             _eventProcessor.InitializeForRecording(data!);
+//             _uiController.Reset();
+//             if (_eventProcessor.HasMousePosition)
+//             {
+//                 SimulateMouseInputOverlayState.Clear();
+//             }
 
-            InputSystem.onAfterUpdate -= OnAfterUpdate;
-            InputSystem.onAfterUpdate += OnAfterUpdate;
+//             _isReplaying = true;
 
-            ReplayStarted?.Invoke();
-        }
+//             InputSystem.onAfterUpdate -= OnAfterUpdate;
+//             InputSystem.onAfterUpdate += OnAfterUpdate;
 
-        public void StopReplay()
-        {
-            if (!_isReplaying)
-            {
-                return;
-            }
+//             ReplayStarted?.Invoke();
+//         }
 
-            InputSystem.onAfterUpdate -= OnAfterUpdate;
-            _isReplaying = false;
+//         public void StopReplay()
+//         {
+//             if (!_isReplaying)
+//             {
+//                 return;
+//             }
 
-            _eventProcessor.ReleaseAllHeldInputs();
+//             InputSystem.onAfterUpdate -= OnAfterUpdate;
+//             _isReplaying = false;
 
-            _data = null;
-            _eventIndex = 0;
-            _currentFrame = 0;
-            _eventProcessor.ClearHeldState();
-            _uiController.RestoreUiInputModules();
-            _uiController.Reset();
+//             _eventProcessor.ReleaseAllHeldInputs();
 
-            ReplayInputOverlayState.Clear();
-            if (_eventProcessor.HasMousePosition)
-            {
-                SimulateMouseUiOverlayState.Clear();
-            }
-        }
+//             _data = null;
+//             _eventIndex = 0;
+//             _currentFrame = 0;
+//             _eventProcessor.ClearHeldState();
+//             _uiController.RestoreUiInputModules();
+//             _uiController.Reset();
 
-        private void OnAfterUpdate()
-        {
-            if (!_isReplaying || _data == null)
-            {
-                return;
-            }
+//             ReplayInputOverlayState.Clear();
+//             if (_eventProcessor.HasMousePosition)
+//             {
+//                 SimulateMouseUiOverlayState.Clear();
+//             }
+//         }
 
-            InputUpdateType currentUpdateType = InputState.currentUpdateType;
-            InputUpdateType targetUpdateType = InputUpdateTypeResolver.Resolve();
-            if (!InputUpdateTypeResolver.IsMatch(currentUpdateType, targetUpdateType))
-            {
-                return;
-            }
+//         private void OnAfterUpdate()
+//         {
+//             if (!_isReplaying || _data == null)
+//             {
+//                 return;
+//             }
 
-            Vector2 frameDelta = Vector2.zero;
-            Vector2 frameScroll = Vector2.zero;
+//             InputUpdateType currentUpdateType = InputState.currentUpdateType;
+//             InputUpdateType targetUpdateType = InputUpdateTypeResolver.Resolve();
+//             if (!InputUpdateTypeResolver.IsMatch(currentUpdateType, targetUpdateType))
+//             {
+//                 return;
+//             }
 
-            CollectFrameState(ref frameDelta, ref frameScroll);
-            _eventProcessor.ApplyCurrentFrameSnapshot(Keyboard.current, Mouse.current, frameDelta, frameScroll);
+//             Vector2 frameDelta = Vector2.zero;
+//             Vector2 frameScroll = Vector2.zero;
 
-            if (_eventProcessor.HasMousePosition)
-            {
-                _uiController.ApplyUiEvents();
-            }
+//             CollectFrameState(ref frameDelta, ref frameScroll);
+//             _eventProcessor.ApplyCurrentFrameSnapshot(Keyboard.current, Mouse.current, frameDelta, frameScroll);
 
-            if (_showOverlay)
-            {
-                ReplayInputOverlayState.Update(_currentFrame, _data.Metadata.TotalFrames, _loop);
-            }
+//             if (_eventProcessor.HasMousePosition)
+//             {
+//                 _uiController.ApplyUiEvents();
+//             }
 
-            _currentFrame++;
+//             if (_showOverlay)
+//             {
+//                 ReplayInputOverlayState.Update(_currentFrame, _data.Metadata.TotalFrames, _loop);
+//             }
 
-            if (_eventIndex >= _data.Frames.Count && _currentFrame > _data.Metadata.TotalFrames)
-            {
-                if (_loop)
-                {
-                    _eventProcessor.ReleaseAllHeldInputs();
-                    _eventIndex = 0;
-                    _currentFrame = 0;
-                    _uiController.Reset();
-                }
-                else
-                {
-                    StopReplay();
-                    ReplayCompleted?.Invoke();
-                }
-            }
-        }
+//             _currentFrame++;
 
-        private void CollectFrameState(ref Vector2 frameDelta, ref Vector2 frameScroll)
-        {
-            Debug.Assert(_data != null, "_data must not be null while replaying");
+//             if (_eventIndex >= _data.Frames.Count && _currentFrame > _data.Metadata.TotalFrames)
+//             {
+//                 if (_loop)
+//                 {
+//                     _eventProcessor.ReleaseAllHeldInputs();
+//                     _eventIndex = 0;
+//                     _currentFrame = 0;
+//                     _uiController.Reset();
+//                 }
+//                 else
+//                 {
+//                     StopReplay();
+//                     ReplayCompleted?.Invoke();
+//                 }
+//             }
+//         }
 
-            while (_eventIndex < _data!.Frames.Count && _data.Frames[_eventIndex].Frame <= _currentFrame)
-            {
-                InputFrameEvents frameEvents = _data.Frames[_eventIndex];
-                for (int i = 0; i < frameEvents.Events.Count; i++)
-                {
-                    _eventProcessor.ProcessEvent(frameEvents.Events[i], ref frameDelta, ref frameScroll);
-                }
+//         private void CollectFrameState(ref Vector2 frameDelta, ref Vector2 frameScroll)
+//         {
+//             Debug.Assert(_data != null, "_data must not be null while replaying");
 
-                _eventIndex++;
-            }
-        }
+//             while (_eventIndex < _data!.Frames.Count && _data.Frames[_eventIndex].Frame <= _currentFrame)
+//             {
+//                 InputFrameEvents frameEvents = _data.Frames[_eventIndex];
+//                 for (int i = 0; i < frameEvents.Events.Count; i++)
+//                 {
+//                     _eventProcessor.ProcessEvent(frameEvents.Events[i], ref frameDelta, ref frameScroll);
+//                 }
 
-        private void OnPlayModeStateChanged(PlayModeStateChange state)
-        {
-            if (state == PlayModeStateChange.ExitingPlayMode)
-            {
-                StopReplay();
-            }
-        }
-    }
+//                 _eventIndex++;
+//             }
+//         }
 
-    /// <summary>
-    /// Provides Input Replayer behavior for Unity CLI Loop.
-    /// </summary>
-    internal static class InputReplayer
-    {
-        private static readonly InputReplayerService ServiceValue = new InputReplayerService();
+//         private void OnPlayModeStateChanged(PlayModeStateChange state)
+//         {
+//             if (state == PlayModeStateChange.ExitingPlayMode)
+//             {
+//                 StopReplay();
+//             }
+//         }
+//     }
 
-        internal static void InitializeForEditorStartup()
-        {
-            ServiceValue.RegisterPlayModeCallbacks();
-        }
+//     /// <summary>
+//     /// Provides Input Replayer behavior for Unity CLI Loop.
+//     /// </summary>
+//     internal static class InputReplayer
+//     {
+//         private static readonly InputReplayerService ServiceValue = new InputReplayerService();
 
-        public static void AddReplayStartedHandler(Action handler)
-        {
-            ServiceValue.ReplayStarted += handler;
-        }
+//         internal static void InitializeForEditorStartup()
+//         {
+//             ServiceValue.RegisterPlayModeCallbacks();
+//         }
 
-        public static void RemoveReplayStartedHandler(Action handler)
-        {
-            ServiceValue.ReplayStarted -= handler;
-        }
+//         public static void AddReplayStartedHandler(Action handler)
+//         {
+//             ServiceValue.ReplayStarted += handler;
+//         }
 
-        public static void AddReplayCompletedHandler(Action handler)
-        {
-            ServiceValue.ReplayCompleted += handler;
-        }
+//         public static void RemoveReplayStartedHandler(Action handler)
+//         {
+//             ServiceValue.ReplayStarted -= handler;
+//         }
 
-        public static void RemoveReplayCompletedHandler(Action handler)
-        {
-            ServiceValue.ReplayCompleted -= handler;
-        }
+//         public static void AddReplayCompletedHandler(Action handler)
+//         {
+//             ServiceValue.ReplayCompleted += handler;
+//         }
 
-        public static bool IsReplaying => ServiceValue.IsReplaying;
-        public static int CurrentFrame => ServiceValue.CurrentFrame;
-        public static int TotalFrames => ServiceValue.TotalFrames;
-        public static float Progress => ServiceValue.Progress;
+//         public static void RemoveReplayCompletedHandler(Action handler)
+//         {
+//             ServiceValue.ReplayCompleted -= handler;
+//         }
 
-        public static void StartReplay(InputRecordingData data, bool loop, bool showOverlay)
-        {
-            ServiceValue.StartReplay(data, loop, showOverlay);
-        }
+//         public static bool IsReplaying => ServiceValue.IsReplaying;
+//         public static int CurrentFrame => ServiceValue.CurrentFrame;
+//         public static int TotalFrames => ServiceValue.TotalFrames;
+//         public static float Progress => ServiceValue.Progress;
 
-        public static void StopReplay()
-        {
-            ServiceValue.StopReplay();
-        }
-    }
-}
-#endif
+//         public static void StartReplay(InputRecordingData data, bool loop, bool showOverlay)
+//         {
+//             ServiceValue.StartReplay(data, loop, showOverlay);
+//         }
+
+//         public static void StopReplay()
+//         {
+//             ServiceValue.StopReplay();
+//         }
+//     }
+// }
+// #endif

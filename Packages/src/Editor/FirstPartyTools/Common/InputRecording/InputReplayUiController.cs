@@ -1,377 +1,380 @@
-#if TLOOP_HAS_INPUT_SYSTEM
-#nullable enable
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.EventSystems;
+// Input recording and replay are disabled in this fork. The original source is kept
+// below, commented out, so it can be restored by uncommenting it.
 
-using RuntimeMouseButton = io.github.hatayama.UnityCliLoop.Runtime.MouseButton;
-using io.github.hatayama.UnityCliLoop.Runtime;
+// #if TLOOP_HAS_INPUT_SYSTEM
+// #nullable enable
+// using System.Collections.Generic;
+// using UnityEditor;
+// using UnityEngine;
+// using UnityEngine.EventSystems;
 
-namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
-{
-    /// <summary>
-    /// Replays pointer UI interactions through ExecuteEvents during input recording playback.
-    /// </summary>
-    internal sealed class InputReplayUiController
-    {
-        private readonly InputReplayEventProcessor _eventProcessor;
-        private readonly List<BaseInputModule> _disabledInputModules = new List<BaseInputModule>();
+// using RuntimeMouseButton = io.github.hatayama.UnityCliLoop.Runtime.MouseButton;
+// using io.github.hatayama.UnityCliLoop.Runtime;
 
-        private bool _prevLeftButtonHeld;
-        private Vector2? _previousReplayMousePosition;
-        private bool _suppressIdleUiOverlay;
-        private PointerEventData? _pointerData;
-        private GameObject? _currentPressTarget;
-        private GameObject? _currentDragTarget;
-        private bool _isDragging;
-        private Vector2 _pressScreenPosition;
-        private float _pressTime;
+// namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
+// {
+//     /// <summary>
+//     /// Replays pointer UI interactions through ExecuteEvents during input recording playback.
+//     /// </summary>
+//     internal sealed class InputReplayUiController
+//     {
+//         private readonly InputReplayEventProcessor _eventProcessor;
+//         private readonly List<BaseInputModule> _disabledInputModules = new List<BaseInputModule>();
 
-        public InputReplayUiController(InputReplayEventProcessor eventProcessor)
-        {
-            _eventProcessor = eventProcessor;
-        }
+//         private bool _prevLeftButtonHeld;
+//         private Vector2? _previousReplayMousePosition;
+//         private bool _suppressIdleUiOverlay;
+//         private PointerEventData? _pointerData;
+//         private GameObject? _currentPressTarget;
+//         private GameObject? _currentDragTarget;
+//         private bool _isDragging;
+//         private Vector2 _pressScreenPosition;
+//         private float _pressTime;
 
-        public void ApplyUiEvents()
-        {
-            UiReplayFrame? replayFrame = CreateUiReplayFrame();
-            if (!replayFrame.HasValue)
-            {
-                RestoreUiInputModules();
-                return;
-            }
+//         public InputReplayUiController(InputReplayEventProcessor eventProcessor)
+//         {
+//             _eventProcessor = eventProcessor;
+//         }
 
-            ApplyUiPointerActivity(replayFrame.Value);
-            ApplyUiPointerRelease(replayFrame.Value);
-        }
+//         public void ApplyUiEvents()
+//         {
+//             UiReplayFrame? replayFrame = CreateUiReplayFrame();
+//             if (!replayFrame.HasValue)
+//             {
+//                 RestoreUiInputModules();
+//                 return;
+//             }
 
-        public void Reset()
-        {
-            _previousReplayMousePosition = null;
-            _prevLeftButtonHeld = false;
-            _suppressIdleUiOverlay = false;
-            _pointerData = null;
-            _currentPressTarget = null;
-            _currentDragTarget = null;
-            _isDragging = false;
-            _pressTime = 0f;
-        }
+//             ApplyUiPointerActivity(replayFrame.Value);
+//             ApplyUiPointerRelease(replayFrame.Value);
+//         }
 
-        public void RestoreUiInputModules()
-        {
-            for (int i = 0; i < _disabledInputModules.Count; i++)
-            {
-                BaseInputModule module = _disabledInputModules[i];
-                if (module != null)
-                {
-                    module.enabled = true;
-                }
-            }
+//         public void Reset()
+//         {
+//             _previousReplayMousePosition = null;
+//             _prevLeftButtonHeld = false;
+//             _suppressIdleUiOverlay = false;
+//             _pointerData = null;
+//             _currentPressTarget = null;
+//             _currentDragTarget = null;
+//             _isDragging = false;
+//             _pressTime = 0f;
+//         }
 
-            _disabledInputModules.Clear();
-        }
+//         public void RestoreUiInputModules()
+//         {
+//             for (int i = 0; i < _disabledInputModules.Count; i++)
+//             {
+//                 BaseInputModule module = _disabledInputModules[i];
+//                 if (module != null)
+//                 {
+//                     module.enabled = true;
+//                 }
+//             }
 
-        private void ApplyUiPointerActivity(UiReplayFrame replayFrame)
-        {
-            if (replayFrame.JustPressed)
-            {
-                _suppressIdleUiOverlay = false;
-                _pressTime = Time.realtimeSinceStartup;
-                OnUiPointerDown(replayFrame.ScreenPosition, replayFrame.EventSystem);
-                SimulateMouseUiOverlayState.Update(
-                    MouseAction.Click,
-                    replayFrame.InputPosition,
-                    null,
-                    replayFrame.GameViewSize);
-                SimulateMouseUiOverlayState.RequestExpandAnimation();
-                return;
-            }
+//             _disabledInputModules.Clear();
+//         }
 
-            if (replayFrame.LeftHeld && (_currentPressTarget != null || _currentDragTarget != null))
-            {
-                ApplyUiPointerHold(replayFrame);
-                return;
-            }
+//         private void ApplyUiPointerActivity(UiReplayFrame replayFrame)
+//         {
+//             if (replayFrame.JustPressed)
+//             {
+//                 _suppressIdleUiOverlay = false;
+//                 _pressTime = Time.realtimeSinceStartup;
+//                 OnUiPointerDown(replayFrame.ScreenPosition, replayFrame.EventSystem);
+//                 SimulateMouseUiOverlayState.Update(
+//                     MouseAction.Click,
+//                     replayFrame.InputPosition,
+//                     null,
+//                     replayFrame.GameViewSize);
+//                 SimulateMouseUiOverlayState.RequestExpandAnimation();
+//                 return;
+//             }
 
-            if (!_suppressIdleUiOverlay || replayFrame.MouseMoved)
-            {
-                // Keeping the overlay hidden until the pointer actually moves prevents release fade-out
-                // from being cancelled by the next idle frame at the same position.
-                _suppressIdleUiOverlay = false;
-                SimulateMouseUiOverlayState.Update(
-                    MouseAction.Click,
-                    replayFrame.InputPosition,
-                    null,
-                    replayFrame.GameViewSize);
-            }
-        }
+//             if (replayFrame.LeftHeld && (_currentPressTarget != null || _currentDragTarget != null))
+//             {
+//                 ApplyUiPointerHold(replayFrame);
+//                 return;
+//             }
 
-        private void ApplyUiPointerHold(UiReplayFrame replayFrame)
-        {
-            OnUiDrag(replayFrame.ScreenPosition);
+//             if (!_suppressIdleUiOverlay || replayFrame.MouseMoved)
+//             {
+//                 // Keeping the overlay hidden until the pointer actually moves prevents release fade-out
+//                 // from being cancelled by the next idle frame at the same position.
+//                 _suppressIdleUiOverlay = false;
+//                 SimulateMouseUiOverlayState.Update(
+//                     MouseAction.Click,
+//                     replayFrame.InputPosition,
+//                     null,
+//                     replayFrame.GameViewSize);
+//             }
+//         }
 
-            if (_isDragging)
-            {
-                Vector2 pressInputPos = new(
-                    _pressScreenPosition.x,
-                    replayFrame.GameViewSize.y - _pressScreenPosition.y);
-                SimulateMouseUiOverlayState.Update(
-                    MouseAction.Drag,
-                    replayFrame.InputPosition,
-                    pressInputPos,
-                    replayFrame.GameViewSize);
-                return;
-            }
+//         private void ApplyUiPointerHold(UiReplayFrame replayFrame)
+//         {
+//             OnUiDrag(replayFrame.ScreenPosition);
 
-            float elapsed = Time.realtimeSinceStartup - _pressTime;
-            if (elapsed < 0.5f)
-            {
-                return;
-            }
+//             if (_isDragging)
+//             {
+//                 Vector2 pressInputPos = new(
+//                     _pressScreenPosition.x,
+//                     replayFrame.GameViewSize.y - _pressScreenPosition.y);
+//                 SimulateMouseUiOverlayState.Update(
+//                     MouseAction.Drag,
+//                     replayFrame.InputPosition,
+//                     pressInputPos,
+//                     replayFrame.GameViewSize);
+//                 return;
+//             }
 
-            SimulateMouseUiOverlayState.Update(
-                MouseAction.LongPress,
-                replayFrame.InputPosition,
-                null,
-                replayFrame.GameViewSize);
-            SimulateMouseUiOverlayState.UpdateLongPressElapsed(elapsed);
-        }
+//             float elapsed = Time.realtimeSinceStartup - _pressTime;
+//             if (elapsed < 0.5f)
+//             {
+//                 return;
+//             }
 
-        private void ApplyUiPointerRelease(UiReplayFrame replayFrame)
-        {
-            if (!replayFrame.JustReleased)
-            {
-                return;
-            }
+//             SimulateMouseUiOverlayState.Update(
+//                 MouseAction.LongPress,
+//                 replayFrame.InputPosition,
+//                 null,
+//                 replayFrame.GameViewSize);
+//             SimulateMouseUiOverlayState.UpdateLongPressElapsed(elapsed);
+//         }
 
-            OnUiPointerUp(replayFrame.ScreenPosition, replayFrame.EventSystem);
-            _suppressIdleUiOverlay = true;
-            SimulateMouseUiOverlayState.RequestDissipateAnimation();
-            SimulateMouseUiOverlayState.Clear();
-        }
+//         private void ApplyUiPointerRelease(UiReplayFrame replayFrame)
+//         {
+//             if (!replayFrame.JustReleased)
+//             {
+//                 return;
+//             }
 
-        private UiReplayFrame? CreateUiReplayFrame()
-        {
-            if (!_eventProcessor.MousePosition.HasValue)
-            {
-                return null;
-            }
+//             OnUiPointerUp(replayFrame.ScreenPosition, replayFrame.EventSystem);
+//             _suppressIdleUiOverlay = true;
+//             SimulateMouseUiOverlayState.RequestDissipateAnimation();
+//             SimulateMouseUiOverlayState.Clear();
+//         }
 
-            EventSystem? eventSystem = EventSystem.current;
-            if (eventSystem == null)
-            {
-                return null;
-            }
+//         private UiReplayFrame? CreateUiReplayFrame()
+//         {
+//             if (!_eventProcessor.MousePosition.HasValue)
+//             {
+//                 return null;
+//             }
 
-            Vector2 screenPos = _eventProcessor.MousePosition.Value;
-            bool mouseMoved = !_previousReplayMousePosition.HasValue
-                              || _previousReplayMousePosition.Value != screenPos;
-            _previousReplayMousePosition = screenPos;
+//             EventSystem? eventSystem = EventSystem.current;
+//             if (eventSystem == null)
+//             {
+//                 return null;
+//             }
 
-            bool leftHeld = _eventProcessor.IsLeftButtonHeld();
-            bool justPressed = leftHeld && !_prevLeftButtonHeld;
-            bool justReleased = !leftHeld && _prevLeftButtonHeld;
-            _prevLeftButtonHeld = leftHeld;
-            SetUiInputModulesSuppressed(leftHeld || justReleased);
+//             Vector2 screenPos = _eventProcessor.MousePosition.Value;
+//             bool mouseMoved = !_previousReplayMousePosition.HasValue
+//                               || _previousReplayMousePosition.Value != screenPos;
+//             _previousReplayMousePosition = screenPos;
 
-            Vector2 gameViewSize = Handles.GetMainGameViewSize();
-            Vector2 inputPos = new(screenPos.x, gameViewSize.y - screenPos.y);
+//             bool leftHeld = _eventProcessor.IsLeftButtonHeld();
+//             bool justPressed = leftHeld && !_prevLeftButtonHeld;
+//             bool justReleased = !leftHeld && _prevLeftButtonHeld;
+//             _prevLeftButtonHeld = leftHeld;
+//             SetUiInputModulesSuppressed(leftHeld || justReleased);
 
-            return new UiReplayFrame(
-                eventSystem,
-                screenPos,
-                inputPos,
-                gameViewSize,
-                leftHeld,
-                justPressed,
-                justReleased,
-                mouseMoved);
-        }
+//             Vector2 gameViewSize = Handles.GetMainGameViewSize();
+//             Vector2 inputPos = new(screenPos.x, gameViewSize.y - screenPos.y);
 
-        private void OnUiPointerDown(Vector2 screenPos, EventSystem eventSystem)
-        {
-            RaycastResult? hit = UiRaycastHelper.RaycastUI(screenPos, eventSystem);
+//             return new UiReplayFrame(
+//                 eventSystem,
+//                 screenPos,
+//                 inputPos,
+//                 gameViewSize,
+//                 leftHeld,
+//                 justPressed,
+//                 justReleased,
+//                 mouseMoved);
+//         }
 
-            _pointerData = new PointerEventData(eventSystem)
-            {
-                position = screenPos,
-                pressPosition = screenPos,
-                button = PointerEventData.InputButton.Left
-            };
-            _pressScreenPosition = screenPos;
-            _isDragging = false;
-            _currentDragTarget = null;
+//         private void OnUiPointerDown(Vector2 screenPos, EventSystem eventSystem)
+//         {
+//             RaycastResult? hit = UiRaycastHelper.RaycastUI(screenPos, eventSystem);
 
-            if (hit == null)
-            {
-                _currentPressTarget = null;
-                return;
-            }
+//             _pointerData = new PointerEventData(eventSystem)
+//             {
+//                 position = screenPos,
+//                 pressPosition = screenPos,
+//                 button = PointerEventData.InputButton.Left
+//             };
+//             _pressScreenPosition = screenPos;
+//             _isDragging = false;
+//             _currentDragTarget = null;
 
-            GameObject rawTarget = hit.Value.gameObject;
-            _pointerData.pointerCurrentRaycast = hit.Value;
-            _pointerData.pointerPressRaycast = hit.Value;
+//             if (hit == null)
+//             {
+//                 _currentPressTarget = null;
+//                 return;
+//             }
 
-            _currentPressTarget = ExecuteEvents.GetEventHandler<IPointerDownHandler>(rawTarget)
-                                  ?? ExecuteEvents.GetEventHandler<IPointerClickHandler>(rawTarget);
+//             GameObject rawTarget = hit.Value.gameObject;
+//             _pointerData.pointerCurrentRaycast = hit.Value;
+//             _pointerData.pointerPressRaycast = hit.Value;
 
-            if (_currentPressTarget != null)
-            {
-                _pointerData.pointerPress = _currentPressTarget;
-                _pointerData.rawPointerPress = rawTarget;
-                ExecuteEvents.ExecuteHierarchy(rawTarget, _pointerData, ExecuteEvents.pointerDownHandler);
-            }
+//             _currentPressTarget = ExecuteEvents.GetEventHandler<IPointerDownHandler>(rawTarget)
+//                                   ?? ExecuteEvents.GetEventHandler<IPointerClickHandler>(rawTarget);
 
-            // initializePotentialDrag must fire before beginDrag per StandaloneInputModule contract
-            _currentDragTarget = ExecuteEvents.GetEventHandler<IDragHandler>(rawTarget);
-            if (_currentDragTarget != null)
-            {
-                ExecuteEvents.Execute(_currentDragTarget, _pointerData, ExecuteEvents.initializePotentialDrag);
-            }
-        }
+//             if (_currentPressTarget != null)
+//             {
+//                 _pointerData.pointerPress = _currentPressTarget;
+//                 _pointerData.rawPointerPress = rawTarget;
+//                 ExecuteEvents.ExecuteHierarchy(rawTarget, _pointerData, ExecuteEvents.pointerDownHandler);
+//             }
 
-        private void OnUiDrag(Vector2 screenPos)
-        {
-            if (_pointerData == null)
-            {
-                return;
-            }
+//             // initializePotentialDrag must fire before beginDrag per StandaloneInputModule contract
+//             _currentDragTarget = ExecuteEvents.GetEventHandler<IDragHandler>(rawTarget);
+//             if (_currentDragTarget != null)
+//             {
+//                 ExecuteEvents.Execute(_currentDragTarget, _pointerData, ExecuteEvents.initializePotentialDrag);
+//             }
+//         }
 
-            Vector2 delta = screenPos - _pointerData.position;
-            if (delta == Vector2.zero)
-            {
-                return;
-            }
+//         private void OnUiDrag(Vector2 screenPos)
+//         {
+//             if (_pointerData == null)
+//             {
+//                 return;
+//             }
 
-            _pointerData.position = screenPos;
-            _pointerData.delta = delta;
+//             Vector2 delta = screenPos - _pointerData.position;
+//             if (delta == Vector2.zero)
+//             {
+//                 return;
+//             }
 
-            if (!_isDragging && _currentDragTarget != null)
-            {
-                float distance = (screenPos - _pressScreenPosition).magnitude;
-                if (distance > EventSystem.current.pixelDragThreshold)
-                {
-                    _isDragging = true;
-                    _pointerData.dragging = true;
-                    _pointerData.pointerDrag = _currentDragTarget;
-                    ExecuteEvents.Execute(_currentDragTarget, _pointerData, ExecuteEvents.beginDragHandler);
-                }
-            }
+//             _pointerData.position = screenPos;
+//             _pointerData.delta = delta;
 
-            if (_isDragging && _currentDragTarget != null)
-            {
-                ExecuteEvents.Execute(_currentDragTarget, _pointerData, ExecuteEvents.dragHandler);
-            }
-        }
+//             if (!_isDragging && _currentDragTarget != null)
+//             {
+//                 float distance = (screenPos - _pressScreenPosition).magnitude;
+//                 if (distance > EventSystem.current.pixelDragThreshold)
+//                 {
+//                     _isDragging = true;
+//                     _pointerData.dragging = true;
+//                     _pointerData.pointerDrag = _currentDragTarget;
+//                     ExecuteEvents.Execute(_currentDragTarget, _pointerData, ExecuteEvents.beginDragHandler);
+//                 }
+//             }
 
-        private void OnUiPointerUp(Vector2 screenPos, EventSystem eventSystem)
-        {
-            if (_pointerData == null)
-            {
-                return;
-            }
+//             if (_isDragging && _currentDragTarget != null)
+//             {
+//                 ExecuteEvents.Execute(_currentDragTarget, _pointerData, ExecuteEvents.dragHandler);
+//             }
+//         }
 
-            _pointerData.position = screenPos;
+//         private void OnUiPointerUp(Vector2 screenPos, EventSystem eventSystem)
+//         {
+//             if (_pointerData == null)
+//             {
+//                 return;
+//             }
 
-            if (_currentPressTarget != null)
-            {
-                ExecuteEvents.Execute(_currentPressTarget, _pointerData, ExecuteEvents.pointerUpHandler);
-            }
+//             _pointerData.position = screenPos;
 
-            if (_isDragging && _currentDragTarget != null)
-            {
-                RaycastResult? dropHit = UiRaycastHelper.RaycastUI(screenPos, eventSystem);
-                if (dropHit != null)
-                {
-                    _pointerData.pointerCurrentRaycast = dropHit.Value;
-                    GameObject? dropTarget = ExecuteEvents.GetEventHandler<IDropHandler>(dropHit.Value.gameObject);
-                    if (dropTarget != null)
-                    {
-                        ExecuteEvents.Execute(dropTarget, _pointerData, ExecuteEvents.dropHandler);
-                    }
-                }
+//             if (_currentPressTarget != null)
+//             {
+//                 ExecuteEvents.Execute(_currentPressTarget, _pointerData, ExecuteEvents.pointerUpHandler);
+//             }
 
-                ExecuteEvents.Execute(_currentDragTarget, _pointerData, ExecuteEvents.endDragHandler);
-            }
-            else if (_currentPressTarget != null)
-            {
-                // StandaloneInputModule skips click when dragged; match that behavior
-                GameObject? clickTarget = ExecuteEvents.GetEventHandler<IPointerClickHandler>(
-                    _pointerData.rawPointerPress ?? _currentPressTarget);
-                if (clickTarget != null)
-                {
-                    ExecuteEvents.Execute(clickTarget, _pointerData, ExecuteEvents.pointerClickHandler);
-                }
-            }
+//             if (_isDragging && _currentDragTarget != null)
+//             {
+//                 RaycastResult? dropHit = UiRaycastHelper.RaycastUI(screenPos, eventSystem);
+//                 if (dropHit != null)
+//                 {
+//                     _pointerData.pointerCurrentRaycast = dropHit.Value;
+//                     GameObject? dropTarget = ExecuteEvents.GetEventHandler<IDropHandler>(dropHit.Value.gameObject);
+//                     if (dropTarget != null)
+//                     {
+//                         ExecuteEvents.Execute(dropTarget, _pointerData, ExecuteEvents.dropHandler);
+//                     }
+//                 }
 
-            _currentPressTarget = null;
-            _currentDragTarget = null;
-            _isDragging = false;
-            _pointerData = null;
-        }
+//                 ExecuteEvents.Execute(_currentDragTarget, _pointerData, ExecuteEvents.endDragHandler);
+//             }
+//             else if (_currentPressTarget != null)
+//             {
+//                 // StandaloneInputModule skips click when dragged; match that behavior
+//                 GameObject? clickTarget = ExecuteEvents.GetEventHandler<IPointerClickHandler>(
+//                     _pointerData.rawPointerPress ?? _currentPressTarget);
+//                 if (clickTarget != null)
+//                 {
+//                     ExecuteEvents.Execute(clickTarget, _pointerData, ExecuteEvents.pointerClickHandler);
+//                 }
+//             }
 
-        private void SetUiInputModulesSuppressed(bool suppressed)
-        {
-            if (!suppressed)
-            {
-                RestoreUiInputModules();
-                return;
-            }
+//             _currentPressTarget = null;
+//             _currentDragTarget = null;
+//             _isDragging = false;
+//             _pointerData = null;
+//         }
 
-            EventSystem? eventSystem = EventSystem.current;
-            if (eventSystem == null)
-            {
-                return;
-            }
+//         private void SetUiInputModulesSuppressed(bool suppressed)
+//         {
+//             if (!suppressed)
+//             {
+//                 RestoreUiInputModules();
+//                 return;
+//             }
 
-            BaseInputModule[] modules = eventSystem.GetComponents<BaseInputModule>();
-            for (int i = 0; i < modules.Length; i++)
-            {
-                BaseInputModule module = modules[i];
-                if (!module.enabled)
-                {
-                    continue;
-                }
+//             EventSystem? eventSystem = EventSystem.current;
+//             if (eventSystem == null)
+//             {
+//                 return;
+//             }
 
-                // Replay synthesizes ExecuteEvents directly; leaving input modules enabled
-                // lets them consume the same injected Mouse.current state a second time.
-                module.enabled = false;
-                _disabledInputModules.Add(module);
-            }
-        }
+//             BaseInputModule[] modules = eventSystem.GetComponents<BaseInputModule>();
+//             for (int i = 0; i < modules.Length; i++)
+//             {
+//                 BaseInputModule module = modules[i];
+//                 if (!module.enabled)
+//                 {
+//                     continue;
+//                 }
 
-        private readonly struct UiReplayFrame
-        {
-            public UiReplayFrame(
-                EventSystem eventSystem,
-                Vector2 screenPosition,
-                Vector2 inputPosition,
-                Vector2 gameViewSize,
-                bool leftHeld,
-                bool justPressed,
-                bool justReleased,
-                bool mouseMoved)
-            {
-                EventSystem = eventSystem;
-                ScreenPosition = screenPosition;
-                InputPosition = inputPosition;
-                GameViewSize = gameViewSize;
-                LeftHeld = leftHeld;
-                JustPressed = justPressed;
-                JustReleased = justReleased;
-                MouseMoved = mouseMoved;
-            }
+//                 // Replay synthesizes ExecuteEvents directly; leaving input modules enabled
+//                 // lets them consume the same injected Mouse.current state a second time.
+//                 module.enabled = false;
+//                 _disabledInputModules.Add(module);
+//             }
+//         }
 
-            public EventSystem EventSystem { get; }
-            public Vector2 ScreenPosition { get; }
-            public Vector2 InputPosition { get; }
-            public Vector2 GameViewSize { get; }
-            public bool LeftHeld { get; }
-            public bool JustPressed { get; }
-            public bool JustReleased { get; }
-            public bool MouseMoved { get; }
-        }
-    }
-}
-#endif
+//         private readonly struct UiReplayFrame
+//         {
+//             public UiReplayFrame(
+//                 EventSystem eventSystem,
+//                 Vector2 screenPosition,
+//                 Vector2 inputPosition,
+//                 Vector2 gameViewSize,
+//                 bool leftHeld,
+//                 bool justPressed,
+//                 bool justReleased,
+//                 bool mouseMoved)
+//             {
+//                 EventSystem = eventSystem;
+//                 ScreenPosition = screenPosition;
+//                 InputPosition = inputPosition;
+//                 GameViewSize = gameViewSize;
+//                 LeftHeld = leftHeld;
+//                 JustPressed = justPressed;
+//                 JustReleased = justReleased;
+//                 MouseMoved = mouseMoved;
+//             }
+
+//             public EventSystem EventSystem { get; }
+//             public Vector2 ScreenPosition { get; }
+//             public Vector2 InputPosition { get; }
+//             public Vector2 GameViewSize { get; }
+//             public bool LeftHeld { get; }
+//             public bool JustPressed { get; }
+//             public bool JustReleased { get; }
+//             public bool MouseMoved { get; }
+//         }
+//     }
+// }
+// #endif

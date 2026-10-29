@@ -22,9 +22,10 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             "Packages/src/Editor/FirstPartyTools/ExecuteDynamicCode/Execution/DynamicCodeForegroundWarmupState.cs",
             "Packages/src/Editor/FirstPartyTools/ExecuteDynamicCode/DynamicCompilation/SharedRoslynCompilerWorkerHost.cs",
             "Packages/src/Editor/ToolContracts/EditorFrameWaiter.cs",
-            "Packages/src/Editor/FirstPartyTools/Common/InputRecording/InputRecorder.cs",
-            "Packages/src/Editor/FirstPartyTools/RecordInput/Application/RecordingsApplicationFacade.cs",
-            "Packages/src/Editor/FirstPartyTools/Common/InputRecording/InputReplayer.cs",
+            // Disabled along with input recording and replay.
+            // "Packages/src/Editor/FirstPartyTools/Common/InputRecording/InputRecorder.cs",
+            // "Packages/src/Editor/FirstPartyTools/RecordInput/Application/RecordingsApplicationFacade.cs",
+            // "Packages/src/Editor/FirstPartyTools/Common/InputRecording/InputReplayer.cs",
             "Packages/src/Editor/FirstPartyTools/SimulateKeyboard/Application/KeyboardKeyState.cs",
             "Packages/src/Editor/FirstPartyTools/SimulateMouseInput/Application/MouseInputState.cs",
             "Packages/src/Editor/FirstPartyTools/SimulateMouseUi/Application/MouseDragState.cs",
@@ -231,30 +232,31 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(isViolation, Is.True);
         }
 
-        [Test]
-        public void RecordingsApplicationFacade_WhenStartingDelayedRecording_DoesNotDiscardTimerTask()
-        {
-            // Tests that delayed recording observes timeout faults and keeps its countdown cleanup path reachable.
-            string source = ReadSourceFile(
-                "Packages/src/Editor/FirstPartyTools/RecordInput/Application/RecordingsApplicationFacade.cs");
+        // Disabled along with input recording and replay.
+        // [Test]
+        // public void RecordingsApplicationFacade_WhenStartingDelayedRecording_DoesNotDiscardTimerTask()
+        // {
+        //     // Tests that delayed recording observes timeout faults and keeps its countdown cleanup path reachable.
+        //     string source = ReadSourceFile(
+        //         "Packages/src/Editor/FirstPartyTools/RecordInput/Application/RecordingsApplicationFacade.cs");
 
-            Assert.That(DiscardedMainThreadTimerTaskPattern.IsMatch(source), Is.False);
-            Assert.That(source, Does.Contain("QueueCountdownCleanup"));
-            Assert.That(source, Does.Contain("StartDelayedRecordingAsync(delayMilliseconds, generation, CancellationToken.None)"));
-            Assert.That(source, Does.Contain("StartDelayedRecordingAsync(int delayMilliseconds, int generation, CancellationToken ct)"));
-        }
+        //     Assert.That(DiscardedMainThreadTimerTaskPattern.IsMatch(source), Is.False);
+        //     Assert.That(source, Does.Contain("QueueCountdownCleanup"));
+        //     Assert.That(source, Does.Contain("StartDelayedRecordingAsync(delayMilliseconds, generation, CancellationToken.None)"));
+        //     Assert.That(source, Does.Contain("StartDelayedRecordingAsync(int delayMilliseconds, int generation, CancellationToken ct)"));
+        // }
 
-        /// <summary>
-        /// Verifies stale UI recording callbacks cannot clear a newer countdown instance.
-        /// </summary>
-        [Test]
-        public void RecordingsDelayedStarts_WhenCallbackIsStale_DoNotClearCurrentCountdown()
-        {
-            string facadeSource = ReadSourceFile(
-                "Packages/src/Editor/FirstPartyTools/RecordInput/Application/RecordingsApplicationFacade.cs");
+        // /// <summary>
+        // /// Verifies stale UI recording callbacks cannot clear a newer countdown instance.
+        // /// </summary>
+        // [Test]
+        // public void RecordingsDelayedStarts_WhenCallbackIsStale_DoNotClearCurrentCountdown()
+        // {
+        //     string facadeSource = ReadSourceFile(
+        //         "Packages/src/Editor/FirstPartyTools/RecordInput/Application/RecordingsApplicationFacade.cs");
 
-            Assert.That(facadeSource, Does.Contain("if (generation != _countdownGeneration)\n            {\n                return;\n            }"));
-        }
+        //     Assert.That(facadeSource, Does.Contain("if (generation != _countdownGeneration)\n            {\n                return;\n            }"));
+        // }
 
         [Test]
         public void TimerDelay_WhenMainThreadActionCompletes_CancelsTimeoutWait()

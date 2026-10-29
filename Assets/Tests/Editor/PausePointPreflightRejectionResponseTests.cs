@@ -55,15 +55,16 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(json, Does.Contain("\"RejectedBeforeExecution\":true"));
         }
 
-        [Test]
-        public void ReplayInputResponse_WhenRejectedBeforeExecution_SerializesTheFlag()
-        {
-            // Verifies replay-input reports the flag under the exact name the CLI matches on.
-            string json = JsonConvert.SerializeObject(
-                new ReplayInputResponse { Success = false, RejectedBeforeExecution = true });
+        // Disabled along with input recording and replay.
+        // [Test]
+        // public void ReplayInputResponse_WhenRejectedBeforeExecution_SerializesTheFlag()
+        // {
+        //     // Verifies replay-input reports the flag under the exact name the CLI matches on.
+        //     string json = JsonConvert.SerializeObject(
+        //         new ReplayInputResponse { Success = false, RejectedBeforeExecution = true });
 
-            Assert.That(json, Does.Contain("\"RejectedBeforeExecution\":true"));
-        }
+        //     Assert.That(json, Does.Contain("\"RejectedBeforeExecution\":true"));
+        // }
 
         [Test]
         public void MouseUiPreflightFailure_WhenPreflightRejected_ReportsRejectionBeforeExecution()
@@ -116,18 +117,19 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(response.Success, Is.False);
         }
 
-        [Test]
-        public void ReplayInputPreflightFailure_WhenPreflightRejected_ReportsRejectionBeforeExecution()
-        {
-            // Verifies replay-input's preflight rejection response sets the flag and names the marker.
-            ReplayInputResponse response = ReplayInputResponseFactory.PreflightRejectedResult(
-                ReplayInputAction.start,
-                PlayModeToolPreflightResult.FailureRejectedByPausePoint("PlayMode is paused.", "marker"));
+        // Disabled along with input recording and replay.
+        // [Test]
+        // public void ReplayInputPreflightFailure_WhenPreflightRejected_ReportsRejectionBeforeExecution()
+        // {
+        //     // Verifies replay-input's preflight rejection response sets the flag and names the marker.
+        //     ReplayInputResponse response = ReplayInputResponseFactory.PreflightRejectedResult(
+        //         ReplayInputAction.start,
+        //         PlayModeToolPreflightResult.FailureRejectedByPausePoint("PlayMode is paused.", "marker"));
 
-            Assert.That(response.RejectedBeforeExecution, Is.True);
-            Assert.That(response.RejectedByActivePausePointId, Is.EqualTo("marker"));
-            Assert.That(response.Success, Is.False);
-        }
+        //     Assert.That(response.RejectedBeforeExecution, Is.True);
+        //     Assert.That(response.RejectedByActivePausePointId, Is.EqualTo("marker"));
+        //     Assert.That(response.Success, Is.False);
+        // }
 #endif
 
         [Test]
@@ -171,19 +173,20 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(response.RejectedBeforeExecution, Is.True);
         }
 
-        [Test]
-        public void ReplayInputUseCase_WhenPlayModeIsStopped_ReportsRejectionBeforeExecution()
-        {
-            // Verifies replay-input's own entry point wires the rejected preflight to the wire flag.
-            // ExecuteStart is private, so Start is driven through the public ReplayInputAsync.
-            ReplayInputResponse response = RunToCompletion(
-                new ReplayInputUseCase().ReplayInputAsync(
-                    new ReplayInputSchema { Action = ReplayInputAction.start },
-                    CancellationToken.None));
+        // Disabled along with input recording and replay.
+        // [Test]
+        // public void ReplayInputUseCase_WhenPlayModeIsStopped_ReportsRejectionBeforeExecution()
+        // {
+        //     // Verifies replay-input's own entry point wires the rejected preflight to the wire flag.
+        //     // ExecuteStart is private, so Start is driven through the public ReplayInputAsync.
+        //     ReplayInputResponse response = RunToCompletion(
+        //         new ReplayInputUseCase().ReplayInputAsync(
+        //             new ReplayInputSchema { Action = ReplayInputAction.start },
+        //             CancellationToken.None));
 
-            Assert.That(response.Success, Is.False);
-            Assert.That(response.RejectedBeforeExecution, Is.True);
-        }
+        //     Assert.That(response.Success, Is.False);
+        //     Assert.That(response.RejectedBeforeExecution, Is.True);
+        // }
 #endif
 
         // Why not await or block: a preflight rejection is returned before the use case reaches any

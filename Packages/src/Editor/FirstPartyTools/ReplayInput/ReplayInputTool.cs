@@ -1,22 +1,25 @@
-using System.Threading;
-using System.Threading.Tasks;
+// Input recording and replay are disabled in this fork. The original source is kept
+// below, commented out, so it can be restored by uncommenting it.
 
-using io.github.hatayama.UnityCliLoop.ToolContracts;
+// using System.Threading;
+// using System.Threading.Tasks;
 
-namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
-{
-    /// <summary>
-    /// Bundled tool entry point for input replay.
-    /// </summary>
-    [UnityCliLoopTool]
-    public class ReplayInputTool : UnityCliLoopTool<ReplayInputSchema, ReplayInputResponse>
-    {
-        public override string ToolName => "replay-input";
+// using io.github.hatayama.UnityCliLoop.ToolContracts;
 
-        protected override async Task<ReplayInputResponse> ExecuteAsync(ReplayInputSchema parameters, CancellationToken ct)
-        {
-            ReplayInputUseCase useCase = new();
-            return await useCase.ReplayInputAsync(parameters, ct).ConfigureAwait(false);
-        }
-    }
-}
+// namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
+// {
+//     /// <summary>
+//     /// Bundled tool entry point for input replay.
+//     /// </summary>
+//     [UnityCliLoopTool]
+//     public class ReplayInputTool : UnityCliLoopTool<ReplayInputSchema, ReplayInputResponse>
+//     {
+//         public override string ToolName => "replay-input";
+
+//         protected override async Task<ReplayInputResponse> ExecuteAsync(ReplayInputSchema parameters, CancellationToken ct)
+//         {
+//             ReplayInputUseCase useCase = new();
+//             return await useCase.ReplayInputAsync(parameters, ct).ConfigureAwait(false);
+//         }
+//     }
+// }

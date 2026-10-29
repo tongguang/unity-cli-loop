@@ -15,7 +15,6 @@ var commandSkillNames = map[string]string{
 	"get-hierarchy":        "tloop-get-hierarchy",
 	"get-logs":             "tloop-get-logs",
 	"record-video":         "tloop-record-video",
-	"replay-input":         "tloop-replay-input",
 	"run-tests":            "tloop-run-tests",
 	"screenshot":           "tloop-screenshot",
 	"set-game-view-size":   "tloop-set-game-view-size",

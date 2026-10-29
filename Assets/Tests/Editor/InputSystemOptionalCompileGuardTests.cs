@@ -16,8 +16,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         {
             "Packages/src/Editor/FirstPartyTools/SimulateMouseInput/SimulateMouseInputEditorStartup.cs",
             "Packages/src/Editor/FirstPartyTools/SimulateKeyboard/SimulateKeyboardEditorStartup.cs",
-            "Packages/src/Editor/FirstPartyTools/RecordInput/RecordInputEditorStartup.cs",
-            "Packages/src/Editor/FirstPartyTools/ReplayInput/ReplayInputEditorStartup.cs"
+            // Disabled along with input recording and replay.
+            // "Packages/src/Editor/FirstPartyTools/RecordInput/RecordInputEditorStartup.cs",
+            // "Packages/src/Editor/FirstPartyTools/ReplayInput/ReplayInputEditorStartup.cs"
         };
 
         [Test]

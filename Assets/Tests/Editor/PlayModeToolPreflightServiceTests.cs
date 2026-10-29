@@ -26,7 +26,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         public void RequireActiveAndNotPaused_WhenEditModeIsNotPlaying_ReturnsNotActiveFailure()
         {
             // Verifies the paused-aware preflight also fails with the exact not-active message when PlayMode is inactive.
-            PlayModeToolPreflightResult result = PlayModeToolPreflightService.RequireActiveAndNotPaused(ReplayInputUseCase.PausedActionDescription);
+            PlayModeToolPreflightResult result = PlayModeToolPreflightService.RequireActiveAndNotPaused(SimulateKeyboardUseCase.PausedActionDescription);
 
             Assert.That(result.IsValid, Is.False);
             Assert.That(result.ErrorMessage, Is.EqualTo(ExpectedNotActiveMessage));
@@ -41,14 +41,15 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 Is.EqualTo(ExpectedNotActiveMessage));
         }
 
-        [Test]
-        public void FormatPausedMessage_WithReplayInputSuffix_ReturnsExpectedWireString()
-        {
-            // Verifies ReplayInput's paused preflight message stays byte-identical, including the suffix the use case actually passes.
-            Assert.That(
-                PlayModeToolPreflightService.FormatPausedMessage(ReplayInputUseCase.PausedActionDescription),
-                Is.EqualTo("PlayMode is paused. Resume PlayMode before replaying input."));
-        }
+        // Disabled along with input recording and replay.
+        // [Test]
+        // public void FormatPausedMessage_WithReplayInputSuffix_ReturnsExpectedWireString()
+        // {
+        //     // Verifies ReplayInput's paused preflight message stays byte-identical, including the suffix the use case actually passes.
+        //     Assert.That(
+        //         PlayModeToolPreflightService.FormatPausedMessage(ReplayInputUseCase.PausedActionDescription),
+        //         Is.EqualTo("PlayMode is paused. Resume PlayMode before replaying input."));
+        // }
 
         [Test]
         public void FormatPausedMessage_WithSimulateKeyboardSuffix_ReturnsExpectedWireString()

@@ -428,31 +428,32 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(useCaseAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
         }
 
-        /// <summary>
-        /// Verifies replay-input contracts stay inside the first-party tool assembly.
-        /// </summary>
-        [Test]
-        public void ReplayInputTypes_WhenLoaded_CompileUnderFirstPartyToolsAssembly()
-        {
-            string replaySchemaAssemblyName = typeof(ReplayInputSchema).Assembly.GetName().Name;
-            string replayResponseAssemblyName = typeof(ReplayInputResponse).Assembly.GetName().Name;
-            string replayActionAssemblyName = typeof(ReplayInputAction).Assembly.GetName().Name;
+        // Disabled along with input recording and replay.
+        // /// <summary>
+        // /// Verifies replay-input contracts stay inside the first-party tool assembly.
+        // /// </summary>
+        // [Test]
+        // public void ReplayInputTypes_WhenLoaded_CompileUnderFirstPartyToolsAssembly()
+        // {
+        //     string replaySchemaAssemblyName = typeof(ReplayInputSchema).Assembly.GetName().Name;
+        //     string replayResponseAssemblyName = typeof(ReplayInputResponse).Assembly.GetName().Name;
+        //     string replayActionAssemblyName = typeof(ReplayInputAction).Assembly.GetName().Name;
 
-            Assert.That(replaySchemaAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
-            Assert.That(replayResponseAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
-            Assert.That(replayActionAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
-        }
+        //     Assert.That(replaySchemaAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
+        //     Assert.That(replayResponseAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
+        //     Assert.That(replayActionAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
+        // }
 
-        /// <summary>
-        /// Verifies replay-input owns its implementation in the first-party tool assembly.
-        /// </summary>
-        [Test]
-        public void ReplayInputUseCase_WhenLoaded_CompilesUnderApplicationAssembly()
-        {
-            string replayUseCaseAssemblyName = typeof(ReplayInputUseCase).Assembly.GetName().Name;
+        // /// <summary>
+        // /// Verifies replay-input owns its implementation in the first-party tool assembly.
+        // /// </summary>
+        // [Test]
+        // public void ReplayInputUseCase_WhenLoaded_CompilesUnderApplicationAssembly()
+        // {
+        //     string replayUseCaseAssemblyName = typeof(ReplayInputUseCase).Assembly.GetName().Name;
 
-            Assert.That(replayUseCaseAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
-        }
+        //     Assert.That(replayUseCaseAssemblyName, Does.StartWith(FirstPartyToolsAssemblyNamePrefix));
+        // }
 
         [Test]
         public void InputSimulationUseCases_WhenLoaded_CompileUnderApplicationAssembly()

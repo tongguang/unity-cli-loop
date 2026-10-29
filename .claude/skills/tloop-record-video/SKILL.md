@@ -19,7 +19,7 @@ Record the Game View during Play Mode, or any Editor window with `--window-name`
 
 ## Choosing the trigger
 
-- Input: `simulate-keyboard`, `simulate-mouse-input`, `simulate-mouse-ui`, `replay-input`.
+- Input: `simulate-keyboard`, `simulate-mouse-input`, `simulate-mouse-ui`.
 - Code reaching a line (an AI branch, a coroutine stage): `enable-pause-point --file <f> --line <n> --mode trace --await`. Trace does not pause Play Mode; other modes are rejected. For long waits raise `--seconds` and `--max-duration-seconds`.
 
 ## Reading the numbers

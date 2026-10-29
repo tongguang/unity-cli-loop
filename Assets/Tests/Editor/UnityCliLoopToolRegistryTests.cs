@@ -69,7 +69,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             Assert.That(registry.IsToolRegistered("run-tests"), Is.True);
             Assert.That(registry.IsToolRegistered("find-game-objects"), Is.True);
             Assert.That(registry.IsToolRegistered("screenshot"), Is.True);
-            Assert.That(registry.IsToolRegistered("replay-input"), Is.True);
+            // Assert.That(registry.IsToolRegistered("replay-input"), Is.True);
             Assert.That(registry.IsToolRegistered("simulate-keyboard"), Is.True);
             Assert.That(registry.IsToolRegistered("simulate-mouse-input"), Is.True);
             Assert.That(registry.IsToolRegistered("simulate-mouse-ui"), Is.True);
@@ -203,18 +203,19 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             AssertThirdPartyTool(toolType, false);
         }
 
-        [Test]
-        public void GetToolType_WhenReplayInputComesFromFirstPartyToolsAssembly_ReturnsBundledPluginType()
-        {
-            // Tests that replay-input is a bundled plugin instead of an application-layer tool.
-            UnityCliLoopToolRegistry registry = ToolRegistryTestFactory.Create();
+        // Disabled along with input recording and replay.
+        // [Test]
+        // public void GetToolType_WhenReplayInputComesFromFirstPartyToolsAssembly_ReturnsBundledPluginType()
+        // {
+        //     // Tests that replay-input is a bundled plugin instead of an application-layer tool.
+        //     UnityCliLoopToolRegistry registry = ToolRegistryTestFactory.Create();
 
-            System.Type toolType = registry.GetToolType("replay-input");
+        //     System.Type toolType = registry.GetToolType("replay-input");
 
-            Assert.That(toolType, Is.Not.Null);
-            Assert.That(toolType.Assembly.GetName().Name, Is.EqualTo(ReplayInputAssemblyName));
-            AssertThirdPartyTool(toolType, false);
-        }
+        //     Assert.That(toolType, Is.Not.Null);
+        //     Assert.That(toolType.Assembly.GetName().Name, Is.EqualTo(ReplayInputAssemblyName));
+        //     AssertThirdPartyTool(toolType, false);
+        // }
 
         [Test]
         public void GetToolType_WhenSimulateKeyboardComesFromFirstPartyToolsAssembly_ReturnsBundledPluginType()

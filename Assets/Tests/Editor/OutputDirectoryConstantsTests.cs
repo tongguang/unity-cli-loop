@@ -51,7 +51,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             AssertSegmentHasNoPathSeparator(nameof(UnityCliLoopConstants.FIND_GAMEOBJECTS_RESULTS_DIR), UnityCliLoopConstants.FIND_GAMEOBJECTS_RESULTS_DIR);
             AssertSegmentHasNoPathSeparator(nameof(UnityCliLoopConstants.SCREENSHOTS_DIR), UnityCliLoopConstants.SCREENSHOTS_DIR);
             AssertSegmentHasNoPathSeparator(nameof(UnityCliLoopConstants.VIBE_LOGS_DIR), UnityCliLoopConstants.VIBE_LOGS_DIR);
-            AssertSegmentHasNoPathSeparator(nameof(RecordInputConstants.INPUT_RECORDINGS_DIR), RecordInputConstants.INPUT_RECORDINGS_DIR);
+            // Disabled along with input recording and replay.
+            // AssertSegmentHasNoPathSeparator(nameof(RecordInputConstants.INPUT_RECORDINGS_DIR), RecordInputConstants.INPUT_RECORDINGS_DIR);
         }
 
         /// <summary>

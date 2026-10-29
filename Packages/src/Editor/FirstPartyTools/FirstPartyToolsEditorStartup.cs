@@ -31,8 +31,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             RunTestsTestFrameworkStartup.Initialize();
 #endif
 #if TLOOP_HAS_INPUT_SYSTEM
-            RecordInputEditorStartup.Initialize();
-            ReplayInputEditorStartup.Initialize();
+            // Input recording and replay are disabled in this fork.
+            // RecordInputEditorStartup.Initialize();
+            // ReplayInputEditorStartup.Initialize();
             SimulateKeyboardEditorStartup.Initialize();
             SimulateMouseInputEditorStartup.Initialize();
             SimulateMouseUiEditorStartup.Initialize();
