@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.14.2](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.1...dispatcher-v3.14.2) (2026-10-29)
+
+
+### Bug Fixes
+
+* install Tuanjie package from Git and restrict releases to main ([a2517f1](https://github.com/tongguang/unity-cli-loop/commit/a2517f12183d7d0aeca133474d0b076ded3ce51c))
+
 ## [3.14.1](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.0...dispatcher-v3.14.1) (2026-10-28)
 
 
