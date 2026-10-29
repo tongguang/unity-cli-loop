@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.14.5](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.4...dispatcher-v3.14.5) (2026-10-29)
+
+- fix: Commands sent while a dialog blocks the Unity Editor now fail fast with MAIN_THREAD_BLOCKED instead of waiting silently (#3417) (1dfaeae5)
+
 ## [3.14.4](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.3...dispatcher-v3.14.4) (2026-10-29)
 
 - fix: Agents now see the Unity main-thread stall notice even when stderr is not a terminal (#3416) (eba0ea48)

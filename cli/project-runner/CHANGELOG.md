@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.13.4](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.3...tloop-project-runner-v3.13.4) (2026-10-29)
+
+- fix: Commands sent while a dialog blocks the Unity Editor now fail fast with MAIN_THREAD_BLOCKED instead of waiting silently (#3417) (1dfaeae5)
+
 ## [3.13.3](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.2...tloop-project-runner-v3.13.3) (2026-10-29)
 
 - fix: Agents now see the Unity main-thread stall notice even when stderr is not a terminal (#3416) (eba0ea48)
