@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.22.6](https://github.com/tongguang/unity-cli-loop/compare/v3.22.5...v3.22.6) (2026-10-29)
+
+- chore: update dispatcher pin to the 3.13.2 stable release (4859c206)
+- fix: Commands sent while a dialog blocks the Unity Editor now fail fast with MAIN_THREAD_BLOCKED instead of waiting silently (#3417) (1dfaeae5)
+
 ## [3.22.5](https://github.com/tongguang/unity-cli-loop/compare/v3.22.4...v3.22.5) (2026-10-29)
 
 - fix: set-game-view-size no longer reports success under the Device Simulator, and --reset removes the size entry it leaves behind (#3412) (4ecde684)
