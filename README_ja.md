@@ -47,9 +47,11 @@ macOS / Linux / Windows Git Bash:
 curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scripts/install.sh | sh
 ```
 
-`tloop --version` で確認できます。Homebrew、winget、OpenUPM での配布はまだ設定していません。`tloop package install` は OpenUPM への登録が必要なため、今回は次の Git URL または tarball を使用してください。
+`tloop --version` で確認できます。このブランチは GitHub Releases と Git URL で配布し、OpenUPM には公開しません。Homebrew と winget は未設定です。
 
 ### 2. Tuanjie パッケージ
+
+Tuanjie プロジェクトのルートで `tloop package install` を実行すると、`Packages/manifest.json` に Git URL を追加できます。デフォルトでは `main` を追跡し、`tloop package install --version <version>` で公開済みのリリースタグに固定できます。
 
 Tuanjie の `Window > Package Manager` で **Add package from git URL** を選択し、次の URL を入力してください。
 

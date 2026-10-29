@@ -7,16 +7,19 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	clierrors "github.com/hatayama/unity-cli-loop/common/errors"
 
 	"github.com/hatayama/unity-cli-loop/common/clicore"
 	"github.com/hatayama/unity-cli-loop/common/project"
+	"github.com/hatayama/unity-cli-loop/common/version"
 )
 
 const (
 	packageVersionFlagName                 = "version"
 	dispatcherPackagesManifestRelativePath = "Packages/manifest.json"
+	packageGitURL                          = "https://github.com/" + dispatcherReleaseRepository + ".git?path=/Packages/src"
 )
 
 type packageInstallOptions struct {
@@ -24,7 +27,7 @@ type packageInstallOptions struct {
 }
 
 func tryHandlePackageRequest(
-	ctx context.Context,
+	_ context.Context,
 	args []string,
 	startPath string,
 	globalProjectPath string,
@@ -51,7 +54,7 @@ func tryHandlePackageRequest(
 
 	switch subcommand {
 	case "install":
-		return true, runPackageInstall(ctx, args[2:], startPath, globalProjectPath, stdout, stderr)
+		return true, runPackageInstall(args[2:], startPath, globalProjectPath, stdout, stderr)
 	case "status":
 		return true, runPackageStatus(args[2:], startPath, globalProjectPath, stdout, stderr)
 	default:
@@ -109,6 +112,15 @@ func parsePackageInstallOptions(args []string) (packageInstallOptions, error) {
 				NextActions: []string{"Pass --version only once."},
 			}
 		}
+		if strings.TrimSpace(value) != value || !version.IsValid(value) {
+			return packageInstallOptions{}, &clierrors.ArgumentError{
+				Message:     "Invalid package version: " + value,
+				Option:      "--version",
+				Received:    value,
+				Command:     clicore.PackageCommandName,
+				NextActions: []string{"Use a published package version such as `--version 3.22.2`."},
+			}
+		}
 		options.version = value
 		if consumedNext {
 			index++
@@ -141,7 +153,6 @@ func resolvePackageProjectRoot(startPath string, explicitProjectPath string) (st
 }
 
 func runPackageInstall(
-	ctx context.Context,
 	args []string,
 	startPath string,
 	explicitProjectPath string,
@@ -167,23 +178,18 @@ func runPackageInstall(
 		return 1
 	}
 
-	version := options.version
-	if version == "" {
-		version, err = resolveLatestPackageVersion(ctx)
-		if err != nil {
-			clierrors.WriteErrorEnvelope(stderr, packageRegistryUnavailableError(projectRoot, err))
-			return 1
-		}
+	dependency := packageGitURL
+	if options.version != "" {
+		dependency += "#v" + strings.TrimLeft(options.version, "vV")
 	}
-
-	result, err := mergePackageManifest(content, version)
+	result, err := mergePackageManifest(content, dependency)
 	if err != nil {
 		clierrors.WriteErrorEnvelope(stderr, packageManifestInvalidError(projectRoot, err))
 		return 1
 	}
 
 	if !result.Changed {
-		clicore.WriteFormat(stdout, "%s %s is already installed. Nothing to do.\n", dispatcherUnityPackageName, version)
+		clicore.WriteFormat(stdout, "%s %s is already installed. Nothing to do.\n", dispatcherUnityPackageName, dependency)
 		return 0
 	}
 
@@ -192,7 +198,7 @@ func runPackageInstall(
 		return 1
 	}
 
-	writePackageInstallSuccess(stdout, result, version)
+	writePackageInstallSuccess(stdout, result, dependency)
 	return 0
 }
 
@@ -228,11 +234,6 @@ func runPackageStatus(
 	}
 
 	clicore.WriteFormat(stdout, "Package: %s\n", dispatcherUnityPackageName)
-	if status.registryInstalled {
-		clicore.WriteFormat(stdout, "Scoped registry: installed (%s)\n", openUPMRegistryURL)
-	} else {
-		clicore.WriteLine(stdout, "Scoped registry: not installed")
-	}
 	if status.dependencyInstalled {
 		clicore.WriteFormat(stdout, "Dependency: installed (%s)\n", status.dependencyVersion)
 	} else {
@@ -242,7 +243,6 @@ func runPackageStatus(
 }
 
 type packageManifestStatus struct {
-	registryInstalled   bool
 	dependencyInstalled bool
 	dependencyVersion   string
 }
@@ -256,9 +256,6 @@ func inspectPackageManifestStatus(content []byte) (packageManifestStatus, error)
 
 	status := packageManifestStatus{}
 	if inspectErr := inspectPackageManifestDependency(root, &status); inspectErr != nil {
-		return packageManifestStatus{}, inspectErr
-	}
-	if inspectErr := inspectPackageManifestOpenUPMRegistry(root, &status); inspectErr != nil {
 		return packageManifestStatus{}, inspectErr
 	}
 	return status, nil
@@ -286,72 +283,6 @@ func inspectPackageManifestDependency(root orderedJSONObject, status *packageMan
 	return nil
 }
 
-func inspectPackageManifestOpenUPMRegistry(root orderedJSONObject, status *packageManifestStatus) error {
-	rawRegistries, ok := root.values["scopedRegistries"]
-	if !ok {
-		return nil
-	}
-	elements, arrayErr := parseJSONRawArray(rawRegistries)
-	if arrayErr != nil {
-		return arrayErr
-	}
-	installed, err := openUPMRegistryHasPackageScope(elements)
-	if err != nil {
-		return err
-	}
-	status.registryInstalled = installed
-	return nil
-}
-
-func openUPMRegistryHasPackageScope(elements []json.RawMessage) (bool, error) {
-	found := false
-	for _, element := range elements {
-		entry, parseErr := parseOrderedJSONObjectBytes(element)
-		if parseErr != nil {
-			return false, parseErr
-		}
-		hasScope, err := openUPMEntryHasPackageScope(entry)
-		if err != nil {
-			return false, err
-		}
-		if hasScope {
-			// Why not return here: the original scan kept walking later
-			// scopedRegistries entries so a trailing malformed object still
-			// failed status inspect. Early success would hide that parse error.
-			found = true
-		}
-	}
-	return found, nil
-}
-
-func openUPMEntryHasPackageScope(entry orderedJSONObject) (bool, error) {
-	urlRaw, hasURL := entry.values["url"]
-	if !hasURL {
-		return false, nil
-	}
-	url := ""
-	if unmarshalErr := json.Unmarshal(urlRaw, &url); unmarshalErr != nil {
-		return false, unmarshalErr
-	}
-	if url != openUPMRegistryURL {
-		return false, nil
-	}
-	rawScopes, hasScopes := entry.values["scopes"]
-	if !hasScopes {
-		return false, nil
-	}
-	scopes := []string{}
-	if unmarshalErr := json.Unmarshal(rawScopes, &scopes); unmarshalErr != nil {
-		return false, unmarshalErr
-	}
-	for _, scope := range scopes {
-		if scope == dispatcherUnityPackageName {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
 func writePackageManifestAtomically(manifestPath string, content []byte) error {
 	temporaryPath := manifestPath + ".tmp"
 	if err := os.WriteFile(temporaryPath, content, 0o644); err != nil {
@@ -365,14 +296,6 @@ func writePackageManifestAtomically(manifestPath string, content []byte) error {
 }
 
 func writePackageInstallSuccess(stdout io.Writer, result packageManifestMergeResult, version string) {
-	if result.RegistryAdded || result.ScopeAdded {
-		clicore.WriteFormat(
-			stdout,
-			"Added scoped registry %s (scope %s)\n",
-			openUPMRegistryURL,
-			dispatcherUnityPackageName,
-		)
-	}
 	if result.PreviousVersion != "" {
 		clicore.WriteFormat(
 			stdout,
@@ -391,7 +314,7 @@ func writePackageInstallSuccess(stdout io.Writer, result packageManifestMergeRes
 			dispatcherPackagesManifestRelativePath,
 		)
 	}
-	clicore.WriteLine(stdout, "If the Unity Editor is open, it applies the change when the window regains focus; otherwise the next launch applies it.")
+	clicore.WriteLine(stdout, "If the Tuanjie Editor is open, it applies the change when the window regains focus; otherwise the next launch applies it.")
 }
 
 func packageManifestInvalidError(projectRoot string, cause error) clierrors.CLIError {
@@ -403,27 +326,8 @@ func packageManifestInvalidError(projectRoot string, cause error) clierrors.CLIE
 		SafeToRetry: false,
 		Command:     clicore.PackageCommandName,
 		NextActions: []string{
-			"Confirm the path is a Unity project root that contains Packages/manifest.json.",
+			"Confirm the path is a Tuanjie project root that contains Packages/manifest.json.",
 			"Repair Packages/manifest.json so it is valid JSON, then retry.",
-		},
-		Details: map[string]any{
-			"ProjectRoot": projectRoot,
-			"Cause":       cause.Error(),
-		},
-	}
-}
-
-func packageRegistryUnavailableError(projectRoot string, cause error) clierrors.CLIError {
-	return clierrors.CLIError{
-		ErrorCode:   clierrors.ErrorCodePackageRegistryUnavailable,
-		Phase:       clierrors.ErrorPhaseExecution,
-		Message:     "OpenUPM registry lookup failed",
-		Retryable:   true,
-		SafeToRetry: true,
-		Command:     clicore.PackageCommandName,
-		NextActions: []string{
-			"Retry after the network is available.",
-			"Pin a version with `tloop package install --version <x.y.z>` to skip the registry lookup.",
 		},
 		Details: map[string]any{
 			"ProjectRoot": projectRoot,
@@ -437,14 +341,14 @@ func printPackageHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "  tloop package install [--version <x.y.z>]")
 	clicore.WriteLine(stdout, "  tloop package status")
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Install or inspect the Tuanjie CLI Loop package in a Unity project's Packages/manifest.json.")
+	clicore.WriteLine(stdout, "Install or inspect the Tuanjie CLI Loop package in a Tuanjie project's Packages/manifest.json.")
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Subcommands:")
-	clicore.WriteLine(stdout, "  install   Add the OpenUPM scoped registry and package dependency")
-	clicore.WriteLine(stdout, "  status    Report whether the registry and dependency are present")
+	clicore.WriteLine(stdout, "  install   Add the Git package dependency (default: main)")
+	clicore.WriteLine(stdout, "  status    Report the configured package dependency")
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Options:")
-	clicore.WriteLine(stdout, "  --version <x.y.z>   Install a specific package version instead of dist-tags.latest")
+	clicore.WriteLine(stdout, "  --version <x.y.z>   Pin the dependency to the matching v<version> Git tag")
 	clicore.WriteLine(stdout, "")
 	printGlobalOptionsHelp(stdout)
 }

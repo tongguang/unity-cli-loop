@@ -27,7 +27,8 @@ release, so consumers never see a published release without its package asset.
    `io.github.tongguang.tloop-<version>.tgz`.
 4. **Publish.** `cmd/create-unity-package-release` checks the release commit,
    tag, and changelog, then creates the release with its complete tarball. Only
-   this job writes repository contents. Published releases are never modified.
+   this job writes repository contents, and it runs only on `main`. Other branches
+   may pack for validation. Published releases are never modified.
 5. **Post-publish.** The workflow marks the package release PR tagged and starts
    release-please, because writes made with GITHUB_TOKEN do not start follow-up
    push workflows.
@@ -44,10 +45,9 @@ release, so consumers never see a published release without its package asset.
   and rerun the failed workflow. Do not publish a partial draft by hand.
 - A published release missing its package asset must be replaced by a new
   version; the workflow will not patch a published release.
-- OpenUPM is an optional distribution channel. This fork must register its own
-  package metadata, with `trackingMode: githubRelease` and
-  `githubReleaseAssetName: 'io.github.tongguang.tloop-'`. The source rename does
-  not register it. Git URL and tarball installation work independently.
+- This fork distributes through Git URLs and GitHub Release tarballs, without
+  publishing to OpenUPM. `tloop package install` writes the Git dependency, using
+  `main` by default or a release tag when `--version` is supplied.
 
 No `upm-signing` environment or `UPM_*` secrets are used by this fork's package
 workflow. The historical signed-package decision is retained in ADR 0013 with

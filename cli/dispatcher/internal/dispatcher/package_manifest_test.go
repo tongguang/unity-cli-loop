@@ -3,136 +3,49 @@ package dispatcher
 import (
 	"bytes"
 	"encoding/json"
+	"reflect"
 	"strings"
 	"testing"
 )
 
-// Verifies a bare dependencies-only manifest gains the OpenUPM registry and package dependency.
-func TestMergePackageManifestAddsRegistryAndDependencyToBareManifest(t *testing.T) {
-	input := []byte(`{
-  "dependencies": {
-    "com.unity.modules.ai": "1.0.0"
-  }
-}
-`)
-
-	result, err := mergePackageManifest(input, "1.2.3")
-	if err != nil {
-		t.Fatalf("mergePackageManifest failed: %v", err)
+// Verifies a bare manifest gains only the Git dependency, without adding scoped registries.
+func TestMergePackageManifestAddsOnlyGitDependency(t *testing.T) {
+	result, err := mergePackageManifest([]byte(barePackageManifest()), packageGitURL)
+	if err != nil || !result.Changed || !result.DependencyAdded {
+		t.Fatalf("result=%+v err=%v", result, err)
 	}
-	if !result.Changed {
-		t.Fatal("expected Changed=true")
+	assertManifestHasDependency(t, result.Content, dispatcherUnityPackageName, packageGitURL)
+	if _, ok := parseOrderedJSONObject(t, result.Content).values["scopedRegistries"]; ok {
+		t.Fatalf("unexpected scoped registry: %s", result.Content)
 	}
-	if !result.RegistryAdded || !result.DependencyAdded {
-		t.Fatalf("flags mismatch: %#v", result)
-	}
-
-	assertManifestHasDependency(t, result.Content, dispatcherUnityPackageName, "1.2.3")
-	assertManifestHasOpenUPMRegistry(t, result.Content)
 }
 
-// Verifies foreign scopedRegistries entries stay intact while OpenUPM is appended.
+// Verifies foreign scoped registries keep all their values when a Git dependency is added.
 func TestMergePackageManifestKeepsExistingForeignRegistry(t *testing.T) {
-	input := []byte(`{
-  "dependencies": {
-    "com.unity.modules.ai": "1.0.0"
-  },
-  "scopedRegistries": [
-    {
-      "name": "Other",
-      "url": "https://example.invalid/registry",
-      "scopes": [
-        "com.other.package"
-      ]
-    }
-  ]
-}
-`)
-
-	result, err := mergePackageManifest(input, "1.2.3")
+	input := []byte(`{"dependencies":{},"scopedRegistries":[{"name":"Other","url":"https://example.invalid/registry","scopes":["com.other.package"]}]}`)
+	result, err := mergePackageManifest(input, packageGitURL)
 	if err != nil {
-		t.Fatalf("mergePackageManifest failed: %v", err)
+		t.Fatal(err)
 	}
-
-	content := string(result.Content)
-	if !strings.Contains(content, `"url": "https://example.invalid/registry"`) {
-		t.Fatalf("foreign registry was altered:\n%s", content)
-	}
-	if !strings.Contains(content, `"com.other.package"`) {
-		t.Fatalf("foreign scope was altered:\n%s", content)
-	}
-	assertManifestHasOpenUPMRegistry(t, result.Content)
-	assertManifestHasDependency(t, result.Content, dispatcherUnityPackageName, "1.2.3")
+	assertManifestRegistriesUnchanged(t, input, result.Content)
 }
 
-// Verifies an existing OpenUPM registry entry gets the scope appended without a duplicate entry.
-func TestMergePackageManifestAppendsScopeToExistingOpenUPMRegistry(t *testing.T) {
-	input := []byte(`{
-  "dependencies": {
-    "com.unity.modules.ai": "1.0.0"
-  },
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "com.other.openupm"
-      ]
-    }
-  ]
-}
-`)
-
-	result, err := mergePackageManifest(input, "1.2.3")
+// Verifies an existing OpenUPM registry is not extended with the unpublished fork's scope.
+func TestMergePackageManifestPreservesExistingOpenUPMRegistry(t *testing.T) {
+	input := []byte(`{"dependencies":{},"scopedRegistries":[{"name":"OpenUPM","url":"https://package.openupm.com","scopes":["com.other.package"]}]}`)
+	result, err := mergePackageManifest(input, packageGitURL)
 	if err != nil {
-		t.Fatalf("mergePackageManifest failed: %v", err)
+		t.Fatal(err)
 	}
-	if !result.ScopeAdded {
-		t.Fatal("expected ScopeAdded=true")
-	}
-	if result.RegistryAdded {
-		t.Fatal("expected RegistryAdded=false when OpenUPM already exists")
-	}
-
-	openUPMCount := strings.Count(string(result.Content), `"url": "https://package.openupm.com"`)
-	if openUPMCount != 1 {
-		t.Fatalf("expected one OpenUPM registry entry, got %d:\n%s", openUPMCount, result.Content)
-	}
-	if !strings.Contains(string(result.Content), `"com.other.openupm"`) {
-		t.Fatalf("existing scope missing:\n%s", result.Content)
-	}
-	assertManifestHasOpenUPMRegistry(t, result.Content)
-	assertManifestHasDependency(t, result.Content, dispatcherUnityPackageName, "1.2.3")
+	assertManifestRegistriesUnchanged(t, input, result.Content)
 }
 
-// Verifies no rewrite when registry, scope, and the same dependency version are already present.
+// Verifies a matching Git dependency leaves the entire manifest byte-identical.
 func TestMergePackageManifestNoChangeWhenAlreadyInstalled(t *testing.T) {
-	input := []byte(`{
-  "dependencies": {
-    "com.unity.modules.ai": "1.0.0",
-    "io.github.tongguang.tloop": "1.2.3"
-  },
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "io.github.tongguang.tloop"
-      ]
-    }
-  ]
-}
-`)
-
-	result, err := mergePackageManifest(input, "1.2.3")
-	if err != nil {
-		t.Fatalf("mergePackageManifest failed: %v", err)
-	}
-	if result.Changed {
-		t.Fatalf("expected Changed=false, got content:\n%s", result.Content)
-	}
-	if !bytes.Equal(result.Content, input) {
-		t.Fatalf("content changed unexpectedly:\n%s", result.Content)
+	input := []byte(installedPackageManifest(packageGitURL + "#v1.2.3"))
+	result, err := mergePackageManifest(input, packageGitURL+"#v1.2.3")
+	if err != nil || result.Changed || !bytes.Equal(result.Content, input) {
+		t.Fatalf("result=%+v err=%v", result, err)
 	}
 }
 
@@ -147,7 +60,7 @@ func TestMergePackageManifestUpdatesDependencyVersionInPlace(t *testing.T) {
 }
 `)
 
-	result, err := mergePackageManifest(input, "1.2.3")
+	result, err := mergePackageManifest(input, packageGitURL+"#v1.2.3")
 	if err != nil {
 		t.Fatalf("mergePackageManifest failed: %v", err)
 	}
@@ -172,7 +85,7 @@ func TestMergePackageManifestUpdatesDependencyVersionInPlace(t *testing.T) {
 			t.Fatalf("dependency key order mismatch at %d: %#v", index, keys)
 		}
 	}
-	assertManifestHasDependency(t, result.Content, dispatcherUnityPackageName, "1.2.3")
+	assertManifestHasDependency(t, result.Content, dispatcherUnityPackageName, packageGitURL+"#v1.2.3")
 }
 
 // Verifies non-alphabetical top-level key order is preserved across a rewrite.
@@ -187,7 +100,7 @@ func TestMergePackageManifestPreservesTopLevelKeyOrder(t *testing.T) {
 }
 `)
 
-	result, err := mergePackageManifest(input, "1.2.3")
+	result, err := mergePackageManifest(input, packageGitURL+"#v1.2.3")
 	if err != nil {
 		t.Fatalf("mergePackageManifest failed: %v", err)
 	}
@@ -205,7 +118,7 @@ func TestMergePackageManifestPreservesTopLevelKeyOrder(t *testing.T) {
 func TestMergePackageManifestPreservesCRLFLineEndings(t *testing.T) {
 	input := []byte("{\r\n  \"dependencies\": {\r\n    \"com.unity.modules.ai\": \"1.0.0\"\r\n  }\r\n}\r\n")
 
-	result, err := mergePackageManifest(input, "1.2.3")
+	result, err := mergePackageManifest(input, packageGitURL+"#v1.2.3")
 	if err != nil {
 		t.Fatalf("mergePackageManifest failed: %v", err)
 	}
@@ -226,7 +139,7 @@ func TestMergePackageManifestPreservesMissingTrailingNewline(t *testing.T) {
 }`)
 	withNewline := append(append([]byte{}, withoutNewline...), '\n')
 
-	resultWithout, err := mergePackageManifest(withoutNewline, "1.2.3")
+	resultWithout, err := mergePackageManifest(withoutNewline, packageGitURL+"#v1.2.3")
 	if err != nil {
 		t.Fatalf("merge without newline failed: %v", err)
 	}
@@ -234,7 +147,7 @@ func TestMergePackageManifestPreservesMissingTrailingNewline(t *testing.T) {
 		t.Fatalf("unexpected trailing newline:\n%q", resultWithout.Content)
 	}
 
-	resultWith, err := mergePackageManifest(withNewline, "1.2.3")
+	resultWith, err := mergePackageManifest(withNewline, packageGitURL+"#v1.2.3")
 	if err != nil {
 		t.Fatalf("merge with newline failed: %v", err)
 	}
@@ -245,7 +158,7 @@ func TestMergePackageManifestPreservesMissingTrailingNewline(t *testing.T) {
 
 // Verifies malformed JSON is rejected.
 func TestMergePackageManifestRejectsMalformedJSON(t *testing.T) {
-	_, err := mergePackageManifest([]byte(`{not json`), "1.2.3")
+	_, err := mergePackageManifest([]byte(`{not json`), packageGitURL+"#v1.2.3")
 	if err == nil {
 		t.Fatal("expected error for malformed JSON")
 	}
@@ -253,45 +166,9 @@ func TestMergePackageManifestRejectsMalformedJSON(t *testing.T) {
 
 // Verifies trailing garbage after a complete JSON object is rejected.
 func TestMergePackageManifestRejectsTrailingGarbage(t *testing.T) {
-	_, err := mergePackageManifest([]byte("{\n  \"dependencies\": {}\n}\n trailing"), "1.2.3")
+	_, err := mergePackageManifest([]byte("{\n  \"dependencies\": {}\n}\n trailing"), packageGitURL+"#v1.2.3")
 	if err == nil {
 		t.Fatal("expected error for trailing garbage after JSON object")
-	}
-}
-
-// Verifies scopedRegistries is inserted immediately after dependencies when absent.
-func TestMergePackageManifestInsertsScopedRegistriesAfterDependencies(t *testing.T) {
-	input := []byte(`{
-  "dependencies": {
-    "com.unity.modules.ai": "1.0.0"
-  },
-  "testables": [
-    "com.unity.testtools.codecoverage"
-  ]
-}
-`)
-
-	result, err := mergePackageManifest(input, "1.2.3")
-	if err != nil {
-		t.Fatalf("mergePackageManifest failed: %v", err)
-	}
-
-	top := parseOrderedJSONObject(t, result.Content)
-	dependenciesIndex := -1
-	scopedIndex := -1
-	for index, key := range top.keys {
-		if key == "dependencies" {
-			dependenciesIndex = index
-		}
-		if key == "scopedRegistries" {
-			scopedIndex = index
-		}
-	}
-	if dependenciesIndex < 0 || scopedIndex < 0 {
-		t.Fatalf("missing keys: %#v", top.keys)
-	}
-	if scopedIndex != dependenciesIndex+1 {
-		t.Fatalf("scopedRegistries not after dependencies: %#v", top.keys)
 	}
 }
 
@@ -311,49 +188,20 @@ func assertManifestHasDependency(t *testing.T, content []byte, name string, vers
 	}
 }
 
-func assertManifestHasOpenUPMRegistry(t *testing.T, content []byte) {
+func assertManifestRegistriesUnchanged(t *testing.T, before, after []byte) {
 	t.Helper()
-	top := parseOrderedJSONObject(t, content)
-	rawRegistries, ok := top.values["scopedRegistries"]
-	if !ok {
-		t.Fatalf("scopedRegistries missing:\n%s", content)
+	decode := func(content []byte) any {
+		t.Helper()
+		raw := parseOrderedJSONObject(t, content).values["scopedRegistries"]
+		var value any
+		if err := json.Unmarshal(raw, &value); err != nil {
+			t.Fatal(err)
+		}
+		return value
 	}
-	elements, err := parseJSONRawArray(rawRegistries)
-	if err != nil {
-		t.Fatalf("parse scopedRegistries failed: %v", err)
+	if !reflect.DeepEqual(decode(before), decode(after)) {
+		t.Fatalf("registries changed: before=%s after=%s", before, after)
 	}
-	for _, element := range elements {
-		entry, parseErr := parseOrderedJSONObjectBytes(element)
-		if parseErr != nil {
-			t.Fatalf("parse registry entry failed: %v", parseErr)
-		}
-		urlRaw, hasURL := entry.values["url"]
-		if !hasURL {
-			continue
-		}
-		var url string
-		if unmarshalErr := json.Unmarshal(urlRaw, &url); unmarshalErr != nil {
-			t.Fatalf("url decode failed: %v", unmarshalErr)
-		}
-		if url != openUPMRegistryURL {
-			continue
-		}
-		rawScopes, hasScopes := entry.values["scopes"]
-		if !hasScopes {
-			t.Fatalf("OpenUPM registry missing scopes:\n%s", content)
-		}
-		var scopes []string
-		if unmarshalErr := json.Unmarshal(rawScopes, &scopes); unmarshalErr != nil {
-			t.Fatalf("scopes decode failed: %v", unmarshalErr)
-		}
-		for _, scope := range scopes {
-			if scope == dispatcherUnityPackageName {
-				return
-			}
-		}
-		t.Fatalf("OpenUPM scopes missing %s: %#v\n%s", dispatcherUnityPackageName, scopes, content)
-	}
-	t.Fatalf("OpenUPM registry missing:\n%s", content)
 }
 
 func decodeOrderedObjectField(t *testing.T, content []byte, field string) orderedJSONObject {
@@ -379,35 +227,23 @@ func parseOrderedJSONObject(t *testing.T, content []byte) orderedJSONObject {
 	return object
 }
 
+// Verifies malformed owned dependencies are reported rather than overwritten.
 func TestMergePackageManifestRejectsMalformedSections(t *testing.T) {
-	// Verifies each malformed section is reported with the path of the offending value instead of being overwritten.
-	registryEntry := `{"url":"` + openUPMRegistryURL + `"`
-	cases := []struct {
-		name       string
-		manifest   string
-		wantPrefix string
-	}{
-		{name: "dependencies not an object", manifest: `{"dependencies":[]}`, wantPrefix: "dependencies: "},
-		{name: "dependency not a string", manifest: `{"dependencies":{"` + dispatcherUnityPackageName + `":1}}`, wantPrefix: "dependency " + dispatcherUnityPackageName + ": "},
-		{name: "registries not an array", manifest: `{"dependencies":{},"scopedRegistries":{}}`, wantPrefix: "scopedRegistries: "},
-		{name: "registry entry not an object", manifest: `{"dependencies":{},"scopedRegistries":[1]}`, wantPrefix: "scopedRegistries[0]: "},
-		{name: "registry url not a string", manifest: `{"dependencies":{},"scopedRegistries":[{"name":"x"},{"url":1}]}`, wantPrefix: "scopedRegistries[1].url: "},
-		{name: "registry scopes not strings", manifest: `{"dependencies":{},"scopedRegistries":[` + registryEntry + `,"scopes":[1]}]}`, wantPrefix: "scopes: "},
+	cases := []struct{ manifest, prefix string }{
+		{`{"dependencies":[]}`, "dependencies: "},
+		{`{"dependencies":{"io.github.tongguang.tloop":1}}`, "dependency io.github.tongguang.tloop: "},
 	}
-	for _, testCase := range cases {
-		t.Run(testCase.name, func(t *testing.T) {
-			result, err := mergePackageManifest([]byte(testCase.manifest), "1.2.3")
-
-			if err == nil || !strings.HasPrefix(err.Error(), testCase.wantPrefix) || result.Changed {
-				t.Fatalf("expected an error starting with %q, got result=%+v err=%v", testCase.wantPrefix, result, err)
-			}
-		})
+	for _, tc := range cases {
+		result, err := mergePackageManifest([]byte(tc.manifest), packageGitURL)
+		if err == nil || !strings.HasPrefix(err.Error(), tc.prefix) || result.Changed {
+			t.Fatalf("result=%+v err=%v", result, err)
+		}
 	}
 }
 
 func TestMergePackageManifestAddsMissingDependenciesSection(t *testing.T) {
 	// Verifies a manifest without dependencies gains a dependencies object holding only the package.
-	result, err := mergePackageManifest([]byte("{}\n"), "1.2.3")
+	result, err := mergePackageManifest([]byte("{}\n"), packageGitURL+"#v1.2.3")
 
 	if err != nil || !result.DependencyAdded || !result.Changed {
 		t.Fatalf("unexpected result: %+v err=%v", result, err)
@@ -418,10 +254,9 @@ func TestMergePackageManifestAddsMissingDependenciesSection(t *testing.T) {
 	if err := json.Unmarshal(result.Content, &manifest); err != nil {
 		t.Fatalf("emitted manifest is not JSON: %v\n%s", err, result.Content)
 	}
-	if len(manifest.Dependencies) != 1 || manifest.Dependencies[dispatcherUnityPackageName] != "1.2.3" {
+	if len(manifest.Dependencies) != 1 || manifest.Dependencies[dispatcherUnityPackageName] != packageGitURL+"#v1.2.3" {
 		t.Fatalf("unexpected dependencies: %v", manifest.Dependencies)
 	}
-	assertManifestHasOpenUPMRegistry(t, result.Content)
 }
 
 func TestMergePackageManifestInsertsDependencyInAlphabeticalOrder(t *testing.T) {
@@ -434,7 +269,7 @@ func TestMergePackageManifestInsertsDependencyInAlphabeticalOrder(t *testing.T) 
 }
 `)
 
-	result, err := mergePackageManifest(input, "1.2.3")
+	result, err := mergePackageManifest(input, packageGitURL+"#v1.2.3")
 	if err != nil {
 		t.Fatalf("mergePackageManifest failed: %v", err)
 	}
@@ -442,38 +277,5 @@ func TestMergePackageManifestInsertsDependencyInAlphabeticalOrder(t *testing.T) 
 	packageIndex := strings.Index(content, dispatcherUnityPackageName)
 	if packageIndex < strings.Index(content, "com.unity.modules.ai") || packageIndex > strings.Index(content, "org.example.tool") {
 		t.Fatalf("package is not between its neighbors:\n%s", content)
-	}
-}
-
-func TestMergePackageManifestAddsScopesToOpenUPMRegistryWithoutScopes(t *testing.T) {
-	// Verifies an OpenUPM registry entry that has no scopes key gains the package scope while keeping its other keys.
-	input := []byte(`{
-  "dependencies": {},
-  "scopedRegistries": [
-    {
-      "name": "custom",
-      "url": "` + openUPMRegistryURL + `"
-    }
-  ]
-}
-`)
-
-	result, err := mergePackageManifest(input, "1.2.3")
-
-	if err != nil || !result.ScopeAdded || result.RegistryAdded {
-		t.Fatalf("unexpected result: %+v err=%v", result, err)
-	}
-	var manifest struct {
-		ScopedRegistries []struct {
-			Name   string   `json:"name"`
-			Scopes []string `json:"scopes"`
-		} `json:"scopedRegistries"`
-	}
-	if err := json.Unmarshal(result.Content, &manifest); err != nil {
-		t.Fatalf("emitted manifest is not JSON: %v\n%s", err, result.Content)
-	}
-	if len(manifest.ScopedRegistries) != 1 || manifest.ScopedRegistries[0].Name != "custom" ||
-		len(manifest.ScopedRegistries[0].Scopes) != 1 || manifest.ScopedRegistries[0].Scopes[0] != dispatcherUnityPackageName {
-		t.Fatalf("unexpected registries: %+v", manifest.ScopedRegistries)
 	}
 }

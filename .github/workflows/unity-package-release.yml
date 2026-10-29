@@ -3,8 +3,8 @@ name: unity-package-release
 # Creates the Unity package's GitHub release, and is the only workflow that
 # does. The package is packed and checked for complete contents
 # first, and the release is created and published with the package tarball in
-# one step, because a published release is immutable; OpenUPM republishes that
-# tarball unchanged (docs/unity-package-release.md). A release can be created
+# one step, because a published release is immutable
+# (docs/unity-package-release.md). A release can be created
 # once its release commit is on main and the runner and dispatcher releases it
 # depends on are published, so this follows every run of the three workflows
 # that make one of those happen.
@@ -127,7 +127,8 @@ jobs:
   # tag and the release, which can, are checked again right before the writes.
   publish:
     needs: [plan, pack]
-    if: needs.plan.outputs.publish == 'true'
+    # Other branches may pack for validation; only main may publish a release.
+    if: needs.plan.outputs.publish == 'true' && github.ref == 'refs/heads/main'
     # Creations run one at a time, so two runs never create the same release.
     # Only this job is serialized: a run that skips, a dry run, or a run after a
     # cancelled one never gets here, so it cannot take the place of a waiting

@@ -53,6 +53,13 @@ test_runs_after_each_dependency_on_main() {
   fi
 }
 
+# Verifies branch runs may pack, while the release-writing job requires main.
+test_only_main_can_publish() {
+  assert_job_contains publish "    if: needs.plan.outputs.publish == 'true' && github.ref == 'refs/heads/main'"
+  assert_job_contains pack "    if: needs.plan.outputs.pack == 'true'"
+  assert_job_not_contains pack "github.ref == 'refs/heads/main'"
+}
+
 # Verifies only the job that creates the release is serialized, so a run that skips or only packs never takes the place of a waiting creation, and a running creation is never cancelled.
 test_only_release_creations_run_one_at_a_time() {
   if grep -n '^concurrency:' "$WORKFLOW"; then
@@ -146,6 +153,7 @@ test_failures_are_reported() {
 }
 
 test_runs_after_each_dependency_on_main
+test_only_main_can_publish
 test_only_release_creations_run_one_at_a_time
 test_jobs_use_least_privilege
 test_packing_needs_no_signing_credentials

@@ -3,8 +3,6 @@ package dispatcher
 import (
 	"bytes"
 	"context"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -30,126 +28,61 @@ func TestPackageHelpListsSubcommands(t *testing.T) {
 	}
 }
 
-// Verifies install writes registry and dependency using dist-tags.latest from the registry.
-func TestPackageInstallWritesManifestUsingRegistryLatest(t *testing.T) {
+// Verifies the default install writes the fork Git URL without requiring a registry.
+func TestPackageInstallWritesGitDependency(t *testing.T) {
 	projectRoot := createPackageTestProject(t, barePackageManifest())
-	restore := stubOpenUPMRegistry(t, `{"dist-tags":{"latest":"1.2.3"}}`)
-	defer restore()
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := RunDispatcher(
-		context.Background(),
-		[]string{"package", "install", "--project-path", projectRoot},
-		&stdout,
-		&stderr,
-	)
+	code, stdout, stderr := runPackageForTest(t, projectRoot, "install")
 	if code != 0 {
-		t.Fatalf("package install failed: code=%d stderr=%s", code, stderr.String())
+		t.Fatalf("install failed: code=%d stderr=%s", code, stderr)
 	}
-	output := stdout.String()
-	for _, expected := range []string{
-		"Added scoped registry https://package.openupm.com",
-		"Added " + dispatcherUnityPackageName + " 1.2.3",
-	} {
-		if !strings.Contains(output, expected) {
-			t.Fatalf("install output missing %q:\n%s", expected, output)
-		}
-	}
-
 	content := readPackageManifest(t, projectRoot)
-	if !strings.Contains(content, `"url": "https://package.openupm.com"`) {
-		t.Fatalf("registry missing from manifest:\n%s", content)
-	}
-	if !strings.Contains(content, `"`+dispatcherUnityPackageName+`": "1.2.3"`) {
-		t.Fatalf("dependency missing from manifest:\n%s", content)
+	assertManifestHasDependency(t, []byte(content), dispatcherUnityPackageName, "https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src")
+	if strings.Contains(content, "scopedRegistries") || strings.Contains(stdout, "OpenUPM") {
+		t.Fatalf("install must use only the Git dependency: manifest=%s stdout=%s", content, stdout)
 	}
 }
 
-// Verifies --version skips the registry HTTP lookup entirely.
-func TestPackageInstallWithVersionSkipsRegistryLookup(t *testing.T) {
-	projectRoot := createPackageTestProject(t, barePackageManifest())
-	server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
-		t.Fatal("registry must not be contacted when --version is set")
-	}))
-	t.Cleanup(server.Close)
-
-	previousURL := openUPMRegistryBaseURL
-	previousClient := packageRegistryHTTPClient
-	openUPMRegistryBaseURL = server.URL
-	packageRegistryHTTPClient = server.Client()
-	t.Cleanup(func() {
-		openUPMRegistryBaseURL = previousURL
-		packageRegistryHTTPClient = previousClient
-	})
-
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := RunDispatcher(
-		context.Background(),
-		[]string{"package", "install", "--version", "1.2.3", "--project-path", projectRoot},
-		&stdout,
-		&stderr,
-	)
-	if code != 0 {
-		t.Fatalf("package install failed: code=%d stderr=%s", code, stderr.String())
+// Verifies release versions, with or without a v prefix, become pinned Git dependencies.
+func TestPackageInstallPinsGitReleaseTag(t *testing.T) {
+	cases := []struct{ version, tag string }{
+		{"1.2.3", "v1.2.3"},
+		{"v1.2.3", "v1.2.3"},
+		{"V1.2.3", "v1.2.3"},
+		{"1.2.3-beta.1", "v1.2.3-beta.1"},
 	}
-	content := readPackageManifest(t, projectRoot)
-	if !strings.Contains(content, `"`+dispatcherUnityPackageName+`": "1.2.3"`) {
-		t.Fatalf("dependency missing from manifest:\n%s", content)
+	for _, tc := range cases {
+		t.Run(tc.version, func(t *testing.T) {
+			projectRoot := createPackageTestProject(t, barePackageManifest())
+			code, _, stderr := runPackageForTest(t, projectRoot, "install", "--version", tc.version)
+			if code != 0 {
+				t.Fatalf("install failed: code=%d stderr=%s", code, stderr)
+			}
+			assertManifestHasDependency(t, []byte(readPackageManifest(t, projectRoot)), dispatcherUnityPackageName, packageGitURL+"#"+tc.tag)
+		})
 	}
 }
 
-// Verifies install appends the package scope to an existing OpenUPM registry without duplicating it.
-func TestPackageInstallAppendsScopeToExistingOpenUPMRegistry(t *testing.T) {
+// Verifies Git installation preserves other package dependencies and scoped registries.
+func TestPackageInstallPreservesOtherPackagesAndRegistries(t *testing.T) {
 	manifest := `{
-  "dependencies": {
-    "com.unity.modules.ai": "1.0.0"
-  },
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "com.other.openupm"
-      ]
-    }
-  ]
+  "dependencies": {"io.github.hatayama.uloopmcp": "3.21.1"},
+  "scopedRegistries": [{"name":"OpenUPM","url":"https://package.openupm.com","scopes":["io.github.hatayama.uloopmcp"]}]
 }
 `
 	projectRoot := createPackageTestProject(t, manifest)
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := RunDispatcher(
-		context.Background(),
-		[]string{"package", "install", "--version", "1.2.3", "--project-path", projectRoot},
-		&stdout,
-		&stderr,
-	)
+	code, _, stderr := runPackageForTest(t, projectRoot, "install", "--version", "3.22.2")
 	if code != 0 {
-		t.Fatalf("package install failed: code=%d stderr=%s", code, stderr.String())
+		t.Fatalf("install failed: code=%d stderr=%s", code, stderr)
 	}
-	content := readPackageManifest(t, projectRoot)
-	if strings.Count(content, `"url": "https://package.openupm.com"`) != 1 {
-		t.Fatalf("expected one OpenUPM registry entry:\n%s", content)
-	}
-	if !strings.Contains(content, `"com.other.openupm"`) {
-		t.Fatalf("existing scope missing:\n%s", content)
-	}
-	assertManifestHasOpenUPMRegistry(t, []byte(content))
-	if !strings.Contains(content, `"`+dispatcherUnityPackageName+`": "1.2.3"`) {
-		t.Fatalf("dependency missing from manifest:\n%s", content)
-	}
-	if !strings.Contains(stdout.String(), "Added scoped registry") {
-		t.Fatalf("expected scoped registry message:\n%s", stdout.String())
-	}
+	content := []byte(readPackageManifest(t, projectRoot))
+	assertManifestHasDependency(t, content, "io.github.hatayama.uloopmcp", "3.21.1")
+	assertManifestHasDependency(t, content, dispatcherUnityPackageName, packageGitURL+"#v3.22.2")
+	assertManifestRegistriesUnchanged(t, []byte(manifest), content)
 }
 
 // Verifies a second install reports already installed and leaves the manifest unchanged.
 func TestPackageInstallIsIdempotent(t *testing.T) {
 	projectRoot := createPackageTestProject(t, barePackageManifest())
-	restore := stubOpenUPMRegistry(t, `{"dist-tags":{"latest":"1.2.3"}}`)
-	defer restore()
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -226,7 +159,6 @@ func TestPackageStatusReportsNotInstalled(t *testing.T) {
 	output := stdout.String()
 	for _, expected := range []string{
 		"Package: " + dispatcherUnityPackageName,
-		"Scoped registry: not installed",
 		"Dependency: not installed",
 	} {
 		if !strings.Contains(output, expected) {
@@ -235,172 +167,35 @@ func TestPackageStatusReportsNotInstalled(t *testing.T) {
 	}
 }
 
-// Verifies status reports the installed dependency version and registry.
+// Verifies status reports a Git dependency without requiring a scoped registry.
 func TestPackageStatusReportsInstalledVersion(t *testing.T) {
-	projectRoot := createPackageTestProject(t, installedPackageManifest("1.2.3"))
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	code := RunDispatcher(
-		context.Background(),
-		[]string{"package", "status", "--project-path", projectRoot},
-		&stdout,
-		&stderr,
-	)
-	if code != 0 {
-		t.Fatalf("status failed: code=%d stderr=%s", code, stderr.String())
+	dependency := packageGitURL + "#v1.2.3"
+	projectRoot := createPackageTestProject(t, installedPackageManifest(dependency))
+	code, stdout, stderr := runPackageForTest(t, projectRoot, "status")
+	if code != 0 || !strings.Contains(stdout, "Dependency: installed ("+dependency+")") {
+		t.Fatalf("unexpected status: code=%d stdout=%s stderr=%s", code, stdout, stderr)
 	}
-	output := stdout.String()
-	for _, expected := range []string{
-		"Scoped registry: installed (https://package.openupm.com)",
-		"Dependency: installed (1.2.3)",
-	} {
-		if !strings.Contains(output, expected) {
-			t.Fatalf("status output missing %q:\n%s", expected, output)
-		}
+	if strings.Contains(stdout, "Scoped registry") {
+		t.Fatalf("unexpected registry requirement: %s", stdout)
 	}
 }
 
+// Verifies status reads package dependencies independently of unrelated registry settings.
 func TestInspectPackageManifestStatusCharacterizesInstalledFlags(t *testing.T) {
-	// Characterizes inspectPackageManifestStatus dependency and OpenUPM-scope detection.
-	testCases := []struct {
-		name        string
-		content     string
-		want        packageManifestStatus
-		wantErr     bool
-		wantErrText string
+	cases := []struct {
+		name, content string
+		want          packageManifestStatus
 	}{
-		{
-			name: "bare dependencies",
-			content: `{
-  "dependencies": {
-    "com.unity.modules.ai": "1.0.0"
-  }
-}
-`,
-			want: packageManifestStatus{},
-		},
-		{
-			name: "dependency without registry",
-			content: `{
-  "dependencies": {
-    "io.github.tongguang.tloop": "1.2.3"
-  }
-}
-`,
-			want: packageManifestStatus{
-				dependencyInstalled: true,
-				dependencyVersion:   "1.2.3",
-			},
-		},
-		{
-			name: "openupm without package scope",
-			content: `{
-  "dependencies": {},
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": ["com.other.openupm"]
-    }
-  ]
-}
-`,
-			want: packageManifestStatus{},
-		},
-		{
-			name: "foreign registry only",
-			content: `{
-  "dependencies": {},
-  "scopedRegistries": [
-    {
-      "name": "Other",
-      "url": "https://example.invalid/registry",
-      "scopes": ["io.github.tongguang.tloop"]
-    }
-  ]
-}
-`,
-			want: packageManifestStatus{},
-		},
-		{
-			name: "openupm scope without dependency",
-			content: `{
-  "dependencies": {},
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": ["io.github.tongguang.tloop"]
-    }
-  ]
-}
-`,
-			want: packageManifestStatus{registryInstalled: true},
-		},
-		{
-			name:    "installed dependency and registry",
-			content: installedPackageManifest("1.2.3"),
-			want: packageManifestStatus{
-				registryInstalled:   true,
-				dependencyInstalled: true,
-				dependencyVersion:   "1.2.3",
-			},
-		},
-		{
-			name: "openupm entry missing url",
-			content: `{
-  "dependencies": {},
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "scopes": ["io.github.tongguang.tloop"]
-    }
-  ]
-}
-`,
-			want: packageManifestStatus{},
-		},
-		{
-			name:    "malformed json",
-			content: `{not json`,
-			wantErr: true,
-		},
-		{
-			name: "valid openupm followed by non object",
-			content: `{
-  "dependencies": {},
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": ["io.github.tongguang.tloop"]
-    },
-    "not-an-object"
-  ]
-}
-`,
-			wantErr:     true,
-			wantErrText: "expected JSON object",
-		},
+		{"bare manifest", barePackageManifest(), packageManifestStatus{}},
+		{"Git dependency", installedPackageManifest(packageGitURL), packageManifestStatus{dependencyInstalled: true, dependencyVersion: packageGitURL}},
+		{"pinned Git dependency", installedPackageManifest(packageGitURL + "#v1.2.3"), packageManifestStatus{dependencyInstalled: true, dependencyVersion: packageGitURL + "#v1.2.3"}},
+		{"registry without dependency", `{"scopedRegistries":[{"url":"https://package.openupm.com"}]}`, packageManifestStatus{}},
 	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			status, err := inspectPackageManifestStatus([]byte(testCase.content))
-			if testCase.wantErr {
-				if err == nil {
-					t.Fatal("expected inspectPackageManifestStatus error")
-				}
-				if testCase.wantErrText != "" && err.Error() != testCase.wantErrText {
-					t.Fatalf("error = %q, want %q", err.Error(), testCase.wantErrText)
-				}
-				return
-			}
-			if err != nil {
-				t.Fatalf("inspectPackageManifestStatus failed: %v", err)
-			}
-			if status != testCase.want {
-				t.Fatalf("status = %#v, want %#v", status, testCase.want)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			status, err := inspectPackageManifestStatus([]byte(tc.content))
+			if err != nil || status != tc.want {
+				t.Fatalf("status=%+v want=%+v err=%v", status, tc.want, err)
 			}
 		})
 	}
@@ -436,21 +231,12 @@ func barePackageManifest() string {
 `
 }
 
-func installedPackageManifest(version string) string {
+func installedPackageManifest(dependency string) string {
 	return `{
   "dependencies": {
     "com.unity.modules.ai": "1.0.0",
-    "io.github.tongguang.tloop": "` + version + `"
-  },
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "io.github.tongguang.tloop"
-      ]
-    }
-  ]
+    "io.github.tongguang.tloop": "` + dependency + `"
+  }
 }
 `
 }
@@ -462,26 +248,6 @@ func readPackageManifest(t *testing.T, projectRoot string) string {
 		t.Fatalf("read manifest failed: %v", err)
 	}
 	return string(content)
-}
-
-func stubOpenUPMRegistry(t *testing.T, body string) func() {
-	t.Helper()
-	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		if request.URL.Path != "/"+dispatcherUnityPackageName {
-			t.Fatalf("unexpected path: %s", request.URL.Path)
-		}
-		writer.Header().Set("Content-Type", "application/json")
-		_, _ = writer.Write([]byte(body))
-	}))
-	previousURL := openUPMRegistryBaseURL
-	previousClient := packageRegistryHTTPClient
-	openUPMRegistryBaseURL = server.URL
-	packageRegistryHTTPClient = server.Client()
-	return func() {
-		server.Close()
-		openUPMRegistryBaseURL = previousURL
-		packageRegistryHTTPClient = previousClient
-	}
 }
 
 // Verifies install resolves a Unity project in a child directory when run from a repository root.
@@ -507,7 +273,7 @@ func TestPackageInstallFindsProjectInChildDirectory(t *testing.T) {
 	}
 
 	content := readPackageManifest(t, projectRoot)
-	if !strings.Contains(content, `"`+dispatcherUnityPackageName+`": "9.9.9"`) {
+	if !strings.Contains(content, `"`+dispatcherUnityPackageName+`": "`+packageGitURL+`#v9.9.9"`) {
 		t.Fatalf("dependency missing from manifest:\n%s", content)
 	}
 }
@@ -558,7 +324,7 @@ func TestPackageInstallPrefersEnclosingProjectOverNestedChild(t *testing.T) {
 		t.Fatalf("package install failed: code=%d stderr=%s", code, stderr.String())
 	}
 
-	if !strings.Contains(readPackageManifest(t, projectRoot), `"`+dispatcherUnityPackageName+`": "9.9.9"`) {
+	if !strings.Contains(readPackageManifest(t, projectRoot), `"`+dispatcherUnityPackageName+`": "`+packageGitURL+`#v9.9.9"`) {
 		t.Fatalf("enclosing project manifest must be updated")
 	}
 	if strings.Contains(readPackageManifest(t, nestedFixture), dispatcherUnityPackageName) {
@@ -703,29 +469,20 @@ func TestPackageStatusReportsMissingManifestAndProject(t *testing.T) {
 	}
 }
 
-func TestPackageInstallReportsRegistryFailure(t *testing.T) {
-	// Verifies a failed registry lookup is reported as PACKAGE_REGISTRY_UNAVAILABLE with its cause, without editing the manifest.
-	projectRoot := createPackageTestProject(t, barePackageManifest())
-	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(http.StatusServiceUnavailable)
-	}))
-	t.Cleanup(server.Close)
-	previousURL := openUPMRegistryBaseURL
-	previousClient := packageRegistryHTTPClient
-	openUPMRegistryBaseURL = server.URL
-	packageRegistryHTTPClient = server.Client()
-	t.Cleanup(func() {
-		openUPMRegistryBaseURL = previousURL
-		packageRegistryHTTPClient = previousClient
-	})
-
-	code, _, stderr := runPackageForTest(t, projectRoot, "install")
-
-	if code != 1 || !strings.Contains(stderr, "PACKAGE_REGISTRY_UNAVAILABLE") || !strings.Contains(stderr, "OpenUPM registry returned HTTP 503") {
-		t.Fatalf("expected the registry error: code=%d stderr=%s", code, stderr)
-	}
-	if manifest := readPackageManifest(t, projectRoot); manifest != barePackageManifest() {
-		t.Fatalf("manifest must stay untouched: %s", manifest)
+// Verifies invalid Git version inputs fail without replacing an existing working dependency.
+func TestPackageInstallRejectsInvalidVersionsWithoutChangingManifest(t *testing.T) {
+	for _, value := range []string{"main", "1.2", "1.2.3#main", "1.2.3/../main", " 1.2.3 "} {
+		t.Run(value, func(t *testing.T) {
+			manifest := installedPackageManifest(packageGitURL + "#v3.22.2")
+			projectRoot := createPackageTestProject(t, manifest)
+			code, _, stderr := runPackageForTest(t, projectRoot, "install", "--version", value)
+			if code != 1 || !strings.Contains(stderr, "Invalid package version") {
+				t.Fatalf("code=%d stderr=%s", code, stderr)
+			}
+			if after := readPackageManifest(t, projectRoot); after != manifest {
+				t.Fatalf("manifest changed: %s", after)
+			}
+		})
 	}
 }
 
@@ -754,41 +511,36 @@ func TestPackageInstallReportsManifestWriteFailure(t *testing.T) {
 	}
 }
 
+// Verifies upgrading changes a Git tag and reports both dependency URLs.
 func TestPackageInstallReportsVersionUpgrade(t *testing.T) {
-	// Verifies installing a new version over an existing dependency reports the previous and new versions.
-	projectRoot := createPackageTestProject(t, installedPackageManifest("1.0.0"))
-
+	previous := packageGitURL + "#v1.0.0"
+	next := packageGitURL + "#v2.0.0"
+	projectRoot := createPackageTestProject(t, installedPackageManifest(previous))
 	code, stdout, stderr := runPackageForTest(t, projectRoot, "install", "--version", "2.0.0")
-
-	if code != 0 || !strings.Contains(stdout, "Updated "+dispatcherUnityPackageName+" 1.0.0 -> 2.0.0 in Packages/manifest.json") {
-		t.Fatalf("unexpected result: code=%d stdout=%s stderr=%s", code, stdout, stderr)
+	if code != 0 || !strings.Contains(stdout, "Updated "+dispatcherUnityPackageName+" "+previous+" -> "+next+" in Packages/manifest.json") {
+		t.Fatalf("code=%d stdout=%s stderr=%s", code, stdout, stderr)
 	}
-	if strings.Contains(stdout, "Added scoped registry") {
-		t.Fatalf("the existing registry must not be reported as added: %s", stdout)
-	}
+	assertManifestHasDependency(t, []byte(readPackageManifest(t, projectRoot)), dispatcherUnityPackageName, next)
 }
 
+// Verifies malformed package dependencies fail inspection instead of appearing absent.
 func TestInspectPackageManifestStatusRejectsMalformedEntries(t *testing.T) {
-	// Verifies malformed dependency or registry entries fail inspection instead of being read as not installed.
-	cases := map[string]string{
-		"dependencies not an object":  `{"dependencies":[]}`,
-		"registries not an array":     `{"scopedRegistries":{}}`,
-		"registry entry not object":   `{"scopedRegistries":[1]}`,
-		"registry url not a string":   `{"scopedRegistries":[{"url":1}]}`,
-		"registry scopes not strings": `{"scopedRegistries":[{"url":"` + openUPMRegistryURL + `","scopes":[1]}]}`,
-	}
-	for name, manifest := range cases {
+	for _, manifest := range []string{`{not json`, `{"dependencies":[]}`, `{"dependencies":{"io.github.tongguang.tloop":1}}`} {
 		if _, err := inspectPackageManifestStatus([]byte(manifest)); err == nil {
-			t.Fatalf("%s: expected an inspection error", name)
+			t.Fatalf("expected an error for %s", manifest)
 		}
 	}
 }
 
-func TestInspectPackageManifestStatusIgnoresRegistryWithoutScopes(t *testing.T) {
-	// Verifies an OpenUPM registry entry without scopes does not count as installed.
-	status, err := inspectPackageManifestStatus([]byte(`{"scopedRegistries":[{"url":"` + openUPMRegistryURL + `"}]}`))
-
-	if err != nil || status.registryInstalled {
-		t.Fatalf("unexpected status: %+v err=%v", status, err)
+// Verifies reinstalling a pinned Git dependency never replaces it with a registry version.
+func TestPackageInstallPreservesMatchingGitDependency(t *testing.T) {
+	manifest := installedPackageManifest(packageGitURL + "#v3.22.2")
+	projectRoot := createPackageTestProject(t, manifest)
+	code, stdout, stderr := runPackageForTest(t, projectRoot, "install", "--version", "3.22.2")
+	if code != 0 || !strings.Contains(stdout, "already installed") {
+		t.Fatalf("code=%d stdout=%s stderr=%s", code, stdout, stderr)
+	}
+	if after := readPackageManifest(t, projectRoot); after != manifest {
+		t.Fatalf("manifest changed: %s", after)
 	}
 }

@@ -67,9 +67,9 @@ Before publishing the fork's first release:
 - Use the existing release flow to publish the fork's native assets and stamp
   their verified hashes into the package pin before publishing the package.
   Do not reuse upstream archives or manually relabel their pin entries.
-- Configure Homebrew, winget, and OpenUPM separately if those channels are wanted.
-  The source configuration alone does not register or publish the renamed
-  package in any external registry.
+- Homebrew and winget need separate configuration if those channels are wanted.
+  This branch does not publish to OpenUPM; `tloop package install` uses the fork's
+  Git URL, following `main` by default or a release tag with `--version`.
 
 The inherited `unity-compile-check-and-test-runner.yml` and
 `unity-editmode-tests.yml` still run Unity Editors, including Unity 6000 releases.

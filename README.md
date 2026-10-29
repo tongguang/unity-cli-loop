@@ -68,9 +68,11 @@ curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scrip
 tloop --version
 ```
 
-本分支暂未配置 Homebrew、winget 或 OpenUPM 分发。`tloop package install` 依赖 OpenUPM 注册；本次发布请按下一步使用 Git URL 或 tarball 安装插件。
+本分支通过 GitHub Releases 和 Git URL 分发，不发布到 OpenUPM。Homebrew、winget 分发尚未配置。
 
 ### 2. 安装团结插件
+
+在团结工程根目录运行 `tloop package install`，即可将 Git URL 写入 `Packages/manifest.json`。默认跟随 `main`；使用 `tloop package install --version <版本号>` 可固定到已发布的版本标签。
 
 在团结 Editor 的 `Window > Package Manager` 中选择 **Add package from git URL**，输入：
 
