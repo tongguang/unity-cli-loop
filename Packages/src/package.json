@@ -1,11 +1,4 @@
 {
-  "name": "io.github.tongguang.tloop",
-  "version": "3.22.3",
-  "displayName": "Tuanjie CLI Loop",
-  "description": "AI-driven development loop for Tuanjie via CLI.",
-  "unity": "2022.3",
-  "documentationUrl": "https://github.com/tongguang/unity-cli-loop/blob/main/README.md",
-  "licensesUrl": "https://github.com/tongguang/unity-cli-loop/blob/main/LICENSE.md",
   "author": {
     "name": "hatayama",
     "email": "booqle@gmail.com",
@@ -16,6 +9,9 @@
     "com.unity.nuget.newtonsoft-json": "3.2.1",
     "com.unity.nuget.mono-cecil": "1.11.6"
   },
+  "description": "AI-driven development loop for Tuanjie via CLI.",
+  "displayName": "Tuanjie CLI Loop",
+  "documentationUrl": "https://github.com/tongguang/unity-cli-loop/blob/main/README.md",
   "keywords": [
     "Tuanjie CLI Loop",
     "tloop",
@@ -26,8 +22,12 @@
     "AI"
   ],
   "license": "MIT",
+  "licensesUrl": "https://github.com/tongguang/unity-cli-loop/blob/main/LICENSE.md",
+  "name": "io.github.tongguang.tloop",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tongguang/unity-cli-loop.git"
-  }
-} 
+  },
+  "unity": "2022.3",
+  "version": "3.22.4"
+}

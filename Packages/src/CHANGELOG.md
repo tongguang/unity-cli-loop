@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.22.4](https://github.com/tongguang/unity-cli-loop/compare/v3.22.3...v3.22.4) (2026-10-29)
+
+- fix: disable retired input overlay state mutations (bd423e52)
+- feat(verify-project): accept Tuanjie-encoded GUIDs (88b1a256)
+- feat: retire the replay-input tool and disable input recording (2745e0b2)
+
 ## [3.22.3](https://github.com/tongguang/unity-cli-loop/compare/v3.22.2...v3.22.3) (2026-10-29)
 
 
