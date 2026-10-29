@@ -81,10 +81,7 @@ func updatePackageManifestDependencies(root *orderedJSONObject, version string, 
 		return fmt.Errorf("dependencies: %w", err)
 	}
 
-	versionJSON, err := json.Marshal(version)
-	if err != nil {
-		return err
-	}
+	versionJSON, _ := json.Marshal(version)
 	existing, exists := dependencies.values[dispatcherUnityPackageName]
 	if exists {
 		var previous string
@@ -112,10 +109,7 @@ func updatePackageManifestDependencies(root *orderedJSONObject, version string, 
 }
 
 func insertDependencyAlphabetically(dependencies *orderedJSONObject, name string, version string) {
-	versionJSON, err := json.Marshal(version)
-	if err != nil {
-		panic(err)
-	}
+	versionJSON, _ := json.Marshal(version)
 	insertAt := len(dependencies.keys)
 	for index, key := range dependencies.keys {
 		if key > name {

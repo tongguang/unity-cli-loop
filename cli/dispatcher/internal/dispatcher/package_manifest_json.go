@@ -84,10 +84,7 @@ func emitOrderedJSONObject(object orderedJSONObject, depth int) (json.RawMessage
 		if !ok {
 			return nil, fmt.Errorf("missing value for key %q", key)
 		}
-		encodedKey, err := json.Marshal(key)
-		if err != nil {
-			return nil, err
-		}
+		encodedKey, _ := json.Marshal(key)
 		formattedValue, err := formatJSONRawForEmit(raw, depth+1)
 		if err != nil {
 			return nil, err

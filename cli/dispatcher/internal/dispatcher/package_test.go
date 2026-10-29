@@ -435,6 +435,8 @@ func TestPackageCommandsReportFailures(t *testing.T) {
 	}{
 		{name: "install invalid option", manifest: barePackageManifest(), args: []string{"install", "--bogus=1"}, wantMessage: "Unknown package install option: --bogus"},
 		{name: "install invalid manifest", manifest: "{", args: []string{"install", "--version", "1.0.0"}, wantMessage: "PACKAGE_MANIFEST_INVALID"},
+		{name: "install invalid manifest key", manifest: "{:}", args: []string{"install", "--version", "1.0.0"}, wantMessage: "PACKAGE_MANIFEST_INVALID"},
+		{name: "install trailing JSON value", manifest: `{"dependencies":{}} true`, args: []string{"install", "--version", "1.0.0"}, wantMessage: "PACKAGE_MANIFEST_INVALID"},
 		{name: "status invalid option", manifest: barePackageManifest(), args: []string{"status", "--verbose"}, wantMessage: "Unknown package status option: --verbose"},
 		{name: "status invalid manifest", manifest: "{", args: []string{"status"}, wantMessage: "PACKAGE_MANIFEST_INVALID"},
 		{name: "status dependency not a string", manifest: `{"dependencies":{"` + dispatcherUnityPackageName + `":1}}`, args: []string{"status"}, wantMessage: "PACKAGE_MANIFEST_INVALID"},
@@ -483,6 +485,29 @@ func TestPackageInstallRejectsInvalidVersionsWithoutChangingManifest(t *testing.
 				t.Fatalf("manifest changed: %s", after)
 			}
 		})
+	}
+}
+
+// Verifies a failed rename removes the temporary file and preserves the occupied destination.
+func TestWritePackageManifestAtomicallyCleansUpAfterRenameFailure(t *testing.T) {
+	manifestPath := filepath.Join(t.TempDir(), "manifest.json")
+	if err := os.Mkdir(manifestPath, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	markerPath := filepath.Join(manifestPath, "existing")
+	if err := os.WriteFile(markerPath, []byte("keep"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := writePackageManifestAtomically(manifestPath, []byte(barePackageManifest())); err == nil {
+		t.Fatal("expected rename to fail when the destination is an occupied directory")
+	}
+	if _, err := os.Stat(manifestPath + ".tmp"); !os.IsNotExist(err) {
+		t.Fatalf("temporary manifest was not removed: %v", err)
+	}
+	marker, err := os.ReadFile(markerPath)
+	if err != nil || string(marker) != "keep" {
+		t.Fatalf("destination changed: marker=%q err=%v", marker, err)
 	}
 }
 
