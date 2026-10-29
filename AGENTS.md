@@ -182,9 +182,9 @@ figures in `coverage-baseline.json`; the Linux `build-cli` job fails the pull
 request otherwise.
 When your tests lift a module a point or more, the job summary suggests a new
 figure; raise it in the same pull request. Never lower a figure without a reason
-in the pull request description. C# coverage is measured nightly in the Unity
-2022.3 EditMode leg and posted to the `coverage-trend` issue; it warns but never
-gates. What is measured and how to run it locally: `docs/coverage.md`.
+in the pull request description. C# coverage is not measured, because no CI job
+runs a Tuanjie Editor. What is measured and how to run it locally:
+`docs/coverage.md`.
 
 ## Nested Type Name Forms
 
@@ -272,11 +272,11 @@ tests (especially anything touching async execution, cancellation, threads, or d
 runtime paths), read `docs/unity-editmode-test-guardrails.md` and follow its rules. If a new
 test makes `tloop run-tests` stall, remove or disable it instead of retrying the suite. If
 Unity freezes or stops responding to `tloop`, restart the Editor with `tloop launch -r`.
-`unity-editmode-tests.yml` runs the full EditMode suite on a schedule and on a manual
-`workflow_dispatch`, but in this fork it gates nothing: its jobs run only when the
-`UNITY_LICENSE` secret is set, which it is not, and they test Unity rather than Tuanjie (see
-`docs/tuanjie-compatibility.md`). Pull-request CI and local pre-commit verification do not run
-the full suite either — it takes far too long. Before a commit or
+No CI job runs a Tuanjie Editor, so CI runs no EditMode test. `scripts/check-tuanjie.ps1`
+compiles the project and runs a scoped EditMode test set in the open Editor; run it after
+merging upstream changes and before merging a release pull request (see
+`docs/tuanjie-compatibility.md`). Local pre-commit verification does not run the full suite
+either — it takes far too long. Before a commit or
 pull request, run only the tests that cover the code you changed, scoped with
 `--filter-type class` / `--filter-value <TestClass>` (`regex` for a few classes, `assembly` for
 one test assembly). Run the full unfiltered suite locally only when the change touches shared

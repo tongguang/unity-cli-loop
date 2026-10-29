@@ -57,8 +57,8 @@ The two rules that motivated the checker:
   below `Application`. A Common assembly that reaches into `Application` can no
   longer be reused by anything that must stay lightweight.
 
-There is no cycle rule. Unity refuses to import an asmdef cycle, and the
-`unity-compile-check-and-test-runner.yml` workflow already surfaces that.
+There is no cycle rule. Unity refuses to import an asmdef cycle, so the next
+Editor compile already surfaces it.
 
 ## Allowlist
 

@@ -1,5 +1,0 @@
-{
-  "dependencies": {
-    "io.github.tongguang.tloop": "file:../../../../Packages/src"
-  }
-}

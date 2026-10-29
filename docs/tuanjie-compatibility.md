@@ -71,13 +71,13 @@ Before publishing the fork's first release:
   This branch does not publish to OpenUPM; `tloop package install` uses the fork's
   Git URL, following `main` by default or a release tag with `--version`.
 
-The inherited `unity-compile-check-and-test-runner.yml` and
-`unity-editmode-tests.yml` still run Unity Editors, including Unity 6000 releases.
-They have not been migrated to Tuanjie and are not evidence of Tuanjie
-compatibility. A Tuanjie CI job needs an available Tuanjie Editor and its own
-working activation setup; changing the matrix version string alone does not
-provide either. The first release check found no repository secrets or GitHub
-App configuration.
+No CI job starts a Unity or Tuanjie Editor. The inherited GameCI jobs tested
+Unity and ran only when a `UNITY_LICENSE` secret was set, which this fork never
+had, so they were removed; `unity-compile-check-and-test-runner.yml` keeps only
+the Unity-free .NET unit tests. A Tuanjie CI job would need a machine with an
+installed and activated Tuanjie Editor, which GitHub-hosted runners do not
+provide. Use the [local Tuanjie check](#local-tuanjie-check) instead. The first
+release check found no repository secrets or GitHub App configuration.
 The package workflow was then changed to ordinary UPM packing at the user's request.
 
 ## Editor discovery and local validation
@@ -133,12 +133,7 @@ or `--editor-path` can also select a Tuanjie Editor explicitly.
 This repository's own development project uses Tuanjie 1.9.1 (`2022.3.62t9`).
 Opening it in that Editor raised Input System to the Editor-bundled `1.14.4-t1`
 and the Universal Render Pipeline to the built-in `14.2.0-t1`, and switched the
-default registry to `packages.tuanjie.cn`. The EditMode workflow still tests with
-Unity: its GameCI jobs run the Unity versions named in their matrix, and its
-Release leg downloads the Editor named in `ProjectVersion.txt` from Unity's
-servers, which serve no Tuanjie build. These jobs run only when the
-`UNITY_LICENSE` secret is set, and the Release leg cannot start against this
-project until it installs Tuanjie instead.
+default registry to `packages.tuanjie.cn`.
 
 These discovery changes do not establish compatibility with every Tuanjie release.
 Tools using private Editor APIs, the bundled compiler, or hot reload still need
@@ -184,8 +179,8 @@ With Tuanjie 1.9.1 the development project opened from Tuanjie Hub reached
 with zero errors and warnings. A scoped EditMode run of the third-party migration,
 pause-point, transform-worker, and hot-reload package-source tests passed 957 of
 958 tests with one skipped and none failed. The pause-point tests need Debug code
-optimization, which the CI workflow sets with `-debugCodeOptimization`; in an
-Editor running in Release, run `tloop set-code-optimization debug` before them.
+optimization; in an Editor running in Release, run
+`tloop set-code-optimization debug` before them.
 
 The fork's release-please config uses the upstream import commit as
 `bootstrap-sha`, so its first release notes contain this fork's changes rather
@@ -204,3 +199,30 @@ On this Windows host, GitHub CLI 2.97.0 reported `verifying with issuer
 "sigstore.dev"` without details when checking the public archive. The product's
 embedded verifier succeeded against that same downloaded bundle and tag commit;
 the publisher's GitHub-hosted Linux verification also succeeded.
+
+## Local Tuanjie check
+
+`scripts/check-tuanjie.ps1` checks this project against the Tuanjie Editor that
+already has it open. It confirms the Editor can take a command, compiles the
+project and fails on any error or warning, then runs the `CliVersionComparerTests`
+EditMode tests. It exits 1 at the first failing step. Run it after merging
+upstream changes and before merging a release pull request.
+
+```powershell
+pwsh -NoProfile -File ./scripts/check-tuanjie.ps1
+pwsh -NoProfile -File ./scripts/check-tuanjie.ps1 -TestFilterType regex -TestFilterValue CliPin
+pwsh -NoProfile -File ./scripts/check-tuanjie.ps1 -SkipTests
+```
+
+The default tests only show that the Test Runner works under Tuanjie. To cover a
+change, pass `-TestFilterType` and `-TestFilterValue` with the values
+`tloop run-tests` accepts, except `all`: the unfiltered suite takes far too long
+for this check.
+
+The script uses this checkout's `dist` binary; rebuild it with
+`scripts/build-go-cli.sh` after CLI source changes, or pass `-TloopPath`. It never
+launches, restarts, or focuses the Editor. It stops when the Editor is in Play
+Mode, because a compile would discard the Play session, and it runs the tests
+with `--unsaved-changes fail`, so unsaved Scene changes stop the test run instead
+of being saved. `scripts/test-check-tuanjie.ps1` covers these outcomes with a
+fake `tloop`.

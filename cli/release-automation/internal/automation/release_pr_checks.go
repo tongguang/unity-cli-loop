@@ -17,7 +17,7 @@ const (
 	// GITHUB_TOKEN-created release PRs never trigger pull_request workflows on
 	// their own, so every workflow that produces a required status check must be
 	// dispatched here: build-cli, test-unity-package, and test-windows-installers
-	// come from build-and-test.yml, while Compile Check (Linux) comes from
+	// come from build-and-test.yml, while the C# unit tests come from
 	// unity-compile-check-and-test-runner.yml.
 	defaultReleasePRCheckWorkflows             = "build-and-test.yml,unity-compile-check-and-test-runner.yml"
 	defaultReleasePRCheckLookupAttempts        = 30
