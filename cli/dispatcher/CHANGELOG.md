@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.14.3](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.2...dispatcher-v3.14.3) (2026-10-29)
+
+
+### Bug Fixes
+
+* CLI binaries ship with the Go 1.27.3 runtime ([d6060e4](https://github.com/tongguang/unity-cli-loop/commit/d6060e4fa9a479d703c8968547de4dbb3ef323bc))
+
 ## [3.14.2](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.1...dispatcher-v3.14.2) (2026-10-29)
 
 
