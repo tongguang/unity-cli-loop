@@ -84,3 +84,9 @@ by category instead of symbol by symbol.
 | `HotReloadUnityMessageProxy`'s protected constructor | The reflection-emitted subclass chains to it; no C# source calls it. |
 | `GenericConsoleWindowUtility.GetConsoleLogCounts` | Pre-Unity-6 fallback behind `#if`; the scanner compiles only the Unity 6 branch. |
 | `Utf8StringWriter.Encoding` | Overrides `StringWriter.Encoding` so the XML writer emits UTF-8. |
+| `RecordInputOverlayState.StartCountdown`, `StartRecording`, `Clear`; `ReplayInputOverlayState.Clear`; `SimulateMouseUiOverlayState.RequestExpandAnimation`, `RequestDissipateAnimation` | The recording/replay retirement removed their Editor callers. The runtime overlays still ship with the shared input-visualization prefab; retain these six public state APIs with those components to avoid an additional public API removal in the retirement change. |
+
+The measured ceiling is 44 after recording/replay retirement (previously 38).
+The six retained overlay state methods account for the entire increase. Revisit
+them and lower the ceiling when the runtime overlays receive a dedicated removal
+or migration.

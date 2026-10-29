@@ -425,6 +425,8 @@ jobs:
       # --max-public-candidates tracks the measured PublicCandidate count with no slack
       # (docs/dead-code-scanner.md). Lower it whenever triage removes a candidate, and
       # raise it only together with the reason the new candidate has to stay.
+      # Retiring recording/replay leaves six public overlay state methods without callers;
+      # preserve their API surface alongside the retained runtime overlays.
       - name: Scan for dead code
         run: >
           scripts/check-dead-code.sh
@@ -437,7 +439,7 @@ jobs:
           --include-kept false
           --format table
           --fail-on high-confidence
-          --max-public-candidates 38
+          --max-public-candidates 44
 
   security-scan:
     needs: source
