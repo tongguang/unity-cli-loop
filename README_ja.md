@@ -174,6 +174,6 @@ AI ツールがサンドボックス内でコマンドを実行している場�
 
 ## 謝辞とライセンス
 
-`tloop` のコマンド、skills、開発ループの仕組みはすべて上流の [Unity CLI Loop](https://github.com/hatayama/unity-cli-loop) に由来します。Masamichi Hatayama 氏に感謝します。このブランチで手を入れているのは主に Tuanjie 対応の部分で、Editor の探索、`uloop` との分離、独立したリリースフローです。リポジトリ内のロゴ、スクリーンショット、デモ素材も上流のものです。上流のロゴは Daft Punk のアルバム *Human After All* のジャケットに着想を得ています。
+`tloop` のコマンド、skills、開発ループの仕組みはすべて上流の [Unity CLI Loop](https://github.com/hatayama/unity-cli-loop) に由来します。Masamichi Hatayama 氏に感謝します。このブランチで手を入れているのは主に Tuanjie 対応の部分で、Editor の探索、`uloop` との分離、独立したリリースフローです。リポジトリ内のロゴ、スクリーンショット、デモ素材も上流のものです。
 
 上流と同じ MIT ライセンスを継承しています。著作権表示は Copyright (c) 2025 Masamichi Hatayama で、全文は [LICENSE.md](LICENSE.md) にあります。パッケージに含まれるサードパーティ製コンポーネントのライセンスは [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md) を参照してください。

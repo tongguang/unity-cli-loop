@@ -174,6 +174,6 @@ AI 工具在沙箱里执行命令时（例如开启了沙箱的 Claude Code）�
 
 ## 致谢与许可
 
-`tloop` 的命令、skills 和整套开发循环都来自上游的 [Unity CLI Loop](https://github.com/hatayama/unity-cli-loop)，感谢 Masamichi Hatayama 的工作。本分支主要做团结适配：Editor 查找、与 `uloop` 的隔离，以及独立的发布流程。仓库里的 logo、截图和演示素材也来自上游。上游 logo 的设计灵感来自 Daft Punk 的专辑 *Human After All* 的封面。
+`tloop` 的命令、skills 和整套开发循环都来自上游的 [Unity CLI Loop](https://github.com/hatayama/unity-cli-loop)，感谢 Masamichi Hatayama 的工作。本分支主要做团结适配：Editor 查找、与 `uloop` 的隔离，以及独立的发布流程。仓库里的 logo、截图和演示素材也来自上游。
 
 本项目沿用上游的 MIT 许可证，版权声明为 Copyright (c) 2025 Masamichi Hatayama，全文见 [LICENSE.md](LICENSE.md)。插件内第三方组件的许可见 [THIRD-PARTY-NOTICES.md](Packages/src/THIRD-PARTY-NOTICES.md)。
