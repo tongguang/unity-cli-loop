@@ -425,6 +425,7 @@ jobs:
       # --max-public-candidates tracks the measured PublicCandidate count with no slack
       # (docs/dead-code-scanner.md). Lower it whenever triage removes a candidate, and
       # raise it only together with the reason the new candidate has to stay.
+      # MainThreadBlockedErrorData.type is a wire discriminator consumed by the CLI.
       - name: Scan for dead code
         run: >
           scripts/check-dead-code.sh
@@ -437,7 +438,7 @@ jobs:
           --include-kept false
           --format table
           --fail-on high-confidence
-          --max-public-candidates 38
+          --max-public-candidates 39
 
   security-scan:
     needs: source

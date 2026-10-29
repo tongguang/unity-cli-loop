@@ -24,6 +24,7 @@ const (
 	errorCodeUnityRPCError                   = "UNITY_RPC_ERROR"
 	errorCodeUnityServerBusy                 = "UNITY_SERVER_BUSY"
 	errorCodeToolCancelled                   = "TOOL_CANCELLED"
+	errorCodeMainThreadBlocked               = "MAIN_THREAD_BLOCKED"
 	ErrorCodeCLIUpdateRequired               = "CLI_UPDATE_REQUIRED"
 	ErrorCodeToolDisabled                    = "TOOL_DISABLED"
 	ErrorCodeCompileWaitTimeout              = "COMPILE_WAIT_TIMEOUT"
