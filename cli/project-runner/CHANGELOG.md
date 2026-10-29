@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.13.3](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.2...tloop-project-runner-v3.13.3) (2026-10-29)
+
+- fix: Agents now see the Unity main-thread stall notice even when stderr is not a terminal (#3416) (eba0ea48)
+- fix: set-game-view-size no longer reports success under the Device Simulator, and --reset removes the size entry it leaves behind (#3412) (4ecde684)
+
 ## [3.13.2](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.1...tloop-project-runner-v3.13.2) (2026-10-29)
 
 - feat: retire the replay-input tool and disable input recording (2745e0b2)
