@@ -43,6 +43,8 @@ curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scrip
 
 **2. プロジェクトにパッケージを追加**
 
+上流の `io.github.hatayama.uloopmcp` が入っているプロジェクトでは、先に `Packages/manifest.json` から削除してください。2 つのパッケージはアセンブリ名と asmdef の GUID が同じため、同時にはインストールできません。
+
 Tuanjie プロジェクトのルートで実行します。
 
 ```sh
@@ -96,7 +98,7 @@ tloop execute-dynamic-code --code 'using UnityEngine; Debug.Log("Hello from tloo
 | 任意の C# の実行 | `execute-dynamic-code` |
 | ウィンドウ、スクリーンショット、録画 | `focus-window`、`screenshot`、`record-video` |
 | Game View と Device Simulator | `set-game-view-size`、`game-view-mode` |
-| PlayMode と入力 | `control-play-mode`、`simulate-keyboard`、`simulate-mouse-input`、`simulate-mouse-ui`、`replay-input` |
+| PlayMode と入力 | `control-play-mode`、`simulate-keyboard`、`simulate-mouse-input`、`simulate-mouse-ui` |
 | ソース上の一時停止と変数のウォッチ | `enable-pause-point`、`await-pause-point`、`enable-watch`、`get-watch-values` |
 
 `tloop list` で現在のプロジェクトで使える全コマンドを、`tloop <command> --help` で引数を確認できます。入力シミュレーションには Input System パッケージが必要です。Linux では `focus-window` を使えません。
@@ -129,10 +131,10 @@ https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src
 
 Windows で確認済みです。
 
-- **Tuanjie 1.9.1**（Editor バージョン `2022.3.62t9`、このリポジトリの開発プロジェクトが使うバージョン）：GUI の Editor で接続でき、コンパイルと対象を絞った EditMode テストが通りました。
+- **Tuanjie 1.9.1**（Editor バージョン `2022.3.62t9`、このリポジトリの開発プロジェクトが使うバージョン）：GUI の Editor で、`launch`（`-r` による再起動を含む）、コンパイル、PlayMode、スクリーンショット、録画、hot reload、ソース上の一時停止、対象を絞った EditMode テストが通りました。
 - **Tuanjie 1.10.3**（Editor バージョン `2022.3.62t15`）：batchmode で動かした Editor で、パッケージのインポート、接続、対象を絞ったテスト、オフラインコンパイルチェックが通りました。
 
-macOS / Linux の Tuanjie Editor と、ほかの Tuanjie バージョンは未検証です。`tloop launch`、PlayMode、hot reload、録画は Tuanjie での追加検証が必要です。詳細と既知の問題は [Tuanjie 互換性メモ](docs/tuanjie-compatibility.md) を参照してください。
+macOS / Linux の Tuanjie Editor と、ほかの Tuanjie バージョンは未検証です。Windows では `focus-window` が OS のフォアグラウンドロックで拒否されることがあります。詳細と既知の問題は [Tuanjie 互換性メモ](docs/tuanjie-compatibility.md) を参照してください。
 
 ## よくある質問
 

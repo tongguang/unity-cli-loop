@@ -159,8 +159,8 @@ The existing POSIX manifest CR rejection test fails under this host's Git Bash
 both before and after these changes. Native Windows pin-resolution tests passed;
 the Bash text-mode difference remains outside this rename.
 
-Graphical Editor startup did not reach CLI readiness during this session and still
-needs verification in a desktop session. The successful headless checks do not
+Graphical Editor startup did not reach CLI readiness during this session; a later
+desktop session verified it (see below). The successful headless checks do not
 establish that graphical startup completed.
 
 That project used Input System 1.7.0: the Tuanjie package registry did not provide
@@ -174,6 +174,30 @@ pause-point, transform-worker, and hot-reload package-source tests passed 957 of
 958 tests with one skipped and none failed. The pause-point tests need Debug code
 optimization; in an Editor running in Release, run
 `tloop set-code-optimization debug` before them.
+
+A later graphical-Editor session with Tuanjie 1.9.1 on Windows exercised the
+runtime tools with a dispatcher built from this checkout. `launch` started the
+Editor and returned once it was ready; run again, it reported `AlreadyRunning`.
+`launch -r` asked the Editor to quit (`StopMethod: Quit`) and was ready again
+after 49 seconds. `compile` returned zero errors and warnings after the domain
+reload that its C# changes caused. `control-play-mode` started and stopped Play
+Mode. In Play Mode, `screenshot --capture-mode rendering` captured the 1080x1920
+Game View, and `record-video --seconds 3` recorded 96 frames of the
+HotReloadSpinningImage harness, 95 of them different from the previous frame.
+`scripts/regression-harness-hot-reload.sh` passed: the patched method body
+changed the logged marker, and `--revert-all` restored it. On the
+KeyStateAfterPauseInterruption harness, a file:line
+`enable-pause-point --await --trigger "simulate-keyboard --action Press --key Space --duration 5"`
+hit after 1.9 seconds and captured `isHeld = True`, with Debug code
+optimization. `scripts/check-tuanjie.ps1` passed.
+
+The development project enters Play Mode with Domain Reload disabled, so that
+session did not exercise a Play-entry domain reload. `focus-window` failed
+because Windows refused the foreground change for a caller that was not in the
+foreground itself (foreground lock); click the Editor window or its taskbar icon
+instead. When `launch` runs from a shell that ends every child process as a
+command returns, the Editor it started exits with that command. That comes from
+the calling environment: an Editor launched from a detached job kept running.
 
 The historical release-please config uses the upstream import commit as
 `bootstrap-sha`, so its first release notes contain this fork's changes rather

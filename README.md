@@ -43,6 +43,8 @@ curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scrip
 
 **2. 把插件加入工程**
 
+如果工程里已经装了上游的 `io.github.hatayama.uloopmcp`，先把它从 `Packages/manifest.json` 里删掉。两个包的程序集名称和 asmdef GUID 相同，不能同时安装。
+
 在团结工程根目录运行：
 
 ```sh
@@ -96,7 +98,7 @@ tloop execute-dynamic-code --code 'using UnityEngine; Debug.Log("Hello from tloo
 | 执行任意 C# | `execute-dynamic-code` |
 | 窗口、截图、录屏 | `focus-window`、`screenshot`、`record-video` |
 | Game View 和设备模拟器 | `set-game-view-size`、`game-view-mode` |
-| PlayMode 和输入 | `control-play-mode`、`simulate-keyboard`、`simulate-mouse-input`、`simulate-mouse-ui`、`replay-input` |
+| PlayMode 和输入 | `control-play-mode`、`simulate-keyboard`、`simulate-mouse-input`、`simulate-mouse-ui` |
 | 源码暂停点和变量监视 | `enable-pause-point`、`await-pause-point`、`enable-watch`、`get-watch-values` |
 
 `tloop list` 列出当前工程可用的全部命令，`tloop <command> --help` 查看参数。输入模拟需要工程使用 Input System 包。`focus-window` 不支持 Linux。
@@ -129,10 +131,10 @@ https://github.com/tongguang/unity-cli-loop.git?path=/Packages/src
 
 已在 Windows 上验证：
 
-- **团结 1.9.1**（Editor 版本 `2022.3.62t9`，也是本仓库开发工程使用的版本）：图形界面的 Editor 连接正常，编译和定向 EditMode 测试通过。
+- **团结 1.9.1**（Editor 版本 `2022.3.62t9`，也是本仓库开发工程使用的版本）：在图形界面的 Editor 中，`launch`（包括 `-r` 重启）、编译、PlayMode、截图、录屏、热重载、源码暂停点和定向 EditMode 测试都已通过。
 - **团结 1.10.3**（Editor 版本 `2022.3.62t15`）：在 batchmode 运行的 Editor 中，插件导入、连接、定向测试和离线编译检查通过。
 
-macOS 和 Linux 上的团结 Editor、其他团结版本都还没有测试。`tloop launch`、PlayMode、热重载和录屏在团结上还需要进一步验证。测试明细和已知问题见 [团结兼容性说明](docs/tuanjie-compatibility.md)。
+macOS 和 Linux 上的团结 Editor、其他团结版本都还没有测试。在 Windows 上，`focus-window` 可能被系统的前台锁拒绝。测试明细和已知问题见 [团结兼容性说明](docs/tuanjie-compatibility.md)。
 
 ## 常见问题
 
