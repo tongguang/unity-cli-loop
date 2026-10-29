@@ -133,7 +133,8 @@ func requireDirectoryIfPresent(path string) error {
 type verifier struct {
 	projectRoot string
 	findings    []Finding
-	// guidPaths maps each lower-cased GUID to the display paths of the .meta files declaring it.
+	// guidPaths maps the duplicate key of each GUID (see classifyGUID) to the display paths of the
+	// .meta files declaring it.
 	guidPaths     map[string][]string
 	metaFileCount int
 }

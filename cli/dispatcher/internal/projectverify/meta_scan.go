@@ -13,7 +13,6 @@ import (
 const (
 	metaFileExtension = ".meta"
 	metaGUIDKey       = "guid:"
-	guidLength        = 32
 )
 
 // scanDirectory pairs every entry of dir with its .meta file and descends into the folders Unity
@@ -105,10 +104,13 @@ func (v *verifier) checkMetaFile(
 	if err != nil {
 		return fmt.Errorf("read %s: %w", path, err)
 	}
-	guid, valid := parseMetaGUID(content)
-	if valid {
+	guid, form := parseMetaGUID(content)
+	switch form {
+	case guidFormHex, guidFormTuanjieEncoded:
 		v.guidPaths[guid] = append(v.guidPaths[guid], display)
-	} else {
+	case guidFormTuanjieEncodedMismatch:
+		v.addFinding(CheckGUIDInvalid, display, 0, tuanjieGUIDMismatchMessage(display))
+	default:
 		v.addFinding(CheckGUIDInvalid, display, 0, guidInvalidMessage(display))
 	}
 
@@ -122,9 +124,8 @@ func (v *verifier) checkMetaFile(
 	return nil
 }
 
-// parseMetaGUID returns the lower-cased value of the first column-0 "guid:" line and whether it
-// is a GUID Unity accepts.
-func parseMetaGUID(content []byte) (string, bool) {
+// parseMetaGUID returns the duplicate key and form of the value on the first column-0 "guid:" line.
+func parseMetaGUID(content []byte) (string, guidForm) {
 	text := string(bytes.TrimPrefix(content, []byte(utf8ByteOrderMark)))
 	for _, rawLine := range strings.Split(text, "\n") {
 		line := strings.TrimSuffix(rawLine, "\r")
@@ -133,32 +134,9 @@ func parseMetaGUID(content []byte) (string, bool) {
 		}
 		// Only the first guid line counts, the way Unity reads the file.
 		value := strings.TrimSpace(strings.TrimPrefix(line, metaGUIDKey))
-		return strings.ToLower(value), isValidGUID(value)
+		return classifyGUID(value)
 	}
-	return "", false
-}
-
-// isValidGUID reports whether value is 32 hexadecimal characters that are not all zero.
-func isValidGUID(value string) bool {
-	if len(value) != guidLength {
-		return false
-	}
-	allZero := true
-	for _, character := range value {
-		if !isHexDigit(character) {
-			return false
-		}
-		if character != '0' {
-			allZero = false
-		}
-	}
-	return !allZero
-}
-
-func isHexDigit(character rune) bool {
-	return ('0' <= character && character <= '9') ||
-		('a' <= character && character <= 'f') ||
-		('A' <= character && character <= 'F')
+	return "", guidFormInvalid
 }
 
 // isOpaquePluginFolder reports whether Unity imports a folder as one plugin instead of file by file.
@@ -205,7 +183,15 @@ func metaOrphanMessage(path string) string {
 
 func guidInvalidMessage(path string) string {
 	return path + ` has no valid guid line (expected "guid: " followed by 32 hexadecimal characters, ` +
-		"not all zero). Unity will assign a new GUID, which breaks references to this asset."
+		"not all zero, or a 56-character Tuanjie-encoded GUID). Unity will assign a new GUID, which " +
+		"breaks references to this asset."
+}
+
+func tuanjieGUIDMismatchMessage(path string) string {
+	return path + " has a guid that looks like a Tuanjie-encoded GUID but does not decode the way " +
+		"Tuanjie's encoding does, so the value is probably damaged. If every Tuanjie-encoded GUID in the " +
+		"project is reported like this, this Tuanjie version probably encodes GUIDs differently and " +
+		"verify-project needs updating."
 }
 
 func guidDuplicateMessage(path string, guid string, relatedPaths []string) string {

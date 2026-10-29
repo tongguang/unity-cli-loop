@@ -207,7 +207,8 @@ func TestRunReportsInvalidGuids(t *testing.T) {
 		guidInvalid("Assets/Zero.txt.meta"))
 	assertMessagesAt(t, report, projectverify.CheckGUIDInvalid, "Assets/NotHex.txt.meta",
 		`Assets/NotHex.txt.meta has no valid guid line (expected "guid: " followed by 32 hexadecimal`+
-			` characters, not all zero). Unity will assign a new GUID, which breaks references to this asset.`)
+			` characters, not all zero, or a 56-character Tuanjie-encoded GUID). Unity will assign a new GUID,`+
+			` which breaks references to this asset.`)
 }
 
 // Verifies a .meta file with a byte order mark right before its guid line and CRLF line endings is read.

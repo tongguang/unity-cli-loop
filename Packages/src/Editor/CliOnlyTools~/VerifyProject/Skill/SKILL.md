@@ -37,8 +37,8 @@ Exit codes:
 |-------|---------|------------|
 | `CONFLICT_MARKER` | A merge conflict block (`<<<<<<<`, `=======`, `>>>>>>>`) is left in a file | Resolve the conflict and remove the markers; Tuanjie cannot load or compile a file that contains them |
 | `MANIFEST_INVALID` | `Packages/manifest.json` is missing, is not a valid JSON object, has a malformed `dependencies` object, or has a `file:` dependency that does not point to a package folder | Restore the manifest from version control, or fix or remove the dependency the message names |
-| `GUID_DUPLICATE` | Two or more `.meta` files declare the same GUID | Keep the `.meta` file of the original asset and delete the copies' `.meta` files so Tuanjie assigns them new GUIDs |
-| `GUID_INVALID` | A `.meta` file has no valid `guid:` line (32 hexadecimal characters, not all zero) | Restore the `.meta` file from version control; otherwise Tuanjie assigns a new GUID, which breaks references to the asset |
+| `GUID_DUPLICATE` | Two or more `.meta` files declare the same GUID (hex GUIDs compared ignoring case, Tuanjie-encoded GUIDs exactly as written, each form only with itself) | Keep the `.meta` file of the original asset and delete the copies' `.meta` files so Tuanjie assigns them new GUIDs |
+| `GUID_INVALID` | A `.meta` file has no valid `guid:` line: either 32 hexadecimal characters, not all zero, or a 56-character Tuanjie-encoded GUID. A value shaped like an encoded GUID that does not decode the way Tuanjie's encoding does gets its own message | Restore the `.meta` file from version control; otherwise Tuanjie assigns a new GUID, which breaks references to the asset |
 | `META_MISSING` | An asset has no `.meta` file next to it | Bring its `.meta` file along from the branch or folder it came from; if you just created the asset, let Tuanjie import it (for example with `tloop compile`) and commit the generated `.meta` file |
 | `META_ORPHAN` | A `.meta` file has no matching asset | If the asset was moved or renamed, move the `.meta` file with it to keep the GUID; if the asset was deleted, delete the `.meta` file too |
 
@@ -82,6 +82,6 @@ JSON on stdout:
 - A file you just created has no .meta file until Tuanjie imports it. Run `tloop compile` first, or treat META_MISSING on brand-new files as expected.
 - After a fresh clone, an empty folder that git does not track leaves its folder .meta file as META_ORPHAN. Delete that .meta file, or add a file to the folder so git tracks it.
 - Run it while Tuanjie is idle. Files Tuanjie is writing at that moment can be reported, and a file Tuanjie deletes during the check makes the command fail; run it again once Tuanjie is idle.
-- Not checked: GUID collisions with packages in Library/PackageCache, folders hidden only by the Windows hidden attribute (they are reported as META_MISSING), and package folders under Packages/ that are symbolic links.
+- Not checked: GUID collisions with packages in Library/PackageCache, whether a Tuanjie-encoded GUID and a 32-hex GUID name the same asset, folders hidden only by the Windows hidden attribute (they are reported as META_MISSING), and package folders under Packages/ that are symbolic links.
 - It only reads files and works whether Tuanjie is open or closed.
 - If tloop answers that verify-project is an unknown command, or that it "is handled by the global tloop dispatcher", the installed tloop is older than this command: run `tloop update`.
