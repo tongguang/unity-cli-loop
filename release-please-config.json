@@ -1,5 +1,5 @@
 {
-  "pull-request-header": "Release components:\n\n- `unity-package`: Unity Package Manager/OpenUPM package (`v<version>` tags).\n- `tloop-project-runner`: native project runner binaries (`tloop-project-runner-v<version>` tags).\n- `dispatcher`: native dispatcher binaries (`dispatcher-v<version>` tags).",
+  "pull-request-header": "Release components:\n\n- `unity-package`: Tuanjie UPM package (`v<version>` tags).\n- `tloop-project-runner`: native project runner binaries (`tloop-project-runner-v<version>` tags).\n- `dispatcher`: native dispatcher binaries (`dispatcher-v<version>` tags).",
   "separate-pull-requests": true,
   "always-update": true,
   "packages": {
