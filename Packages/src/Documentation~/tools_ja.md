@@ -214,3 +214,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run-windows-e2e.ps
 ```
 
 `run-posix-e2e.sh` は、デフォルトでチェックイン済みのネイティブCLIバイナリを使い、すべての `tloop` 呼び出しに明示的な `--project-path` を渡します。CLI recovery/readiness、simulate-mouse UI、UI Toolkit のスクリーンショット注釈とクリックを1つの流れで検証します（最後のものは `--skip-uitoolkit-annotation` で省けます）。
+
+## Editor 状態確認ツール
+
+### 18. status - Editor がコマンドを受けられるか確認
+Tuanjie が起動中・コンパイル中・処理中・終了している可能性があるときは、コマンドを送る前に `tloop status` を使います。副作用なしで応答し、`State` 欄に状態を 1 つだけ返します: `Busy`（tloop のコマンドが実行枠を持っている）、`Starting`、`MainThreadBlocked`（main thread が 5 秒以上動いていない。多くはモーダルダイアログ）、`Compiling`、`ImportingAssets`、`Ready`（exit code 0 になる唯一の状態）、`NotResponding`、`ServerUnavailable`、`NotRunning`、`Unreachable`。
+
+main thread がブロックされている間に送ったコマンドは、その解除を待ちます。コマンドのコードがまだ 1 行も動いていない状態で停止が 30 秒に達すると、Tuanjie は待機をやめてコマンドの実行枠を解放し、コマンドは `MAIN_THREAD_BLOCKED` と停止秒数を返して失敗します。何も実行されていないので、ブロックが解けた後に送り直しても安全です。このパッケージが pin する project runner は、専用のエラーコードと案内を表示します。コマンド自身のコードが main thread をブロックしている場合は止めません。代わりに CLI が 60 秒ごとに stderr へ停止の通知を出し、5 分で `UNITY_EDITOR_UNRESPONSIVE` を返して諦めます。ただし `execute-dynamic-code` は例外で、スニペットが main thread を塞いでいる間は打ち切りません。
+
+```text
+→ status
+→ State: MainThreadBlocked, SecondsSinceLastMainThreadTick: 12.3
+→ Dismiss the dialog (or run focus-window to find it), then send the command once more
+```

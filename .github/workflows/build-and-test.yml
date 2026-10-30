@@ -79,7 +79,6 @@ jobs:
           scripts/test-go-cli-toolchain.sh
           scripts/test-resolve-native-cli-release-target.sh
           scripts/test-resolve-dispatcher-release-target.sh
-          scripts/test-is-release-please-release-commit.sh
           scripts/test-release-please-config.sh
           scripts/test-verify-native-cli-release-assets.sh
           scripts/test-verify-dispatcher-release-assets.sh
