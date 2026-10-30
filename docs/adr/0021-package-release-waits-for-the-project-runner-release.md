@@ -4,7 +4,9 @@ Tuanjie branch update (2026-10-30): this imported ADR records the upstream
 release-please design, not this fork's active workflow. [ADR 0020](0020-explicit-release-workflow.md)
 continues to govern this branch: the explicit Release workflow publishes and
 verifies native components before publishing the package, without release PRs
-or post-publish workflow dispatches.
+or post-publish workflow dispatches. The upstream runner-PR gate and
+`check-release-please-gate` command are intentionally not carried in this fork;
+this document remains as an upstream design record only.
 
 Date: 2026-10-29
 
