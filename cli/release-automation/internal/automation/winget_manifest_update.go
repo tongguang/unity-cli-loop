@@ -9,6 +9,8 @@ import (
 	"os"
 	"strings"
 	"text/template"
+
+	"github.com/hatayama/unity-cli-loop/common/product"
 )
 
 const (
@@ -60,7 +62,7 @@ PackageLocale: en-US
 Publisher: tongguang
 PublisherUrl: https://github.com/tongguang
 PublisherSupportUrl: https://github.com/tongguang/unity-cli-loop/issues
-PackageName: Tuanjie CLI Loop
+PackageName: ` + product.DisplayName + `
 PackageUrl: https://github.com/tongguang/unity-cli-loop
 License: MIT
 LicenseUrl: https://github.com/tongguang/unity-cli-loop/blob/main/LICENSE.md

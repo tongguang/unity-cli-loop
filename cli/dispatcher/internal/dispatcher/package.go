@@ -12,6 +12,7 @@ import (
 	clierrors "github.com/hatayama/unity-cli-loop/common/errors"
 
 	"github.com/hatayama/unity-cli-loop/common/clicore"
+	"github.com/hatayama/unity-cli-loop/common/product"
 	"github.com/hatayama/unity-cli-loop/common/project"
 	"github.com/hatayama/unity-cli-loop/common/version"
 )
@@ -341,7 +342,7 @@ func printPackageHelp(stdout io.Writer) {
 	clicore.WriteLine(stdout, "  tloop package install [--version <x.y.z>]")
 	clicore.WriteLine(stdout, "  tloop package status")
 	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Install or inspect the Tuanjie CLI Loop package in a Tuanjie project's Packages/manifest.json.")
+	clicore.WriteLine(stdout, "Install or inspect the "+product.DisplayName+" package in a Tuanjie project's Packages/manifest.json.")
 	clicore.WriteLine(stdout, "")
 	clicore.WriteLine(stdout, "Subcommands:")
 	clicore.WriteLine(stdout, "  install   Add the Git package dependency (default: main)")

@@ -35,6 +35,9 @@ namespace io.github.hatayama.UnityCliLoop.ToolContracts
 
         public const string PROJECT_NAME = "TuanjieCliLoop";
         public const string PACKAGE_NAME = "io.github.tongguang.tloop";
+
+        // Product name shown in menus, window titles, and messages; keep it equal to displayName in package.json.
+        public const string DISPLAY_NAME = "Tuanjie CLI Loop";
         
         // Editor settings
         public const string SETTINGS_FILE_NAME = "TuanjieCliLoopSettings.json";

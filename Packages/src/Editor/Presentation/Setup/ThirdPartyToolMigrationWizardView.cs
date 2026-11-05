@@ -297,7 +297,7 @@ namespace io.github.hatayama.UnityCliLoop.Presentation
 
             TextField reopenHintTextField = CreateSelectableText(
                 "You can close this wizard and reopen it later from\n" +
-                "Window > Tuanjie CLI Loop > Custom Tool Migration.",
+                "Window > " + UnityCliLoopConstants.DISPLAY_NAME + " > Custom Tool Migration.",
                 "setup-footer__hint-label");
             footer.Add(reopenHintTextField);
         }
