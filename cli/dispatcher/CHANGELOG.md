@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.14.6](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.5...dispatcher-v3.14.6) (2026-11-06)
+
+- fix: Repeated test runs no longer grow Unity's memory through log stack traces (#3429) (527ade67)
+- chore: Keep the product name in one constant for the Editor and the uloop CLI (#3425) (0c9ecbd4)
+- chore(deps): bump actions/create-github-app-token from 3.2.0 to 3.3.0 (#3423) (3fc98ba9)
+- chore(deps): bump actions/upload-artifact from 7.0.1 to 7.0.2 (#3422) (864738d8)
+- chore(deps): bump actions/download-artifact from 8.0.1 to 8.0.2 (#3421) (65b60fff)
+
 ## [3.14.5](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.4...dispatcher-v3.14.5) (2026-10-29)
 
 - fix: Commands sent while a dialog blocks the Unity Editor now fail fast with MAIN_THREAD_BLOCKED instead of waiting silently (#3417) (1dfaeae5)
