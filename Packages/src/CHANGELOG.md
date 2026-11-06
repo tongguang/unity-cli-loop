@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.22.7](https://github.com/tongguang/unity-cli-loop/compare/v3.22.6...v3.22.7) (2026-11-06)
+
+- chore: update dispatcher pin to the 3.13.3 stable release (91e44faf)
+- fix: Repeated test runs no longer grow Unity's memory through log stack traces (#3429) (527ade67)
+- chore: Keep the product name in one constant for the Editor and the uloop CLI (#3425) (0c9ecbd4)
+- fix: Unity package now ships project runner 3.12.3, which reports MAIN_THREAD_BLOCKED and the stall notice (#3418) (cc95f3b8)
+
 ## [3.22.6](https://github.com/tongguang/unity-cli-loop/compare/v3.22.5...v3.22.6) (2026-10-29)
 
 - chore: update dispatcher pin to the 3.13.2 stable release (4859c206)
