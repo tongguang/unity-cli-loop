@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.22.8](https://github.com/tongguang/unity-cli-loop/compare/v3.22.7...v3.22.8) (2026-11-06)
+
+- fix: A project path containing "-batchmode" no longer makes uloop lose the running Editor and open a second one (#3442) (27177f23)
+- fix: Repeated test runs no longer grow Unity's managed heap through finished runs (#3439) (f07f2b9d)
+- feat: uloop launch can give each Editor its own log file (#3438) (5273f3f2)
+- feat: Hot reload now applies lambdas in internal classes that call new methods, and added fields initialized with new (#3437) (a241b664)
+- fix: Hot reload answers now end with whether the edit went live, so reading only the last lines no longer looks like success (#3435) (fdeb5333)
+
 ## [3.22.7](https://github.com/tongguang/unity-cli-loop/compare/v3.22.6...v3.22.7) (2026-11-06)
 
 - chore: update dispatcher pin to the 3.13.3 stable release (91e44faf)
