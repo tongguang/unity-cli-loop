@@ -63,15 +63,15 @@ func TestMatchTuanjieProcessesOnUnix(t *testing.T) {
 			}
 		})
 	}
-	command := `/Applications/Tuanjie/Hub/Editor/2022.3.62t15/Tuanjie.app/Contents/MacOS/Tuanjie -projectPath "` + projectPath + `"`
-	got, matched := matchMacUnityProcess(123, command)
+	args := []string{"/Applications/Tuanjie/Hub/Editor/2022.3.62t15/Tuanjie.app/Contents/MacOS/Tuanjie", "-projectPath", projectPath}
+	got, matched := matchMacUnityProcess(123, args)
 	if !matched || got.projectPath != projectPath {
 		t.Fatalf("macOS process = %+v, matched = %v", got, matched)
 	}
-	if _, matched := matchMacUnityProcess(456, command+" -batchmode"); matched {
+	if _, matched := matchMacUnityProcess(456, append(args, "-batchmode")); matched {
 		t.Fatal("macOS matched a batch Editor")
 	}
-	if _, matched := matchMacUnityProcess(789, `/Applications/Unity.app/Contents/MacOS/Unity -projectPath /work/project`); matched {
+	if _, matched := matchMacUnityProcess(789, []string{"/Applications/Unity.app/Contents/MacOS/Unity", "-projectPath", "/work/project"}); matched {
 		t.Fatal("macOS matched a Unity Editor")
 	}
 }

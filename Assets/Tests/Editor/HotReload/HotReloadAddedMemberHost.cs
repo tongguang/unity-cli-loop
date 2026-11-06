@@ -181,7 +181,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     {
         public int Hp { get; set; }
 
+#pragma warning disable CS0414
         public event Action ScoreChanged;
+#pragma warning restore CS0414
 
         int IHotReloadFieldKindChangeMarker.ExplicitHp
         {

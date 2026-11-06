@@ -15,11 +15,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     /// </summary>
     public class HotReloadEventAccessorHost
     {
+#pragma warning disable CS0067
         public event HotReloadScoreDelegate Scored;
 
         public static event HotReloadScoreDelegate StaticScored;
 
         internal event HotReloadHiddenScoreDelegate HiddenScored;
+#pragma warning restore CS0067
 
         // Custom accessors mean no compiler-generated backing field, so a test can edit this
         // declaration into a field-like event and check that the raiser is still skipped.

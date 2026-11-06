@@ -23,10 +23,6 @@ const windowsPowerShellCommand = "powershell"
 var (
 	macUnityExecutablePattern     = regexp.MustCompile(`(?i)Tuanjie\.app/Contents/MacOS/Tuanjie(?:["'\s]|$)`)
 	windowsUnityExecutablePattern = regexp.MustCompile(`(?i)(?:^|[\\/"\s])Tuanjie\.exe(?:["\s]|$)`)
-	// Why -createProject too: the Editor that creates a project opens it in the same session, and that
-	// session's command line may name the project only through -createProject.
-	projectPathFlagPattern = regexp.MustCompile(`(?i)-(?:projectpath|createproject)(?:=|\s+)(.+)$`)
-	nextUnityFlagPattern   = regexp.MustCompile(`\s-[A-Za-z][A-Za-z0-9-]*(?:=|\s|$)`)
 )
 
 type UnityProcess struct {
@@ -193,15 +189,15 @@ func windowsUnityProcessListScript() string {
 	return strings.Join(scriptLines, "\n")
 }
 
-// matchMacUnityProcess checks a single process's (pid, space-joined argv) pair against
-// the same Unity-editor-command and project-path rules used for the ps-based command
-// text this replaced, so callers built from either a text source or a raw argv slice
-// share one matching implementation.
-func matchMacUnityProcess(pid int, command string) (UnityProcess, bool) {
-	if !isUnityEditorCommand(command, macUnityExecutablePattern) {
+// matchMacUnityProcess checks a single process's argv against the Unity Editor and project path rules.
+// It reads the arguments rather than their joined text, which loses where a path ends: a path containing
+// " -batchmode" would read as that flag. Only argv[0] counts as the executable, because a shell whose -c string
+// names the Editor is not one, and listing it as an Editor of unknown project hides whether the real one is gone.
+func matchMacUnityProcess(pid int, args []string) (UnityProcess, bool) {
+	if len(args) == 0 || !macUnityExecutablePattern.MatchString(args[0]) || hasNonEditorArg(args) {
 		return UnityProcess{}, false
 	}
-	return UnityProcess{Pid: pid, projectPath: extractProjectPath(command)}, true
+	return UnityProcess{Pid: pid, projectPath: projectPathFromArgs(args)}, true
 }
 
 // parseMacProcArgs2 decodes the kern.procargs2 sysctl buffer layout: a leading int32
@@ -253,8 +249,7 @@ func parseLinuxProcCmdline(buf []byte) []string {
 }
 
 // matchLinuxUnityProcess decides from a raw argv slice whether a process is an
-// interactive Unity Editor and, if so, which project it opened. Unlike the macOS
-// matcher it does not join argv and match substrings or regexes over it: argv
+// interactive Tuanjie Editor and, if so, which project it opened. Argument
 // boundaries are preserved in /proc, so a project path containing spaces is read
 // without guessing where it ends. path.Base (not filepath.Base) keeps the result
 // identical when the tests run on Windows, since Linux paths always use '/'.
@@ -265,28 +260,35 @@ func matchLinuxUnityProcess(pid int, args []string) (UnityProcess, bool) {
 	if path.Base(args[0]) != "Tuanjie" {
 		return UnityProcess{}, false
 	}
-	if hasNonEditorLinuxArg(args) {
+	if hasNonEditorArg(args) {
 		return UnityProcess{}, false
 	}
-	return UnityProcess{Pid: pid, projectPath: linuxProjectPathFromArgs(args)}, true
+	return UnityProcess{Pid: pid, projectPath: projectPathFromArgs(args)}, true
 }
 
-// hasNonEditorLinuxArg reports whether argv marks a batchmode run or an asset
-// import worker. It compares whole arguments rather than substrings of the joined
-// command so a project path that merely contains these words is not excluded.
-func hasNonEditorLinuxArg(args []string) bool {
-	for _, arg := range args {
+// hasNonEditorArg reports whether argv marks a batchmode run or an asset import
+// worker. It compares whole arguments rather than substrings of the joined command,
+// and reads a worker's name only from -name, so a project or log path that merely
+// contains these words is not excluded: losing a running Editor makes launch delete
+// its lockfile and Temp and open a second one.
+func hasNonEditorArg(args []string) bool {
+	for index, arg := range args {
 		lowerArg := strings.ToLower(arg)
-		if lowerArg == "-batchmode" || strings.HasPrefix(lowerArg, "assetimportworker") {
+		if lowerArg == "-batchmode" {
+			return true
+		}
+		if lowerArg == "-name" && index+1 < len(args) && strings.HasPrefix(strings.ToLower(args[index+1]), "assetimportworker") {
 			return true
 		}
 	}
 	return false
 }
 
-// linuxProjectPathFromArgs returns the value of Unity's -projectPath or -createProject flag, accepting
+// projectPathFromArgs returns the value of Unity's -projectPath or -createProject flag, accepting
 // both the "-projectPath <path>" and "-projectPath=<path>" forms case-insensitively.
-func linuxProjectPathFromArgs(args []string) string {
+// Why -createProject too: the Editor that creates a project opens it in the same session, and that
+// session's command line may name the project only through -createProject.
+func projectPathFromArgs(args []string) string {
 	for index, arg := range args {
 		lowerArg := strings.ToLower(arg)
 		for _, flag := range []string{"-projectpath", "-createproject"} {
@@ -328,51 +330,13 @@ func parseWindowsUnityProcesses(output string) []UnityProcess {
 		}
 
 		command := strings.TrimSpace(string(decodedCommand))
-		if !isUnityEditorCommand(command, windowsUnityExecutablePattern) {
+		args := splitWindowsCommandLine(command)
+		if hasNonEditorArg(args) || !windowsUnityExecutablePattern.MatchString(command) {
 			continue
 		}
-		processes = append(processes, UnityProcess{Pid: pid, projectPath: extractProjectPath(command)})
+		processes = append(processes, UnityProcess{Pid: pid, projectPath: projectPathFromArgs(args)})
 	}
 	return processes
-}
-
-func isUnityEditorCommand(command string, executablePattern *regexp.Regexp) bool {
-	lowerCommand := strings.ToLower(command)
-	if strings.Contains(lowerCommand, "-batchmode") || strings.Contains(lowerCommand, "assetimportworker") {
-		return false
-	}
-	return executablePattern.MatchString(command)
-}
-
-func extractProjectPath(command string) string {
-	matches := projectPathFlagPattern.FindStringSubmatch(command)
-	if len(matches) != 2 {
-		return ""
-	}
-
-	value := strings.TrimSpace(matches[1])
-	if value == "" {
-		return ""
-	}
-
-	if strings.HasPrefix(value, `"`) || strings.HasPrefix(value, `'`) {
-		return extractQuotedProjectPath(value)
-	}
-
-	nextFlagIndex := nextUnityFlagPattern.FindStringIndex(value)
-	if nextFlagIndex != nil {
-		value = strings.TrimSpace(value[:nextFlagIndex[0]])
-	}
-	return strings.Trim(value, `"'`)
-}
-
-func extractQuotedProjectPath(value string) string {
-	quote := value[0]
-	endIndex := strings.IndexByte(value[1:], quote)
-	if endIndex < 0 {
-		return ""
-	}
-	return value[1 : endIndex+1]
 }
 
 func normalizeComparablePath(path string) (string, error) {

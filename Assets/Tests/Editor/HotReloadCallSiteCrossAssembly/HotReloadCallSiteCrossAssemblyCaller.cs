@@ -15,7 +15,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         public static int CallSameFullNameTarget()
         {
+#pragma warning disable CS0436
             return HotReloadCallSiteScannerFixture.CalledFromCrossAssembly();
+#pragma warning restore CS0436
         }
 
         public static int CallGenericHostTarget()

@@ -11,7 +11,9 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
     {
         public int PartialOtherProperty { get; set; }
 
+#pragma warning disable CS0067
         public event Action PartialOtherEvent;
+#pragma warning restore CS0067
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public int PartialOtherFile()

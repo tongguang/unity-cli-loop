@@ -26,6 +26,7 @@ tloop launch [project-path] [options]
 | `--editor-version <version>` | string | Use this Tuanjie Editor version instead of ProjectVersion.txt |
 | `--editor-path <path>` | string | Use an explicit Editor executable instead of automatic discovery; cannot be combined with --editor-version |
 | `-p, --platform <P>` | string | Build target (e.g., StandaloneOSX, Android, iOS) |
+| `--log-file <path>` | string | Write this Editor's log to `<path>` instead of the log every Editor shares. A relative path starts from the current directory |
 | `--max-depth <N>` | number | Search depth when project-path is omitted (default: 3, -1 for unlimited) |
 
 ## Output
@@ -61,7 +62,9 @@ running, or still does not respond after retries.
 - Custom installs registered in Hub are discovered automatically; use `--editor-path` only for an executable outside those locations
 - If Tuanjie is already running, focuses the existing window and verifies tool readiness
 - `--restart` and `--quit` ask Tuanjie to quit first: it saves its window layout and discards unsaved scene changes without a save dialog. Tuanjie is force-killed instead, losing the layout, when it cannot take the request (frozen, or a package that predates it) or does not exit within 30 seconds
-- If process scan is blocked (e.g. sandboxed `ps`), plain launch falls back to IPC probing; `--restart` and `--quit` still fail because they need the process id
+- If process scan is blocked (e.g. sandboxed `ps`), plain launch falls back to IPC probing; `--restart`, `--quit`, and `--log-file` still fail because they need the process scan
 - New Tuanjie processes ignore project compiler errors during Editor startup by default when run by dispatcher 3.0.1-beta.8 or newer; run `tloop update` first if an older dispatcher is installed
 - `--editor-version` and `--editor-path` only affect new processes; use either with `--restart` to replace an already-running Editor
+- Without `--log-file`, every Editor on the machine uses the same log: each start renames it to `Editor-prev.log` and deletes the older one. Starting one Editor moves another running Editor's log away from `Editor.log`, and the next start deletes it. When several Editors run at once, pass `--log-file` on every launch
+- `--log-file` only affects new Tuanjie processes; use it with `--restart` to replace an already-running Editor. A start overwrites that file and keeps no previous copy, so read it first after a crash. The step other commands print after an abnormal exit, which names this Editor's log, only looks at the shared log: it does not know this path, and can name an older log of the same project
 - The command waits until Tuanjie finishes startup and the CLI can connect before returning

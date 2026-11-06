@@ -15,6 +15,7 @@ var nativeCommandOptions = map[string][]string{
 		"--delete-recovery",
 		"--editor-version",
 		"--editor-path",
+		launchLogFileOption,
 		"--max-depth",
 		"--platform",
 		"--quit",

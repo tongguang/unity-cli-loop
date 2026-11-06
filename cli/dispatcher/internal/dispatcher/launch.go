@@ -41,6 +41,7 @@ type launchOptions struct {
 	editorVersion  string
 	editorPath     string
 	platform       string
+	logFile        string
 	maxDepth       int
 }
 
@@ -106,6 +107,13 @@ func runLaunchWithDeps(ctx context.Context, options launchOptions, startPath str
 		return code
 	}
 
+	if launchStartsEditor(options, runningProcess) {
+		if err := prepareLaunchLogFile(options.logFile); err != nil {
+			clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
+			return 1
+		}
+	}
+
 	var previousStop launchStopMethod
 	if runningProcess != nil {
 		stopMethod, handled, code := handleExistingLaunchProcess(ctx, options, projectRoot, runningProcess, stdout, stderr, deps)
@@ -160,6 +168,10 @@ func findLaunchRunningProcess(
 	// proves Unity is running, so plain launch must not fail on the scan alone.
 	// Restart and quit still fail because they need a process id to kill.
 	if !options.restart && !options.quit && deps.probeProjectIpcFallback(ctx, projectRoot) == nil {
+		if options.logFile != "" {
+			clierrors.WriteClassifiedError(stderr, launchLogFileNeedsProcessScanError(options.logFile, err), clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
+			return nil, true, 1
+		}
 		return nil, true, writeDetectionFallbackLaunchReadyResponse(stdout, stderr, projectRoot, err)
 	}
 	clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
@@ -178,6 +190,10 @@ func handleExistingLaunchProcess(
 	if !options.restart && !options.quit {
 		if options.editorVersion != "" || options.editorPath != "" {
 			clierrors.WriteClassifiedError(stderr, launchEditorSelectionRequiresRestartError(options), clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
+			return "", true, 1
+		}
+		if options.logFile != "" {
+			clierrors.WriteClassifiedError(stderr, launchLogFileRequiresRestartError(options.logFile), clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
 			return "", true, 1
 		}
 		return "", true, waitForExistingLaunchReadiness(ctx, projectRoot, runningProcess.Pid, stdout, stderr, deps)
@@ -267,6 +283,9 @@ func startUnityAndWaitForReadiness(
 		clicore.WriteFormat(stdout, "Detected Tuanjie version: %s\n", unityVersion)
 	}
 	clicore.WriteFormat(stdout, "Editor Path: %s\n", unityPath)
+	if options.logFile != "" {
+		clicore.WriteFormat(stdout, "Editor Log: %s\n", options.logFile)
+	}
 
 	command := newUnityLaunchCommand(unityPath, buildUnityLaunchArgs(projectRoot, options))
 	if err := command.Start(); err != nil {
@@ -300,6 +319,9 @@ func buildUnityLaunchArgs(projectRoot string, options launchOptions) []string {
 	launchArgs := []string{"-projectPath", projectRoot}
 	if options.platform != "" {
 		launchArgs = append(launchArgs, "-buildTarget", options.platform)
+	}
+	if options.logFile != "" {
+		launchArgs = append(launchArgs, "-logFile", options.logFile)
 	}
 	launchArgs = append(launchArgs, "-ignorecompilererrors")
 	return launchArgs
@@ -400,27 +422,4 @@ func resolveLaunchProjectRoot(startPath string, options launchOptions) (string, 
 		return project.ResolveExplicitProjectRoot(options.projectPath)
 	}
 	return project.FindUnityProjectRootWithin(startPath, options.maxDepth)
-}
-
-func printLaunchHelp(stdout io.Writer) {
-	clicore.WriteLine(stdout, "Usage:")
-	clicore.WriteLine(stdout, "  tloop launch [options] [project-path]")
-	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Options:")
-	clicore.WriteLine(stdout, "  -r, --restart          Quit an existing Unity process for the project before launching")
-	clicore.WriteLine(stdout, "  -q, --quit             Quit an existing Unity process for the project without launching")
-	clicore.WriteLine(stdout, "  -d, --delete-recovery  Delete Assets/_Recovery before launch")
-	clicore.WriteLine(stdout, "      --editor-version <version>")
-	clicore.WriteLine(stdout, "                          Use this Tuanjie Editor version instead of ProjectVersion.txt")
-	clicore.WriteLine(stdout, "      --editor-path <path>")
-	clicore.WriteLine(stdout, "                          Use this Editor executable instead of automatic discovery")
-	clicore.WriteLine(stdout, "  -p, --platform <name>  Pass Unity -buildTarget when launching")
-	clicore.WriteLine(stdout, "      --max-depth <n>    Max directory depth when auto-searching for the project (default: 3, -1 = unlimited)")
-	clicore.WriteLine(stdout, "")
-	clicore.WriteLine(stdout, "Compiler errors are ignored by default during Unity startup.")
-	clicore.WriteLine(stdout, "")
-	printGlobalOptionsHelp(stdout)
-	// launch renders its own help instead of going through printNativeSingleCommandHelp, so the
-	// closing skill line has to be printed here as well.
-	printSkillGuidanceHelp(clicore.LaunchCommandName, stdout)
 }
