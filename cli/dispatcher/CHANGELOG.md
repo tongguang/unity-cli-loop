@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.14.7](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.6...dispatcher-v3.14.7) (2026-11-06)
+
+- fix: A project path containing "-batchmode" no longer makes uloop lose the running Editor and open a second one (#3442) (27177f23)
+- feat: uloop launch can give each Editor its own log file (#3438) (5273f3f2)
+
 ## [3.14.6](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.5...dispatcher-v3.14.6) (2026-11-06)
 
 - fix: Repeated test runs no longer grow Unity's memory through log stack traces (#3429) (527ade67)

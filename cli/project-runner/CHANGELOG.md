@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.13.6](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.5...tloop-project-runner-v3.13.6) (2026-11-06)
+
+- fix: A project path containing "-batchmode" no longer makes uloop lose the running Editor and open a second one (#3442) (27177f23)
+- feat: uloop launch can give each Editor its own log file (#3438) (5273f3f2)
+
 ## [3.13.5](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.4...tloop-project-runner-v3.13.5) (2026-11-06)
 
 - fix: Repeated test runs no longer grow Unity's memory through log stack traces (#3429) (527ade67)

@@ -2,5 +2,5 @@
   "dispatcherArchiveManifest": "2eab0ed70eae974b76adf554d6841aeb48f389120de36fbadf48a3c613336279  install.ps1\n42eaa38ea22d8dc5bfad89728cd40a3b9757110468cf62ebd57bf138f8d89540  tloop-dispatcher-darwin-amd64.tar.gz\n6664fb7d5d362df6aad02427b6d8f6c744fcda6140da7c0375647acaa3d429e1  install.sh\n6d985e5e018cb6ebf3fae1284fd2f04e9246418a1983f30542e5ecd0eb506763  tloop-dispatcher-linux-amd64.tar.gz\n846f53c3db42e6c2ee40ff2458eec48569c9fa2291402ace6a9060e285332f21  tloop-dispatcher-darwin-amd64.tar.gz.sha256\n86afd24cc96f4c700f36a7f7aac9a6bace8671947d14416f88d417ef6eeb1d2d  install.sh.sha256\na80b0feaba53dffd1d10869951a3bd65d34d06bd16a9e47ca5b9d98e1aaef62e  tloop-dispatcher-linux-amd64.tar.gz.sha256\nbe48973c66bf771f50f263f3bcfec8631ee19385a854d951fda710cf87235a7c  install.ps1.sha256\nc8d11009cf455f78297581acdd85d2f19b11f2ad40d1c776c5606da0e7b7358d  tloop-dispatcher-darwin-arm64.tar.gz.sha256\nd1ddaaad022550990fd2c0249ecacdf117b53f3d5244471890f0ae3325fdaf7e  tloop-dispatcher-windows-amd64.zip\nd91cf573267970f25ba3b9e93a75a6df343863f3028d0bc1a6999349bc82b4c7  tloop-dispatcher-darwin-arm64.tar.gz\ndccdfb81223a09ec310156b160b62505740cc1df0b6427f7ab5b72266bf1e129  tloop-dispatcher-windows-amd64.zip.sha256",
   "dispatcherReleaseTag": "dispatcher-v3.14.6",
   "minimumDispatcherVersion": "3.14.0",
-  "projectRunnerVersion": "3.13.5"
+  "projectRunnerVersion": "3.13.6"
 }
