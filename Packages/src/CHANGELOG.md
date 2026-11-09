@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.22.9](https://github.com/tongguang/unity-cli-loop/compare/v3.22.8...v3.22.9) (2026-11-09)
+
+- chore: update dispatcher pin to the 3.14.2 stable release (9dcc5d72)
+- fix: uloop compile recovers when Unity accepts a compile but never starts it in the background (#3453) (cafc5640)
+- chore: update dispatcher pin to the 3.14.1 stable release (0dd22761)
+- chore: update dispatcher pin to the 3.14.0 stable release (3082166f)
+
 ## [3.22.8](https://github.com/tongguang/unity-cli-loop/compare/v3.22.7...v3.22.8) (2026-11-06)
 
 - fix: A project path containing "-batchmode" no longer makes uloop lose the running Editor and open a second one (#3442) (27177f23)
