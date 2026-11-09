@@ -10,6 +10,8 @@ Execute Tuanjie Test Runner. When a test or suite fails or a test ends inconclus
 
 `tloop run-tests` automatically compiles pending script changes before running tests. Pass `--skip-compile` only while validating active hot-reload patches, because the compile clears those patches; otherwise let the default compile surface errors and run against current scripts. `--skip-compile` skips only the CLI-side compile: script edits saved since the last compile can still be imported during the run; such an import reloads the domain as soon as the run releases its assembly lock, discarding active patches and ending the request. While hot reload holds Auto Refresh (the state an apply leaves), a verified run kept the patches live. Check `tloop hot-reload --status` after the run instead of assuming either outcome.
 
+If the implicit compile returns `COMPILE_NOT_STARTED`, no tests ran. Release any held mouse button, click inside the Tuanjie Editor, and rerun `tloop run-tests`.
+
 Before executing tests, `tloop run-tests` handles unsaved loaded Scene and Prefab Stage changes according to `--unsaved-changes` (default `save`): `save` writes them first, `fail` stops if any remain, and `discard` reloads disk state so tests run against saved files. Untitled scenes cannot be discarded and fail. If the chosen mode cannot proceed, it returns `Success: false`, keeps `TestCount` at `0`, lists the items in `Message`, and does not start the Tuanjie Test Runner.
 
 Active pause points are automatically cleared (the underlying code patches are removed as well) before test execution begins. Cleared IDs are reported in the response's `ClearedPausePointIds` field.
