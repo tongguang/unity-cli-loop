@@ -104,9 +104,9 @@ func verifyDispatcherPinSubjects(
 	if err != nil {
 		return err
 	}
-	bundleData, err := deps.fetchBundle(ctx, installerURL+".sigstore.json")
+	bundleData, err := fetchDispatcherInstallerBundle(ctx, assets, installerURL, deps)
 	if err != nil {
-		return fmt.Errorf("fetch dispatcher installer attestation bundle: %w", err)
+		return err
 	}
 	commitSHA, err := deps.fetchTagCommitSHA(ctx, attestation.ReleaseRepository, values.DispatcherReleaseTag)
 	if err != nil {

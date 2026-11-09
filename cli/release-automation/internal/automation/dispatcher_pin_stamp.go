@@ -3,6 +3,7 @@ package automation
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -80,9 +81,9 @@ func stampDispatcherPin(
 	if _, err := findDispatcherReleaseAssetURL(assets, dispatcherPinStampPowerShellScript); err != nil {
 		return err
 	}
-	bundleData, err := deps.fetchBundle(ctx, installScriptURL+".sigstore.json")
+	bundleData, err := fetchDispatcherInstallerBundle(ctx, assets, installScriptURL, deps)
 	if err != nil {
-		return fmt.Errorf("fetch dispatcher installer attestation bundle: %w", err)
+		return err
 	}
 	commitSHA, err := deps.fetchTagCommitSHA(ctx, attestation.ReleaseRepository, releaseTag)
 	if err != nil {
@@ -97,6 +98,26 @@ func stampDispatcherPin(
 		return err
 	}
 	return writeDispatcherPinStamp(pinPath, releaseTag, manifest)
+}
+
+func fetchDispatcherInstallerBundle(
+	ctx context.Context, assets []dispatcherReleaseAsset, shellURL string, deps dispatcherPinStampDeps,
+) ([]byte, error) {
+	bundle, shellErr := deps.fetchBundle(ctx, shellURL+".sigstore.json")
+	if shellErr == nil {
+		return bundle, nil
+	}
+
+	// The publisher attaches the same multi-asset bundle to both installers.
+	// The caller still verifies the signature, source commit, and full subject manifest.
+	powerShellURL, fallbackErr := findDispatcherReleaseAssetURL(assets, dispatcherPinStampPowerShellScript)
+	if fallbackErr == nil {
+		bundle, fallbackErr = deps.fetchBundle(ctx, powerShellURL+".sigstore.json")
+	}
+	if fallbackErr == nil {
+		return bundle, nil
+	}
+	return nil, fmt.Errorf("fetch dispatcher installer attestation bundle: %w", errors.Join(shellErr, fallbackErr))
 }
 
 func findDispatcherReleaseAssetURL(assets []dispatcherReleaseAsset, name string) (string, error) {

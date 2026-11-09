@@ -262,6 +262,33 @@ func TestVerifyDispatcherPinSubjectsComparesManifestWithVerifiedSubjects(t *test
 	}
 }
 
+func TestVerifyDispatcherPinSubjectsVerifiesPowerShellBundleWhenShellDownloadFails(t *testing.T) {
+	// Verifies a failed shell bundle download can use the PowerShell copy, which still needs a valid signature.
+	deps := validDispatcherPinGuardDeps()
+	deps.fetchBundle = func(_ context.Context, url string) ([]byte, error) {
+		if url == "https://example.invalid/install.ps1.sigstore.json" {
+			return []byte("powershell bundle"), nil
+		}
+		return nil, errors.New("gateway timeout")
+	}
+	verify := deps.verifySubjects
+	deps.verifySubjects = func(bundle []byte, commit string) (map[string]string, error) {
+		if string(bundle) != "powershell bundle" || commit != "commit" {
+			t.Fatalf("verification received bundle %q and commit %q", bundle, commit)
+		}
+		return verify(bundle, commit)
+	}
+	if err := verifyDispatcherPinSubjects(context.Background(), validDispatcherPinGuardFixture(), deps); err != nil {
+		t.Fatalf("expected the verified fallback to pass, got %v", err)
+	}
+	deps.verifySubjects = func([]byte, string) (map[string]string, error) {
+		return nil, errors.New("bad signature")
+	}
+	if err := verifyDispatcherPinSubjects(context.Background(), validDispatcherPinGuardFixture(), deps); err == nil || !strings.Contains(err.Error(), "bad signature") {
+		t.Fatalf("expected an invalid fallback signature to fail, got %v", err)
+	}
+}
+
 func TestDispatcherPinScriptDriftWarningsRejectsUnusableInputs(t *testing.T) {
 	// Verifies an unparsable pin, a malformed manifest entry, and a missing source installer are errors rather than warnings.
 	installers := map[string][]byte{"install.sh": []byte("a"), "install.ps1": []byte("b")}
