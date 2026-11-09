@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.14.8](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.7...dispatcher-v3.14.8) (2026-11-09)
+
+- fix: uloop compile recovers when Unity accepts a compile but never starts it in the background (#3453) (cafc5640)
+- fix: CLI binaries ship with Go 1.27.3 and sigstore-go 1.4.0, and now require macOS 13 or later (#3447) (6ee816a5)
+
 ## [3.14.7](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.6...dispatcher-v3.14.7) (2026-11-06)
 
 - fix: A project path containing "-batchmode" no longer makes uloop lose the running Editor and open a second one (#3442) (27177f23)
