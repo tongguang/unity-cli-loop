@@ -22,6 +22,7 @@ type launchDeps struct {
 	probeProjectIpcFallback    func(context.Context, string) error
 	removePath                 func(string) error
 	statPath                   func(string) (os.FileInfo, error)
+	isUnityLockfileHeld        func(string) (bool, error)
 	sleep                      func(time.Duration)
 }
 
@@ -39,6 +40,7 @@ func defaultLaunchDeps() launchDeps {
 		probeProjectIpcFallback:    clicore.ProbeToolReadinessSequence,
 		removePath:                 os.RemoveAll,
 		statPath:                   os.Stat,
+		isUnityLockfileHeld:        isUnityLockfileHeld,
 		sleep:                      time.Sleep,
 	}
 }
