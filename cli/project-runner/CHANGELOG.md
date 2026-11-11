@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.13.8](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.7...tloop-project-runner-v3.13.8) (2026-11-11)
+
+- fix: build native CLI with Go 1.27.4 (74d416f9)
+
 ## [3.13.7](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.6...tloop-project-runner-v3.13.7) (2026-11-09)
 
 - fix: uloop compile recovers when Unity accepts a compile but never starts it in the background (#3453) (cafc5640)

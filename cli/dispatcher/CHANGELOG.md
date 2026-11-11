@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.14.9](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.8...dispatcher-v3.14.9) (2026-11-11)
+
+- fix: build native CLI with Go 1.27.4 (74d416f9)
+- Merge upstream launch lock protection (46833f2e)
+
 ## [3.14.8](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.7...dispatcher-v3.14.8) (2026-11-09)
 
 - fix: uloop compile recovers when Unity accepts a compile but never starts it in the background (#3453) (cafc5640)
