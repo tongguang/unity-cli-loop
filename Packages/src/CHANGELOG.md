@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.22.10](https://github.com/tongguang/unity-cli-loop/compare/v3.22.9...v3.22.10) (2026-11-11)
+
+- Update release dependencies and packaging.
+
 ## [3.22.9](https://github.com/tongguang/unity-cli-loop/compare/v3.22.8...v3.22.9) (2026-11-09)
 
 - chore: update dispatcher pin to the 3.14.2 stable release (9dcc5d72)
