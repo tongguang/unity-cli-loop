@@ -87,7 +87,8 @@ func writeManualReleaseChangelog(ctx context.Context, options manualReleaseOptio
 	if strings.TrimSpace(existing) != "" {
 		revision = tag + "..HEAD"
 	}
-	args := append([]string{"-C", options.Root, "log", "--no-merges", "--format=- %s (%h)", revision, "--"}, manualReleaseInputs(component)...)
+	// A merge records what the fork adopted; side-branch commits may include deliberately rejected changes.
+	args := append([]string{"-C", options.Root, "log", "--first-parent", "--format=- %s (%h)", revision, "--"}, manualReleaseInputs(component)...)
 	notes, err := run(ctx, "git", args...)
 	if err != nil {
 		return err

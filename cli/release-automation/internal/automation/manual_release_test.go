@@ -239,7 +239,7 @@ func TestManualReleaseDoesNotPublishUnchangedOrDryRunSources(t *testing.T) {
 
 // TestManualReleaseStopsOnCommandOrAttestationFailure verifies every external command failure prevents later release stages.
 func TestManualReleaseStopsOnCommandOrAttestationFailure(t *testing.T) {
-	for _, failure := range []string{"status", "rev-parse", "tag --list", "diff --name-only", "/commits/main", "log --no-merges", " add ", "user.name=", "push origin", "workflow run build-and-test", "workflow run dispatcher-publish", "run list", "release view", "/commits/dispatcher-v", "stamp", "workflow run unity-package"} {
+	for _, failure := range []string{"status", "rev-parse", "tag --list", "diff --name-only", "/commits/main", "log --first-parent", " add ", "user.name=", "push origin", "workflow run build-and-test", "workflow run dispatcher-publish", "run list", "release view", "/commits/dispatcher-v", "stamp", "workflow run unity-package"} {
 		t.Run(failure, func(t *testing.T) {
 			fixture := newManualReleaseFixture(t)
 			fixture.changed["cli/dispatcher"] = true
