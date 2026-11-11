@@ -18,7 +18,7 @@ type manualReleaseWorkflowRun struct {
 }
 
 func dispatchManualReleaseWorkflow(ctx context.Context, out io.Writer, options manualReleaseOptions, deps manualReleaseDeps, workflow, sha, phase string) error {
-	if err := requireManualReleaseHead(ctx, options, sha, deps.run); err != nil {
+	if err := waitForManualReleaseDispatchHead(ctx, options, deps, sha); err != nil {
 		return err
 	}
 	id := "tloop-release-" + options.RunID + "-" + phase

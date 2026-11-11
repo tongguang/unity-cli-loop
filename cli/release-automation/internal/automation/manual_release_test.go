@@ -127,6 +127,9 @@ func (fixture *manualReleaseFixture) git(args []string) (string, error) {
 func (fixture *manualReleaseFixture) gh(args []string) (string, error) {
 	switch args[0] {
 	case "api":
+		if strings.HasSuffix(args[1], "/main") {
+			return fixture.remote, nil
+		}
 		parts := strings.Split(args[1], "/")
 		return fixture.tags[parts[len(parts)-1]], nil
 	case "release":
