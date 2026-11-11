@@ -99,6 +99,8 @@ func (fixture *manualReleaseFixture) git(args []string) (string, error) {
 		return "", nil
 	case "rev-parse":
 		return fixture.head, nil
+	case "ls-remote":
+		return fixture.remote + "\trefs/heads/main\n", nil
 	case "tag":
 		return args[len(args)-1], nil
 	case "diff":
@@ -125,9 +127,6 @@ func (fixture *manualReleaseFixture) git(args []string) (string, error) {
 func (fixture *manualReleaseFixture) gh(args []string) (string, error) {
 	switch args[0] {
 	case "api":
-		if strings.HasSuffix(args[1], "/main") {
-			return fixture.remote, nil
-		}
 		parts := strings.Split(args[1], "/")
 		return fixture.tags[parts[len(parts)-1]], nil
 	case "release":
@@ -239,7 +238,7 @@ func TestManualReleaseDoesNotPublishUnchangedOrDryRunSources(t *testing.T) {
 
 // TestManualReleaseStopsOnCommandOrAttestationFailure verifies every external command failure prevents later release stages.
 func TestManualReleaseStopsOnCommandOrAttestationFailure(t *testing.T) {
-	for _, failure := range []string{"status", "rev-parse", "tag --list", "diff --name-only", "/commits/main", "log --first-parent", " add ", "user.name=", "push origin", "workflow run build-and-test", "workflow run dispatcher-publish", "run list", "release view", "/commits/dispatcher-v", "stamp", "workflow run unity-package"} {
+	for _, failure := range []string{"status", "rev-parse", "tag --list", "diff --name-only", "ls-remote", "log --first-parent", " add ", "user.name=", "push origin", "workflow run build-and-test", "workflow run dispatcher-publish", "run list", "release view", "/commits/dispatcher-v", "stamp", "workflow run unity-package"} {
 		t.Run(failure, func(t *testing.T) {
 			fixture := newManualReleaseFixture(t)
 			fixture.changed["cli/dispatcher"] = true

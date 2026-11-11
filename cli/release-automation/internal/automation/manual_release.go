@@ -167,12 +167,17 @@ func publishManualPackage(ctx context.Context, out io.Writer, options manualRele
 }
 
 func requireManualReleaseHead(ctx context.Context, options manualReleaseOptions, expected string, run manualReleaseRun) error {
-	actual, err := run(ctx, "gh", "api", "repos/"+options.Repository+"/commits/main", "--jq", ".sha")
+	// The commits API can briefly return the previous head after our push. Read the ref we actually push to.
+	output, err := run(ctx, "git", "-C", options.Root, "ls-remote", "--exit-code", "origin", "refs/heads/main")
 	if err != nil {
 		return err
 	}
-	if strings.TrimSpace(actual) != expected {
-		return fmt.Errorf("main moved from %s to %s; stop and start a new release from the updated source", expected, strings.TrimSpace(actual))
+	fields := strings.Fields(output)
+	if len(fields) != 2 || fields[1] != "refs/heads/main" {
+		return fmt.Errorf("could not resolve origin refs/heads/main: %q", output)
+	}
+	if fields[0] != expected {
+		return fmt.Errorf("main moved from %s to %s; stop and start a new release from the updated source", expected, fields[0])
 	}
 	return nil
 }
