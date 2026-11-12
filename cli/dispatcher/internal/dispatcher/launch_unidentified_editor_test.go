@@ -4,15 +4,48 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/hatayama/unity-cli-loop/common/clicore"
+	clierrors "github.com/hatayama/unity-cli-loop/common/errors"
 	"github.com/hatayama/unity-cli-loop/common/unityprocess"
 )
 
 // errLaunchTestEditorStart stops a launch test at the point where launch would start an Editor.
 var errLaunchTestEditorStart = errors.New("launch test stops before starting an Editor")
+
+// Verifies wrapped unidentified-Editor failures retain their cause and report a safe manual retry without
+// allowing an automatic retry that could stop an Editor the caller has not identified.
+func TestLaunchStopLookupErrorPreservesCauseAndRetryContract(t *testing.T) {
+	cause := fmt.Errorf("process scan: %w", unityprocess.ErrUnidentifiedUnityEditor)
+	err := launchStopLookupError(cause)
+	if err.Error() != cause.Error() || !errors.Is(err, unityprocess.ErrUnidentifiedUnityEditor) {
+		t.Fatalf("unidentified Editor cause was lost: %v", err)
+	}
+	if errors.Unwrap(err) != cause {
+		t.Fatalf("wrapped cause = %v, want %v", errors.Unwrap(err), cause)
+	}
+	context := clierrors.ErrorContext{ProjectRoot: "/projects/sample", Command: "launch"}
+	classified := clierrors.ClassifyError(err, context)
+	if classified.ErrorCode != clierrors.ErrorCodeUnityNotReachable || classified.Retryable || !classified.SafeToRetry {
+		t.Fatalf("unexpected quit failure contract: %#v", classified)
+	}
+	if classified.ProjectRoot != context.ProjectRoot || classified.Command != context.Command {
+		t.Fatalf("quit failure lost its request context: %#v", classified)
+	}
+}
+
+// Verifies ordinary scan errors and a successful lookup keep their original identity instead of being
+// misreported as an unidentified Editor.
+func TestLaunchStopLookupErrorPreservesOtherResults(t *testing.T) {
+	for _, result := range []error{nil, context.Canceled, errors.New("process enumeration denied")} {
+		if got := launchStopLookupError(result); got != result {
+			t.Fatalf("lookup result = %v, want %v", got, result)
+		}
+	}
+}
 
 // unidentifiedEditorLaunchDeps returns launch dependencies whose ordinary lookup finds no Editor, as it does
 // when the only running Editor's command line does not name its project, and whose definitive lookup answers
