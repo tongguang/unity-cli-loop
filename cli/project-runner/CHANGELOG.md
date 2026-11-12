@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.13.11](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.10...tloop-project-runner-v3.13.11) (2026-11-12)
+
+- Merge upstream process detection fixes for Tuanjie (52f8a73a)
+
 ## [3.13.10](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.9...tloop-project-runner-v3.13.10) (2026-11-11)
 
 - fix: build native CLI with Go 1.27.4 (74d416f9)

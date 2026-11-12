@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.14.12](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.11...dispatcher-v3.14.12) (2026-11-12)
+
+- test: cover unidentified Editor error contracts (348477b3)
+- Merge upstream process detection fixes for Tuanjie (52f8a73a)
+
 ## [3.14.11](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.10...dispatcher-v3.14.11) (2026-11-11)
 
 - fix: build native CLI with Go 1.27.4 (74d416f9)
