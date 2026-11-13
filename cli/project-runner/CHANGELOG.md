@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.13.12](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.11...tloop-project-runner-v3.13.12) (2026-11-13)
+
+- Merge upstream Windows launch and reload response fixes for Tuanjie (26fce3cd)
+
 ## [3.13.11](https://github.com/tongguang/unity-cli-loop/compare/tloop-project-runner-v3.13.10...tloop-project-runner-v3.13.11) (2026-11-12)
 
 - Merge upstream process detection fixes for Tuanjie (52f8a73a)

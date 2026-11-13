@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.14.13](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.12...dispatcher-v3.14.13) (2026-11-13)
+
+- test: cover permanent lockfile failures across platforms (893fa6c8)
+- Merge upstream Windows launch and reload response fixes for Tuanjie (26fce3cd)
+
 ## [3.14.12](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.11...dispatcher-v3.14.12) (2026-11-12)
 
 - test: cover unidentified Editor error contracts (348477b3)
