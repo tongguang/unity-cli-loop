@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.22.12](https://github.com/tongguang/unity-cli-loop/compare/v3.22.11...v3.22.12) (2026-11-13)
+
+- Update release dependencies and packaging.
+
 ## [3.22.11](https://github.com/tongguang/unity-cli-loop/compare/v3.22.10...v3.22.11) (2026-11-12)
 
 - Update release dependencies and packaging.
