@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.23.0](https://github.com/tongguang/unity-cli-loop/compare/v3.22.12...v3.23.0) (2026-11-16)
+
+- feat: merge upstream dialog and hot reload updates for Tuanjie (e8a01f75)
+
 ## [3.22.12](https://github.com/tongguang/unity-cli-loop/compare/v3.22.11...v3.22.12) (2026-11-13)
 
 - Update release dependencies and packaging.
