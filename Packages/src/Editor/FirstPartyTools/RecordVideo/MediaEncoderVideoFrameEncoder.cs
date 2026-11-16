@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEditor.Media;
 using UnityEngine;
@@ -12,6 +13,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         private MediaEncoder _encoder;
         private readonly int _width;
         private readonly int _height;
+        private readonly string _filePath;
+        private readonly bool _useVp8;
+        private bool _hasFrames;
         private bool _disposed;
 
         internal MediaEncoderVideoFrameEncoder(
@@ -29,6 +33,8 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
 
             _width = width;
             _height = height;
+            _filePath = filePath;
+            _useVp8 = useVp8;
             _encoder = new MediaEncoder(filePath, CreateAttributes(width, height, frameRate, useVp8, quality));
         }
 
@@ -39,7 +45,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public bool AddFrame(Texture2D texture)
         {
             Debug.Assert(!_disposed, "AddFrame must not run after Dispose.");
-            return _encoder.AddFrame(texture);
+            bool added = _encoder.AddFrame(texture);
+            _hasFrames |= added;
+            return added;
         }
 
         public void Dispose()
@@ -52,6 +60,18 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             _disposed = true;
             _encoder.Dispose();
             _encoder = null;
+            if (Application.platform == RuntimePlatform.WindowsEditor && !_useVp8 && _hasFrames)
+            {
+                try
+                {
+                    Mp4ColorMetadata.Apply(_filePath, _height);
+                }
+                catch (Exception exception)
+                {
+                    // Metadata failure must not discard the finished recording or its frame evidence.
+                    Debug.LogWarning($"Could not add MP4 colour metadata to '{_filePath}': {exception.Message}");
+                }
+            }
         }
 
         private static VideoTrackEncoderAttributes CreateAttributes(
