@@ -56,6 +56,18 @@ internal static class ShimMethodEmitter
                 shimTypes,
                 assemblyGlobalUsings,
                 shimNames);
+            PropertySetterEmitter.EmitPropertySettersForType(
+                typeState,
+                addedMethodCatalog,
+                addedFieldCatalog,
+                addedPropertyCatalog,
+                input,
+                entries,
+                skipped,
+                unchangedMethods,
+                shimTypes,
+                assemblyGlobalUsings,
+                shimNames);
         }
     }
 
@@ -81,7 +93,8 @@ internal static class ShimMethodEmitter
                 queued.Decision.ClosureScopedAccessors,
                 addedMethodCatalog,
                 addedFieldCatalog,
-                addedPropertyCatalog);
+                addedPropertyCatalog,
+                queued.ShimType.BaseCallStandIns);
             if (queued.IsAddedMethod)
             {
                 queued.ShimType.AddAddedMemberMethod(rewrittenMethod, queued.ShimMethodName, queued.MethodSymbol);
@@ -104,7 +117,7 @@ internal static class ShimMethodEmitter
             {
                 SourceProjectRelativePath = typeState.SourceUnit.Input.ProjectRelativePath,
                 TypeMetadataName = CecilTypeNames.ToMetadataName(typeState.TypeSymbol),
-                MethodName = queued.MethodSymbol.Name,
+                MethodName = queued.EntryMethodName,
                 ParameterTypeFullNames = queued.ParameterTypeFullNames,
                 GenericArity = queued.MethodSymbol.Arity,
                 ShimTypeName = queued.ShimType.ShimTypeName,
@@ -129,7 +142,8 @@ internal static class ShimMethodEmitter
         bool accessorsOnlyInClosures,
         AddedMethodCatalog addedMethodCatalog,
         AddedFieldCatalog addedFieldCatalog,
-        AddedPropertyCatalog addedPropertyCatalog)
+        AddedPropertyCatalog addedPropertyCatalog,
+        BaseCallStandInPlan baseCallStandIns)
     {
         // Why a single rewriter: rewriting the tree invalidates SemanticModel for new nodes.
         // Qualify + accessor rewrite both classify symbols on the original tree in one Visit pass.
@@ -142,7 +156,10 @@ internal static class ShimMethodEmitter
             addedPropertyCatalog,
             accessorsOnlyInClosures
                 ? (SyntaxNode)methodDeclaration.Body ?? methodDeclaration.ExpressionBody
-                : null);
+                : null)
+        {
+            BaseCallStandIns = baseCallStandIns
+        };
         MethodDeclarationSyntax rewritten = (MethodDeclarationSyntax)rewriter.Visit(methodDeclaration);
         return ShimMethodFactory.ToShimMethod(rewritten, methodSymbol);
     }

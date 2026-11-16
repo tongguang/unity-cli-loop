@@ -16,6 +16,7 @@ AI 改完代码可以自己编译，看到报错就接着修，直到编译通�
 - **快速验证改动**：热重载把 C# 修改直接应用到正在运行的 Editor，不触发域重载，PlayMode 状态也会保留。离线编译检查不连接 Editor 也能查出编译错误。
 - **查看场景**：输出场景层级，查找 GameObject，截取 Editor 窗口或 Game View，录制视频。
 - **调试运行时行为**：控制 PlayMode，模拟键盘和鼠标输入，在指定源码行暂停并读取局部变量，或统计这行代码执行了几次。
+- **处理阻塞弹窗**：在 Windows 和 macOS 上读取阻塞 Editor 的弹窗内容，并按按钮标签操作可识别的消息框。
 - **执行任意 C#**：现有命令覆盖不到的操作，可以让 AI 直接在 Editor 里执行一段 C#。
 - **扩展**：用 C# 编写自己的命令，再配一份给 AI 看的 skill。
 
@@ -90,6 +91,7 @@ tloop execute-dynamic-code --code 'using UnityEngine; Debug.Log("Hello from tloo
 | 用途 | 命令 |
 | --- | --- |
 | 查看 Editor 状态、取消正在执行的命令 | `status`、`cancel` |
+| 查看阻塞弹窗、点击消息框按钮（Windows / macOS） | `get-dialogs`、`press-dialog-button` |
 | 启动或重启 Editor | `launch` |
 | 编译、离线编译检查 | `compile`、`compile-check` |
 | 测试和 Console | `run-tests`、`get-logs`、`clear-console` |

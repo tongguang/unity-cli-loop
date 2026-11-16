@@ -16,6 +16,7 @@ AI はコードを変更したあと自分でコンパイルし、エラーが�
 - **変更をすばやく確かめる**：hot reload は C# の変更をドメインリロードなしで実行中の Editor に反映し、PlayMode の状態も保ちます。オフラインコンパイルチェックは Editor に接続せずにコンパイルエラーを見つけます。
 - **シーンを見る**：シーン階層の出力、GameObject の検索、Editor ウィンドウや Game View のスクリーンショット、録画ができます。
 - **実行時の挙動を調べる**：PlayMode の操作、キーボードとマウス入力のシミュレーション、指定したソース行での一時停止とローカル変数の読み取り、その行の実行回数の計測ができます。
+- **Editor を止めるダイアログを扱う**：Windows と macOS でダイアログの内容を読み取り、認識できるメッセージボックスのボタンをラベルで押せます。
 - **任意の C# を実行**：既存のコマンドでできない操作は、AI に Editor 内で C# を直接実行させられます。
 - **拡張**：C# で独自のコマンドを作り、AI 向けの skill を添えられます。
 
@@ -90,6 +91,7 @@ tloop execute-dynamic-code --code 'using UnityEngine; Debug.Log("Hello from tloo
 | 用途 | コマンド |
 | --- | --- |
 | Editor の状態確認、実行中コマンドの取り消し | `status`、`cancel` |
+| ダイアログの確認、メッセージボックスのボタン操作（Windows / macOS） | `get-dialogs`、`press-dialog-button` |
 | Editor の起動・再起動 | `launch` |
 | コンパイル、オフラインコンパイルチェック | `compile`、`compile-check` |
 | テストと Console | `run-tests`、`get-logs`、`clear-console` |

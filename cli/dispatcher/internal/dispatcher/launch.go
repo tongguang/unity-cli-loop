@@ -247,7 +247,7 @@ func waitForExistingLaunchReadiness(ctx context.Context, projectRoot string, pid
 	spinner := ui.NewLaunchSpinner(stdout, stderr)
 	defer spinner.Stop()
 	writeLaunchReadinessWait(stdout, spinner)
-	if err := waitForLaunchReadinessWithDeps(ctx, projectRoot, deps); err != nil {
+	if err := waitForLaunchReadinessWithDeps(ctx, projectRoot, false, deps); err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
 		return 1
 	}
@@ -318,7 +318,7 @@ func startUnityAndWaitForReadiness(
 	}
 	logLaunchFreshFocusWithDeps(ctx, projectRoot, currentPid, deps)
 	writeLaunchReadinessWait(stdout, spinner)
-	if err := waitForLaunchReadinessWithDeps(ctx, projectRoot, deps); err != nil {
+	if err := waitForLaunchReadinessWithDeps(ctx, projectRoot, options.restart, deps); err != nil {
 		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{ProjectRoot: projectRoot, Command: clicore.LaunchCommandName})
 		return 1
 	}
@@ -330,6 +330,11 @@ func startUnityAndWaitForReadiness(
 	return writeLaunchedReadyResponse(stdout, stderr, projectRoot, previousPid, previousStop, currentPid)
 }
 
+// tloopLaunchMarkerArg tells an Editor started by tloop launch apart from one started by
+// Tuanjie Hub or by hand when several Tuanjie processes are running. Tuanjie ignores arguments it
+// does not know, so the marker only shows up in the process command line and Editor.log.
+const tloopLaunchMarkerArg = "-launchedByTloop"
+
 func buildUnityLaunchArgs(projectRoot string, options launchOptions) []string {
 	launchArgs := []string{"-projectPath", projectRoot}
 	if options.platform != "" {
@@ -338,7 +343,7 @@ func buildUnityLaunchArgs(projectRoot string, options launchOptions) []string {
 	if options.logFile != "" {
 		launchArgs = append(launchArgs, "-logFile", options.logFile)
 	}
-	launchArgs = append(launchArgs, "-ignorecompilererrors")
+	launchArgs = append(launchArgs, tloopLaunchMarkerArg)
 	return launchArgs
 }
 

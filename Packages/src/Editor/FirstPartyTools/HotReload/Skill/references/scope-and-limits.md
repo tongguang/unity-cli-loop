@@ -1,14 +1,16 @@
 # Hot Reload Scope and Limits
 
-Only ordinary method declarations and property getters with a body are patched. A
+Only ordinary method declarations and property getters and setters with a body are patched. A
 property added to a compiled type applies as an added member instead (see below).
-Constructors, operators, and explicit event accessors are reported as `Skipped`
-when edited (with a verified baseline, unchanged members of those kinds produce
-no row). Finalizers and `interface` members (including default interface
-implementations) are never scanned: **edits** to them produce **no per-method
-entry at all** and are silently not applied — use `tloop compile` for those.
-Adding a constructor, operator, or explicit event accessor is reported as
+Constructors, finalizers, operators, and explicit event accessors are reported as
+`Skipped` when edited (with a verified baseline, unchanged members of those kinds
+produce no row). Methods of an `interface`, including default interface
+implementations, are reported as `Skipped` the same way; a default property getter or
+setter of an `interface` is patched like any other. Use `tloop compile` for the
+skipped ones.
+Adding a constructor, finalizer, operator, or explicit event accessor is reported as
 `Skipped` as well, same as an edit to an existing one.
+An edited explicit interface method (`void IFoo.Run()`) is patched like an ordinary method; its row reads `Ns.Type.Ns.IFoo.Run()`. Explicit interface property accessors are reported as `Skipped`.
 Methods and property getters of `partial` types are patched like any other; the
 other parts of the type are read from the assembly's source files.
 
@@ -118,7 +120,7 @@ compiled source) removes it from the ledger on that run. Deleting a *compiled*
 member is reported in `Warnings`, but its IL remains callable from unedited code
 until `tloop compile`.
 
-Adding a constructor, operator, or explicit event accessor is still out of
+Adding a constructor, finalizer, operator, or explicit event accessor is still out of
 scope and is reported as `Skipped`, same as edits to them. With a verified
 baseline, event declarations are compared per accessor, so only the edited
 add or remove appears as a `Skipped` row. A newly added explicit event, or
@@ -165,10 +167,12 @@ pattern that matches the property, `nameof`, `ref`/`out`/`in`, and conditional a
 on the property itself. A compound assignment or increment keeps hot reloading when it is
 rewritten as a plain assignment statement (`X = X + 1;`).
 
-Types, indexers, and added events the store cannot hold (a struct host, a delegate type not
-visible outside the assembly) are not reported per member — no `Skipped` row names them;
-at most they surface as outside-body drift in `Warnings`. Treat their silence
-as "not applied" and land them with `tloop compile`.
+A nested type added to a compiled type is named in a `Warnings` line (`Nested type
+requires a compile`), and its methods are reported as `Skipped`; so are the bodied
+accessors of an added indexer. An added event the store cannot hold (a struct host, a
+delegate type not visible outside the assembly) gets no row of its own: the methods
+that use it are `Skipped`, and an event nothing uses changes no behavior. Land all of
+these with `tloop compile`.
 
 Outside method bodies, only member additions (previous section) take effect.
 Every other declaration edit — changing a `const` value, a compiled field's
@@ -377,12 +381,17 @@ A file saved while the compile was running — after the compiler read it — is
 the snapshot is captured: a run without `--files` selects it, and its methods are all
 patched with a warning, until the next compile.
 
-Property getters with a body (including expression-bodied properties) are patched
-like ordinary methods. Editing a compiled property's setter, init, or indexer accessor
-is reported per-accessor as `Skipped`, so an edited accessor never disappears from the
-response silently; with a verified baseline, accessors unchanged from it produce no
-row. A property *added* in this edit is different: both of its accessors apply (see
-"Added members" above).
+Property getters and setters with a body (including expression-bodied ones) are patched
+like ordinary methods; a setter's row reads `Ns.Type.set_X(<type>)`. A patched setter
+changes what the next assignment does: values stored by earlier assignments stay as they
+are. Editing a compiled property's `init` accessor or an indexer accessor is reported
+per-accessor as `Skipped`, and so is a setter with no matching setter on the compiled
+property (a `set` added to a getter-only property, one that was `init` at the last
+compile, or one whose property changed its type or `static` modifier since then), so an
+edited accessor never disappears from the response silently; with a verified baseline,
+accessors unchanged from it produce no row. A property *added* in this edit is
+different: its accessors apply when the property has a supported shape (see "Added
+members" above).
 
 Subscribing to or unsubscribing from a field-like event (`+=`/`-=`) inside an edited
 body works, and so does raising or reading one (`E?.Invoke(x)`, `E(x)`,
@@ -421,6 +430,11 @@ Play Mode when Domain Reload is off, as a compiled static event's do. Deleting t
 the source removes it from `AddedFields`, but its subscribers stay in the store until
 `--revert-all`, so adding it back delivers to them again.
 
+A method that calls a base method (`base.Method(args)`) in its own statements is
+patched: the call runs the base implementation exactly as compiled code would,
+including a base method declared in another assembly or on a generic base class. The
+other uses of `base` listed in the table below are `Skipped`.
+
 A `Skipped` row never undoes what an earlier reload applied to the same method: that
 patch keeps running, so the method matches neither the compiled assembly nor the
 source on disk. When a run skips a method it had patched before, `Warnings` names it.
@@ -437,16 +451,21 @@ source on disk. When a run skips a method it had patched before, `Warnings` name
 | Method or getter on a `partial` type whose body uses an `internal` member of a type in another assembly (through `InternalsVisibleTo`) | Reported as a name no source file of the `partial` type declares; hot reload does not patch this use from a `partial` type yet. Run `tloop compile` |
 | Method on a struct (value type) | Value-type patching is out of scope |
 | Generic method, or method on a generic type | Harmony cannot safely patch open generics |
-| Explicit interface implementation | Dotted metadata names cannot be expressed as shim identifiers |
+| Explicit interface method the compiled assembly does not hold yet, or an accessor of an explicit interface property | Only the body of an explicit interface method the compiled type already implements is patched. Run `tloop compile` |
 | No body (`abstract` / `extern`) | Nothing to transplant |
-| Body contains a `base.` call | `base` cannot be expressed from outside the type |
-| Private/internal access inside an async/iterator/closure body has no accessor-delegate shape | Conditional access (`?.`), `??=`, indexers, static field writes, initializer member assignments, compound writes whose receiver could be evaluated twice, assignments whose value is consumed, deconstructions that set a property through a private/internal setter, and calls with `ref`/`out`/`in`, named, optional, or `params` arguments (or to extension/generic/by-ref-returning methods) cannot be rewritten to accessor delegates. Neither can ref-returning properties. These limits apply to compiled members; a method added in the same reload is reached directly, whatever its arguments. A compiled private/internal static property can be read, assigned, and compound-assigned |
+| Body uses `base.` for something other than a direct call to a base method (a base property, indexer, event, or method group) | C# cannot express that outside the type; run `tloop compile` |
+| Base method call in a lambda, local function, query, async or iterator body, a property accessor, a member or type hot reload added, or a body patched through a delegating shim | A base call is applied only in a compiled method's own statements; move the call there, or run `tloop compile` |
+| Base call to a generic or ref-returning method, to one with a `params` parameter or a pointer type in its signature, or with named or omitted optional arguments | For named or omitted optional arguments, write every argument positionally; otherwise run `tloop compile` |
+| Base call to a method marked `[Conditional]` | The compiler removes the call, and the evaluation of its arguments, when the symbol is not defined; hot reload cannot do the same. Run `tloop compile` |
+| Base call to a method whose base type declares another overload with the same parameter types once its type arguments are filled in (for example `Pick(T)` and `Pick(int)` on `Base<int>`) | Hot reload finds the base method by name and parameter types, which cannot tell these overloads apart. Run `tloop compile` |
+| Base call to a method the compiled assembly does not hold yet (added or re-signatured since the last compile) | Run `tloop compile` |
+| Private/internal access inside an async/iterator/closure body has no accessor-delegate shape | Conditional access (`?.`), indexers, initializer member assignments, and calls with `ref`/`out`/`in`, named, optional, or `params` arguments (or to extension/generic/by-ref-returning methods) cannot be rewritten to accessor delegates. Neither can ref-returning properties, nor these writes to a property through a private/internal setter: `??=`, a compound write whose receiver could be evaluated twice, an assignment whose value is used (a lambda or `=>` member that returns nothing and is only the assignment applies), and a deconstruction. A compound write (`+=`, `??=`, and the like) to a property whose getter is private/internal and whose setter is not is refused as well. The same writes to a private/internal field declared on a class apply, static fields included. A private/internal instance member declared on a struct is refused. These limits apply to compiled members; a method added in the same reload is reached directly, whatever its arguments. A compiled private/internal static property can be read, assigned, and compound-assigned |
 | An async/iterator/closure body of a type not visible outside its assembly reaches a compiled member | An accessor delegate has to name its host, which a shim cannot do for an `internal` class or a class nested in one, so this refuses even a `public` member of that class. A body reaching only methods added in the same reload applies. In a lambda or local function, copy the compiled member into a local outside it; otherwise run `tloop compile` |
 | An async/iterator/closure body references a private/internal type | Accessor delegates rescue member access, not type references; the body still cannot JIT-compile from the shim assembly |
 | A declared return or parameter type cannot be resolved (a new type this reload could not introduce, a missing using, or a typo) | Skipped; a supported new type declared in an edited file of the same assembly is introduced by this reload, so check `Warnings` for the refusal reason (`introduced-types.md`); otherwise add the type or the `using`, or fix the typo, then run `tloop compile` |
 | An added member's body cannot be fully bound in the hot-reload compilation | Hot reload cannot verify a member it cannot bind. A common cause: another file of the same reload, passed or pulled back in because it holds active patches, declares a compiled type from source, while a compiled API the body calls still names the compiled copy (for example, a lambda handed to a compiled `Register(Action<T>)`). The reason then names both types and the file declaring the compiled API. When the called member belongs to a type an earlier reload introduced and its signature was bound to the compiled copy, the reason names the introduced type and that compiled type instead. Either way the `Skipped` row names the step for that run (pass the file declaring the compiled API, leave the file declaring the type out, undo its edit and leave it out, or `tloop compile`), chosen from whether each file was passed, carried in, or already holds patches; a row about an added property's body points to the row of its accessor instead. A file passed this way is brought back by every later reload of the assembly while it stays unchanged, including the reload that re-applies after `--revert-all` or Play entry, until the next successful compile. When the skip deactivated added members an earlier reload applied, the next reload of the assembly retries their unchanged file once, so passing only the declaring file applies them again |
-| Edited setter, init, or indexer accessor of a *compiled* property | Accessor patching covers getters only; `tloop compile` applies these edits. Accessors of a property added in this edit are emitted instead |
-| Constructor (instance or static), operator, conversion operator, or explicit event accessor (add/remove) | Skipped; `tloop compile` applies these edits |
+| Edited `init` or indexer accessor of a *compiled* property, or a setter with no matching setter on the compiled property | Accessor patching covers getters and setters of ordinary properties; `tloop compile` applies these edits. Accessors of a property added in this edit are emitted instead when the property has a supported shape |
+| Constructor (instance or static), finalizer, operator, conversion operator, or explicit event accessor (add/remove) | Skipped; `tloop compile` applies these edits |
 | Method raises or reads a field-like event that has no reachable backing field | Custom `add`/`remove` accessors, an `abstract`/`extern`/interface event, a delegate type that is not visible outside the assembly, or an added event the added-field store cannot hold leave nothing for the shim's Harmony accessor to bind |
 | Method raises or reads a field-like event through a conditional receiver (`other?.E`) | The shim has no name for the conditional receiver to pass to the accessor call |
 | Method names a field-like event inside `nameof` | The shim is a different type and cannot keep the bare event name |

@@ -77,8 +77,8 @@ func TestParseLaunchOptionsRejectsRemovedIgnoreCompilerErrorsFlags(t *testing.T)
 	}
 }
 
-func TestBuildUnityLaunchArgsIncludesIgnoreCompilerErrorsByDefault(t *testing.T) {
-	// Verifies every Unity launch ignores project compiler errors during Editor startup.
+func TestBuildUnityLaunchArgsMarksLaunchAsUloopStarted(t *testing.T) {
+	// Verifies a launch ends with the marker that identifies a tloop-started Editor, and no compiler-error switch.
 	args := buildUnityLaunchArgs(
 		"/tmp/project",
 		launchOptions{platform: "Android"},
@@ -88,7 +88,7 @@ func TestBuildUnityLaunchArgsIncludesIgnoreCompilerErrorsByDefault(t *testing.T)
 		"/tmp/project",
 		"-buildTarget",
 		"Android",
-		"-ignorecompilererrors",
+		"-launchedByTloop",
 	}
 
 	if !slices.Equal(args, expectedArgs) {
@@ -96,8 +96,8 @@ func TestBuildUnityLaunchArgsIncludesIgnoreCompilerErrorsByDefault(t *testing.T)
 	}
 }
 
-func TestBuildUnityLaunchArgsIncludesIgnoreCompilerErrorsForRestart(t *testing.T) {
-	// Verifies restarted Unity launches use the same compiler-error ignore startup argument.
+func TestBuildUnityLaunchArgsMarksRestartAsUloopStarted(t *testing.T) {
+	// Verifies a restarted Editor carries the same tloop-started marker as a fresh launch.
 	args := buildUnityLaunchArgs(
 		"/tmp/project",
 		launchOptions{restart: true},
@@ -105,7 +105,7 @@ func TestBuildUnityLaunchArgsIncludesIgnoreCompilerErrorsForRestart(t *testing.T
 	expectedArgs := []string{
 		"-projectPath",
 		"/tmp/project",
-		"-ignorecompilererrors",
+		"-launchedByTloop",
 	}
 
 	if !slices.Equal(args, expectedArgs) {
@@ -371,7 +371,7 @@ func TestRunLaunchWritesReadyResponseAfterToolReadiness(t *testing.T) {
 	deps.waitForUnityStartupMarker = func(context.Context, string, time.Duration, time.Duration) error {
 		return nil
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		return nil
 	}
 	deps.focusUnityProcess = func(context.Context, int) error {
@@ -413,12 +413,12 @@ func TestWaitForLaunchReadinessUsesLaunchTimeout(t *testing.T) {
 	// Verifies launch gets a longer startup window without changing shared readiness defaults.
 	deps := defaultLaunchDeps()
 	var capturedTimeout time.Duration
-	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
+	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration, _ clicore.DialogFinder) error {
 		capturedTimeout = timeout
 		return nil
 	}
 
-	if err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), deps); err != nil {
+	if err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps); err != nil {
 		t.Fatalf("waitForLaunchReadinessWithDeps failed: %v", err)
 	}
 	if capturedTimeout != launchReadinessTimeout {
@@ -429,7 +429,7 @@ func TestWaitForLaunchReadinessUsesLaunchTimeout(t *testing.T) {
 func TestWaitForLaunchReadinessWrapsStartupTimeout(t *testing.T) {
 	// Verifies launch timeout errors receive the launch-specific startup classification.
 	deps := defaultLaunchDeps()
-	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
+	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration, _ clicore.DialogFinder) error {
 		return clierrors.UnityServerNotRespondingError{
 			ProjectRoot: projectRoot,
 			Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
@@ -437,7 +437,7 @@ func TestWaitForLaunchReadinessWrapsStartupTimeout(t *testing.T) {
 		}
 	}
 
-	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), deps)
+	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
 
 	var startupErr launchStartupTimeoutError
 	if !errors.As(err, &startupErr) {
@@ -448,7 +448,7 @@ func TestWaitForLaunchReadinessWrapsStartupTimeout(t *testing.T) {
 func TestWaitForLaunchReadinessWrapsInternalProbeDeadline(t *testing.T) {
 	// Verifies probe deadlines are classified as launch startup timeouts while the parent context is active.
 	deps := defaultLaunchDeps()
-	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
+	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration, _ clicore.DialogFinder) error {
 		return clierrors.UnityServerNotRespondingError{
 			ProjectRoot: projectRoot,
 			Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
@@ -456,7 +456,7 @@ func TestWaitForLaunchReadinessWrapsInternalProbeDeadline(t *testing.T) {
 		}
 	}
 
-	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), deps)
+	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
 
 	var startupErr launchStartupTimeoutError
 	if !errors.As(err, &startupErr) {
@@ -470,7 +470,7 @@ func TestWaitForLaunchReadinessWrapsInternalProbeDeadline(t *testing.T) {
 func TestWaitForLaunchReadinessPreservesNoProcessReachability(t *testing.T) {
 	// Verifies a launch whose Editor exited before readiness does not report that Unity is running.
 	deps := defaultLaunchDeps()
-	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
+	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration, _ clicore.DialogFinder) error {
 		return fmt.Errorf("timed out waiting for Unity tool readiness: %w", &unityipc.ConnectionAttemptError{
 			ProjectRoot: projectRoot,
 			Endpoint:    "/tmp/tloop/TuanjieCliLoop-sample.sock",
@@ -478,7 +478,7 @@ func TestWaitForLaunchReadinessPreservesNoProcessReachability(t *testing.T) {
 		})
 	}
 
-	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), deps)
+	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
 
 	var startupErr launchStartupTimeoutError
 	if errors.As(err, &startupErr) {
@@ -497,11 +497,11 @@ func TestWaitForLaunchReadinessReportsAnEditorThatExitedDuringStartup(t *testing
 	// Verifies an Editor that exited while launch waited for it is reported as not running, with launch
 	// still safe to run again, rather than as a startup timeout that says Unity is running.
 	deps := defaultLaunchDeps()
-	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
+	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration, _ clicore.DialogFinder) error {
 		return clierrors.UnityNotRunningError{ProjectRoot: projectRoot, ExitedDuringCommand: true}
 	}
 
-	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), deps)
+	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
 
 	var startupErr launchStartupTimeoutError
 	if errors.As(err, &startupErr) {
@@ -519,13 +519,13 @@ func TestWaitForLaunchReadinessReportsAnEditorThatExitedDuringStartup(t *testing
 func TestWaitForLaunchReadinessPreservesParentCancellation(t *testing.T) {
 	// Verifies caller cancellation is not converted into a launch startup timeout.
 	deps := defaultLaunchDeps()
-	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration) error {
+	deps.waitForToolReadiness = func(ctx context.Context, projectRoot string, timeout time.Duration, _ clicore.DialogFinder) error {
 		return ctx.Err()
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	err := waitForLaunchReadinessWithDeps(ctx, t.TempDir(), deps)
+	err := waitForLaunchReadinessWithDeps(ctx, t.TempDir(), false, deps)
 
 	if !errors.Is(err, context.Canceled) {
 		t.Fatalf("expected parent cancellation, got %v", err)
@@ -542,7 +542,7 @@ func TestRunLaunchWritesStructuredResponseForExistingUnityProcess(t *testing.T) 
 	deps.focusUnityProcess = func(context.Context, int) error {
 		return nil
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		readinessChecked = true
 		return nil
 	}
@@ -588,7 +588,7 @@ func TestRunLaunchRequiresRestartForEditorVersionWithExistingUnityProcess(t *tes
 	deps.findRunningUnityProcess = func(context.Context, string) (*clicore.UnityProcess, error) {
 		return &clicore.UnityProcess{Pid: 222}, nil
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		readinessChecked = true
 		return nil
 	}
@@ -640,7 +640,7 @@ func TestRunLaunchRestartWritesProcessTransitionResponse(t *testing.T) {
 	deps.waitForUnityStartupMarker = func(context.Context, string, time.Duration, time.Duration) error {
 		return nil
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		return nil
 	}
 	deps.focusUnityProcess = func(context.Context, int) error {
@@ -782,7 +782,7 @@ func TestRunLaunchWritesExistingFocusSuccessVibeLog(t *testing.T) {
 	deps.focusUnityProcess = func(context.Context, int) error {
 		return nil
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		return nil
 	}
 
@@ -829,7 +829,7 @@ func TestRunLaunchWritesExistingFocusFailureVibeLog(t *testing.T) {
 	deps.focusUnityProcess = func(context.Context, int) error {
 		return fmt.Errorf("activation denied")
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		return nil
 	}
 
@@ -878,7 +878,7 @@ func TestRunLaunchFocusesFreshUnityAfterStartupMarker(t *testing.T) {
 		events = append(events, "startup_marker")
 		return nil
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		return nil
 	}
 	deps.focusUnityProcess = func(_ context.Context, pid int) error {
@@ -936,7 +936,7 @@ func TestRunLaunchSucceedsWhenFreshFocusFails(t *testing.T) {
 	deps.waitForUnityStartupMarker = func(context.Context, string, time.Duration, time.Duration) error {
 		return nil
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		return nil
 	}
 	deps.focusUnityProcess = func(context.Context, int) error {
@@ -1299,7 +1299,7 @@ func newRestartLaunchTestDeps(t *testing.T) launchDeps {
 	deps.waitForUnityStartupMarker = func(context.Context, string, time.Duration, time.Duration) error {
 		return nil
 	}
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error {
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
 		return nil
 	}
 	deps.focusUnityProcess = func(context.Context, int) error {
@@ -1603,7 +1603,7 @@ func isolatedLaunchTestDeps(t *testing.T) launchDeps {
 	deps.resolveUnityExecutablePath = func(string) (string, error) { return fakeUnityExecutablePath(t), nil }
 	deps.waitForUnityProcessExit = func(context.Context, string, int, time.Duration, time.Duration) error { return nil }
 	deps.waitForUnityStartupMarker = func(context.Context, string, time.Duration, time.Duration) error { return nil }
-	deps.waitForToolReadiness = func(context.Context, string, time.Duration) error { return nil }
+	deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error { return nil }
 	deps.probeProjectIpcFallback = func(context.Context, string) error { return errors.New("no IPC in tests") }
 	deps.sleep = func(time.Duration) {}
 	return deps
@@ -1695,7 +1695,9 @@ func TestRunLaunchReportsRunningProcessFailures(t *testing.T) {
 		deps.findRunningUnityProcess = func(context.Context, string) (*clicore.UnityProcess, error) {
 			return &clicore.UnityProcess{Pid: 4242}, nil
 		}
-		deps.waitForToolReadiness = func(context.Context, string, time.Duration) error { return errors.New("tools not ready") }
+		deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
+			return errors.New("tools not ready")
+		}
 		projectRoot := createVersionedLaunchTestProject(t)
 		var stderr bytes.Buffer
 
@@ -1733,7 +1735,9 @@ func TestRunLaunchReportsStartFailures(t *testing.T) {
 			}
 		}, wantMessage: "no lockfile"},
 		{name: "tools never ready", modify: func(_ *testing.T, deps *launchDeps, _ string) {
-			deps.waitForToolReadiness = func(context.Context, string, time.Duration) error { return errors.New("tools not ready") }
+			deps.waitForToolReadiness = func(context.Context, string, time.Duration, clicore.DialogFinder) error {
+				return errors.New("tools not ready")
+			}
 		}, wantMessage: "tools not ready"},
 	}
 	for _, testCase := range cases {

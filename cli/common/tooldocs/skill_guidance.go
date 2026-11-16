@@ -28,7 +28,11 @@ var commandSkillNames = map[string]string{
 	"status": "tloop-status",
 	// The status skill documents cancel in references/cancel.md: cancel is the way out of a Busy
 	// that status reports, and a skill of its own would sit in every session for a rare recovery.
-	"cancel": "tloop-status",
+	// get-dialogs and press-dialog-button are documented in references/dialog.md for the same
+	// reason: they are the way out of the BlockedByDialog that status reports.
+	"cancel":              "tloop-status",
+	"get-dialogs":         "tloop-status",
+	"press-dialog-button": "tloop-status",
 
 	// One skill covers the four pause-point commands and the three watch commands: watch
 	// expressions are documented by the pause-point skill's references/watch-expressions.md.

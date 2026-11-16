@@ -3,10 +3,12 @@ package dispatcher
 import (
 	"context"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/hatayama/unity-cli-loop/common/clicore"
 	"github.com/hatayama/unity-cli-loop/common/unityprocess"
+	"github.com/hatayama/unity-cli-loop/common/unityprocess/unitydialog"
 )
 
 type launchDeps struct {
@@ -20,12 +22,17 @@ type launchDeps struct {
 	resolveUnityExecutablePath          func(string) (string, error)
 	waitForUnityProcessExit             func(context.Context, string, int, time.Duration, time.Duration) error
 	waitForUnityStartupMarker           func(context.Context, string, time.Duration, time.Duration) error
-	waitForToolReadiness                func(context.Context, string, time.Duration) error
-	probeProjectIpcFallback             func(context.Context, string) error
-	removePath                          func(string) error
-	statPath                            func(string) (os.FileInfo, error)
-	isUnityLockfileHeld                 func(string) (bool, error)
-	sleep                               func(time.Duration)
+	waitForToolReadiness                func(context.Context, string, time.Duration, clicore.DialogFinder) error
+	// lookForDialogs reads the modal dialogs of the Editor that lookupProcess finds, through the
+	// operating system.
+	lookForDialogs func(context.Context, string, unitydialog.ProcessLookup) ([]unitydialog.Dialog, error)
+	// canPressDialogs is whether tloop press-dialog-button works on this operating system.
+	canPressDialogs         bool
+	probeProjectIpcFallback func(context.Context, string) error
+	removePath              func(string) error
+	statPath                func(string) (os.FileInfo, error)
+	isUnityLockfileHeld     func(string) (bool, error)
+	sleep                   func(time.Duration)
 }
 
 func defaultLaunchDeps() launchDeps {
@@ -39,6 +46,8 @@ func defaultLaunchDeps() launchDeps {
 		resolveUnityExecutablePath:          resolveUnityExecutablePath,
 		waitForUnityProcessExit:             waitForUnityProcessExit,
 		waitForUnityStartupMarker:           waitForUnityStartupMarkerOrTimeout,
+		lookForDialogs:                      lookForLaunchDialogs,
+		canPressDialogs:                     unitydialog.NewInspector(runtime.GOOS, nil).CanPress(),
 		waitForToolReadiness:                clicore.WaitForToolReadinessWithTimeout,
 		probeProjectIpcFallback:             clicore.ProbeToolReadinessSequence,
 		removePath:                          os.RemoveAll,
@@ -46,4 +55,13 @@ func defaultLaunchDeps() launchDeps {
 		isUnityLockfileHeld:                 isUnityLockfileHeld,
 		sleep:                               time.Sleep,
 	}
+}
+
+// lookForLaunchDialogs reads the dialogs of the Editor lookupProcess finds, on this operating system.
+func lookForLaunchDialogs(
+	ctx context.Context,
+	projectRoot string,
+	lookupProcess unitydialog.ProcessLookup,
+) ([]unitydialog.Dialog, error) {
+	return unitydialog.NewInspector(runtime.GOOS, lookupProcess).Inspect(ctx, projectRoot)
 }

@@ -13,13 +13,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             templates.Add(
                 HotReloadWorkerReasonCode.UnsupportedMemberExplicitAccessor,
                 Plain(
-                    "Property setter, init, or indexer accessors are skipped; "
+                    "Property init accessors, indexer accessors, and setters with no matching setter on the compiled property are skipped; "
                     + "run 'tloop compile' to apply accessor edits.",
                     0));
             templates.Add(
                 HotReloadWorkerReasonCode.UnsupportedMemberUnsupportedKind,
                 Plain(
-                    "Constructors, operators, and event accessors are skipped; "
+                    "Constructors, finalizers, operators, and event accessors are skipped; "
                     + "run 'tloop compile' to apply these edits.",
                     0));
 
@@ -125,6 +125,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             templates.Add(
                 HotReloadWorkerReasonCode.AccessorIndexerNoShape,
                 Plain("inaccessible indexer access has no accessor rewrite shape.", 0));
+            templates.Add(
+                HotReloadWorkerReasonCode.AccessorStructMemberNoShape,
+                Plain("inaccessible instance member of a struct has no accessor rewrite shape.", 0));
             templates.Add(
                 HotReloadWorkerReasonCode.AccessorEventCompoundAssignmentNoShape,
                 Plain("compound assignment to an event has no accessor rewrite shape.", 0));

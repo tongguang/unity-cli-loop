@@ -219,6 +219,20 @@ the publisher's GitHub-hosted Linux verification also succeeded.
 
 ## Local Tuanjie check
 
+The November 2026 upstream dialog and hot-reload import was verified on Windows
+with Tuanjie 1.9.1 (`2022.3.62t9`). Compilation reported zero errors and warnings.
+The 34 affected EditMode test classes covered 997 cases: 972 passed initially;
+the remaining 25 required Debug optimization and all passed after switching the
+current session to Debug. The Go CLI checks and all four platform builds passed.
+
+A live `EditorUtility.DisplayDialog` smoke check preserved Chinese message text
+and button labels. `get-dialogs` listed it, `status` reported `BlockedByDialog`,
+and `get-hierarchy` was refused with `CommandNotRun: true`. The running snippet
+was reported as already started with `SafeToRetry: false`. Pressing the Chinese
+button label through `press-dialog-button` closed the prompt and restored `Ready`.
+This uses Win32 inspection: Tuanjie 1.9.1 does not expose Unity 6000.7 dialog events.
+It does not establish live macOS or Linux Editor behavior.
+
 `scripts/check-tuanjie.ps1` checks this project against the Tuanjie Editor that
 already has it open. It confirms the Editor can take a command, compiles the
 project and fails on any error or warning, then runs the `CliVersionComparerTests`
@@ -235,6 +249,12 @@ The default tests only show that the Test Runner works under Tuanjie. To cover a
 change, pass `-TestFilterType` and `-TestFilterValue` with the values
 `tloop run-tests` accepts, except `all`: the unfiltered suite takes far too long
 for this check.
+
+For hot-reload and source pause-point tests, first run the development binary's
+`set-code-optimization debug` command and wait until `status` reports `Ready`.
+This changes the current Editor session only. Release optimization can inline
+the fixture methods and rejects source pause points, so it is not a valid mode
+for tests that require Debug behavior. Do not use `--startup` for this check.
 
 The script uses this checkout's `dist` binary; rebuild it with
 `scripts/build-go-cli.sh` after CLI source changes, or pass `-TloopPath`. It never
