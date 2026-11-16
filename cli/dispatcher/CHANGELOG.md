@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.15.0](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.13...dispatcher-v3.15.0) (2026-11-16)
+
+- feat: merge upstream dialog and hot reload updates for Tuanjie (e8a01f75)
+
 ## [3.14.13](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.14.12...dispatcher-v3.14.13) (2026-11-13)
 
 - test: cover permanent lockfile failures across platforms (893fa6c8)
