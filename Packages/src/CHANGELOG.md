@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.25.1](https://github.com/tongguang/unity-cli-loop/compare/v3.25.0...v3.25.1) (2026-11-16)
+
+- fix: merge upstream implicit-call hot reload guards for Tuanjie (fdc65977)
+
 ## [3.25.0](https://github.com/tongguang/unity-cli-loop/compare/v3.24.0...v3.25.0) (2026-11-16)
 
 - feat: merge upstream explicit interface property hot reload (875225d4)
