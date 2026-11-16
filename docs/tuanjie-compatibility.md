@@ -234,6 +234,15 @@ matching, getter signature changes, retained declarations, added properties,
 indexer regressions, and skip-reason text. Skill size, generated tool catalog,
 file length, and C# complexity checks also passed.
 
+The implicit-call guard import (upstream #3532) was verified on Tuanjie 1.9.1
+on Windows, with Debug optimization. `scripts/check-tuanjie.ps1` compiled with
+zero errors and warnings and passed all 265 scoped EditMode cases, with none
+skipped. Coverage included compiler-generated calls in closures and async bodies,
+members declared in files outside the reload, public-call controls, apply/revert,
+existing accessor and internal-member regressions, and skip-reason text. The
+imported async tests fail explicitly on unexpected cancellation. Skill size,
+generated tool catalog, file length, and C# complexity checks also passed.
+
 A live `EditorUtility.DisplayDialog` smoke check preserved Chinese message text
 and button labels. `get-dialogs` listed it, `status` reported `BlockedByDialog`,
 and `get-hierarchy` was refused with `CommandNotRun: true`. The running snippet
