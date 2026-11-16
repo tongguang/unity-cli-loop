@@ -1,5 +1,5 @@
 {
-  "Packages/src": "3.23.0",
+  "Packages/src": "3.24.0",
   "cli/dispatcher": "3.15.0",
   "cli/project-runner": "3.14.0"
 }

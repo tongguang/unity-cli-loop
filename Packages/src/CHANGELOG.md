@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.24.0](https://github.com/tongguang/unity-cli-loop/compare/v3.23.0...v3.24.0) (2026-11-16)
+
+- Merge pull request #12 from tongguang/codex/merge-upstream-indexer-partial (afe8d5dd)
+
 ## [3.23.0](https://github.com/tongguang/unity-cli-loop/compare/v3.22.12...v3.23.0) (2026-11-16)
 
 - feat: merge upstream dialog and hot reload updates for Tuanjie (e8a01f75)
