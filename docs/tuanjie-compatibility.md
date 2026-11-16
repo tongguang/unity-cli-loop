@@ -225,6 +225,15 @@ The 34 affected EditMode test classes covered 997 cases: 972 passed initially;
 the remaining 25 required Debug optimization and all passed after switching the
 current session to Debug. The Go CLI checks and all four platform builds passed.
 
+The subsequent explicit interface property accessor import (upstream #3535) was
+verified on the same Tuanjie version on Windows, with Debug optimization.
+`scripts/check-tuanjie.ps1` compiled with zero errors and warnings and passed all
+442 cases across eight affected EditMode test classes, with none skipped. These
+covered explicit interface getter/setter apply and revert, compiled accessor name
+matching, getter signature changes, retained declarations, added properties,
+indexer regressions, and skip-reason text. Skill size, generated tool catalog,
+file length, and C# complexity checks also passed.
+
 A live `EditorUtility.DisplayDialog` smoke check preserved Chinese message text
 and button labels. `get-dialogs` listed it, `status` reported `BlockedByDialog`,
 and `get-hierarchy` was refused with `CommandNotRun: true`. The running snippet
