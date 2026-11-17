@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.17.0](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.16.0...dispatcher-v3.17.0) (2026-11-17)
+
+- test: cover dispatcher update recovery failures (76985268)
+- feat: merge upstream dispatcher updates for Tuanjie (91d3ae8f)
+
 ## [3.16.0](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.15.0...dispatcher-v3.16.0) (2026-11-17)
 
 - feat: merge upstream hot reload and launch improvements for Tuanjie (f11e071e)
