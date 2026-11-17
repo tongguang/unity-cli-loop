@@ -175,9 +175,9 @@ func fakeDispatcherRunDeps(t *testing.T) dispatcherRunDeps {
 		t.Fatal("the project runner must not be executed")
 		return 0
 	}
-	deps.runUpdate = func(context.Context) (bool, error) {
+	deps.runRequiredUpdate = func(context.Context, string) (string, error) {
 		t.Fatal("the dispatcher self-update must not run")
-		return false, nil
+		return "", nil
 	}
 	return deps
 }

@@ -266,6 +266,19 @@ button labels exactly; a translated or different prompt still requires an answer
 through the normal dialog flow. The launch tests simulate the prompt and do not
 establish live localized Safe Mode behavior.
 
+The dispatcher self-update and older-package launch import (upstream #3557 and
+#3558) retains the Tuanjie update repository, installer paths, and release metadata.
+Periodic updates and version holds use only `TLOOP_*` settings and the Tuanjie
+config directory. Go regressions cover update throttling, concurrent installer
+locks, version holds, required-update floors, older-protocol launch responses,
+and config paths on Windows, macOS, and Linux, including rejection of the
+original CLI config override. On Windows with Tuanjie 1.9.1, the rebuilt
+dispatcher launched this project successfully. `scripts/check-tuanjie.ps1`
+compiled with zero errors and warnings and passed all 21 `CliVersionComparerTests`
+cases with none skipped. No C# implementation or IPC protocol version changed.
+The older-package protocol response is covered by simulated IPC tests, not a
+live installation of an older package.
+
 `scripts/check-tuanjie.ps1` checks this project against the Tuanjie Editor that
 already has it open. It confirms the Editor can take a command, compiles the
 project and fails on any error or warning, then runs the `CliVersionComparerTests`

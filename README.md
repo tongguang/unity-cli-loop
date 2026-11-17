@@ -42,6 +42,17 @@ curl -fsSL https://raw.githubusercontent.com/tongguang/unity-cli-loop/main/scrip
 
 运行 `tloop --version` 确认安装成功。提示找不到命令时，重新打开终端。
 
+<details>
+<summary>CLI 自动更新</summary>
+
+使用 CLI 时，最多每 24 小时检查一次新版本并自动安装，下一条命令使用新版本。
+
+- 固定版本：`tloop update --to-version <version>` 安装并锁定指定版本；运行 `tloop update` 恢复自动更新。
+- 关闭自动更新：设置环境变量 `TLOOP_DISABLE_SELF_UPDATE=1`。
+- 仅更新安装目录内的团结版 CLI；开发构建和手动解压的副本不会触发自动更新。
+
+</details>
+
 **2. 把插件加入工程**
 
 如果工程里已经装了上游的 `io.github.hatayama.uloopmcp`，先把它从 `Packages/manifest.json` 里删掉。两个包的程序集名称和 asmdef GUID 相同，不能同时安装。

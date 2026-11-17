@@ -10,8 +10,10 @@ import (
 const (
 	InstallDirEnvName        = "TLOOP_INSTALL_DIR"
 	CacheDirEnvName          = "TLOOP_CACHE_DIR"
+	ConfigDirEnvName         = "TLOOP_CONFIG_DIR"
 	ProjectRunnerPathEnvName = "TLOOP_PROJECT_RUNNER_PATH"
 	LocalAppDataEnvName      = "LOCALAPPDATA"
+	AppDataEnvName           = "APPDATA"
 	WindowsProgramsDirName   = "Programs"
 	ProductDirectoryName     = "tloop"
 	InstallBinDirectoryName  = "bin"
@@ -93,6 +95,38 @@ func CacheRoot(goos string, environment Environment) (string, error) {
 			return "", err
 		}
 		return Join(goos, home, ".cache", ProductDirectoryName), nil
+	}
+}
+
+// ConfigRoot returns the per-user configuration directory for settings that must survive cache
+// cleanup, such as the dispatcher version hold.
+func ConfigRoot(goos string, environment Environment) (string, error) {
+	if explicitConfigRoot := strings.TrimSpace(getEnvironmentValue(environment, ConfigDirEnvName)); explicitConfigRoot != "" {
+		return explicitConfigRoot, nil
+	}
+
+	switch goos {
+	case "darwin":
+		home, err := userHomeDir(environment)
+		if err != nil {
+			return "", err
+		}
+		return Join(goos, home, "Library", "Application Support", ProductDirectoryName), nil
+	case "windows":
+		appData := strings.TrimSpace(getEnvironmentValue(environment, AppDataEnvName))
+		if appData == "" {
+			return "", errors.New("APPDATA is required to resolve the tloop config directory")
+		}
+		return Join(goos, appData, ProductDirectoryName), nil
+	default:
+		if xdgConfigHome := strings.TrimSpace(getEnvironmentValue(environment, "XDG_CONFIG_HOME")); xdgConfigHome != "" {
+			return Join(goos, xdgConfigHome, ProductDirectoryName), nil
+		}
+		home, err := userHomeDir(environment)
+		if err != nil {
+			return "", err
+		}
+		return Join(goos, home, ".config", ProductDirectoryName), nil
 	}
 }
 

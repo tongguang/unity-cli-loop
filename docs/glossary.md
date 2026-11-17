@@ -81,7 +81,8 @@ the project runner.
 
 The globally installed `tloop` binary. It resolves the target Unity project, ensures the
 pinned project runner release is installed (downloading it when needed), keeps itself
-up to date against the pin's `minimumDispatcherVersion`, and delegates command execution
+up to date with a periodic self-update to the newest release plus the pin's
+`minimumDispatcherVersion` floor, and delegates command execution
 to the project runner. Released through the explicit `Release` workflow from `cli/dispatcher/`.
 
 ### Project runner
@@ -98,6 +99,13 @@ the explicit `Release` workflow from `cli/project-runner/`.
 requirements: `projectRunnerVersion` (stamped by release automation) and
 `minimumDispatcherVersion` (the manually maintained dispatcher floor). The pin evolves
 additively only — existing fields are never deleted or renamed.
+
+### Version hold
+
+The setting `tloop update --to-version <version>` records in the user's config directory
+(`dispatcher-version-hold.json`) to keep the dispatcher on that release: while it exists,
+the dispatcher's periodic self-update does not run. Plain `tloop update` removes it. It is
+unrelated to the project runner [pin](#pin) — never call it a pin.
 
 ### Protocol version
 
