@@ -251,6 +251,21 @@ button label through `press-dialog-button` closed the prompt and restored `Ready
 This uses Win32 inspection: Tuanjie 1.9.1 does not expose Unity 6000.7 dialog events.
 It does not establish live macOS or Linux Editor behavior.
 
+The next upstream import includes init accessor bodies (#3536), internal extension
+method calls from closures and async bodies (#3539), startup Safe Mode prompt
+handling (#3551), and project discovery below a repository root (#3552). It keeps
+Tuanjie's Editor discovery, explicit `--editor-path`, package identity, and release
+metadata. The new async EditMode tests explicitly fail on unexpected cancellation.
+On Windows with Tuanjie 1.9.1 in Debug optimization, `scripts/check-tuanjie.ps1`
+compiled with zero errors and warnings and passed all 512 cases in 12 affected
+EditMode test classes, with none skipped. These cover init accessor apply/revert,
+public-class internal extension calls, existing indexers and implicit calls,
+transform-worker binding, and skip-reason text.
+Safe Mode handling matches the English `Enter Safe Mode?` title and its three
+button labels exactly; a translated or different prompt still requires an answer
+through the normal dialog flow. The launch tests simulate the prompt and do not
+establish live localized Safe Mode behavior.
+
 `scripts/check-tuanjie.ps1` checks this project against the Tuanjie Editor that
 already has it open. It confirms the Editor can take a command, compiles the
 project and fails on any error or warning, then runs the `CliVersionComparerTests`

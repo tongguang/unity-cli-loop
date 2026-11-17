@@ -307,6 +307,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 "Explicit interface implementations the compiled assembly does not hold yet, and accessors "
                 + "of explicit interface indexers, are skipped. Run 'tloop compile'.");
             yield return Case(
+                HotReloadWorkerReasonCode.MethodTransformInitAccessorWritesInitOnlyMember,
+                NoArgs,
+                "Init accessors that assign a readonly field or an init-only property are skipped; the patch "
+                + "is compiled outside the type, where only the type's own constructors and init accessors "
+                + "may assign them. Run 'tloop compile'.");
+            yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformSiblingBodyBindsCompiledType,
                 new[] { "CS1061: 'Host' does not contain a definition for 'Hit'", "'Host'", "'Assets/Host.cs'" },
                 "This file was brought back to re-bind its active patches, but this method's body no longer "
@@ -599,7 +605,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             yield return Case(
                 HotReloadWorkerReasonCode.UnsupportedMemberExplicitAccessor,
                 NoArgs,
-                "Property init accessors, and getters, setters or indexer accessors with no matching accessor on the compiled type, are skipped; "
+                "Getters, setters, property init accessors, and indexer accessors with no matching accessor on the compiled type, and explicit interface or indexer init accessors, are skipped; "
                 + "run 'tloop compile' to apply accessor edits.");
             yield return Case(
                 HotReloadWorkerReasonCode.UnsupportedMemberUnsupportedKind,
@@ -703,9 +709,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 NoArgs,
                 "compound assignment to an event has no accessor rewrite shape.");
             yield return Case(
-                HotReloadWorkerReasonCode.AccessorExtensionMethodNotRewritten,
+                HotReloadWorkerReasonCode.AccessorExtensionMethodGroupNoShape,
                 NoArgs,
-                "inaccessible extension method calls are not rewritten.");
+                "inaccessible extension method used as a method group (not called) has no accessor rewrite shape.");
+            yield return Case(
+                HotReloadWorkerReasonCode.AccessorAddedExtensionReducedCallNoShape,
+                new[] { "AddedTriple", "Extensions" },
+                "extension method 'AddedTriple' added in this reload has no rewrite shape when called on a receiver; write the call as 'Extensions.AddedTriple(receiver, ...)'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AccessorGenericMethodNotRewritten,
                 NoArgs,
@@ -770,6 +780,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 HotReloadWorkerReasonCode.AccessorRefReturningMethodNoShape,
                 NoArgs,
                 "inaccessible methods that return by ref have no accessor rewrite shape.");
+            yield return Case(
+                HotReloadWorkerReasonCode.AccessorConditionalMethodNotRewritten,
+                NoArgs,
+                "inaccessible [Conditional] method calls are not rewritten, because the compiler omits them when the condition symbol is not defined.");
+            yield return Case(
+                HotReloadWorkerReasonCode.AccessorRefLikeSignatureNoShape,
+                NoArgs,
+                "inaccessible method with a ref struct parameter or return type has no accessor rewrite shape.");
             yield return Case(
                 HotReloadWorkerReasonCode.AccessorRefOutInParameterNotRewritten,
                 NoArgs,

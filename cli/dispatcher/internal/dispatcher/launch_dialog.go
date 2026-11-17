@@ -49,12 +49,16 @@ type launchBlockedByDialogError struct {
 	restart bool
 	// cause is the failure the wait saw last before it found the dialog; nil when it saw none.
 	cause error
+	// safeModePromptIgnored is whether launch pressed Ignore on Unity's Safe Mode prompt before it
+	// stopped at these dialogs.
+	safeModePromptIgnored bool
 }
 
 // asLaunchDialogError turns a wait that stopped at a dialog into launchBlockedByDialogError and
 // returns any other err unchanged. canPress reflects OS support for dialog buttons;
 // restart is whether launch ran with --restart.
-func asLaunchDialogError(err error, projectRoot string, canPress bool, restart bool) error {
+// safeModePromptIgnored is whether launch pressed Ignore on Unity's Safe Mode prompt on the way.
+func asLaunchDialogError(err error, projectRoot string, canPress bool, restart bool, safeModePromptIgnored bool) error {
 	var blocked clicore.ToolReadinessBlockedByDialogError
 	if !errors.As(err, &blocked) {
 		return err
@@ -65,6 +69,8 @@ func asLaunchDialogError(err error, projectRoot string, canPress bool, restart b
 		canPress:    canPress,
 		restart:     restart,
 		cause:       blocked.Cause,
+
+		safeModePromptIgnored: safeModePromptIgnored,
 	}
 }
 
@@ -82,6 +88,10 @@ func (err launchBlockedByDialogError) ToCLIError(context clierrors.ErrorContext)
 	details := map[string]any{"Dialogs": err.dialogs}
 	if err.cause != nil {
 		details["Cause"] = err.cause.Error()
+	}
+	// Why only when true: a launch that pressed nothing keeps the output it always had.
+	if err.safeModePromptIgnored {
+		details["SafeModePromptIgnored"] = true
 	}
 	return clierrors.CLIError{
 		ErrorCode:   clierrors.ErrorCodeBlockedByDialog,

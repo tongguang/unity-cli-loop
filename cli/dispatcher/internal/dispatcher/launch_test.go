@@ -418,7 +418,7 @@ func TestWaitForLaunchReadinessUsesLaunchTimeout(t *testing.T) {
 		return nil
 	}
 
-	if err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps); err != nil {
+	if _, err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps); err != nil {
 		t.Fatalf("waitForLaunchReadinessWithDeps failed: %v", err)
 	}
 	if capturedTimeout != launchReadinessTimeout {
@@ -437,7 +437,7 @@ func TestWaitForLaunchReadinessWrapsStartupTimeout(t *testing.T) {
 		}
 	}
 
-	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
+	_, err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
 
 	var startupErr launchStartupTimeoutError
 	if !errors.As(err, &startupErr) {
@@ -456,7 +456,7 @@ func TestWaitForLaunchReadinessWrapsInternalProbeDeadline(t *testing.T) {
 		}
 	}
 
-	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
+	_, err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
 
 	var startupErr launchStartupTimeoutError
 	if !errors.As(err, &startupErr) {
@@ -478,7 +478,7 @@ func TestWaitForLaunchReadinessPreservesNoProcessReachability(t *testing.T) {
 		})
 	}
 
-	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
+	_, err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
 
 	var startupErr launchStartupTimeoutError
 	if errors.As(err, &startupErr) {
@@ -501,7 +501,7 @@ func TestWaitForLaunchReadinessReportsAnEditorThatExitedDuringStartup(t *testing
 		return clierrors.UnityNotRunningError{ProjectRoot: projectRoot, ExitedDuringCommand: true}
 	}
 
-	err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
+	_, err := waitForLaunchReadinessWithDeps(context.Background(), t.TempDir(), false, deps)
 
 	var startupErr launchStartupTimeoutError
 	if errors.As(err, &startupErr) {
@@ -525,7 +525,7 @@ func TestWaitForLaunchReadinessPreservesParentCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	err := waitForLaunchReadinessWithDeps(ctx, t.TempDir(), false, deps)
+	_, err := waitForLaunchReadinessWithDeps(ctx, t.TempDir(), false, deps)
 
 	if !errors.Is(err, context.Canceled) {
 		t.Fatalf("expected parent cancellation, got %v", err)
