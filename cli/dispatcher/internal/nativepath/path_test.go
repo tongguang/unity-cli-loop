@@ -348,7 +348,7 @@ func TestConfigRootResolvesPerOperatingSystem(t *testing.T) {
 		{name: "explicit wins", goos: "darwin", env: map[string]string{ConfigDirEnvName: " /tmp/tloop-config "}, expected: "/tmp/tloop-config"},
 		{name: "darwin", goos: "darwin", expected: "/home/<USER_NAME>/Library/Application Support/tloop"},
 		{name: "ignores upstream config", goos: "linux", env: map[string]string{"ULOOP_CONFIG_DIR": "/config/uloop"}, expected: "/home/<USER_NAME>/.config/tloop"},
-		{name: "windows mixed separators", goos: "windows", env: map[string]string{AppDataEnvName: `C:/Users/用户/AppData/Roaming/`}, expected: `C:/Users/用户/AppData/Roaming\tloop`},
+		{name: "windows mixed separators", goos: "windows", env: map[string]string{AppDataEnvName: `C:/Users/鐢ㄦ埛/AppData/Roaming/`}, expected: `C:/Users/鐢ㄦ埛/AppData/Roaming\tloop`},
 		{name: "windows", goos: "windows", env: map[string]string{AppDataEnvName: `C:\Users\<USER_NAME>\AppData\Roaming\`}, expected: `C:\Users\<USER_NAME>\AppData\Roaming\tloop`},
 		{name: "windows without APPDATA", goos: "windows", wantErr: true},
 		{name: "linux with XDG", goos: "linux", env: map[string]string{"XDG_CONFIG_HOME": "/config"}, expected: "/config/tloop"},
@@ -370,5 +370,16 @@ func TestConfigRootResolvesPerOperatingSystem(t *testing.T) {
 				t.Fatalf("config root mismatch: got %q err=%v want %q", configRoot, err, testCase.expected)
 			}
 		})
+	}
+}
+
+func TestConfigRootReportsHomeLookupFailure(t *testing.T) {
+	// Verifies home-based config directories preserve the lookup failure instead of returning a relative path.
+	failure := errors.New("home unavailable")
+	for _, platform := range []string{"darwin", "linux"} {
+		root, err := ConfigRoot(platform, homeEnvironment("", failure, nil))
+		if root != "" || !errors.Is(err, failure) {
+			t.Fatalf("%s: root=%q err=%v", platform, root, err)
+		}
 	}
 }
