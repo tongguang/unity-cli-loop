@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.26.0](https://github.com/tongguang/unity-cli-loop/compare/v3.25.2...v3.26.0) (2026-11-17)
+
+- feat: merge upstream hot reload and launch improvements for Tuanjie (f11e071e)
+
 ## [3.25.2](https://github.com/tongguang/unity-cli-loop/compare/v3.25.1...v3.25.2) (2026-11-16)
 
 - fix: tag Windows recordings with the correct YUV matrix (c4f2aff8)
