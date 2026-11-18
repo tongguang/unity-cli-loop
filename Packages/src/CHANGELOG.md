@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.27.1](https://github.com/tongguang/unity-cli-loop/compare/v3.27.0...v3.27.1) (2026-11-18)
+
+- Update release dependencies and packaging.
+
 ## [3.27.0](https://github.com/tongguang/unity-cli-loop/compare/v3.26.0...v3.27.0) (2026-11-17)
 
 - feat: merge upstream dispatcher updates for Tuanjie (91d3ae8f)
