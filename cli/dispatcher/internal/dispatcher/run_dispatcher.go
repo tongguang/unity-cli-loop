@@ -124,7 +124,7 @@ func runPinnedDispatcherProjectRunner(
 
 	projectRoot, err := resolveDispatcherProjectRoot(startPath, projectPath, remainingArgs)
 	if err != nil {
-		clierrors.WriteClassifiedError(stderr, err, clierrors.ErrorContext{})
+		clierrors.WriteErrorEnvelope(stderr, projectResolutionError(err, remainingArgs[0], clierrors.ErrorContext{}))
 		return 1
 	}
 

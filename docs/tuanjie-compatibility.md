@@ -279,6 +279,16 @@ cases with none skipped. No C# implementation or IPC protocol version changed.
 The older-package protocol response is covered by simulated IPC tests, not a
 live installation of an older package.
 
+The unknown-command import (upstream #3561) reports misspelled commands outside
+a project as `UNKNOWN_COMMAND`, with suggestions and Tuanjie-specific guidance.
+It retains the fork's versions and pins for the explicit Release workflow.
+The full Go CLI checks and all four platform builds passed. On Windows with
+Tuanjie 1.9.1, `scripts/check-tuanjie.ps1` compiled with zero errors and warnings
+and passed all 21 `CliVersionComparerTests` cases with none skipped. The rebuilt
+Windows dispatcher reported `UNKNOWN_COMMAND` and suggested `update` for both
+`tloop upadte` and `tloop upadte --help` outside a project; the valid `get-logs`
+command still reported `PROJECT_NOT_FOUND`. The file-length check also passed.
+
 `scripts/check-tuanjie.ps1` checks this project against the Tuanjie Editor that
 already has it open. It confirms the Editor can take a command, compiles the
 project and fails on any error or warning, then runs the `CliVersionComparerTests`
