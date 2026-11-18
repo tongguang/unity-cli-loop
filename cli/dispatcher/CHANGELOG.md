@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.17.1](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.17.0...dispatcher-v3.17.1) (2026-11-18)
+
+- fix: merge upstream command suggestions for Tuanjie (a787a8a9)
+
 ## [3.17.0](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.16.0...dispatcher-v3.17.0) (2026-11-17)
 
 - test: cover dispatcher update recovery failures (76985268)
