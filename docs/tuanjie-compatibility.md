@@ -289,6 +289,15 @@ Windows dispatcher reported `UNKNOWN_COMMAND` and suggested `update` for both
 `tloop upadte` and `tloop upadte --help` outside a project; the valid `get-logs`
 command still reported `PROJECT_NOT_FOUND`. The file-length check also passed.
 
+The hot-reload import from upstream #3564, #3565, #3566, #3568, and #3575
+skips individual members that require unsafe code and detects inaccessible
+implicit calls in lambdas and async bodies, including calls involving types
+declared in a file omitted from the reload. It also distinguishes the public
+Span and Memory types from internal copies in referenced assemblies. On
+Windows with Tuanjie 1.9.1 in Debug optimization, `scripts/check-tuanjie.ps1`
+compiled with zero errors and warnings. All 572 EditMode cases in the 12
+affected test classes passed, including patch, skip, and revert checks.
+
 `scripts/check-tuanjie.ps1` checks this project against the Tuanjie Editor that
 already has it open. It confirms the Editor can take a command, compiles the
 project and fails on any error or warning, then runs the `CliVersionComparerTests`

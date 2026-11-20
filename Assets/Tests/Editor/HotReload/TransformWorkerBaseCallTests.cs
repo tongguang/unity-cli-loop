@@ -257,11 +257,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         }
 
         /// <summary>
-        /// What: a base call to a method taking an array of pointers is Skipped for its argument shape,
-        /// because the stand-in cannot declare that parameter in a shim compiled without unsafe code.
+        /// What: a base call to a method taking an array of pointers is Skipped as unsafe code, because
+        /// the call itself needs an unsafe context and the patch is compiled without unsafe code.
         /// </summary>
         [Test]
-        public async Task Run_BaseCallToPointerArrayParameter_IsSkippedAsArgumentShape()
+        public async Task Run_BaseCallToPointerArrayParameter_IsSkippedAsUnsafeCode()
         {
             TransformWorkerClientResult result = await RunWorkerOnEditedFixtureAsync(
                 "BaseCallToPointerArrayParameter.cs",
@@ -277,7 +277,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             AssertSkippedWithCode(
                 result,
                 nameof(HotReloadBaseCallDerivedFixture.CallKeywordParameter),
-                HotReloadWorkerReasonCode.MethodTransformBaseCallArgumentShape);
+                HotReloadWorkerReasonCode.MethodTransformUnsafeCode);
         }
 
         /// <summary>
@@ -680,7 +680,14 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 changedSiblingScanComplete = true
             };
 
-            return await HotReloadCompositionRoot.Services.TransformWorkerClient.RunAsync(input, CancellationToken.None);
+            try
+            {
+                return await HotReloadCompositionRoot.Services.TransformWorkerClient.RunAsync(input, CancellationToken.None);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                throw new AssertionException("Unexpected cancellation.", exception);
+            }
         }
     }
 }
