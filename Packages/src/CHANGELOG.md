@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.27.2](https://github.com/tongguang/unity-cli-loop/compare/v3.27.1...v3.27.2) (2026-11-20)
+
+- fix: merge upstream hot reload safety fixes for Tuanjie (2f5aad25)
+
 ## [3.27.1](https://github.com/tongguang/unity-cli-loop/compare/v3.27.0...v3.27.1) (2026-11-18)
 
 - Update release dependencies and packaging.
