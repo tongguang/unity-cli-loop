@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEditor.Compilation;
 
+using io.github.hatayama.UnityCliLoop.Domain;
 using io.github.hatayama.UnityCliLoop.FirstPartyTools;
 using io.github.hatayama.UnityCliLoop.Infrastructure;
 using io.github.hatayama.UnityCliLoop.ToolContracts;
@@ -44,21 +45,29 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task TryCompileAsync_WhileRequestIsInFlight_PublishesPendingStartReaderUntilCompletion()
         {
-            FakeCompilePipelinePort pipeline = new();
-            using CompileController controller = CreateController(pipeline);
+            try
+            {
+                FakeCompilePipelinePort pipeline = new();
+                using CompileController controller = CreateController(pipeline);
 
-            Task<CompileResult> pendingCompile = controller.TryCompileAsync(
-                forceRecompile: false,
-                playModeStopWarning: null,
-                CancellationToken.None);
+                Task<CompileResult> pendingCompile = controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None);
 
-            Assert.That(CompileStartPendingCoordination.ReadPendingSeconds, Is.Not.Null);
-            Assert.That(CompileStartPendingCoordination.ReadPendingSeconds(), Is.EqualTo(0d));
-            pipeline.CompilationStarted(null);
-            pipeline.CompilationFinished(null);
-            await UncanceledAwaits.AwaitValueAsync(pendingCompile);
+                Assert.That(CompileStartPendingCoordination.ReadPendingSeconds, Is.Not.Null);
+                Assert.That(CompileStartPendingCoordination.ReadPendingSeconds(), Is.EqualTo(0d));
+                pipeline.CompilationStarted(null);
+                pipeline.CompilationFinished(null);
+                await UncanceledAwaits.AwaitValueAsync(pendingCompile);
 
-            Assert.That(CompileStartPendingCoordination.ReadPendingSeconds, Is.Null);
+                Assert.That(CompileStartPendingCoordination.ReadPendingSeconds, Is.Null);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
         }
 
         /// <summary>
@@ -67,23 +76,31 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task Cleanup_WhenCompileIsPending_WithdrawsPendingStartReader()
         {
-            FakeCompilePipelinePort pipeline = new();
-            using CompileController controller = CreateController(pipeline);
-            Task<CompileResult> pendingCompile = controller.TryCompileAsync(
-                forceRecompile: false,
-                playModeStopWarning: null,
-                CancellationToken.None);
-
-            controller.Cleanup();
-
-            Assert.That(CompileStartPendingCoordination.ReadPendingSeconds, Is.Null);
             try
             {
-                await pendingCompile;
-                Assert.Fail("The pending compile should be canceled by Cleanup.");
+                FakeCompilePipelinePort pipeline = new();
+                using CompileController controller = CreateController(pipeline);
+                Task<CompileResult> pendingCompile = controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None);
+
+                controller.Cleanup();
+
+                Assert.That(CompileStartPendingCoordination.ReadPendingSeconds, Is.Null);
+                try
+                {
+                    await pendingCompile;
+                    Assert.Fail("The pending compile should be canceled by Cleanup.");
+                }
+                catch (TaskCanceledException)
+                {
+                }
             }
-            catch (TaskCanceledException)
+            catch (System.OperationCanceledException exception)
             {
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -94,34 +111,42 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task TryCompileAsync_WhenPipelineFinishes_ReturnsReportedMessagesAndClearsState()
         {
-            FakeCompilePipelinePort pipeline = new()
+            try
             {
-                CompleteOnRequest = true,
-                ReportedMessages = new[] { CreateMessage(CompilerMessageType.Warning, "sample warning") }
-            };
-            using CompileController controller = CreateController(pipeline);
-            List<string> startedMessages = new();
-            List<string> compiledAssemblies = new();
-            controller.OnCompileStarted += startedMessages.Add;
-            controller.OnAssemblyCompiled += (assemblyName, _) => compiledAssemblies.Add(assemblyName);
+                FakeCompilePipelinePort pipeline = new()
+                {
+                    CompleteOnRequest = true,
+                    ReportedMessages = new[] { CreateMessage(CompilerMessageType.Warning, "sample warning") }
+                };
+                using CompileController controller = CreateController(pipeline);
+                List<string> startedMessages = new();
+                List<string> compiledAssemblies = new();
+                controller.OnCompileStarted += startedMessages.Add;
+                controller.OnAssemblyCompiled += (assemblyName, _) => compiledAssemblies.Add(assemblyName);
 
-            CompileResult result = await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
-                forceRecompile: false,
-                playModeStopWarning: null,
-                CancellationToken.None));
+                CompileResult result = await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None));
 
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.WarningCount, Is.EqualTo(1));
-            Assert.That(pipeline.RefreshCount, Is.EqualTo(1));
-            Assert.That(pipeline.SubscribeCount, Is.EqualTo(1));
-            Assert.That(pipeline.UnsubscribeCount, Is.EqualTo(1));
-            Assert.That(pipeline.MismatchedUnsubscribeCount, Is.EqualTo(0));
-            Assert.That(pipeline.RequestedCleanBuildCache, Is.EqualTo(new[] { false }));
-            Assert.That(pipeline.WatchdogStartCount, Is.EqualTo(1));
-            Assert.That(startedMessages, Is.EqualTo(new[] { "Compilation started after asset refresh..." }));
-            Assert.That(compiledAssemblies, Is.EqualTo(new[] { "Sample.dll" }));
-            Assert.That(controller.IsCompiling, Is.False);
-            Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.WarningCount, Is.EqualTo(1));
+                Assert.That(pipeline.RefreshCount, Is.EqualTo(1));
+                Assert.That(pipeline.SubscribeCount, Is.EqualTo(1));
+                Assert.That(pipeline.UnsubscribeCount, Is.EqualTo(1));
+                Assert.That(pipeline.MismatchedUnsubscribeCount, Is.EqualTo(0));
+                Assert.That(pipeline.RequestedCleanBuildCache, Is.EqualTo(new[] { false }));
+                Assert.That(pipeline.WatchdogStartCount, Is.EqualTo(1));
+                Assert.That(startedMessages, Is.EqualTo(new[] { "Compilation started after asset refresh..." }));
+                Assert.That(compiledAssemblies, Is.EqualTo(new[] { "Sample.dll" }));
+                Assert.That(controller.IsCompiling, Is.False);
+                Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
         }
 
         /// <summary>
@@ -130,19 +155,27 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task TryCompileAsync_WhenForced_RequestsCleanBuildCacheAndReturnsIndeterminateResult()
         {
-            FakeCompilePipelinePort pipeline = new() { CompleteOnRequest = true };
-            using CompileController controller = CreateController(pipeline);
-            List<string> startedMessages = new();
-            controller.OnCompileStarted += startedMessages.Add;
+            try
+            {
+                FakeCompilePipelinePort pipeline = new() { CompleteOnRequest = true };
+                using CompileController controller = CreateController(pipeline);
+                List<string> startedMessages = new();
+                controller.OnCompileStarted += startedMessages.Add;
 
-            CompileResult result = await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
-                forceRecompile: true,
-                playModeStopWarning: null,
-                CancellationToken.None));
+                CompileResult result = await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                    forceRecompile: true,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None));
 
-            Assert.That(result.IsIndeterminate, Is.True);
-            Assert.That(pipeline.RequestedCleanBuildCache, Is.EqualTo(new[] { true }));
-            Assert.That(startedMessages, Is.EqualTo(new[] { "Forced recompile started after asset refresh..." }));
+                Assert.That(result.IsIndeterminate, Is.True);
+                Assert.That(pipeline.RequestedCleanBuildCache, Is.EqualTo(new[] { true }));
+                Assert.That(startedMessages, Is.EqualTo(new[] { "Forced recompile started after asset refresh..." }));
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
         }
 
         /// <summary>
@@ -152,30 +185,165 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task TryCompileAsync_WhenAssemblyDefinitionErrorsExist_ReturnsFailureWithoutRequestingCompile()
         {
-            // Why CompleteOnRequest: if the early return regresses, the request still finishes
-            // and the assertions fail instead of the test hanging on a compile that never ends.
-            FakeCompilePipelinePort pipeline = new()
+            try
             {
-                CompleteOnRequest = true,
-                AssemblyDefinitionErrors = new AssemblyDefinitionConsoleErrorResult(new[]
+                // Why CompleteOnRequest: if the early return regresses, the request still finishes
+                // and the assertions fail instead of the test hanging on a compile that never ends.
+                FakeCompilePipelinePort pipeline = new()
                 {
-                    new AssemblyDefinitionConsoleError("broken asmdef", "Assets/Broken.asmdef", 1)
-                })
-            };
-            using CompileController controller = CreateController(pipeline);
+                    CompleteOnRequest = true,
+                    AssemblyDefinitionErrors = new AssemblyDefinitionConsoleErrorResult(new[]
+                    {
+                        new AssemblyDefinitionConsoleError("broken asmdef", "Assets/Broken.asmdef", 1)
+                    })
+                };
+                using CompileController controller = CreateController(pipeline);
 
-            CompileResult result = await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
-                forceRecompile: false,
-                playModeStopWarning: null,
-                CancellationToken.None));
+                CompileResult result = await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None));
 
-            Assert.That(result.Success, Is.False);
-            Assert.That(pipeline.RefreshCount, Is.EqualTo(1));
-            Assert.That(pipeline.SubscribeCount, Is.EqualTo(0));
-            Assert.That(pipeline.RequestedCleanBuildCache, Is.Empty);
-            Assert.That(pipeline.WatchdogStartCount, Is.EqualTo(0));
-            Assert.That(controller.IsCompiling, Is.False);
-            Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
+                Assert.That(result.Success, Is.False);
+                Assert.That(pipeline.RefreshCount, Is.EqualTo(1));
+                Assert.That(pipeline.SubscribeCount, Is.EqualTo(0));
+                Assert.That(pipeline.RequestedCleanBuildCache, Is.Empty);
+                Assert.That(pipeline.WatchdogStartCount, Is.EqualTo(0));
+                Assert.That(controller.IsCompiling, Is.False);
+                Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: when the asset refresh leaves no compilation pending, the last compile succeeded, and
+        /// the caller has no state for a domain reload to discard, compile returns a successful result
+        /// without requesting a compilation, so Unity does not reload the domain, and the controller
+        /// returns to idle.
+        /// </summary>
+        [Test]
+        public async Task TryCompileAsync_WhenNothingChangedSinceASuccessfulCompile_ReturnsSuccessWithoutRequestingCompile()
+        {
+            try
+            {
+                // Why CompleteOnRequest: if the skip regresses, the request still finishes and the
+                // assertions fail instead of the test hanging on a compile that never ends.
+                FakeCompilePipelinePort pipeline = new()
+                {
+                    CompleteOnRequest = true,
+                    ScriptCompilationPending = false,
+                    LastScriptCompilationFailed = false
+                };
+                using CompileController controller = CreateController(pipeline);
+                List<string> startedMessages = new();
+                controller.OnCompileStarted += startedMessages.Add;
+
+                CompileResult result = await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None));
+
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.IsIndeterminate, Is.False);
+                Assert.That(result.ErrorCount, Is.EqualTo(0));
+                Assert.That(result.WarningCount, Is.EqualTo(0));
+                Assert.That(result.Message, Does.Contain("domain reload"));
+                Assert.That(pipeline.RefreshCount, Is.EqualTo(1));
+                Assert.That(pipeline.RequestedCleanBuildCache, Is.Empty);
+                Assert.That(pipeline.SubscribeCount, Is.EqualTo(0));
+                Assert.That(pipeline.WatchdogStartCount, Is.EqualTo(0));
+                Assert.That(startedMessages, Is.Empty);
+                Assert.That(controller.IsCompiling, Is.False);
+                Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: each condition that still needs Unity to compile, on its own, makes compile request a
+        /// compilation: a compilation the asset refresh left pending, a last compile that failed (its
+        /// errors must be reported again), a forced recompile, and caller state that only a domain
+        /// reload discards (Play session, pause point patches, hot-reload changes).
+        /// </summary>
+        [TestCase(true, false, false, false, false, TestName = "{m}_PendingAfterRefresh")]
+        [TestCase(false, true, false, false, false, TestName = "{m}_LastCompileFailed")]
+        [TestCase(false, false, true, false, true, TestName = "{m}_ForcedRecompile")]
+        [TestCase(false, false, false, true, false, TestName = "{m}_ReloadDiscardsState")]
+        public async Task TryCompileAsync_WhenAConditionStillNeedsUnityToCompile_RequestsCompilation(
+            bool pendingAfterRefresh,
+            bool lastCompileFailed,
+            bool forceRecompile,
+            bool reloadDiscardsState,
+            bool expectedCleanBuildCache)
+        {
+            try
+            {
+                FakeCompilePipelinePort pipeline = new()
+                {
+                    CompleteOnRequest = true,
+                    ScriptCompilationPending = pendingAfterRefresh,
+                    LastScriptCompilationFailed = lastCompileFailed
+                };
+                using CompileController controller = CreateController(pipeline);
+
+                await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                    forceRecompile: forceRecompile,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: reloadDiscardsState,
+                    CancellationToken.None));
+
+                Assert.That(pipeline.RequestedCleanBuildCache, Is.EqualTo(new[] { expectedCleanBuildCache }));
+                Assert.That(pipeline.SubscribeCount, Is.EqualTo(1));
+                Assert.That(pipeline.WatchdogStartCount, Is.EqualTo(1));
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: Assembly Definition errors take precedence over the up-to-date skip, so compile reports
+        /// them as a failure even when no compilation is pending.
+        /// </summary>
+        [Test]
+        public async Task TryCompileAsync_WhenAssemblyDefinitionErrorsExistAndNothingIsPending_ReturnsTheFailure()
+        {
+            try
+            {
+                FakeCompilePipelinePort pipeline = new()
+                {
+                    CompleteOnRequest = true,
+                    ScriptCompilationPending = false,
+                    AssemblyDefinitionErrors = new AssemblyDefinitionConsoleErrorResult(new[]
+                    {
+                        new AssemblyDefinitionConsoleError("broken asmdef", "Assets/Broken.asmdef", 1)
+                    })
+                };
+                using CompileController controller = CreateController(pipeline);
+
+                CompileResult result = await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None));
+
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.ErrorCount, Is.EqualTo(1));
+                Assert.That(pipeline.RequestedCleanBuildCache, Is.Empty);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
         }
 
         /// <summary>
@@ -185,29 +353,38 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task TryCompileAsync_WhenAlreadyCompiling_WaitsForExistingRequest()
         {
-            FakeCompilePipelinePort pipeline = new();
-            using CompileController controller = CreateController(pipeline);
+            try
+            {
+                FakeCompilePipelinePort pipeline = new();
+                using CompileController controller = CreateController(pipeline);
 
-            Task<CompileResult> firstCompile = controller.TryCompileAsync(
-                forceRecompile: false,
-                playModeStopWarning: null,
-                CancellationToken.None);
-            Task<CompileResult> secondCompile = controller.TryCompileAsync(
-                forceRecompile: true,
-                playModeStopWarning: null,
-                CancellationToken.None);
+                Task<CompileResult> firstCompile = controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None);
+                Task<CompileResult> secondCompile = controller.TryCompileAsync(
+                    forceRecompile: true,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None);
 
-            // Why before completing: if the second call started its own compile, the first request
-            // would never finish, so the check must fail before awaiting it.
-            Assert.That(pipeline.RefreshCount, Is.EqualTo(1));
-            Assert.That(pipeline.RequestedCleanBuildCache, Is.EqualTo(new[] { false }));
-            Assert.That(controller.IsCompiling, Is.True);
-            Assert.That(secondCompile.IsCompleted, Is.False);
-            pipeline.CompilationFinished(null);
-            CompileResult firstResult = await UncanceledAwaits.AwaitValueAsync(firstCompile);
-            CompileResult secondResult = await UncanceledAwaits.AwaitValueAsync(secondCompile);
+                // Why before completing: if the second call started its own compile, the first request
+                // would never finish, so the check must fail before awaiting it.
+                Assert.That(pipeline.RefreshCount, Is.EqualTo(1));
+                Assert.That(pipeline.RequestedCleanBuildCache, Is.EqualTo(new[] { false }));
+                Assert.That(controller.IsCompiling, Is.True);
+                Assert.That(secondCompile.IsCompleted, Is.False);
+                pipeline.CompilationFinished(null);
+                CompileResult firstResult = await UncanceledAwaits.AwaitValueAsync(firstCompile);
+                CompileResult secondResult = await UncanceledAwaits.AwaitValueAsync(secondCompile);
 
-            Assert.That(secondResult, Is.SameAs(firstResult));
+                Assert.That(secondResult, Is.SameAs(firstResult));
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
         }
 
         /// <summary>
@@ -217,31 +394,39 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task TryCompileAsync_WhenRequestThrows_UnregistersCallbacksAndClearsState()
         {
-            FakeCompilePipelinePort pipeline = new()
-            {
-                RequestException = new InvalidOperationException("request failed")
-            };
-            using CompileController controller = CreateController(pipeline);
-
-            // Why not Assert.ThrowsAsync: it blocks the main thread synchronously in this NUnit version.
             try
             {
-                await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
-                    forceRecompile: false,
-                    playModeStopWarning: null,
-                    CancellationToken.None));
-                Assert.Fail("TryCompileAsync should rethrow the request failure.");
-            }
-            catch (InvalidOperationException e)
-            {
-                Assert.That(e.Message, Is.EqualTo("request failed"));
-            }
+                FakeCompilePipelinePort pipeline = new()
+                {
+                    RequestException = new InvalidOperationException("request failed")
+                };
+                using CompileController controller = CreateController(pipeline);
 
-            Assert.That(pipeline.UnsubscribeCount, Is.EqualTo(1));
-            Assert.That(pipeline.MismatchedUnsubscribeCount, Is.EqualTo(0));
-            Assert.That(pipeline.WatchdogStartCount, Is.EqualTo(0));
-            Assert.That(controller.IsCompiling, Is.False);
-            Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
+                // Why not Assert.ThrowsAsync: it blocks the main thread synchronously in this NUnit version.
+                try
+                {
+                    await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                        forceRecompile: false,
+                        playModeStopWarning: null,
+                        reloadDiscardsState: false,
+                        CancellationToken.None));
+                    Assert.Fail("TryCompileAsync should rethrow the request failure.");
+                }
+                catch (InvalidOperationException e)
+                {
+                    Assert.That(e.Message, Is.EqualTo("request failed"));
+                }
+
+                Assert.That(pipeline.UnsubscribeCount, Is.EqualTo(1));
+                Assert.That(pipeline.MismatchedUnsubscribeCount, Is.EqualTo(0));
+                Assert.That(pipeline.WatchdogStartCount, Is.EqualTo(0));
+                Assert.That(controller.IsCompiling, Is.False);
+                Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
         }
 
         /// <summary>
@@ -250,26 +435,34 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task Cleanup_WhenCompileIsPending_UnregistersCallbacksAndCancelsRequest()
         {
-            FakeCompilePipelinePort pipeline = new();
-            using CompileController controller = CreateController(pipeline);
-            Task<CompileResult> pendingCompile = controller.TryCompileAsync(
-                forceRecompile: false,
-                playModeStopWarning: null,
-                CancellationToken.None);
-
-            controller.Cleanup();
-
-            Assert.That(pipeline.UnsubscribeCount, Is.EqualTo(1));
-            Assert.That(pipeline.MismatchedUnsubscribeCount, Is.EqualTo(0));
-            Assert.That(controller.IsCompiling, Is.False);
-            Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
             try
             {
-                await pendingCompile;
-                Assert.Fail("The pending compile should be canceled by Cleanup.");
+                FakeCompilePipelinePort pipeline = new();
+                using CompileController controller = CreateController(pipeline);
+                Task<CompileResult> pendingCompile = controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None);
+
+                controller.Cleanup();
+
+                Assert.That(pipeline.UnsubscribeCount, Is.EqualTo(1));
+                Assert.That(pipeline.MismatchedUnsubscribeCount, Is.EqualTo(0));
+                Assert.That(controller.IsCompiling, Is.False);
+                Assert.That(CompileApiUpdaterConsentState.IsCliCompileInFlight, Is.False);
+                try
+                {
+                    await pendingCompile;
+                    Assert.Fail("The pending compile should be canceled by Cleanup.");
+                }
+                catch (TaskCanceledException)
+                {
+                }
             }
-            catch (TaskCanceledException)
+            catch (System.OperationCanceledException exception)
             {
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -279,36 +472,200 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task SetCompilePipelineForTesting_WhenCompileIsPending_RejectsReplacementAndKeepsOriginalPort()
         {
-            FakeCompilePipelinePort pipeline = new();
-            FakeCompilePipelinePort replacement = new();
+            try
+            {
+                FakeCompilePipelinePort pipeline = new();
+                FakeCompilePipelinePort replacement = new();
+                using CompileController controller = CreateController(pipeline);
+                Task<CompileResult> pendingCompile = controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None);
+
+                try
+                {
+                    controller.SetCompilePipelineForTesting(replacement);
+                    Assert.Fail("Replacing the pipeline during a pending compile should be rejected.");
+                }
+                catch (InvalidOperationException)
+                {
+                }
+
+                controller.Cleanup();
+
+                Assert.That(pipeline.UnsubscribeCount, Is.EqualTo(1));
+                Assert.That(pipeline.MismatchedUnsubscribeCount, Is.EqualTo(0));
+                Assert.That(replacement.UnsubscribeCount + replacement.MismatchedUnsubscribeCount, Is.EqualTo(0));
+                try
+                {
+                    await pendingCompile;
+                    Assert.Fail("The pending compile should be canceled by Cleanup.");
+                }
+                catch (TaskCanceledException)
+                {
+                }
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: TryCompileAsync installs the Script Updating Consent decline once, before it
+        /// refreshes assets, because the refresh can itself start the compile that asks for consent.
+        /// </summary>
+        [Test]
+        public async Task TryCompileAsync_InstallsTheConsentDeclineBeforeRefreshingAssets()
+        {
+            try
+            {
+                FakeCompilePipelinePort pipeline = new() { CompleteOnRequest = true };
+                using CompileController controller = CreateController(pipeline);
+
+                await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                    forceRecompile: false,
+                    playModeStopWarning: null,
+                    reloadDiscardsState: false,
+                    CancellationToken.None));
+
+                Assert.That(pipeline.RefreshCountsWhenConsentDeclineInstalled, Is.EqualTo(new[] { 0 }));
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: a compile that Unity ran without errors stores that a domain reload follows its result.
+        /// </summary>
+        [Test]
+        public async Task TryCompileAsync_WhenPipelineFinishesWithoutErrors_StoresThatAReloadFollows()
+        {
+            try
+            {
+                FakeCompilePipelinePort pipeline = new() { CompleteOnRequest = true };
+
+                bool isFollowedByReload = await CompileAndReadIsFollowedByReload(
+                    pipeline,
+                    "compile_followed_by_reload_clean",
+                    forceRecompile: false);
+
+                Assert.That(isFollowedByReload, Is.True);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: a forced recompile that Unity ran stores that a domain reload follows, although its result is
+        /// indeterminate.
+        /// </summary>
+        [Test]
+        public async Task TryCompileAsync_WhenForcedAndPipelineFinishes_StoresThatAReloadFollows()
+        {
+            try
+            {
+                FakeCompilePipelinePort pipeline = new() { CompleteOnRequest = true };
+
+                bool isFollowedByReload = await CompileAndReadIsFollowedByReload(
+                    pipeline,
+                    "compile_followed_by_reload_forced",
+                    forceRecompile: true);
+
+                Assert.That(isFollowedByReload, Is.True);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: a compile with errors stores that no domain reload follows, because Unity does not reload then.
+        /// </summary>
+        [Test]
+        public async Task TryCompileAsync_WhenPipelineFinishesWithErrors_StoresThatNoReloadFollows()
+        {
+            try
+            {
+                FakeCompilePipelinePort pipeline = new()
+                {
+                    CompleteOnRequest = true,
+                    ReportedMessages = new[] { CreateMessage(CompilerMessageType.Error, "sample error") }
+                };
+
+                bool isFollowedByReload = await CompileAndReadIsFollowedByReload(
+                    pipeline,
+                    "compile_followed_by_reload_errors",
+                    forceRecompile: false);
+
+                Assert.That(isFollowedByReload, Is.False);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: a compile skipped because nothing changed stores that no domain reload follows.
+        /// </summary>
+        [Test]
+        public async Task TryCompileAsync_WhenNothingChanged_StoresThatNoReloadFollows()
+        {
+            try
+            {
+                FakeCompilePipelinePort pipeline = new()
+                {
+                    CompleteOnRequest = true,
+                    ScriptCompilationPending = false,
+                    LastScriptCompilationFailed = false
+                };
+
+                bool isFollowedByReload = await CompileAndReadIsFollowedByReload(
+                    pipeline,
+                    "compile_followed_by_reload_up_to_date",
+                    forceRecompile: false);
+
+                Assert.That(isFollowedByReload, Is.False);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        private static async Task<bool> CompileAndReadIsFollowedByReload(
+            FakeCompilePipelinePort pipeline,
+            string requestId,
+            bool forceRecompile)
+        {
             using CompileController controller = CreateController(pipeline);
-            Task<CompileResult> pendingCompile = controller.TryCompileAsync(
-                forceRecompile: false,
+            controller.SetResultRecordingContext(
+                CompileResultRecordingContext.Create(
+                    new CompileSchema
+                    {
+                        WaitForDomainReload = true,
+                        RequestId = requestId,
+                        ForceRecompile = forceRecompile
+                    }));
+
+            await UncanceledAwaits.AwaitValueAsync(controller.TryCompileAsync(
+                forceRecompile,
                 playModeStopWarning: null,
-                CancellationToken.None);
+                reloadDiscardsState: false,
+                CancellationToken.None));
 
-            try
-            {
-                controller.SetCompilePipelineForTesting(replacement);
-                Assert.Fail("Replacing the pipeline during a pending compile should be rejected.");
-            }
-            catch (InvalidOperationException)
-            {
-            }
-
-            controller.Cleanup();
-
-            Assert.That(pipeline.UnsubscribeCount, Is.EqualTo(1));
-            Assert.That(pipeline.MismatchedUnsubscribeCount, Is.EqualTo(0));
-            Assert.That(replacement.UnsubscribeCount + replacement.MismatchedUnsubscribeCount, Is.EqualTo(0));
-            try
-            {
-                await pendingCompile;
-                Assert.Fail("The pending compile should be canceled by Cleanup.");
-            }
-            catch (TaskCanceledException)
-            {
-            }
+            UnityCliLoopStoredCompileResult storedResult = UnityCliLoopEditorSessionStateTestFactory
+                .CreateCompileResultSessionRepository()
+                .GetCompileResult(requestId);
+            Assert.That(storedResult.HasResult, Is.True);
+            return storedResult.IsFollowedByReload;
         }
 
         private static CompileController CreateController(FakeCompilePipelinePort pipeline)
@@ -348,12 +705,22 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             public AssemblyDefinitionConsoleErrorResult AssemblyDefinitionErrors { get; set; } =
                 new(Array.Empty<AssemblyDefinitionConsoleError>());
             public Exception RequestException { get; set; }
+            // Why true by default: most tests model "scripts changed", the case where compile must
+            // request a compilation; the up-to-date tests turn it off explicitly.
+            public bool ScriptCompilationPending { get; set; } = true;
+            public bool LastScriptCompilationFailed { get; set; }
             public int RefreshCount { get; private set; }
             public int SubscribeCount { get; private set; }
             public int UnsubscribeCount { get; private set; }
             public int MismatchedUnsubscribeCount { get; private set; }
             public int WatchdogStartCount { get; private set; }
             public List<bool> RequestedCleanBuildCache { get; } = new();
+            public List<int> RefreshCountsWhenConsentDeclineInstalled { get; } = new();
+
+            public void InstallApiUpdaterConsentDecline()
+            {
+                RefreshCountsWhenConsentDeclineInstalled.Add(RefreshCount);
+            }
 
             public void RefreshAssets()
             {
@@ -363,6 +730,16 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             public AssemblyDefinitionConsoleErrorResult FindCurrentAssemblyDefinitionErrors()
             {
                 return AssemblyDefinitionErrors;
+            }
+
+            public bool IsScriptCompilationPending()
+            {
+                return ScriptCompilationPending;
+            }
+
+            public bool DidLastScriptCompilationFail()
+            {
+                return LastScriptCompilationFailed;
             }
 
             public UnityCliLoopConsoleLogEntry[] ReadConsoleErrorEntries()

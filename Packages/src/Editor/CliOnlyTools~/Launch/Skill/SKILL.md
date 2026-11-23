@@ -1,6 +1,6 @@
 ---
 name: tloop-launch
-description: "Launch or restart Tuanjie Editor. Use only when the Editor is not running or stays frozen after retries — not as a health check after a failed command; it brings the Editor window to the foreground as a side effect."
+description: "Launch or restart Tuanjie Editor when it is closed, stays frozen after retries, or compile recommends a restart for slow domain reloads. Launch brings the Editor window to the foreground."
 ---
 
 # tloop launch
@@ -56,7 +56,9 @@ The final JSON payload includes:
 A single failed, cancelled, or busy command (e.g. right after a domain reload) is not a reason
 to launch — retry the command instead. Running launch while the Editor is up brings the Tuanjie
 window to the foreground, which disrupts the user. Reach for launch only when Tuanjie is not
-running, or still does not respond after retries.
+running, still does not respond after retries, or a `tloop compile` result's `Warning` recommends
+`tloop launch -r` because domain reloads have slowed down. That restart discards unsaved scene
+changes, so ask the user before running it.
 
 ## Notes
 

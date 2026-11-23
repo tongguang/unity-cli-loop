@@ -308,6 +308,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 + "statements, or unsafe blocks) are skipped; the patch is compiled without unsafe code. "
                 + "Run 'tloop compile'.");
             yield return Case(
+                HotReloadWorkerReasonCode.MethodTransformUseResolvesToHiddenMember,
+                new[] { "Targets.Pick(ArraySegment<int>)" },
+                "The patch could use 'Targets.Pick(ArraySegment<int>)' here instead of the member Tuanjie's "
+                + "compiler uses: the patch is compiled against a copy of the assembly where every member is "
+                + "public, so 'Targets.Pick(ArraySegment<int>)', which this code cannot reach, takes part in "
+                + "choosing the member. Run 'tloop compile'.");
+            yield return Case(
                 HotReloadWorkerReasonCode.MethodTransformExplicitInterfaceImplementation,
                 NoArgs,
                 "Explicit interface implementations the compiled assembly does not hold yet, and accessors "
@@ -485,6 +492,13 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 "Deconstruction assignment to an added field is skipped; the store write cannot stand as a "
                 + "deconstruction target. Assign the field in its own statement 'F = value;', which the "
                 + "store rewrite handles. Run 'tloop compile'.");
+            yield return Case(
+                HotReloadWorkerReasonCode.AddedFieldPropertyPattern,
+                new[] { "A._count" },
+                "Property patterns that match an added field are skipped; a pattern member name cannot be "
+                + "replaced by a read of the field's store. Read 'A._count' from the matched value with a member "
+                + "access outside the pattern instead ('value.A._count'), which the store rewrite handles. "
+                + "Run 'tloop compile'.");
             yield return Case(
                 HotReloadWorkerReasonCode.AddedFieldValueTypeMemberWrite,
                 NoArgs,
@@ -719,10 +733,6 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 NoArgs,
                 "inaccessible extension method used as a method group (not called) has no accessor rewrite shape.");
             yield return Case(
-                HotReloadWorkerReasonCode.AccessorAddedExtensionReducedCallNoShape,
-                new[] { "AddedTriple", "Extensions" },
-                "extension method 'AddedTriple' added in this reload has no rewrite shape when called on a receiver; write the call as 'Extensions.AddedTriple(receiver, ...)'.");
-            yield return Case(
                 HotReloadWorkerReasonCode.AccessorGenericMethodNotRewritten,
                 NoArgs,
                 "inaccessible generic method calls are not rewritten.");
@@ -782,6 +792,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 HotReloadWorkerReasonCode.AccessorConditionalAccessNoShape,
                 NoArgs,
                 "inaccessible member access via conditional access has no rewrite shape.");
+            yield return Case(
+                HotReloadWorkerReasonCode.AccessorPropertyPatternNoShape,
+                new[] { "Secret", "Inner.Secret" },
+                "inaccessible member 'Secret' named in a property pattern has no accessor rewrite shape; "
+                + "read 'Inner.Secret' from the matched value with a member access outside the pattern instead "
+                + "('value.Inner.Secret').");
             yield return Case(
                 HotReloadWorkerReasonCode.AccessorRefReturningMethodNoShape,
                 NoArgs,

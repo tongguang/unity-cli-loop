@@ -29,7 +29,8 @@ internal static class MethodTransformDecider
         INamedTypeSymbol compiledType,
         AddedMemberAccessLookup addedMemberAccess,
         AddedEventLookup addedEvents,
-        PartialTypeParts partialTypeParts)
+        PartialTypeParts partialTypeParts,
+        IAssemblySymbol targetAssembly)
     {
         WorkerReason hardSkip = EvaluateHardSkipReason(
             typeDeclaration,
@@ -47,6 +48,14 @@ internal static class MethodTransformDecider
         if (bodyNode == null)
         {
             return MethodTransformDecision.Skip(WorkerReason.Of(HotReloadWorkerReasonCode.MethodTransformNoBody));
+        }
+
+        // Why before the shape decision: the patch resolves the member differently in its own
+        // statements too, where no accessor rewrite is asked, and a closure would throw for it.
+        WorkerReason hiddenMemberSkip = HiddenMemberPickGuard.DescribeSkipOrNull(semanticModel, bodyNode);
+        if (hiddenMemberSkip != null)
+        {
+            return MethodTransformDecision.Skip(hiddenMemberSkip);
         }
 
         WorkerReason baseCallSkip = BaseCallRules.EvaluateSkipReason(
@@ -68,7 +77,8 @@ internal static class MethodTransformDecider
             semanticModel,
             compiledType,
             addedMemberAccess,
-            addedEvents);
+            addedEvents,
+            targetAssembly);
         // Why: a delegating shim runs in the shim assembly, where a base call cannot be redirected.
         if (decision.SkipReason == null && decision.UsesDelegation && ContainsBaseExpression(bodyNode))
         {
@@ -89,7 +99,8 @@ internal static class MethodTransformDecider
         SemanticModel semanticModel,
         INamedTypeSymbol compiledType,
         AddedMemberAccessLookup addedMemberAccess,
-        AddedEventLookup addedEvents)
+        AddedEventLookup addedEvents,
+        IAssemblySymbol targetAssembly)
     {
         WorkerReason eventUseReason = EventAccessorRules.EvaluateEventUseSkipReason(
             bodyNode,
@@ -124,7 +135,8 @@ internal static class MethodTransformDecider
                 methodSymbol,
                 typeSymbol,
                 bodyNode,
-                addedMemberAccess);
+                addedMemberAccess,
+                targetAssembly);
         }
 
         return DecideWholeBodyTransform(
@@ -135,7 +147,8 @@ internal static class MethodTransformDecider
             addedMemberAccess,
             closureInaccessible,
             asyncIteratorInaccessible,
-            eventAccessorsRequired);
+            eventAccessorsRequired,
+            targetAssembly);
     }
 
     // Async and iterator state machines, event accessors, getters, and added methods JIT the whole
@@ -148,7 +161,8 @@ internal static class MethodTransformDecider
         AddedMemberAccessLookup addedMemberAccess,
         bool closureInaccessible,
         bool asyncIteratorInaccessible,
-        bool eventAccessorsRequired)
+        bool eventAccessorsRequired,
+        IAssemblySymbol targetAssembly)
     {
         // Condition (a): only the private-access skip reasons are eligible for accessor rewrite.
         HotReloadWorkerReasonCode? rescuableSkipCode =
@@ -161,6 +175,7 @@ internal static class MethodTransformDecider
                 bodyNode,
                 addedMemberAccess,
                 null,
+                targetAssembly,
                 out AccessorPlan feasibilityPlan,
                 out WorkerReason accessorRejectReason))
         {
@@ -188,7 +203,8 @@ internal static class MethodTransformDecider
         IMethodSymbol methodSymbol,
         INamedTypeSymbol typeSymbol,
         SyntaxNode bodyNode,
-        AddedMemberAccessLookup addedMemberAccess)
+        AddedMemberAccessLookup addedMemberAccess,
+        IAssemblySymbol targetAssembly)
     {
         if (!AccessorEligibility.TryBuildPlan(
                 semanticModel,
@@ -197,6 +213,7 @@ internal static class MethodTransformDecider
                 bodyNode,
                 addedMemberAccess,
                 FindClosureBodies(bodyNode),
+                targetAssembly,
                 out AccessorPlan closurePlan,
                 out WorkerReason accessorRejectReason))
         {
@@ -447,6 +464,24 @@ internal static class MethodTransformDecider
                     retainedNonPublicMember.ToDisplayString()));
         }
 
+        // Checked without a binding error and before the delegation path: the worker binds an Index
+        // or Range access through the implicit support, while the shim compile calls a non-public
+        // indexer of a compiled type it cannot see, from every statement of an added method.
+        IMethodSymbol hiddenIndexerAccessor = UnpassedExplicitIndexerLookup.FindFirstAccessorOrNull(
+            semanticModel,
+            methodBodyNode,
+            targetAssembly);
+        if (hiddenIndexerAccessor != null)
+        {
+            return MethodTransformDecision.Skip(
+                WorkerReason.Composite(
+                    HotReloadWorkerReasonCode.AddedMethodInaccessibleAccessNoRewrite,
+                    WorkerReason.Of(
+                        HotReloadWorkerReasonCode.AccessorImplicitCallNoShape,
+                        ImplicitCallTargets.DisplayName(hiddenIndexerAccessor),
+                        ImplicitCallTargets.IndexOrRangeConstruct)));
+        }
+
         if (current.UsesDelegation)
         {
             return MethodTransformDecision.AddedMethod(true);
@@ -464,6 +499,7 @@ internal static class MethodTransformDecider
                 methodBodyNode,
                 addedMemberAccess,
                 null,
+                targetAssembly,
                 out AccessorPlan feasibilityPlan,
                 out WorkerReason accessorRejectReason))
         {

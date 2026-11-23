@@ -67,7 +67,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Tests that synchronous startup recovery failures log, complete, and clear the tracked task.
             UnityEngine.TestTools.LogAssert.Expect(
                 UnityEngine.LogType.Error,
-                "[UnityCliLoop] Failed to restore server: restore failed");
+                "[TuanjieCliLoop] Failed to restore server: restore failed");
             System.Action scheduledAction = null;
             UnityCliLoopServerRecoveryTrackingService service = CreateRecoveryTrackingService();
 
@@ -259,7 +259,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
             // Tests that public recovery tracking completes after give-up and does not block later recovery.
             UnityEngine.TestTools.LogAssert.Expect(
                 UnityEngine.LogType.Error,
-                "[UnityCliLoop] Tuanjie CLI Loop server recovery failed before the bridge became ready. first failure");
+                "[TuanjieCliLoop] Tuanjie CLI Loop server recovery failed before the bridge became ready. first failure");
             _sessionFlagsRepository.MarkServerStarted();
             int firstRecoveryAttempts = 0;
             bool secondRecoveryStarted = false;
@@ -478,7 +478,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 });
             UnityEngine.TestTools.LogAssert.Expect(
                 UnityEngine.LogType.Error,
-                "[UnityCliLoop] Tuanjie CLI Loop server recovery failed before the bridge became ready. readiness probe timed out");
+                "[TuanjieCliLoop] Tuanjie CLI Loop server recovery failed before the bridge became ready. readiness probe timed out");
 
             System.InvalidOperationException exception =
                 Assert.ThrowsAsync<System.InvalidOperationException>(async () =>
@@ -671,7 +671,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 readinessService,
                 effectiveStartupProtectionService,
                 recoveryTrackingService,
-                new TestDomainReloadLifecycle());
+                new TestDomainReloadLifecycle(),
+                new DomainReloadDurationMonitor(new InMemoryDomainReloadDurationStore(), () => false));
         }
 
         private UnityCliLoopServerRecoveryTrackingService CreateRecoveryTrackingService(

@@ -117,11 +117,18 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             yield return "InternalStaticMethodNextToLambdaReadingOwnPrivateFieldInGetter";
             yield return "InternalStaticMethodNextToOwnEventRaise";
             yield return "InternalFieldReadIntoAVarCapturedByALambda";
+            yield return "InternalExtensionMethodInLambda";
+            yield return "InternalExtensionMethodOfAPublicClassInLambda";
+            yield return "InternalExtensionMethodInAsyncMethod";
+            yield return "InternalExtensionMethodInIterator";
+            yield return "InternalExtensionMethodThroughConditionalAccessInLambda";
+            yield return "InternalExtensionResultReadIntoAVarCapturedByALambda";
         }
 
         // Edits whose body runs as IL copied into the patched method but uses an internal member in a
-        // form a partial type does not patch: a method passed as a delegate, an event, or a member
-        // named in an object initializer or a property pattern.
+        // form a partial type does not patch: a method passed as a delegate, an event, a member named
+        // in an object initializer or a property pattern, or an extension method called with its
+        // receiver.
         private static IEnumerable<string> EditsThatOnlyAPlainTypeRunsInThePatchedMethod()
         {
             yield return "InternalStaticMethodPassedAsDelegate";
@@ -129,6 +136,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             yield return "InternalEventSubscription";
             yield return "InternalFieldInObjectInitializer";
             yield return "InternalPropertyInPropertyPattern";
+            yield return "InternalExtensionMethodOfAnInternalClass";
+            yield return "InternalExtensionMethodOfAPublicClass";
         }
 
         /// <summary>
@@ -202,17 +211,46 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
 
         /// <summary>
         /// What: an edited body of a plain type that passes an internal method of a compiled type the
-        /// reload was not given as a delegate, subscribes to its internal event, or names its internal
-        /// member in an object initializer or a property pattern is patched, and the method returns
-        /// the edited value.
+        /// reload was not given as a delegate, subscribes to its internal event, names its internal
+        /// member in an object initializer or a property pattern, or calls an internal extension
+        /// method of such a class with its receiver, is patched, and the method returns the edited
+        /// value.
         /// </summary>
         [TestCaseSource(nameof(EditsThatOnlyAPlainTypeRunsInThePatchedMethod))]
-        public async Task Run_PlainTypeBodyUsingInternalMemberAsADelegateEventInitializerOrPattern_PatchesBehavior(string editName)
+        public async Task Run_PlainTypeBodyUsingInternalMemberInAFormAPartialTypeSkips_PatchesBehavior(string editName)
         {
-            BodyEdit edit = FindEdit(editName);
-            HotReloadOrchestratorResult result = await RunEditAsync(FixtureKind.Plain, edit);
+            try
+            {
+                BodyEdit edit = FindEdit(editName);
+                HotReloadOrchestratorResult result = await RunEditAsync(FixtureKind.Plain, edit);
 
-            await AssertPatchedAsEditedAsync(result, FixtureKind.Plain, edit);
+                await AssertPatchedAsEditedAsync(result, FixtureKind.Plain, edit);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: the same edits on a partial type, which does not patch these forms in place, are
+        /// either patched and return the edited value, or skipped and keep the compiled behavior.
+        /// They are never reported as patched and then fail when called, and never fail the file.
+        /// </summary>
+        [TestCaseSource(nameof(EditsThatOnlyAPlainTypeRunsInThePatchedMethod))]
+        public async Task Run_PartialTypeBodyUsingInternalMemberInAFormAPartialTypeSkips_IsAppliedAsEditedOrSkipped(string editName)
+        {
+            try
+            {
+                BodyEdit edit = FindEdit(editName);
+                HotReloadOrchestratorResult result = await RunEditAsync(FixtureKind.Partial, edit);
+
+                await AssertAppliedAsEditedOrSkippedAsync(result, FixtureKind.Partial, edit);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
         }
 
         /// <summary>
@@ -314,6 +352,62 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Assert.That(new HotReloadPlainDerivedFixture().DerivedValue(), Is.EqualTo(expected), FormatOutcomes(result));
         }
 
+        /// <summary>
+        /// What: a lambda that writes through an internal setter, an async method that reads
+        /// through an internal indexer getter, of a public member of a compiled type the reload was
+        /// not given, and a lambda or async method whose range or index the compiler sends to an
+        /// internal Range or Index indexer of such a type, are skipped, on a plain type and for the
+        /// lambda on a partial type too, and the method keeps the compiled value instead of being
+        /// reported as patched and then failing when called.
+        /// </summary>
+        [TestCase("InternalSetterInLambda", FixtureKind.Plain)]
+        [TestCase("InternalIndexerGetterInAsyncMethod", FixtureKind.Plain)]
+        [TestCase("InternalSetterInLambda", FixtureKind.Partial)]
+        [TestCase("InternalRangeIndexerInLambda", FixtureKind.Plain)]
+        [TestCase("InternalIndexIndexerInAsyncMethod", FixtureKind.Plain)]
+        public async Task Run_LambdaOrAsyncUsingInternalAccessorOfUnpassedType_IsSkippedAndKeepsTheCompiledValue(
+            string editName,
+            FixtureKind fixture)
+        {
+            try
+            {
+                BodyEdit edit = FindEdit(editName);
+                HotReloadOrchestratorResult result = await RunEditAsync(fixture, edit);
+
+                Assert.That(
+                    FindRow(result, FixtureTypeName(fixture), edit.MethodName).Kind,
+                    Is.EqualTo(HotReloadMethodOutcomeKind.Skipped),
+                    FormatOutcomes(result));
+                int value = await CallFixtureAsync(fixture, edit.MethodName);
+                Assert.That(value, Is.EqualTo(CompiledValue(fixture, edit.MethodName)), FormatOutcomes(result));
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: an edited body whose own statements write through an internal setter of a public
+        /// member of a compiled type the reload was not given is patched on a partial type, and the
+        /// method returns the edited value, because the patched method itself makes the call.
+        /// </summary>
+        [Test]
+        public async Task Run_PartialTypeOwnStatementsUsingInternalSetterOfUnpassedType_PatchesBehavior()
+        {
+            try
+            {
+                BodyEdit edit = FindEdit("InternalSetterInOwnStatements");
+                HotReloadOrchestratorResult result = await RunEditAsync(FixtureKind.Partial, edit);
+
+                await AssertPatchedAsEditedAsync(result, FixtureKind.Partial, edit);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
         private static BodyEdit FindEdit(string editName)
         {
             switch (editName)
@@ -358,6 +452,26 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                         102);
                 case "InheritedInternalMethodBySimpleName":
                     return BodyEdit.OfDerivedValue("return InternalInstanceValue() + 100;", 102);
+                case "InternalExtensionMethodOfAnInternalClass":
+                    return BodyEdit.OfDerivedValue("return 50.Twice(1);", 101);
+                case "InternalExtensionMethodOfAPublicClass":
+                    return BodyEdit.OfDerivedValue("return 50.InternalTwice(2);", 102);
+                case "InternalExtensionMethodInLambda":
+                    return new BodyEdit(ClosureValue, "() => 30", "() => 50.Twice(1)", 101);
+                case "InternalExtensionMethodOfAPublicClassInLambda":
+                    return new BodyEdit(ClosureValue, "() => 30", "() => 50.InternalTwice(2)", 102);
+                case "InternalExtensionMethodInAsyncMethod":
+                    return new BodyEdit(AsyncValue, "return 50;", "return 50.Twice(1);", 101);
+                case "InternalExtensionMethodInIterator":
+                    return new BodyEdit(IteratorValues, "yield return _seed;", "yield return 50.Twice(1);", 101);
+                case "InternalExtensionResultReadIntoAVarCapturedByALambda":
+                    return BodyEdit.OfDerivedValue(
+                        "var seed = 50.Twice(1);\n"
+                        + "            System.Func<int> read = () => seed;\n"
+                        + "            return read();",
+                        101);
+                case "InternalExtensionMethodThroughConditionalAccessInLambda":
+                    return new BodyEdit(ClosureValue, "() => 30", "() => ((int?)50)?.Twice(1) ?? 0", 101);
                 case "InternalStaticMethodInLambda":
                     return new BodyEdit(ClosureValue, "() => 30", "() => HotReloadInternalMemberHost.InternalStaticValue() + 100", 101);
                 case "InternalInstanceMethodInLambda":
@@ -426,6 +540,38 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     return BodyEdit.OfDerivedValue("return new HotReloadInternalMemberHost { InternalField = 150 }.InternalField;", 150);
                 case "InternalPropertyInPropertyPattern":
                     return BodyEdit.OfDerivedValue("return new HotReloadInternalMemberHost() is { InternalProperty: 4 } ? 104 : 0;", 104);
+                case "InternalSetterInLambda":
+                    return new BodyEdit(
+                        ClosureValue,
+                        "() => 30",
+                        "() => { HotReloadUnpassedInternalSetterHolder holder = new HotReloadUnpassedInternalSetterHolder(); "
+                        + "holder.Length = 105; return holder.ReadLength(); }",
+                        105);
+                case "InternalSetterInOwnStatements":
+                    return BodyEdit.OfDerivedValue(
+                        "HotReloadUnpassedInternalSetterHolder holder = new HotReloadUnpassedInternalSetterHolder();\n"
+                        + "            holder.Length = 105;\n"
+                        + "            return holder.ReadLength();",
+                        105);
+                case "InternalIndexerGetterInAsyncMethod":
+                    return new BodyEdit(
+                        AsyncValue,
+                        "return 50;",
+                        "HotReloadUnpassedIndexerInternalGetterHolder holder = new HotReloadUnpassedIndexerInternalGetterHolder();\n"
+                        + "            return holder[0] + 100;",
+                        121);
+                case "InternalRangeIndexerInLambda":
+                    return new BodyEdit(
+                        ClosureValue,
+                        "() => 30",
+                        "() => new HotReloadUnpassedInternalRangeIndexerHolder()[1..3][0] + 100",
+                        102);
+                case "InternalIndexIndexerInAsyncMethod":
+                    return new BodyEdit(
+                        AsyncValue,
+                        "return 50;",
+                        "return new HotReloadUnpassedInternalIndexIndexerHolder()[^1] + 100;",
+                        140);
                 default:
                     throw new ArgumentException("Unknown edit: " + editName);
             }

@@ -298,6 +298,14 @@ Windows with Tuanjie 1.9.1 in Debug optimization, `scripts/check-tuanjie.ps1`
 compiled with zero errors and warnings. All 572 EditMode cases in the 12
 affected test classes passed, including patch, skip, and revert checks.
 
+The import through upstream 3.36.0 (#3579 through #3619) brings the hot-reload
+binding fixes, compile fast path, background tool cache write, and domain reload
+timing to Tuanjie. On Windows with Tuanjie 1.9.1 in Debug optimization, the
+43 affected EditMode classes passed all 1,187 distinct cases across scoped runs,
+with none skipped. A live compile after a script edit reported zero errors and
+warnings and a 3.97-second domain reload. The next compile reported that it
+skipped the reload and returned a null `DomainReloadSeconds`.
+
 `scripts/check-tuanjie.ps1` checks this project against the Tuanjie Editor that
 already has it open. It confirms the Editor can take a command, compiles the
 project and fails on any error or warning, then runs the `CliVersionComparerTests`

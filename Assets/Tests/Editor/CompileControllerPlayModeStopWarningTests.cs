@@ -23,51 +23,59 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task TryCompileAsync_WhenExternalSceneChangeBlocks_PersistsReceivedPlayModeStopWarning()
         {
-            const string expectedWarning =
-                "Play Mode was active when this compile was requested. The compile stops Play Mode and the domain reload discards the Play session state — re-establish your runtime state before continuing verification.";
-            UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                using CompileController controller = new(
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                controller.SetResultRecordingContext(
-                    CompileResultRecordingContext.Create(
-                        new CompileSchema
-                        {
-                            WaitForDomainReload = true,
-                            RequestId = "compile_scene_change_play_stop_warning",
-                            ForceRecompile = false
-                        }));
-                controller.SetExternalSceneChangeResolutionForTesting(_ => (
-                    false,
-                    "Open Scene files have changed externally and compile stopped.",
-                    new[] { "Assets/Scenes/Sample.unity" }));
+                const string expectedWarning =
+                    "Play Mode was active when this compile was requested. The compile stops Play Mode and the domain reload discards the Play session state — re-establish your runtime state before continuing verification.";
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
 
-                await controller.TryCompileAsync(
-                    forceRecompile: false,
-                    expectedWarning,
-                    CancellationToken.None);
+                try
+                {
+                    using CompileController controller = new(
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    controller.SetResultRecordingContext(
+                        CompileResultRecordingContext.Create(
+                            new CompileSchema
+                            {
+                                WaitForDomainReload = true,
+                                RequestId = "compile_scene_change_play_stop_warning",
+                                ForceRecompile = false
+                            }));
+                    controller.SetExternalSceneChangeResolutionForTesting(_ => (
+                        false,
+                        "Open Scene files have changed externally and compile stopped.",
+                        new[] { "Assets/Scenes/Sample.unity" }));
 
-                UnityCliLoopStoredCompileResult storedResult =
-                    compileResultSessionRepository.GetCompileResult("compile_scene_change_play_stop_warning");
-                CompileResponse storedResponse = JsonConvert.DeserializeObject<CompileResponse>(
-                    storedResult.ResultJson,
-                    UnityCliLoopJsonResponseSerializerSettings.Settings);
+                    await controller.TryCompileAsync(
+                        forceRecompile: false,
+                        expectedWarning,
+                        reloadDiscardsState: false,
+                        CancellationToken.None);
 
-                Assert.That(storedResult.HasResult, Is.True);
-                Assert.That(storedResponse.Warning, Is.EqualTo(expectedWarning));
+                    UnityCliLoopStoredCompileResult storedResult =
+                        compileResultSessionRepository.GetCompileResult("compile_scene_change_play_stop_warning");
+                    CompileResponse storedResponse = JsonConvert.DeserializeObject<CompileResponse>(
+                        storedResult.ResultJson,
+                        UnityCliLoopJsonResponseSerializerSettings.Settings);
+
+                    Assert.That(storedResult.HasResult, Is.True);
+                    Assert.That(storedResponse.Warning, Is.EqualTo(expectedWarning));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
     }

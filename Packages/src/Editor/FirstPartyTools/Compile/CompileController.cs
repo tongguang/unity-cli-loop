@@ -93,6 +93,16 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         public IReadOnlyList<CompilerMessage> CompileMessages => _compileMessages.AsReadOnly();
 
         /// <summary>
+        /// Reads, from the current Editor, whether a domain reload would discard state: Play Mode, an
+        /// enabled pause point, or an active hot-reload change. Pass it as the reloadDiscardsState of
+        /// <see cref="TryCompileAsync"/> when there is no state captured at request start.
+        /// </summary>
+        public static bool ReadLiveReloadDiscardsState()
+        {
+            return CompileReloadDiscardState.ReadLive();
+        }
+
+        /// <summary>
         /// Sets delayed compile result storage for the active CLI request.
         /// </summary>
         internal void SetResultRecordingContext(CompileResultRecordingContext resultRecordingContext)
@@ -153,14 +163,23 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         /// </summary>
         /// <param name="forceRecompile">Whether to force a recompile.</param>
         /// <param name="playModeStopWarning">Optional Warning to carry onto the shaped response when compile was requested during Play Mode.</param>
+        /// <param name="reloadDiscardsState">True when the caller holds state that only a domain reload
+        /// discards (a Play session, pause point patches, hot-reload changes), so the compile must reload
+        /// even when no script changed.</param>
         /// <param name="ct">Cancellation token for the compile execution.</param>
-        /// <returns>The compilation result.</returns>
+        /// <returns>The compilation result. When no script changed since a successful compile, nothing is
+        /// forced, and <paramref name="reloadDiscardsState"/> is false, a successful result returned
+        /// without compiling, so the domain is not reloaded.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the task is not found during compilation.</exception>
         /// <remarks>
         /// Callers must validate editor compilation state before invoking compile execution;
         /// the production pipeline does this in CompileUseCase.
         /// </remarks>
-        public async Task<CompileResult> TryCompileAsync(bool forceRecompile, string playModeStopWarning, CancellationToken ct)
+        public async Task<CompileResult> TryCompileAsync(
+            bool forceRecompile,
+            string playModeStopWarning,
+            bool reloadDiscardsState,
+            CancellationToken ct)
         {
             if (_isCompiling)
             {
@@ -193,7 +212,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     });
                 CompileResult result =
                     CompileResultFactory.CreateExternalSceneChangeFailureResult(sceneChangeResult);
-                RecordCompileResultIfNeeded(result, playModeStopWarning);
+                RecordCompileResultIfNeeded(result, playModeStopWarning, isFollowedByReload: false);
                 return result;
             }
 
@@ -215,8 +234,11 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             try
             {
                 // Why before Refresh: AssetDatabase.Refresh() can start a script compile itself,
-                // and that compile can raise Script Updating Consent. Begin must be set first
-                // or the prefix lets the modal through on the typical "edit then tloop compile" path.
+                // and that compile can raise Script Updating Consent. The decline must be installed
+                // and Begin set first or the modal gets through on the typical "edit then tloop compile"
+                // path. Why install here and not at Editor startup: the Harmony patch costs a domain
+                // reload about 150 ms, which every reload paid even when no CLI compile followed.
+                _pipeline.InstallApiUpdaterConsentDecline();
                 CompileApiUpdaterConsentState.BeginCliCompile();
                 _pipeline.RefreshAssets();
 
@@ -236,6 +258,22 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                         });
                     CompleteCompileWithoutRequest(result);
                     return result;
+                }
+
+                if (IsUpToDate(forceRecompile, reloadDiscardsState))
+                {
+                    // Why skip: requesting a compilation with nothing to compile still makes Unity
+                    // reload the domain, and each reload makes the next one slower over an Editor session.
+                    CompileResult upToDateResult = CompileResultFactory.CreateUpToDateResult();
+                    VibeLogger.LogInfo(
+                        "compile_skipped_up_to_date",
+                        upToDateResult.Message,
+                        new
+                        {
+                            elapsed_ms = CompileElapsedMilliseconds()
+                        });
+                    CompleteCompileWithoutRequest(upToDateResult);
+                    return upToDateResult;
                 }
 
                 // Register events.
@@ -260,6 +298,20 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     ClearUntransferredCompileState(compileTask, eventsRegistered);
                 }
             }
+        }
+
+        /// <summary>
+        /// Whether the compile can end without asking Unity to compile. Must be read after the asset
+        /// refresh, because the refresh is what queues a compilation for changed scripts.
+        /// </summary>
+        private bool IsUpToDate(bool forceRecompile, bool reloadDiscardsState)
+        {
+            if (forceRecompile || reloadDiscardsState)
+            {
+                return false;
+            }
+
+            return !_pipeline.IsScriptCompilationPending() && !_pipeline.DidLastScriptCompilationFail();
         }
 
         private bool IsCompileRequestCompleted()
@@ -317,7 +369,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                     ["is_indeterminate"] = result.IsIndeterminate
                 }));
 
-            CompleteCompileRequest(result, unregisterEvents: true);
+            CompleteCompileRequest(result, unregisterEvents: true, isFollowedByReload: false);
         }
 
         /// <summary>
@@ -325,7 +377,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         /// </summary>
         private void CompleteCompileWithoutRequest(CompileResult result)
         {
-            CompleteCompileRequest(result, unregisterEvents: false);
+            CompleteCompileRequest(result, unregisterEvents: false, isFollowedByReload: false);
         }
 
         private void AbortCompile(string reason)
@@ -355,13 +407,13 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 message: reason
             );
 
-            CompleteCompileRequest(result, unregisterEvents: true);
+            CompleteCompileRequest(result, unregisterEvents: true, isFollowedByReload: false);
         }
 
         /// <summary>
         /// Completes the active compile task while guaranteeing controller state cleanup.
         /// </summary>
-        private void CompleteCompileRequest(CompileResult result, bool unregisterEvents)
+        private void CompleteCompileRequest(CompileResult result, bool unregisterEvents, bool isFollowedByReload)
         {
             UnityEngine.Debug.Assert(result != null, "result must not be null");
 
@@ -370,7 +422,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             // Completion subscribers are outside this controller, so state cleanup cannot depend on them returning.
             try
             {
-                RecordCompileResultIfNeeded(resultToComplete, _pendingPlayModeStopWarning);
+                RecordCompileResultIfNeeded(resultToComplete, _pendingPlayModeStopWarning, isFollowedByReload);
 
                 if (unregisterEvents)
                 {
@@ -426,7 +478,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         {
             UnityEngine.Debug.Assert(result != null, "result must not be null");
             _currentCompileTask = new TaskCompletionSource<CompileResult>();
-            CompleteCompileRequest(result, unregisterEvents: false);
+            CompleteCompileRequest(result, unregisterEvents: false, isFollowedByReload: false);
         }
 
         /// <summary>
@@ -439,7 +491,10 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             ClearUntransferredCompileState(compileTask, eventsRegistered: false);
         }
 
-        private void RecordCompileResultIfNeeded(CompileResult result, string playModeStopWarning)
+        private void RecordCompileResultIfNeeded(
+            CompileResult result,
+            string playModeStopWarning,
+            bool isFollowedByReload)
         {
             UnityEngine.Debug.Assert(result != null, "result must not be null");
 
@@ -454,6 +509,7 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 _resultRecordingContext.RequestId,
                 _resultRecordingContext.ForceRecompile,
                 result,
+                isFollowedByReload,
                 _resultRecordingContext.RequestId,
                 playModeStopWarning);
         }
@@ -498,7 +554,9 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
         {
             CompileResult result = CompileResultFactory.CreateCompileResult(_compileMessages.ToArray(), _isForceCompile);
             LogCompileFinishCallbackReceived(result);
-            CompleteCompileRequest(result, unregisterEvents: true);
+            // Why only without errors: Unity reloads the domain after a compile it ran, even one with nothing
+            // to compile, unless the compile has errors.
+            CompleteCompileRequest(result, unregisterEvents: true, isFollowedByReload: result.ErrorCount == 0);
         }
 
         private void LogCompileFinishCallbackReceived(CompileResult result)

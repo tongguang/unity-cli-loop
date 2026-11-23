@@ -140,11 +140,6 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
                 HotReloadWorkerReasonCode.AccessorExtensionMethodGroupNoShape,
                 Plain("inaccessible extension method used as a method group (not called) has no accessor rewrite shape.", 0));
             templates.Add(
-                HotReloadWorkerReasonCode.AccessorAddedExtensionReducedCallNoShape,
-                Plain(
-                    "extension method '{0}' added in this reload has no rewrite shape when called on a receiver; write the call as '{1}.{0}(receiver, ...)'.",
-                    2));
-            templates.Add(
                 HotReloadWorkerReasonCode.AccessorGenericMethodNotRewritten,
                 Plain("inaccessible generic method calls are not rewritten.", 0));
             templates.Add(
@@ -200,6 +195,15 @@ namespace io.github.hatayama.UnityCliLoop.FirstPartyTools
             templates.Add(
                 HotReloadWorkerReasonCode.AccessorConditionalAccessNoShape,
                 Plain("inaccessible member access via conditional access has no rewrite shape.", 0));
+            templates.Add(
+                HotReloadWorkerReasonCode.AccessorPropertyPatternNoShape,
+                // Why the member access: the accessor rewrite reads an inaccessible member through
+                // one, so the same test written outside the pattern applies.
+                Plain(
+                    "inaccessible member '{0}' named in a property pattern has no accessor rewrite shape; "
+                    + "read '{1}' from the matched value with a member access outside the pattern instead "
+                    + "('value.{1}').",
+                    2));
             templates.Add(
                 HotReloadWorkerReasonCode.AccessorRefReturningMethodNoShape,
                 Plain("inaccessible methods that return by ref have no accessor rewrite shape.", 0));

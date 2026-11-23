@@ -53,6 +53,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                     "compile_consent_delayed",
                     forceRecompile: false,
                     result,
+                    isFollowedByReload: false,
                     "compile_consent_delayed");
                 UnityCliLoopStoredCompileResult storedResult =
                     compileResultSessionRepository.GetCompileResult("compile_consent_delayed");
@@ -74,49 +75,56 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WhenConsentWasDeclined_ReturnsDisclosure()
         {
-            UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                CompileResult executionResult = CreateDeclinedResult();
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetCompilationStateValidationForTesting(() => ValidationResult.Success());
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
+
+                try
                 {
-                    ct.ThrowIfCancellationRequested();
-                    return Task.FromResult(executionResult);
-                });
-
-                CompileResponse response = await useCase.CompileAsync(
-                    new CompileSchema
+                    CompileResult executionResult = CreateDeclinedResult();
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetCompilationStateValidationForTesting(() => ValidationResult.Success());
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
                     {
-                        WaitForDomainReload = false,
-                        RequestId = "compile_consent_immediate",
-                        ForceRecompile = false,
-                        ReloadExternalSceneChanges = true
-                    },
-                    CancellationToken.None);
+                        ct.ThrowIfCancellationRequested();
+                        return Task.FromResult(executionResult);
+                    });
 
-                Assert.That(response.Warning, Is.EqualTo(WarningText));
-                Assert.That(response.NextActions, Is.EqualTo(new[] { NextActionText }));
+                    CompileResponse response = await useCase.CompileAsync(
+                        new CompileSchema
+                        {
+                            WaitForDomainReload = false,
+                            RequestId = "compile_consent_immediate",
+                            ForceRecompile = false,
+                            ReloadExternalSceneChanges = true
+                        },
+                        CancellationToken.None);
+
+                    Assert.That(response.Warning, Is.EqualTo(WarningText));
+                    Assert.That(response.NextActions, Is.EqualTo(new[] { NextActionText }));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 

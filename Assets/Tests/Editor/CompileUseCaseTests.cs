@@ -21,63 +21,146 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WhenExecutionLayerStoresDelayedSuccess_DoesNotStoreResultAgain()
         {
-            // Verifies the UseCase success path preserves the execution layer's single delayed-result write.
-            UnityCliLoopCompileResultSessionRepository innerCompileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            CountingCompileResultSessionRepository compileResultSessionRepository =
-                new(innerCompileResultSessionRepository);
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                CompileSchema request = new()
-                {
-                    WaitForDomainReload = true,
-                    RequestId = "compile_test_request",
-                    ForceRecompile = false,
-                    ReloadExternalSceneChanges = true
-                };
-                CompileResult executionResult = CreateSuccessfulCompileResult();
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
-                {
-                    ct.ThrowIfCancellationRequested();
-                    CompileResultSessionRecorder.RecordCompileResult(
+                // Verifies the UseCase success path preserves the execution layer's single delayed-result write.
+                UnityCliLoopCompileResultSessionRepository innerCompileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                CountingCompileResultSessionRepository compileResultSessionRepository =
+                    new(innerCompileResultSessionRepository);
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
                         compileResultSessionRepository,
-                        pendingCompileSessionRepository,
-                        compileRequest.RequestId,
-                        compileRequest.ForceRecompile,
-                        executionResult,
-                        compileRequest.RequestId);
-                    return Task.FromResult(executionResult);
-                });
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
 
-                CompileResponse response = await useCase.CompileAsync(request, CancellationToken.None);
+                try
+                {
+                    CompileSchema request = new()
+                    {
+                        WaitForDomainReload = true,
+                        RequestId = "compile_test_request",
+                        ForceRecompile = false,
+                        ReloadExternalSceneChanges = true
+                    };
+                    CompileResult executionResult = CreateSuccessfulCompileResult();
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        CompileResultSessionRecorder.RecordCompileResult(
+                            compileResultSessionRepository,
+                            pendingCompileSessionRepository,
+                            compileRequest.RequestId,
+                            compileRequest.ForceRecompile,
+                            executionResult,
+                            isFollowedByReload: false,
+                            compileRequest.RequestId);
+                        return Task.FromResult(executionResult);
+                    });
 
-                Assert.That(compileResultSessionRepository.StoreCount, Is.EqualTo(1));
-                Assert.That(response.Success, Is.True);
-                Assert.That(response.ProjectRoot, Is.Not.Empty);
-                // Verifies no Play-stop Warning appears outside Play Mode (the only state an EditMode test can exercise).
-                Assert.That(response.Warning, Is.Null);
-                UnityCliLoopStoredCompileResult storedResult =
-                    compileResultSessionRepository.GetCompileResult("compile_test_request");
-                Assert.That(storedResult.ResultJson, Does.Contain("\"ProjectRoot\":"));
+                    CompileResponse response = await useCase.CompileAsync(request, CancellationToken.None);
+
+                    Assert.That(compileResultSessionRepository.StoreCount, Is.EqualTo(1));
+                    Assert.That(response.Success, Is.True);
+                    Assert.That(response.ProjectRoot, Is.Not.Empty);
+                    // Verifies no Play-stop Warning appears outside Play Mode (the only state an EditMode test can exercise).
+                    Assert.That(response.Warning, Is.Null);
+                    UnityCliLoopStoredCompileResult storedResult =
+                        compileResultSessionRepository.GetCompileResult("compile_test_request");
+                    Assert.That(storedResult.ResultJson, Does.Contain("\"ProjectRoot\":"));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: the compile is told a domain reload discards state exactly when the request started
+        /// with something only a reload discards — Play Mode, an enabled pause point (persisted ones
+        /// included, since they are dropped and re-armed), or an active hot-reload change — so a
+        /// compile with no script changes still reloads in those cases.
+        /// </summary>
+        [TestCase(false, 0, 0, 0, false, TestName = "{m}_NothingToDiscard")]
+        [TestCase(true, 0, 0, 0, true, TestName = "{m}_PlayModeWasActive")]
+        [TestCase(false, 1, 0, 0, true, TestName = "{m}_PausePointEnabled")]
+        [TestCase(false, 1, 1, 0, true, TestName = "{m}_PersistedPausePointEnabled")]
+        [TestCase(false, 0, 0, 1, true, TestName = "{m}_HotReloadChangeActive")]
+        public async Task CompileAsync_PassesWhetherADomainReloadDiscardsStateToTheCompile(
+            bool wasPlayingAtRequestStart,
+            int activePausePointCount,
+            int activePersistedPausePointCount,
+            int activeHotReloadChangeCount,
+            bool expectedReloadDiscardsState)
+        {
+            try
+            {
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
+
+                try
+                {
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetPlayModeStopWarningInputsForTesting(
+                        wasPlayingAtRequestStart,
+                        activePausePointCount,
+                        activePersistedPausePointCount,
+                        activeHotReloadChangeCount);
+                    useCase.SetCompilationStateValidationForTesting(() => ValidationResult.Success());
+                    bool? receivedReloadDiscardsState = null;
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
+                    {
+                        receivedReloadDiscardsState = reloadDiscardsState;
+                        return Task.FromResult(CreateSuccessfulCompileResult());
+                    });
+
+                    await useCase.CompileAsync(
+                        new CompileSchema
+                        {
+                            WaitForDomainReload = false,
+                            RequestId = "compile_reload_discards_state",
+                            ForceRecompile = false,
+                            ReloadExternalSceneChanges = true
+                        },
+                        CancellationToken.None);
+
+                    Assert.That(receivedReloadDiscardsState, Is.EqualTo(expectedReloadDiscardsState));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -87,52 +170,59 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WhenValidationFailsBecauseCompiling_SetsAlreadyInProgressErrorCode()
         {
-            UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetCompilationStateValidationForTesting(() =>
-                    ValidationResult.FailureWithErrorCode(
-                        "Compilation is already in progress. Please wait for the current compilation to finish.",
-                        CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
+
+                try
                 {
-                    throw new InvalidOperationException("validation failure must not start compilation");
-                });
-
-                CompileResponse response = await useCase.CompileAsync(
-                    new CompileSchema
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetCompilationStateValidationForTesting(() =>
+                        ValidationResult.FailureWithErrorCode(
+                            "Compilation is already in progress. Please wait for the current compilation to finish.",
+                            CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
                     {
-                        WaitForDomainReload = false,
-                        RequestId = "compile_validation_error_code",
-                        ForceRecompile = false,
-                        ReloadExternalSceneChanges = true
-                    },
-                    CancellationToken.None);
+                        throw new InvalidOperationException("validation failure must not start compilation");
+                    });
 
-                Assert.That(response.Success, Is.False);
-                Assert.That(
-                    response.ErrorCode,
-                    Is.EqualTo(CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
+                    CompileResponse response = await useCase.CompileAsync(
+                        new CompileSchema
+                        {
+                            WaitForDomainReload = false,
+                            RequestId = "compile_validation_error_code",
+                            ForceRecompile = false,
+                            ReloadExternalSceneChanges = true
+                        },
+                        CancellationToken.None);
+
+                    Assert.That(response.Success, Is.False);
+                    Assert.That(
+                        response.ErrorCode,
+                        Is.EqualTo(CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -143,52 +233,59 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WhenPlayModePreparationRefuses_ReturnsTheStopPlayModeNextAction()
         {
-            const string refusalMessage = "refused";
-            UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetPlayModePreparationForTesting(() => PreparationResult.CannotProceed(refusalMessage));
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
+                const string refusalMessage = "refused";
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
+
+                try
                 {
-                    throw new InvalidOperationException("a refused preparation must not start compilation");
-                });
-
-                CompileResponse response = await useCase.CompileAsync(
-                    new CompileSchema
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetPlayModePreparationForTesting(() => PreparationResult.CannotProceed(refusalMessage));
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
                     {
-                        WaitForDomainReload = false,
-                        RequestId = "compile_play_mode_refusal",
-                        ForceRecompile = false,
-                        ReloadExternalSceneChanges = true
-                    },
-                    CancellationToken.None);
+                        throw new InvalidOperationException("a refused preparation must not start compilation");
+                    });
 
-                Assert.That(response.Success, Is.False);
-                Assert.That(response.Errors[0].Message, Is.EqualTo(refusalMessage));
-                Assert.That(response.NextActions.Length, Is.EqualTo(1));
-                Assert.That(
-                    response.NextActions[0],
-                    Is.EqualTo(CompileErrorNextActionsConstants.PlayModeStopNextAction));
+                    CompileResponse response = await useCase.CompileAsync(
+                        new CompileSchema
+                        {
+                            WaitForDomainReload = false,
+                            RequestId = "compile_play_mode_refusal",
+                            ForceRecompile = false,
+                            ReloadExternalSceneChanges = true
+                        },
+                        CancellationToken.None);
+
+                    Assert.That(response.Success, Is.False);
+                    Assert.That(response.Errors[0].Message, Is.EqualTo(refusalMessage));
+                    Assert.That(response.NextActions.Length, Is.EqualTo(1));
+                    Assert.That(
+                        response.NextActions[0],
+                        Is.EqualTo(CompileErrorNextActionsConstants.PlayModeStopNextAction));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -198,64 +295,71 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WhenValidationFailsAfterPlayWasActive_SetsPlayModeStopWarningOnImmediateAndStoredResponses()
         {
-            const string expectedWarning =
-                "Play Mode was active when this compile was requested. The compile stops Play Mode and the domain reload discards the Play session state — re-establish your runtime state before continuing verification.";
-            UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetPlayModeStopWarningInputsForTesting(
-                    wasPlayingAtRequestStart: true,
-                    activePausePointCount: 0,
-                    activePersistedPausePointCount: 0,
-                    activeHotReloadChangeCount: 0);
-                useCase.SetCompilationStateValidationForTesting(() =>
-                    ValidationResult.FailureWithErrorCode(
-                        "Compilation is already in progress. Please wait for the current compilation to finish.",
-                        CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
+                const string expectedWarning =
+                    "Play Mode was active when this compile was requested. The compile stops Play Mode and the domain reload discards the Play session state — re-establish your runtime state before continuing verification.";
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
+
+                try
                 {
-                    throw new InvalidOperationException("validation failure must not start compilation");
-                });
-
-                CompileResponse response = await useCase.CompileAsync(
-                    new CompileSchema
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetPlayModeStopWarningInputsForTesting(
+                        wasPlayingAtRequestStart: true,
+                        activePausePointCount: 0,
+                        activePersistedPausePointCount: 0,
+                        activeHotReloadChangeCount: 0);
+                    useCase.SetCompilationStateValidationForTesting(() =>
+                        ValidationResult.FailureWithErrorCode(
+                            "Compilation is already in progress. Please wait for the current compilation to finish.",
+                            CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
                     {
-                        WaitForDomainReload = true,
-                        RequestId = "compile_validation_play_stop_warning",
-                        ForceRecompile = false,
-                        ReloadExternalSceneChanges = true
-                    },
-                    CancellationToken.None);
+                        throw new InvalidOperationException("validation failure must not start compilation");
+                    });
 
-                UnityCliLoopStoredCompileResult storedResult =
-                    compileResultSessionRepository.GetCompileResult("compile_validation_play_stop_warning");
-                CompileResponse storedResponse = JsonConvert.DeserializeObject<CompileResponse>(
-                    storedResult.ResultJson,
-                    UnityCliLoopJsonResponseSerializerSettings.Settings);
+                    CompileResponse response = await useCase.CompileAsync(
+                        new CompileSchema
+                        {
+                            WaitForDomainReload = true,
+                            RequestId = "compile_validation_play_stop_warning",
+                            ForceRecompile = false,
+                            ReloadExternalSceneChanges = true
+                        },
+                        CancellationToken.None);
 
-                Assert.That(response.Warning, Is.EqualTo(expectedWarning));
-                Assert.That(storedResult.HasResult, Is.True);
-                Assert.That(storedResponse.Warning, Is.EqualTo(expectedWarning));
+                    UnityCliLoopStoredCompileResult storedResult =
+                        compileResultSessionRepository.GetCompileResult("compile_validation_play_stop_warning");
+                    CompileResponse storedResponse = JsonConvert.DeserializeObject<CompileResponse>(
+                        storedResult.ResultJson,
+                        UnityCliLoopJsonResponseSerializerSettings.Settings);
+
+                    Assert.That(response.Warning, Is.EqualTo(expectedWarning));
+                    Assert.That(storedResult.HasResult, Is.True);
+                    Assert.That(storedResponse.Warning, Is.EqualTo(expectedWarning));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -265,62 +369,69 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WhenValidationFailsWithActiveHotReloadChanges_SetsHotReloadDropWarningOnImmediateAndStoredResponses()
         {
-            UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetPlayModeStopWarningInputsForTesting(
-                    wasPlayingAtRequestStart: false,
-                    activePausePointCount: 0,
-                    activePersistedPausePointCount: 0,
-                    activeHotReloadChangeCount: 4);
-                useCase.SetCompilationStateValidationForTesting(() =>
-                    ValidationResult.FailureWithErrorCode(
-                        "Compilation is already in progress. Please wait for the current compilation to finish.",
-                        CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
+
+                try
                 {
-                    throw new InvalidOperationException("validation failure must not start compilation");
-                });
-
-                CompileResponse response = await useCase.CompileAsync(
-                    new CompileSchema
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetPlayModeStopWarningInputsForTesting(
+                        wasPlayingAtRequestStart: false,
+                        activePausePointCount: 0,
+                        activePersistedPausePointCount: 0,
+                        activeHotReloadChangeCount: 4);
+                    useCase.SetCompilationStateValidationForTesting(() =>
+                        ValidationResult.FailureWithErrorCode(
+                            "Compilation is already in progress. Please wait for the current compilation to finish.",
+                            CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
                     {
-                        WaitForDomainReload = true,
-                        RequestId = "compile_validation_hot_reload_drop_warning",
-                        ForceRecompile = false,
-                        ReloadExternalSceneChanges = true
-                    },
-                    CancellationToken.None);
+                        throw new InvalidOperationException("validation failure must not start compilation");
+                    });
 
-                UnityCliLoopStoredCompileResult storedResult =
-                    compileResultSessionRepository.GetCompileResult("compile_validation_hot_reload_drop_warning");
-                CompileResponse storedResponse = JsonConvert.DeserializeObject<CompileResponse>(
-                    storedResult.ResultJson,
-                    UnityCliLoopJsonResponseSerializerSettings.Settings);
+                    CompileResponse response = await useCase.CompileAsync(
+                        new CompileSchema
+                        {
+                            WaitForDomainReload = true,
+                            RequestId = "compile_validation_hot_reload_drop_warning",
+                            ForceRecompile = false,
+                            ReloadExternalSceneChanges = true
+                        },
+                        CancellationToken.None);
 
-                Assert.That(response.Warning, Does.Contain("4 active hot-reload change(s)"));
-                Assert.That(storedResult.HasResult, Is.True);
-                Assert.That(storedResponse.Warning, Does.Contain("4 active hot-reload change(s)"));
+                    UnityCliLoopStoredCompileResult storedResult =
+                        compileResultSessionRepository.GetCompileResult("compile_validation_hot_reload_drop_warning");
+                    CompileResponse storedResponse = JsonConvert.DeserializeObject<CompileResponse>(
+                        storedResult.ResultJson,
+                        UnityCliLoopJsonResponseSerializerSettings.Settings);
+
+                    Assert.That(response.Warning, Does.Contain("4 active hot-reload change(s)"));
+                    Assert.That(storedResult.HasResult, Is.True);
+                    Assert.That(storedResponse.Warning, Does.Contain("4 active hot-reload change(s)"));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -330,63 +441,70 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WhenValidationFailsInEditModeWithActivePausePoints_SetsPausePointDropWarningOnImmediateAndStoredResponses()
         {
-            UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetPlayModeStopWarningInputsForTesting(
-                    wasPlayingAtRequestStart: false,
-                    activePausePointCount: 1,
-                    activePersistedPausePointCount: 0,
-                    activeHotReloadChangeCount: 0);
-                useCase.SetCompilationStateValidationForTesting(() =>
-                    ValidationResult.FailureWithErrorCode(
-                        "Compilation is already in progress. Please wait for the current compilation to finish.",
-                        CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
+
+                try
                 {
-                    throw new InvalidOperationException("validation failure must not start compilation");
-                });
-
-                CompileResponse response = await useCase.CompileAsync(
-                    new CompileSchema
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetPlayModeStopWarningInputsForTesting(
+                        wasPlayingAtRequestStart: false,
+                        activePausePointCount: 1,
+                        activePersistedPausePointCount: 0,
+                        activeHotReloadChangeCount: 0);
+                    useCase.SetCompilationStateValidationForTesting(() =>
+                        ValidationResult.FailureWithErrorCode(
+                            "Compilation is already in progress. Please wait for the current compilation to finish.",
+                            CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
                     {
-                        WaitForDomainReload = true,
-                        RequestId = "compile_validation_edit_mode_pause_point_warning",
-                        ForceRecompile = false,
-                        ReloadExternalSceneChanges = true
-                    },
-                    CancellationToken.None);
+                        throw new InvalidOperationException("validation failure must not start compilation");
+                    });
 
-                UnityCliLoopStoredCompileResult storedResult =
-                    compileResultSessionRepository.GetCompileResult("compile_validation_edit_mode_pause_point_warning");
-                CompileResponse storedResponse = JsonConvert.DeserializeObject<CompileResponse>(
-                    storedResult.ResultJson,
-                    UnityCliLoopJsonResponseSerializerSettings.Settings);
+                    CompileResponse response = await useCase.CompileAsync(
+                        new CompileSchema
+                        {
+                            WaitForDomainReload = true,
+                            RequestId = "compile_validation_edit_mode_pause_point_warning",
+                            ForceRecompile = false,
+                            ReloadExternalSceneChanges = true
+                        },
+                        CancellationToken.None);
 
-                Assert.That(response.Warning, Does.Contain("1 enabled pause point(s)"));
-                Assert.That(response.Warning, Does.Not.Contain("Play Mode was active"));
-                Assert.That(storedResult.HasResult, Is.True);
-                Assert.That(storedResponse.Warning, Does.Contain("1 enabled pause point(s)"));
+                    UnityCliLoopStoredCompileResult storedResult =
+                        compileResultSessionRepository.GetCompileResult("compile_validation_edit_mode_pause_point_warning");
+                    CompileResponse storedResponse = JsonConvert.DeserializeObject<CompileResponse>(
+                        storedResult.ResultJson,
+                        UnityCliLoopJsonResponseSerializerSettings.Settings);
+
+                    Assert.That(response.Warning, Does.Contain("1 enabled pause point(s)"));
+                    Assert.That(response.Warning, Does.Not.Contain("Play Mode was active"));
+                    Assert.That(storedResult.HasResult, Is.True);
+                    Assert.That(storedResponse.Warning, Does.Contain("1 enabled pause point(s)"));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -396,62 +514,70 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WhenHotReloadChangesActive_PassesDropWarningToCompilationExecution()
         {
-            UnityCliLoopCompileResultSessionRepository innerCompileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            CountingCompileResultSessionRepository compileResultSessionRepository =
-                new(innerCompileResultSessionRepository);
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-
             try
             {
-                CompileSchema request = new()
-                {
-                    WaitForDomainReload = true,
-                    RequestId = "compile_success_hot_reload_drop_warning",
-                    ForceRecompile = false,
-                    ReloadExternalSceneChanges = true
-                };
-                CompileResult executionResult = CreateSuccessfulCompileResult();
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetPlayModeStopWarningInputsForTesting(
-                    wasPlayingAtRequestStart: false,
-                    activePausePointCount: 0,
-                    activePersistedPausePointCount: 0,
-                    activeHotReloadChangeCount: 2);
-                string capturedPlayModeStopWarning = null;
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
-                {
-                    capturedPlayModeStopWarning = playModeStopWarning;
-                    ct.ThrowIfCancellationRequested();
-                    CompileResultSessionRecorder.RecordCompileResult(
+                UnityCliLoopCompileResultSessionRepository innerCompileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                CountingCompileResultSessionRepository compileResultSessionRepository =
+                    new(innerCompileResultSessionRepository);
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
                         compileResultSessionRepository,
-                        pendingCompileSessionRepository,
-                        compileRequest.RequestId,
-                        compileRequest.ForceRecompile,
-                        executionResult,
-                        compileRequest.RequestId);
-                    return Task.FromResult(executionResult);
-                });
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
 
-                await useCase.CompileAsync(request, CancellationToken.None);
+                try
+                {
+                    CompileSchema request = new()
+                    {
+                        WaitForDomainReload = true,
+                        RequestId = "compile_success_hot_reload_drop_warning",
+                        ForceRecompile = false,
+                        ReloadExternalSceneChanges = true
+                    };
+                    CompileResult executionResult = CreateSuccessfulCompileResult();
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetPlayModeStopWarningInputsForTesting(
+                        wasPlayingAtRequestStart: false,
+                        activePausePointCount: 0,
+                        activePersistedPausePointCount: 0,
+                        activeHotReloadChangeCount: 2);
+                    string capturedPlayModeStopWarning = null;
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
+                    {
+                        capturedPlayModeStopWarning = playModeStopWarning;
+                        ct.ThrowIfCancellationRequested();
+                        CompileResultSessionRecorder.RecordCompileResult(
+                            compileResultSessionRepository,
+                            pendingCompileSessionRepository,
+                            compileRequest.RequestId,
+                            compileRequest.ForceRecompile,
+                            executionResult,
+                            isFollowedByReload: false,
+                            compileRequest.RequestId);
+                        return Task.FromResult(executionResult);
+                    });
 
-                Assert.That(capturedPlayModeStopWarning, Does.Contain("2 active hot-reload change(s)"));
+                    await useCase.CompileAsync(request, CancellationToken.None);
+
+                    Assert.That(capturedPlayModeStopWarning, Does.Contain("2 active hot-reload change(s)"));
+                }
+                finally
+                {
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -462,57 +588,64 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
         [Test]
         public async Task CompileAsync_WithRuntimeChangesLive_WarnsWithTheCountTheRuntimeChangePortReports()
         {
-            UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
-            UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
-                UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
-            UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
-                new(
-                    UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-            UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
-                UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
-            UnityCliLoopEditorSessionStateTestFactory.ClearAll();
-            Func<int> originalRuntimeChangeCount =
-                HotReloadRuntimeChangeCoordination.GetActiveRuntimeChangeCount;
-            HotReloadRuntimeChangeCoordination.GetActiveRuntimeChangeCount = () => 1;
-
             try
             {
-                CompileUseCase useCase = new(
-                    compileSessionLifecycleService,
-                    compileResultSessionRepository,
-                    pendingCompileSessionRepository);
-                useCase.SetCompilationStateValidationForTesting(() =>
-                    ValidationResult.FailureWithErrorCode(
-                        "Compilation is already in progress. Please wait for the current compilation to finish.",
-                        CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
-                useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, ct) =>
+                UnityCliLoopCompileResultSessionRepository compileResultSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreateCompileResultSessionRepository();
+                UnityCliLoopPendingCompileSessionRepository pendingCompileSessionRepository =
+                    UnityCliLoopEditorSessionStateTestFactory.CreatePendingCompileSessionRepository();
+                UnityCliLoopCompileSessionLifecycleService compileSessionLifecycleService =
+                    new(
+                        UnityCliLoopEditorSessionStateTestFactory.CreateSessionFlagsRepository(),
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                UnityCliLoopEditorSessionStateSnapshot originalSnapshot =
+                    UnityCliLoopEditorSessionStateTestFactory.CaptureSnapshot();
+                UnityCliLoopEditorSessionStateTestFactory.ClearAll();
+                Func<int> originalRuntimeChangeCount =
+                    HotReloadRuntimeChangeCoordination.GetActiveRuntimeChangeCount;
+                HotReloadRuntimeChangeCoordination.GetActiveRuntimeChangeCount = () => 1;
+
+                try
                 {
-                    throw new InvalidOperationException("validation failure must not start compilation");
-                });
-
-                CompileResponse response = await useCase.CompileAsync(
-                    new CompileSchema
+                    CompileUseCase useCase = new(
+                        compileSessionLifecycleService,
+                        compileResultSessionRepository,
+                        pendingCompileSessionRepository);
+                    useCase.SetCompilationStateValidationForTesting(() =>
+                        ValidationResult.FailureWithErrorCode(
+                            "Compilation is already in progress. Please wait for the current compilation to finish.",
+                            CompileStateValidationErrorCodes.AlreadyInProgressErrorCodeText));
+                    useCase.SetCompilationExecutionForTesting((compileRequest, playModeStopWarning, reloadDiscardsState, ct) =>
                     {
-                        WaitForDomainReload = false,
-                        RequestId = "compile_runtime_change_warning",
-                        ForceRecompile = false,
-                        ReloadExternalSceneChanges = true
-                    },
-                    CancellationToken.None);
+                        throw new InvalidOperationException("validation failure must not start compilation");
+                    });
 
-                Assert.That(
-                    response.Warning,
-                    Is.Not.Null,
-                    "A compile that would discard a runtime change must warn about it.");
-                Assert.That(response.Warning, Does.Contain("1 active hot-reload change(s)"));
+                    CompileResponse response = await useCase.CompileAsync(
+                        new CompileSchema
+                        {
+                            WaitForDomainReload = false,
+                            RequestId = "compile_runtime_change_warning",
+                            ForceRecompile = false,
+                            ReloadExternalSceneChanges = true
+                        },
+                        CancellationToken.None);
+
+                    Assert.That(
+                        response.Warning,
+                        Is.Not.Null,
+                        "A compile that would discard a runtime change must warn about it.");
+                    Assert.That(response.Warning, Does.Contain("1 active hot-reload change(s)"));
+                }
+                finally
+                {
+                    HotReloadRuntimeChangeCoordination.GetActiveRuntimeChangeCount = originalRuntimeChangeCount;
+                    originalSnapshot.Restore();
+                }
             }
-            finally
+            catch (System.OperationCanceledException exception)
             {
-                HotReloadRuntimeChangeCoordination.GetActiveRuntimeChangeCount = originalRuntimeChangeCount;
-                originalSnapshot.Restore();
+                Assert.Fail("Unexpected cancellation: " + exception);
             }
         }
 
@@ -551,10 +684,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 string requestId,
                 bool forceRecompile,
                 string resultJson,
-                DateTime completedAtUtc)
+                DateTime completedAtUtc,
+                bool isFollowedByReload)
             {
                 StoreCount++;
-                _inner.StoreCompileResult(requestId, forceRecompile, resultJson, completedAtUtc);
+                _inner.StoreCompileResult(requestId, forceRecompile, resultJson, completedAtUtc, isFollowedByReload);
             }
 
             public UnityCliLoopStoredCompileResult GetCompileResult(string requestId)
@@ -639,7 +773,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor
                 string requestId,
                 bool forceRecompile,
                 string resultJson,
-                DateTime completedAtUtc) => throw Touched();
+                DateTime completedAtUtc,
+                bool isFollowedByReload) => throw Touched();
             public UnityCliLoopStoredCompileResult GetCompileResult(string requestId) => throw Touched();
             public UnityCliLoopStoredCompileResult GetStoredCompileResult() => throw Touched();
             public UnityCliLoopStoredCompileResult[] GetStoredCompileResults() => throw Touched();
