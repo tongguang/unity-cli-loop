@@ -29,6 +29,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         private const string Namespace = "io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload";
         private const string RunnerBody = "int IHotReloadExplicitRunner.Run() { return 8101; }";
         private const string ValueSpecifier = "int IHotReloadExplicitValue.Value";
+        private const string HiddenFixtureProjectRelativePath =
+            "Assets/Tests/Editor/HotReload/HotReloadHiddenExplicitInterfaceFixtures.cs";
 
         /// <summary>
         /// What: an edited explicit implementation of a namespaced interface is an entry named by the
@@ -780,6 +782,272 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 HotReloadWorkerReasonCode.MethodTransformExplicitInterfaceImplementation);
         }
 
+        /// <summary>
+        /// What: editing only a class beside explicit implementations of internal interfaces that the
+        /// reload was not given leaves those implementations out of the result, with no skipped row
+        /// and no edit-outside-method-bodies warning, because none of them was edited.
+        /// </summary>
+        [Test]
+        public async Task Run_EditOfNeighborOfHiddenInterfaceImplementations_LeavesThemOutWithoutWarnings()
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenNeighbor.cs",
+                    source => ReplaceUniqueFragment(source, "8304", "9304"));
+
+                AssertEntry(result, typeof(HotReloadHiddenNeighborFixture), "Value", "Value");
+                AssertNoEntryFor(result, typeof(HotReloadHiddenRunnerFixture));
+                AssertNoEntryFor(result, typeof(HotReloadHiddenNestedInterfaceFixture));
+                AssertNoEntryFor(result, typeof(HotReloadHiddenImplementerHolder.Nested));
+                AssertNoEntryFor(result, typeof(HotReloadHiddenValueFixture));
+                AssertNoEntryFor(result, typeof(HotReloadHiddenIndexedFixture));
+                AssertNoEntryFor(result, typeof(HotReloadHiddenNotifierFixture));
+                AssertNoEntryFor(result, typeof(HotReloadHiddenCopierFixture));
+                AssertNoEntryFor(result, typeof(HotReloadHiddenInitValueFixture));
+                Assert.That(FormatSkipped(result), Is.EqualTo("(none)"), "No unedited implementation may be skipped.");
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: an edited explicit implementation of an internal interface that the reload was not
+        /// given is an entry named by the compiled metadata name, as it is for a public interface.
+        /// </summary>
+        [Test]
+        public async Task Run_EditedExplicitImplementationOfHiddenInterface_EmitsEntryWithCompiledName()
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenRunner.cs",
+                    source => ReplaceUniqueFragment(source, "8301", "9301"));
+
+                AssertEntry(result, typeof(HotReloadHiddenRunnerFixture), Namespace + ".IHotReloadHiddenRunner.Run", "Run");
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: an edited explicit implementation of an internal interface that the reload was not
+        /// given, whose signature names the type the reloaded file declares (as a parameter, a ref
+        /// parameter's neighbor and the return type), is an entry named by the compiled metadata name.
+        /// </summary>
+        [Test]
+        public async Task Run_EditedExplicitImplementationOfHiddenInterfaceNamingTheReloadedType_EmitsEntryWithCompiledName()
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenCopier.cs",
+                    source => ReplaceUniqueFragment(source, "8311", "9311"));
+
+                AssertEntry(result, typeof(HotReloadHiddenCopierFixture), Namespace + ".IHotReloadHiddenCopier.Copy", "Copy");
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: an edited explicit implementation of an internal interface nested in a type, declared
+        /// in a file the reload was not given, is an entry whose name joins the outer and nested type
+        /// with a dot.
+        /// </summary>
+        [Test]
+        public async Task Run_EditedExplicitImplementationOfNestedHiddenInterface_EmitsEntryWithCompiledName()
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenNestedInterface.cs",
+                    source => ReplaceUniqueFragment(source, "8302", "9302"));
+
+                AssertEntry(
+                    result,
+                    typeof(HotReloadHiddenNestedInterfaceFixture),
+                    Namespace + ".HotReloadHiddenOuter.IInner.Run",
+                    "Run");
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: a nested type's edited explicit implementation of an internal interface that the
+        /// reload was not given is an entry on the nested type, named by the compiled metadata name.
+        /// </summary>
+        [Test]
+        public async Task Run_EditedExplicitImplementationOnNestedImplementerOfHiddenInterface_EmitsEntryWithCompiledName()
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenNestedImplementer.cs",
+                    source => ReplaceUniqueFragment(source, "8303", "9303"));
+
+                AssertEntry(
+                    result,
+                    typeof(HotReloadHiddenImplementerHolder.Nested),
+                    Namespace + ".IHotReloadHiddenRunner.Run",
+                    "Run");
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: an edited explicit property implementation of an internal interface that the reload
+        /// was not given is an entry for its getter under the compiled metadata name, not under a
+        /// name built as if the property were an ordinary one.
+        /// </summary>
+        [Test]
+        public async Task Run_EditedExplicitPropertyOfHiddenInterface_EmitsGetterEntryWithCompiledName()
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenValue.cs",
+                    source => ReplaceUniqueFragment(source, "8305", "9305"));
+
+                AssertEntry(
+                    result,
+                    typeof(HotReloadHiddenValueFixture),
+                    Namespace + ".IHotReloadHiddenValue.get_Value",
+                    "get_Value");
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: an edited accessor of an explicit indexer, event or init-only property of an internal interface that the
+        /// reload was not given stays Skipped as it does for a public interface, under the name the
+        /// compiled assembly gives the accessor, with no edit-outside-method-bodies warning.
+        /// </summary>
+        [TestCase("8309", "9309", "IHotReloadHiddenIndexed.get_Item(System.Int32)", "MethodTransformExplicitInterfaceImplementation")]
+        [TestCase("8310", "9310", "IHotReloadHiddenNotifier.add_Changed(System.Action)", "UnsupportedMemberUnsupportedKind")]
+        [TestCase("8312", "9312", "IHotReloadHiddenIndexed.set_Item(System.Int32,System.Int32)", "MethodTransformExplicitInterfaceImplementation")]
+        [TestCase("8313", "9313", "IHotReloadHiddenInitValue.set_Value(System.Int32)", "UnsupportedMemberExplicitAccessor")]
+        public async Task Run_EditedExplicitIndexerOrEventAccessorOfHiddenInterface_StaysSkippedUnderTheCompiledName(
+            string token,
+            string replacement,
+            string accessorLabelEnd,
+            string codeName)
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenIndexerOrEvent.cs",
+                    source => ReplaceUniqueFragment(source, token, replacement));
+
+                Assert.That(
+                    result.Output.skipped.Select(skipped => skipped.method + " :: " + skipped.reason?.code),
+                    Is.EqualTo(new[] { Namespace + "." + FixtureTypeOf(token) + "." + Namespace + "." + accessorLabelEnd + " :: " + codeName }));
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: an edited method of an implementer whose body relies on the class implementing an
+        /// internal interface that the reload was not given (a conversion to it, an extension on it,
+        /// an indexer taking it) is an entry, with no row for the implementer's explicit method.
+        /// </summary>
+        [TestCase("8306", "9306", "RunThroughInterface")]
+        [TestCase("8307", "9307", "RunThroughExtension")]
+        [TestCase("8308", "9308", "RunThroughIndexer")]
+        public async Task Run_EditedBodyRelyingOnTheHiddenInterface_EmitsOnlyThatEntry(
+            string token,
+            string replacement,
+            string methodName)
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenRelation.cs",
+                    source => ReplaceUniqueFragment(source, token, replacement));
+
+                Assert.That(
+                    result.Output.entries.Select(entry => entry.typeMetadataName + "::" + entry.methodName),
+                    Is.EqualTo(new[] { typeof(HotReloadHiddenRunnerFixture).FullName + "::" + methodName }));
+                Assert.That(FormatSkipped(result), Is.EqualTo("(none)"));
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        /// <summary>
+        /// What: an explicit implementation of an internal interface that the reload was not given,
+        /// whose edit only respells the interface with global::, is reported unchanged under the
+        /// compiled name with no entry and no warning, as it is for a public interface.
+        /// </summary>
+        [Test]
+        public async Task Run_HiddenInterfaceImplementationOnlyRespelledWithGlobal_IsUnchangedWithoutWarnings()
+        {
+            try
+            {
+                TransformWorkerClientResult result = await RunWorkerOnEditedHiddenFixtureAsync(
+                    "HiddenGlobalOnlyRespelled.cs",
+                    source => ReplaceUniqueFragment(
+                        source,
+                        "int IHotReloadHiddenRunner.Run() { return 8301; }",
+                        "int global::" + Namespace + ".IHotReloadHiddenRunner.Run() { return 8301; }"));
+
+                AssertNoEntryFor(result, typeof(HotReloadHiddenRunnerFixture));
+                Assert.That(
+                    result.Output.unchangedMethods
+                        .Where(row => row.typeMetadataName == typeof(HotReloadHiddenRunnerFixture).FullName)
+                        .Select(row => row.methodName),
+                    Does.Contain(Namespace + ".IHotReloadHiddenRunner.Run"));
+                Assert.That(FormatSkipped(result), Is.EqualTo("(none)"));
+                AssertNoDriftOrRemovedMember(result);
+            }
+            catch (System.OperationCanceledException exception)
+            {
+                Assert.Fail("Unexpected cancellation: " + exception);
+            }
+        }
+
+        private static string FixtureTypeOf(string token)
+        {
+            switch (token)
+            {
+                case "8309":
+                case "8312":
+                    return nameof(HotReloadHiddenIndexedFixture);
+                case "8313":
+                    return nameof(HotReloadHiddenInitValueFixture);
+                default:
+                    return nameof(HotReloadHiddenNotifierFixture);
+            }
+        }
+
         private static void AssertNoDriftOrRemovedMember(TransformWorkerClientResult result)
         {
             Assert.That(
@@ -799,7 +1067,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         private static void AssertNoEntryFor(TransformWorkerClientResult result, Type fixtureType)
         {
             Assert.That(
-                result.Output.entries.Where(entry => entry.typeMetadataName == fixtureType.FullName).Select(entry => entry.methodName),
+                result.Output.entries.Where(entry => entry.typeMetadataName == MetadataNameOf(fixtureType)).Select(entry => entry.methodName),
                 Is.Empty,
                 "No entry expected for " + fixtureType.Name);
         }
@@ -820,7 +1088,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string memberName)
         {
             TransformWorkerEntryDto entry = result.Output.entries.FirstOrDefault(candidate =>
-                candidate.typeMetadataName == fixtureType.FullName);
+                candidate.typeMetadataName == MetadataNameOf(fixtureType));
             Assert.That(entry, Is.Not.Null, "Expected an entry for " + fixtureType.Name + ". Skipped=" + FormatSkipped(result));
             Assert.That(entry.methodName, Is.EqualTo(expectedMethodName));
             Assert.That(
@@ -829,6 +1097,12 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                 "The shim name must be a legal identifier taken from the interface member.");
             Assert.That(FormatSkipped(result), Does.Not.Contain(fixtureType.Name), "An emitted method must not also be Skipped.");
             return entry;
+        }
+
+        // Why: the worker names a nested type with '/', as metadata does, and reflection with '+'.
+        private static string MetadataNameOf(Type fixtureType)
+        {
+            return fixtureType.FullName.Replace('+', '/');
         }
 
         private static string FormatSkipped(TransformWorkerClientResult result)
@@ -857,10 +1131,28 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             Func<string, string> edit,
             string[] excludedMethodKeys = null)
         {
+            return await RunWorkerOnEditedFileAsync(FixtureProjectRelativePath, fileName, edit, excludedMethodKeys);
+        }
+
+        // Why a separate file: its internal interfaces live in a file the reload is not given, so
+        // the worker sees them only through the compiled assembly.
+        private static async Task<TransformWorkerClientResult> RunWorkerOnEditedHiddenFixtureAsync(
+            string fileName,
+            Func<string, string> edit)
+        {
+            return await RunWorkerOnEditedFileAsync(HiddenFixtureProjectRelativePath, fileName, edit, null);
+        }
+
+        private static async Task<TransformWorkerClientResult> RunWorkerOnEditedFileAsync(
+            string fixtureProjectRelativePath,
+            string fileName,
+            Func<string, string> edit,
+            string[] excludedMethodKeys)
+        {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
             string fixturePath = Path.Combine(
                 projectRoot,
-                FixtureProjectRelativePath.Replace('/', Path.DirectorySeparatorChar));
+                fixtureProjectRelativePath.Replace('/', Path.DirectorySeparatorChar));
             string onDisk = File.ReadAllText(fixturePath);
             string editedSource = edit(onDisk);
             Assert.That(editedSource, Is.Not.EqualTo(onDisk), "Precondition: snapshot must differ.");
@@ -870,7 +1162,11 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
             string sourcePath = Path.Combine(directory, fileName);
             File.WriteAllText(sourcePath, editedSource);
 
-            TransformWorkerClientResult result = await RunWorkerOnSourceAsync(sourcePath, onDisk, excludedMethodKeys);
+            TransformWorkerClientResult result = await RunWorkerOnSourceAsync(
+                sourcePath,
+                onDisk,
+                excludedMethodKeys,
+                fixtureProjectRelativePath);
             Assert.That(result.Success, Is.True, result.ErrorMessage);
             return result;
         }
@@ -878,7 +1174,8 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
         private static async Task<TransformWorkerClientResult> RunWorkerOnSourceAsync(
             string sourcePath,
             string snapshotSource,
-            string[] excludedMethodKeys = null)
+            string[] excludedMethodKeys = null,
+            string projectRelativePath = FixtureProjectRelativePath)
         {
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
             string targetDllPath = Path.Combine(projectRoot, "Library", "ScriptAssemblies", TestAssemblyName + ".dll");
@@ -924,7 +1221,7 @@ namespace io.github.hatayama.UnityCliLoop.Tests.Editor.HotReload
                     new TransformWorkerSourceDto
                     {
                         sourcePath = sourcePath,
-                        projectRelativePath = FixtureProjectRelativePath,
+                        projectRelativePath = projectRelativePath,
                         snapshotSource = snapshotSource
                     }
                 },

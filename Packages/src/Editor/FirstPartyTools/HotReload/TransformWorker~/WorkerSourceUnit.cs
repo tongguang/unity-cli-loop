@@ -44,6 +44,10 @@ internal sealed class WorkerSourceUnit
 
     public SemanticModel SemanticModel { get; set; }
 
+    // The binding compilation as the patch's compile sees it (every metadata member imported,
+    // accessibility ignored), shared by every unit of the run. Only the hidden-member guard asks it.
+    public PatchBindingCompilation PatchBinding { get; set; }
+
     // The verified mapping the binding trees were built with, so the emit steps can ask whether a
     // type is served from a retained artifact without threading it through every signature.
     // Empty for every run that has no artifact.
@@ -105,6 +109,12 @@ internal sealed class WorkerSourceUnit
     // pipeline loads them: a pipeline that never does must keep skipping partial types rather than
     // bind them against a type that is missing those parts.
     public PartialTypeParts PartialTypeParts { get; set; } = PartialTypeParts.Unverified;
+
+    // What every explicit interface implementation of the run implements. Why the declared
+    // members alone until a pipeline resolves the rest: a pipeline that never does keeps reading
+    // an implementation of an inaccessible interface as implementing nothing, as before.
+    public ExplicitImplementationMatcher ExplicitImplementations { get; set; } =
+        new ExplicitImplementationMatcher(new Dictionary<ISymbol, ISymbol>());
 
     public CompiledMemberKindChangeWarnings.SyntaxKeys KindChangeSyntaxKeys { get; set; }
 

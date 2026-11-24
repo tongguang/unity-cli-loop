@@ -306,6 +306,20 @@ with none skipped. A live compile after a script edit reported zero errors and
 warnings and a 3.97-second domain reload. The next compile reported that it
 skipped the reload and returned a null `DomainReloadSeconds`.
 
+The import through upstream `111c59af` (hot-reload fixes #3620, #3622, #3623,
+#3626, and #3629, plus the dispatcher terminal dependency update #3563) retains
+Tuanjie identities and the explicit release workflow. On Windows with Tuanjie
+1.9.1 in Debug optimization, `scripts/check-tuanjie.ps1` compiled with zero
+errors and warnings and passed all 547 cases across the nine affected EditMode
+test classes, with none skipped. Coverage includes added generic calls, ref
+extension calls in closures and async bodies, field references across awaits,
+explicit implementations of internal interfaces from omitted files, keyword
+namespace and nested type names, hidden overload selection, and apply/revert.
+Newly imported async tests fail explicitly on unexpected cancellation. The full Go CLI checks and all four platform builds passed. Skill
+size, generated tool catalog, file length, and C# complexity checks passed.
+The upstream release-PR checks change (#3621) is excluded because this fork
+publishes through the explicit Release workflow.
+
 `scripts/check-tuanjie.ps1` checks this project against the Tuanjie Editor that
 already has it open. It confirms the Editor can take a command, compiles the
 project and fails on any error or warning, then runs the `CliVersionComparerTests`
