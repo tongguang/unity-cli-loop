@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.28.1](https://github.com/tongguang/unity-cli-loop/compare/v3.28.0...v3.28.1) (2026-11-24)
+
+- fix: merge upstream hot reload binding fixes for Tuanjie (8f998663)
+
 ## [3.28.0](https://github.com/tongguang/unity-cli-loop/compare/v3.27.2...v3.28.0) (2026-11-23)
 
 - feat: bring upstream hot reload and compile improvements to Tuanjie (7811e4bb)
