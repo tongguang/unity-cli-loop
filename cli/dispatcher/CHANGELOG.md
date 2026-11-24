@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.17.2](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.17.1...dispatcher-v3.17.2) (2026-11-24)
+
+- fix: merge upstream hot reload binding fixes for Tuanjie (8f998663)
+
 ## [3.17.1](https://github.com/tongguang/unity-cli-loop/compare/dispatcher-v3.17.0...dispatcher-v3.17.1) (2026-11-18)
 
 - fix: merge upstream command suggestions for Tuanjie (a787a8a9)
